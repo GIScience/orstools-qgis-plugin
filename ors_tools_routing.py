@@ -300,12 +300,19 @@ class routing:
                 
                 # Read total time
                 time_path = access_path.find("xls:RouteSummary/xls:TotalTime", self.ns)
-                time_list = list(reversed(re.split('H|M', time_path.text[2:-1]))) # Split with 3 characters into sec, mins, hours
-                while len(time_list) < 3:
-                    time_list.append('0')
-                secs, mins, hours = [int(x) for x in time_list]
+                if time_path.text[:2] == 'PT':
+                    time_list = list(reversed(re.split('H|M', time_path.text[2:-1]))) # Split with 3 characters into sec, mins, hours
+                    while len(time_list) < 3:
+                        time_list.append('0')
+                    secs, mins, hours = [int(x) for x in time_list]
+                else:
+                    time_list = list(reversed(re.split('DT|H|M', time_path.text[1:-1])))
+                    while len(time_list) < 4:
+                        time_list.append('0')
+                    secs, mins, hours, days = [int(x) for x in time_list]
+                    hours += days*24
                                      
-                # Read total distance                             
+                # Read total distance
                 distance = float(access_path.find("xls:RouteSummary/xls:TotalDistance", self.ns).get("value"))
                 
                 # Read X and Y
