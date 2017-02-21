@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1077,20 +1077,6 @@
        <string>Map Coordinates</string>
       </property>
      </widget>
-     <zorder>add_end</zorder>
-     <zorder>end_radio_layer</zorder>
-     <zorder>end_layer</zorder>
-     <zorder>label_17</zorder>
-     <zorder>end_radio_map</zorder>
-     <zorder>end_layer_id</zorder>
-     <zorder>add_end_button</zorder>
-     <zorder>start_radio_layer</zorder>
-     <zorder>start_layer</zorder>
-     <zorder>start_layer_id</zorder>
-     <zorder>add_start</zorder>
-     <zorder>add_start_button</zorder>
-     <zorder>label_15</zorder>
-     <zorder>start_radio_map</zorder>
     </widget>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
@@ -1120,7 +1106,7 @@
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[2]&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>1 on 1</string>
+       <string>Row by row</string>
       </property>
       <property name="checked">
        <bool>true</bool>
@@ -1132,9 +1118,9 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>150</x>
         <y>20</y>
-        <width>121</width>
+        <width>141</width>
         <height>20</height>
        </rect>
       </property>
@@ -1142,7 +1128,7 @@
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[2]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[2]&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>Many on Many</string>
+       <string>All rows by all rows</string>
       </property>
      </widget>
     </widget>
@@ -1164,19 +1150,6 @@
       <string>Long,Lat</string>
      </property>
     </widget>
-    <zorder>label_9</zorder>
-    <zorder>label_10</zorder>
-    <zorder>label_12</zorder>
-    <zorder>label_13</zorder>
-    <zorder>mode_travel</zorder>
-    <zorder>mode_routing</zorder>
-    <zorder>speed_max</zorder>
-    <zorder>add_via_button</zorder>
-    <zorder>groupBox</zorder>
-    <zorder>groupBox_2</zorder>
-    <zorder>groupBox_3</zorder>
-    <zorder>add_end</zorder>
-    <zorder>add_via</zorder>
    </widget>
   </widget>
   <widget class="QLabel" name="label_6">
