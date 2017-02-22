@@ -328,7 +328,7 @@ class routing:
                                         secs,
                                         self.mode_travel,
                                         self.mode_routing,
-                                        #self.speed_max,
+                                        self.speed_max,
                                         route_start_y,
                                         route_start_x,
                                         route_end_y,
