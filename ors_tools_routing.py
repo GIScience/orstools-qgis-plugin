@@ -36,6 +36,7 @@ class routing:
         self.dlg.mode_travel.addItem('Car')
         self.dlg.mode_travel.addItem('Bicycle')
         self.dlg.mode_travel.addItem('Pedestrian')
+        self.dlg.mode_travel.addItem('HeavyVehicle')
         self.dlg.mode_routing.addItem('Fastest')
         self.dlg.mode_routing.addItem('Shortest')
         
@@ -193,7 +194,7 @@ class routing:
         layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
         layer_out_prov.addAttributes([QgsField("MODE", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("PREF", QVariant.String)])
-        layer_out_prov.addAttributes([QgsField("SPEED_MAX", QVariant.String)])
+        #layer_out_prov.addAttributes([QgsField("SPEED_MAX", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_LAT", QVariant.Double)])
         layer_out_prov.addAttributes([QgsField("FROM_LONG", QVariant.Double)])
         layer_out_prov.addAttributes([QgsField("TO_LAT", QVariant.Double)])
@@ -266,8 +267,6 @@ class routing:
         
         for i, route in enumerate(route_features):
             # Skip route if start and end are identical
-            progress.setValue(i)
-            
             if route[0] == route[1]:
                 continue
             else:
@@ -278,7 +277,9 @@ class routing:
                                                     route[1],
                                                     self.mode_travel,
                                                     self.mode_routing,
-                                                    self.speed_max)
+                                                    self.speed_max
+                                                    )
+                print req
                 if route_via != "":
                     req += "&via={}".format(route_via)
                     
@@ -327,7 +328,7 @@ class routing:
                                         secs,
                                         self.mode_travel,
                                         self.mode_routing,
-                                        self.speed_max,
+                                        #self.speed_max,
                                         route_start_y,
                                         route_start_x,
                                         route_end_y,
@@ -336,6 +337,8 @@ class routing:
                                         route_ids[i][1]]) 
                 
                 layer_out_prov.addFeatures([feat_out])
+                
+                progress.setValue(i)
         layer_out.updateExtents()
 
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
