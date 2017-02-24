@@ -301,17 +301,20 @@ class routing:
                 
                 # Read total time
                 time_path = access_path.find("xls:RouteSummary/xls:TotalTime", self.ns)
-                if time_path.text[:2] == 'PT':
-                    time_list = list(reversed(re.split('H|M', time_path.text[2:-1]))) # Split with 3 characters into sec, mins, hours
-                    while len(time_list) < 3:
-                        time_list.append('0')
-                    secs, mins, hours = [int(x) for x in time_list]
-                else:
-                    time_list = list(reversed(re.split('DT|H|M', time_path.text[1:-1])))
-                    while len(time_list) < 4:
-                        time_list.append('0')
-                    secs, mins, hours, days = [int(x) for x in time_list]
-                    hours += days*24
+                time_text = time_path.text
+                if 'D' not in time_text:
+                    time_text = re.sub(r'(P)', r'P0D', time_text)
+                if 'H' not in time_text:
+                    time_text = re.sub(r'(T)', r'T0H', time_text)
+                if 'M' not in time_text:
+                    time_text = re.sub(r'(H)', r'H0M', time_text)
+                
+                time_list = list(reversed(re.split('DT|H|M', time_text[1:-1])))
+                while len(time_list) < 4:
+                    time_list.append('0')
+                secs, mins, hours, days = [int(x) for x in time_list]
+                hours += (days*24)
+                #hours = "{0:.3f}".format(hours)
                                      
                 # Read total distance
                 distance = float(access_path.find("xls:RouteSummary/xls:TotalDistance", self.ns).get("value"))
@@ -328,7 +331,6 @@ class routing:
                                         secs,
                                         self.mode_travel,
                                         self.mode_routing,
-                                        self.speed_max,
                                         route_start_y,
                                         route_start_x,
                                         route_end_y,
