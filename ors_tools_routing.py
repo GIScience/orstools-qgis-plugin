@@ -73,8 +73,11 @@ class routing:
         self.dlg.add_start_button.clicked.connect(self.initMapTool)
         self.dlg.add_end_button.clicked.connect(self.initMapTool)
         self.dlg.add_via_button.clicked.connect(self.initMapTool)
+        self.dlg.add_via_button_clear.clicked.connect(self.clearVia)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
     
+    def clearVia(self):
+        self.dlg.add_via.setText("Long,Lat")
     
     def startPopBox(self):
         if self.dlg.start_radio_layer.isChecked():
