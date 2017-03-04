@@ -345,9 +345,11 @@ class routing:
                     layer_out_prov.addFeatures([feat_out])
                     
                     progress.setValue(i)    
-                except AttributeError:
+                except (AttributeError, TypeError):
                     msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
                     qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+                    return
+                
         layer_out.updateExtents()
 
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)

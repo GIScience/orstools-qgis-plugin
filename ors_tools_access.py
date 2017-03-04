@@ -175,20 +175,26 @@ class accessAnalysis:
                 feat_out.setGeometry(QgsGeometry.fromPolygon([coord_ext_list] + coord_int_list))
                 feat_list.append(feat_out)
                 isochrone_list.append(float(isochrone.get("time"))/60)
-        except AttributeError:
+        except (AttributeError, TypeError):
             msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
             qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+            return
         
         return feat_list, isochrone_list
 
         
     def pointAnalysis(self, point):
-        point_geometry = QgsGeometry.fromPoint(point)
-        feat_list, isochrone_list = self.accRequest(point_geometry)
-        
-        _point_geocode = ors_tools_geocode.Geocode(self.dlg, self.api_key)
-        loc_dict = _point_geocode.reverseGeocode(point_geometry)
+        try:
+            point_geometry = QgsGeometry.fromPoint(point)
+            feat_list, isochrone_list = self.accRequest(point_geometry)
             
+            _point_geocode = ors_tools_geocode.Geocode(self.dlg, self.api_key)
+            loc_dict = _point_geocode.reverseGeocode(point_geometry)
+        except (AttributeError, TypeError):
+            msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
+            qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+            return
+        
         out_str = u"Long: {0:.3f}, Lat:{1:.3f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
                                                         loc_dict.get('Lat', ""),
                                                         loc_dict.get('MUNICIPALI', "NA"),
