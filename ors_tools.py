@@ -185,7 +185,7 @@ class ORStools:
         icon_path = ':/plugins/ORStools/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Gimme'),
+            text=self.tr(u'ORS Tools'),
             callback=self.run,
             parent=self.iface.mainWindow())
         

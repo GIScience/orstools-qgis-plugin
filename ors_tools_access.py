@@ -140,40 +140,44 @@ class accessAnalysis:
         isochrone_list = []
         feat_list = []
 
-        for isochrone in access_path.findall("aas:Isochrone", self.ns):
-            feat_out = QgsFeature()
-            
-            coord_ext_list = []
-            coord_int_list = []
-            
-            # First find the exterior ring
-            for coords_ext in isochrone.findall("aas:IsochroneGeometry/"
+        try:
+            for isochrone in access_path.findall("aas:Isochrone", self.ns):
+                feat_out = QgsFeature()
+                
+                coord_ext_list = []
+                coord_int_list = []
+                
+                # First find the exterior ring
+                for coords_ext in isochrone.findall("aas:IsochroneGeometry/"
+                                                "gml:Polygon/"
+                                                "gml:exterior/"
+                                                "gml:LinearRing/"
+                                                "gml:pos",
+                                                self.ns):
+                    coords_ext_tuple = tuple([float(coord) for coord in coords_ext.text.split(" ")])
+                    qgis_coords_ext = QgsPoint(coords_ext_tuple[0], coords_ext_tuple[1])
+                    coord_ext_list.append(qgis_coords_ext)
+                
+                # Then find all interior rings
+                for ring_int in isochrone.findall("aas:IsochroneGeometry/"
                                             "gml:Polygon/"
-                                            "gml:exterior/"
-                                            "gml:LinearRing/"
+                                            "gml:interior",
+                                            self.ns):
+                    int_poly = []
+                    for coords_int in ring_int.findall("gml:LinearRing/"
                                             "gml:pos",
                                             self.ns):
-                coords_ext_tuple = tuple([float(coord) for coord in coords_ext.text.split(" ")])
-                qgis_coords_ext = QgsPoint(coords_ext_tuple[0], coords_ext_tuple[1])
-                coord_ext_list.append(qgis_coords_ext)
-            
-            # Then find all interior rings
-            for ring_int in isochrone.findall("aas:IsochroneGeometry/"
-                                        "gml:Polygon/"
-                                        "gml:interior",
-                                        self.ns):
-                int_poly = []
-                for coords_int in ring_int.findall("gml:LinearRing/"
-                                        "gml:pos",
-                                        self.ns):
-                    coords_int_tuple = tuple([float(coord) for coord in coords_int.text.split(" ")])
-                    qgis_coords_int = QgsPoint(coords_int_tuple[0], coords_int_tuple[1])
-                    int_poly.append(qgis_coords_int)
-                coord_int_list.append(int_poly)
-                    
-            feat_out.setGeometry(QgsGeometry.fromPolygon([coord_ext_list] + coord_int_list))
-            feat_list.append(feat_out)
-            isochrone_list.append(float(isochrone.get("time"))/60)
+                        coords_int_tuple = tuple([float(coord) for coord in coords_int.text.split(" ")])
+                        qgis_coords_int = QgsPoint(coords_int_tuple[0], coords_int_tuple[1])
+                        int_poly.append(qgis_coords_int)
+                    coord_int_list.append(int_poly)
+                        
+                feat_out.setGeometry(QgsGeometry.fromPolygon([coord_ext_list] + coord_int_list))
+                feat_list.append(feat_out)
+                isochrone_list.append(float(isochrone.get("time"))/60)
+        except AttributeError:
+            msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
+            qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
         
         return feat_list, isochrone_list
 

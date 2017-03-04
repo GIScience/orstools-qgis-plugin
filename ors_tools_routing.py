@@ -273,77 +273,81 @@ class routing:
             if route[0] == route[1]:
                 continue
             else:
-                # Create URL
-                req = "{}api_key={}&start={}&end={}&routepref={}&weighting={}&maxspeed={}&instructions=False".format(self.url, 
-                                                    self.api_key, 
-                                                    route[0],
-                                                    route[1],
-                                                    self.mode_travel,
-                                                    self.mode_routing,
-                                                    self.speed_max
-                                                    )
-                print req
-                if route_via != "":
-                    req += "&via={}".format(route_via)
+                try:
+                    # Create URL
+                    req = "{}api_key={}&start={}&end={}&routepref={}&weighting={}&maxspeed={}&instructions=False".format(self.url, 
+                                                        self.api_key, 
+                                                        route[0],
+                                                        route[1],
+                                                        self.mode_travel,
+                                                        self.mode_routing,
+                                                        self.speed_max
+                                                        )
+                    print req
+                    if route_via != "":
+                        req += "&via={}".format(route_via)
+                        
+                    # Get response from API and read into element tree
+                    response = requests.get(req)
+                    root = ET.fromstring(response.content)
+                    access_path = root.find("xls:Response/"
+                                            "xls:DetermineRouteResponse",
+                                            self.ns)
                     
-                # Get response from API and read into element tree
-                response = requests.get(req)
-                root = ET.fromstring(response.content)
-                access_path = root.find("xls:Response/"
-                                        "xls:DetermineRouteResponse",
-                                        self.ns)
-                
-                feat_out = QgsFeature()
-                
-                # Read all coordinates
-                coords_list = []
-                for coords in access_path.findall("xls:RouteGeometry/gml:LineString/gml:pos", self.ns):
-                    coords_tuple = tuple([float(coord) for coord in coords.text.split(" ")])
-                    qgis_coords = QgsPoint(coords_tuple[0], coords_tuple[1])
-                    coords_list.append(qgis_coords)
-                
-                # Read total time
-                time_path = access_path.find("xls:RouteSummary/xls:TotalTime", self.ns)
-                time_text = time_path.text
-                if 'D' not in time_text:
-                    time_text = re.sub(r'(P)', r'P0D', time_text)
-                if 'H' not in time_text:
-                    time_text = re.sub(r'(T)', r'T0H', time_text)
-                if 'M' not in time_text:
-                    time_text = re.sub(r'(H)', r'H0M', time_text)
-                
-                time_list = list(reversed(re.split('DT|H|M', time_text[1:-1])))
-                while len(time_list) < 4:
-                    time_list.append('0')
-                secs, mins, hours, days = [int(x) for x in time_list]
-                hours += (days*24)
-                #hours = "{0:.3f}".format(hours)
-                                     
-                # Read total distance
-                distance = float(access_path.find("xls:RouteSummary/xls:TotalDistance", self.ns).get("value"))
-                
-                # Read X and Y
-                route_start_x, route_start_y = [float(coord) for coord in route[0].split(",")]
-                route_end_x, route_end_y = [float(coord) for coord in route[1].split(",")]
+                    feat_out = QgsFeature()
                     
-                # Set feature geometry and attributes
-                feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
-                feat_out.setAttributes([distance,
-                                        hours,
-                                        mins,
-                                        secs,
-                                        self.mode_travel,
-                                        self.mode_routing,
-                                        route_start_y,
-                                        route_start_x,
-                                        route_end_y,
-                                        route_end_x,
-                                        route_ids[i][0],
-                                        route_ids[i][1]]) 
-                
-                layer_out_prov.addFeatures([feat_out])
-                
-                progress.setValue(i)
+                    # Read all coordinates
+                    coords_list = []
+                    for coords in access_path.findall("xls:RouteGeometry/gml:LineString/gml:pos", self.ns):
+                        coords_tuple = tuple([float(coord) for coord in coords.text.split(" ")])
+                        qgis_coords = QgsPoint(coords_tuple[0], coords_tuple[1])
+                        coords_list.append(qgis_coords)
+                    
+                    # Read total time
+                    time_path = access_path.find("xls:RouteSummary/xls:TotalTime", self.ns)
+                    time_text = time_path.text
+                    if 'D' not in time_text:
+                        time_text = re.sub(r'(P)', r'P0D', time_text)
+                    if 'H' not in time_text:
+                        time_text = re.sub(r'(T)', r'T0H', time_text)
+                    if 'M' not in time_text:
+                        time_text = re.sub(r'(H)', r'H0M', time_text)
+                    
+                    time_list = list(reversed(re.split('DT|H|M', time_text[1:-1])))
+                    while len(time_list) < 4:
+                        time_list.append('0')
+                    secs, mins, hours, days = [int(x) for x in time_list]
+                    hours += (days*24)
+                    #hours = "{0:.3f}".format(hours)
+                                         
+                    # Read total distance
+                    distance = float(access_path.find("xls:RouteSummary/xls:TotalDistance", self.ns).get("value"))
+                    
+                    # Read X and Y
+                    route_start_x, route_start_y = [float(coord) for coord in route[0].split(",")]
+                    route_end_x, route_end_y = [float(coord) for coord in route[1].split(",")]
+                        
+                    # Set feature geometry and attributes
+                    feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
+                    feat_out.setAttributes([distance,
+                                            hours,
+                                            mins,
+                                            secs,
+                                            self.mode_travel,
+                                            self.mode_routing,
+                                            route_start_y,
+                                            route_start_x,
+                                            route_end_y,
+                                            route_end_x,
+                                            route_ids[i][0],
+                                            route_ids[i][1]]) 
+                    
+                    layer_out_prov.addFeatures([feat_out])
+                    
+                    progress.setValue(i)    
+                except AttributeError:
+                    msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
+                    qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
         layer_out.updateExtents()
 
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
