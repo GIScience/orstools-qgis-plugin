@@ -7,9 +7,9 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=ORS Tools
+name=OSM Tools
 qgisMinimumVersion=2.0
-description=ORS Tools provides access to the routing functions of OpenRouteService.org, based on OSM. The tool set includes basic routing and calculation of accessibility areas, both either interactive or from QGIS point files.
+description=OSM Tools provides access to the most of the functions of OpenRouteService.org, based on OpenStreetMap. The tool set includes basic routing and calculation of accessibility areas, both either interactive or from QGIS point files.
 version=0.1
 author=Nils Nolde
 email=nilsnolde@gmail.com
@@ -26,7 +26,7 @@ repository=https://github.com/nilsnolde/ORStools.git
 changelog=2017/02/21 v.0.1 beta version
 
 # Tags are comma separated with spaces allowed
-tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility area
+tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility area, route
 
 homepage=https://github.com/nilsnolde/ORStools
 category=Plugins
