@@ -191,7 +191,7 @@ class OSMtools:
         
         self.dlg.api_key.textChanged.connect(self.keyWriter)
         
-        self.dlg.key_order.setText("<a href = 'mailto:openrouteservice@geog.uni-heidelberg.de?subject=OSM API key request'>Get Key!</a>") 
+        self.dlg.key_order.setText("<a href = 'https://developers.openrouteservice.org/portal/apis/'>Get Key!</a>") 
         self.dlg.key_order.connect(self.dlg.key_order, SIGNAL("linkActivated(QString)"), self.OpenURL) 
         self.dlg.header_2.linkActivated.connect(self.OpenURL)
         self.dlg.header_3.linkActivated.connect(self.OpenURL)
@@ -217,7 +217,7 @@ class OSMtools:
         self.access_anal = osm_tools_access.accessAnalysis(self.dlg)
         self.route_anal = osm_tools_routing.routing(self.dlg)
         
-        self.dlg.setFixedSize(self.dlg.size())  
+        self.dlg.setFixedSize(self.dlg.size())
         
         self.dlg.show()
         

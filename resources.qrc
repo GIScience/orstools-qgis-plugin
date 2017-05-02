@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/ORStools" >
+    <qresource prefix="/plugins/OSMtools" >
         <file>icon.png</file>
     </qresource>
 </RCC>

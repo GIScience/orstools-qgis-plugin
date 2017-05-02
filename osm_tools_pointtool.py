@@ -54,8 +54,7 @@ class PointTool(QgsMapTool):
     def activate(self):
         QApplication.setOverrideCursor(self.cursor)
         #self.canvas.setCursor(self.cursor)
-        
-        print "WTFe"
+
 
     def deactivate(self):
         pass

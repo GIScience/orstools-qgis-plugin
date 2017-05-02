@@ -13,15 +13,13 @@ from qgis.gui import *
 import qgis.utils
 
 import requests
+import json
 import xml.etree.ElementTree as ET
 
 class Geocode:
     def __init__(self, dlg, api_key):
         self.dlg = dlg
-        self.url = r"http://openls.geog.uni-heidelberg.de/geocode?"
-        self.ns = {'gml': 'http://www.opengis.net/gml',
-                  'xls': "http://www.opengis.net/xls",
-                  'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
+        self.url = r"https://api.openrouteservice.org/geocoding?"
                   
         # API parameters
         self.api_key = api_key
@@ -30,35 +28,24 @@ class Geocode:
         
     def reverseGeocode(self, point_in):
         x, y = point_in.asPoint()
-        req = "{}api_key={}&pos={} {}".format(self.url, 
+        req = "{}lang=en&api_key={}&location={},{}".format(self.url, 
                                             self.api_key, 
                                             x, 
                                             y)
         response = requests.get(req)
-        root = ET.fromstring(response.content)
-        access_path = root.find("xls:Response/"
-                                "xls:ReverseGeocodeResponse/"
-                                "xls:ReverseGeocodedLocation",
-                                self.ns)
+        root = json.loads(response.text)
         
         loc_place_dict = dict()
         
-        pos = access_path.find("gml:Point/gml:pos", self.ns).text
-        x, y  = pos.split(" ")
-        loc_place_dict['Lon'] = float(x)
-        loc_place_dict['Lat'] = float(y)
-        loc_place_dict['DIST_INPUT'] = access_path.find("xls:SearchCentreDistance", self.ns).get('value')
-        loc_list = access_path.findall("xls:StreetAddress/xls:Building", self.ns)
-        for element in loc_list:
-            loc_place_dict[element.keys()[0][:10].upper()] = element.get(element.keys()[0], "")
-        loc_list = access_path.findall("xls:StreetAddress/xls:PostalCode", self.ns)
-        for element in loc_list:
-            loc_place_dict['POSTALCODE'] = element.text
-        loc_list = access_path.findall("xls:Address/xls:StreetAddress/xls:Street", self.ns)
-        for element in loc_list:
-            loc_place_dict[element.keys()[0][:10].upper()] = element.get(element.keys()[0], "")
-        loc_list = access_path.findall("xls:Address/xls:Place", self.ns)
-        for element in loc_list:
-            loc_place_dict[element.get('type')[:10].upper()] = unicode(element.text)
+        x, y = root['features'][0]['geometry']['coordinates']
+        loc_place_dict['Lon'] = x
+        loc_place_dict['Lat'] = y
+        loc_place_dict['COUNTRY'] = root['features'][0]['properties'].get('country', None)
+        loc_place_dict['STATE'] = root['features'][0]['properties'].get('state', None)
+        loc_place_dict['CITY'] = root['features'][0]['properties'].get('city', None)
+        loc_place_dict['POSTALCODE'] = root['features'][0]['properties'].get('postal_code', None)
+        loc_place_dict['STREET'] = root['features'][0]['properties'].get('street', None)
+        loc_place_dict['NUMBER'] = root['features'][0]['properties'].get('number', None)
+        loc_place_dict['NAME'] = root['features'][0]['properties'].get('name', None)
                            
         return loc_place_dict

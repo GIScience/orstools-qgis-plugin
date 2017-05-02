@@ -13,7 +13,7 @@ import qgis.utils
 import processing
 
 import requests
-import xml.etree.ElementTree as ET
+import json
 import os.path
 
 import osm_tools       
@@ -23,21 +23,22 @@ import osm_tools_pointtool
 class accessAnalysis:
     def __init__(self, dlg):
         self.dlg = dlg
-        self.url = r"http://openls.geog.uni-heidelberg.de/analyse?"
-        self.ns = {'gml': 'http://www.opengis.net/gml',
-                  'aas': "http://www.geoinform.fh-mainz.de/aas",
-                  'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
+        self.url = r"https://api.openrouteservice.org/isochrones?"
                   
         self.mapTool = None
 
         self.dlg.mode.clear()
         self.dlg.layer.clear()
         self.dlg.method.clear()  
-        self.dlg.mode.addItem('Car')
-        self.dlg.mode.addItem('Bicycle')
-        self.dlg.mode.addItem('Pedestrian')      
-        self.dlg.method.addItem('RecursiveGrid')
-        self.dlg.method.addItem('TIN') 
+        self.dlg.mode.addItem('driving-car')
+        self.dlg.mode.addItem('driving-hgv')
+        self.dlg.mode.addItem('cycling-regular')
+        self.dlg.mode.addItem('cycling-road')
+        self.dlg.mode.addItem('cycling-safe')
+        self.dlg.mode.addItem('cycling-mountain')
+        self.dlg.mode.addItem('cycling-tour')
+        self.dlg.mode.addItem('foot-walking')
+        self.dlg.mode.addItem('foot-hiking')
         
         for layer in qgis.utils.iface.legendInterface().layers():
             layerType = layer.type()
@@ -49,10 +50,10 @@ class accessAnalysis:
         
         # API parameters
         self.api_key = self.dlg.api_key.text()
-        self.iso_max = self.dlg.iso_max.value()
+        self.iso_max = self.dlg.iso_max.value() * 60
         self.iso_int = self.dlg.iso_int.value() * 60
         self.iso_mode = self.dlg.mode.currentText()
-        self.iso_method = self.dlg.method.currentText()
+        self.iso_range_type = 'time'
         self.iface = qgis.utils.iface
         
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -120,20 +121,19 @@ class accessAnalysis:
         #geometry_in = QgsGeometry.fromPoint(point_in)
         x, y = point_in.asPoint()
         
+        
         #TODO: 'method' does not seem to be available over get()?! Ask GIScience team
-        req = "{}api_key={}&position={},{}&minutes={}&interval={}&routePreference={}".format(self.url, 
+        req = "{}api_key={}&locations={},{}&range_type={}&range={}&interval={}&profile={}&location_type=start".format(self.url, 
                                                                 self.api_key, 
                                                                 x, 
                                                                 y,
+                                                                self.iso_range_type,
                                                                 self.iso_max,
                                                                 self.iso_int,
                                                                 self.iso_mode)
+        print req
         response = requests.get(req)
-        root = ET.fromstring(response.content)
-        access_path = root.find("aas:Response/"
-                                "aas:AccessibilityResponse/"
-                                "aas:AccessibilityGeometry",
-                                self.ns)
+        root = json.loads(response.text)
         
         QApplication.restoreOverrideCursor()
         
@@ -141,40 +141,19 @@ class accessAnalysis:
         feat_list = []
 
         try:
-            for isochrone in access_path.findall("aas:Isochrone", self.ns):
+            for isochrone in root['features']:
                 feat_out = QgsFeature()
                 
-                coord_ext_list = []
-                coord_int_list = []
+                coord_list = []
                 
                 # First find the exterior ring
-                for coords_ext in isochrone.findall("aas:IsochroneGeometry/"
-                                                "gml:Polygon/"
-                                                "gml:exterior/"
-                                                "gml:LinearRing/"
-                                                "gml:pos",
-                                                self.ns):
-                    coords_ext_tuple = tuple([float(coord) for coord in coords_ext.text.split(" ")])
-                    qgis_coords_ext = QgsPoint(coords_ext_tuple[0], coords_ext_tuple[1])
-                    coord_ext_list.append(qgis_coords_ext)
-                
-                # Then find all interior rings
-                for ring_int in isochrone.findall("aas:IsochroneGeometry/"
-                                            "gml:Polygon/"
-                                            "gml:interior",
-                                            self.ns):
-                    int_poly = []
-                    for coords_int in ring_int.findall("gml:LinearRing/"
-                                            "gml:pos",
-                                            self.ns):
-                        coords_int_tuple = tuple([float(coord) for coord in coords_int.text.split(" ")])
-                        qgis_coords_int = QgsPoint(coords_int_tuple[0], coords_int_tuple[1])
-                        int_poly.append(qgis_coords_int)
-                    coord_int_list.append(int_poly)
+                for coords in isochrone['geometry']['coordinates'][0]:
+                    qgis_coords = QgsPoint(coords[0], coords[1])
+                    coord_list.append(qgis_coords)
                         
-                feat_out.setGeometry(QgsGeometry.fromPolygon([coord_ext_list] + coord_int_list))
+                feat_out.setGeometry(QgsGeometry.fromPolygon([coord_list]))
                 feat_list.append(feat_out)
-                isochrone_list.append(float(isochrone.get("time"))/60)
+                isochrone_list.append(isochrone['properties']['value']/60.0)
         except (AttributeError, TypeError):
             msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
             qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
@@ -197,8 +176,8 @@ class accessAnalysis:
         
         out_str = u"Long: {0:.3f}, Lat:{1:.3f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
                                                         loc_dict.get('Lat', ""),
-                                                        loc_dict.get('MUNICIPALI', "NA"),
-                                                        loc_dict.get('COUNTRYSUB', "NA"),
+                                                        loc_dict.get('CITY', "NA"),
+                                                        loc_dict.get('STATE', "NA"),
                                                         loc_dict.get('COUNTRY', "NA")
                                                         )
         self.dlg.access_text.setText(out_str)
@@ -214,13 +193,12 @@ class accessAnalysis:
         layer_out_point_prov = layer_out_point.dataProvider()
         layer_out_point_prov.addAttributes([QgsField("LAT", QVariant.String)])
         layer_out_point_prov.addAttributes([QgsField("LONG", QVariant.String)])
-        layer_out_point_prov.addAttributes([QgsField("DIST_INPUT", QVariant.String)])
-        layer_out_point_prov.addAttributes([QgsField("BULIDINGNA", QVariant.String)])
-        layer_out_point_prov.addAttributes([QgsField("OFFICIALNA", QVariant.String)])
+        layer_out_point_prov.addAttributes([QgsField("NAME", QVariant.String)])
+        layer_out_point_prov.addAttributes([QgsField("STREET", QVariant.String)])
         layer_out_point_prov.addAttributes([QgsField("NUMBER", QVariant.String)])
         layer_out_point_prov.addAttributes([QgsField("POSTALCODE", QVariant.String)])
-        layer_out_point_prov.addAttributes([QgsField("MUNICIPALI", QVariant.String)])
-        layer_out_point_prov.addAttributes([QgsField("COUNTRYSUB", QVariant.String)])
+        layer_out_point_prov.addAttributes([QgsField("CITY", QVariant.String)])
+        layer_out_point_prov.addAttributes([QgsField("STATE", QVariant.String)])
         layer_out_point_prov.addAttributes([QgsField("COUNTRY", QVariant.String)])
         layer_out_point.updateFields()
         
@@ -229,13 +207,12 @@ class accessAnalysis:
         point_out.setGeometry(point_geometry)
         point_out.setAttributes([loc_dict.get("Lat", None),
                                 loc_dict.get("Lon", None),
-                                loc_dict.get("DIST_INPUT", None),
-                                loc_dict.get("BULIDINGNA", None),
-                                loc_dict.get("OFFICIALNA", None),
+                                loc_dict.get("NAME", None),
+                                loc_dict.get("STREET", None),
                                 loc_dict.get("NUMBER", None),
                                 loc_dict.get("POSTALCODE", None),
-                                loc_dict.get("MUNICIPALI", None),
-                                loc_dict.get("COUNTRYSUB", None),
+                                loc_dict.get("CITY", None),
+                                loc_dict.get("STATE", None),
                                 loc_dict.get('COUNTRY', None)
                                 ])
         layer_out_point_prov.addFeatures([point_out])

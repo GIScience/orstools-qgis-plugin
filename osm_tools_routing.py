@@ -17,28 +17,31 @@ import xml.etree.ElementTree as ET
 import os.path
 import re
 import itertools
+import json
 
 import osm_tools_pointtool
 
 class routing:
     def __init__(self, dlg):
         self.dlg = dlg
-        self.url = r"http://openls.geog.uni-heidelberg.de/route?"
-        self.ns = {'gml': 'http://www.opengis.net/gml',
-                  'xls': "http://www.opengis.net/xls",
-                  'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
+        self.url = r"https://api.openrouteservice.org/directions?"
         
         # GUI init
         self.dlg.start_layer.clear()
         self.dlg.end_layer.clear()
         self.dlg.mode_travel.clear()
         self.dlg.mode_routing.clear()
-        self.dlg.mode_travel.addItem('Car')
-        self.dlg.mode_travel.addItem('Bicycle')
-        self.dlg.mode_travel.addItem('Pedestrian')
-        self.dlg.mode_travel.addItem('HeavyVehicle')
-        self.dlg.mode_routing.addItem('Fastest')
-        self.dlg.mode_routing.addItem('Shortest')
+        self.dlg.mode_travel.addItem('driving-car')
+        self.dlg.mode_travel.addItem('driving-hgv')
+        self.dlg.mode_travel.addItem('cycling-regular')
+        self.dlg.mode_travel.addItem('cycling-road')
+        self.dlg.mode_travel.addItem('cycling-safe')
+        self.dlg.mode_travel.addItem('cycling-mountain')
+        self.dlg.mode_travel.addItem('cycling-tour')
+        self.dlg.mode_travel.addItem('foot-walking')
+        self.dlg.mode_travel.addItem('foot-hiking')
+        self.dlg.mode_routing.addItem('fastest')
+        self.dlg.mode_routing.addItem('shortest')
         
         for layer in qgis.utils.iface.legendInterface().layers():
             layerType = layer.type()
@@ -56,7 +59,6 @@ class routing:
         self.api_key = self.dlg.api_key.text()
         self.mode_travel = self.dlg.mode_travel.currentText()
         self.mode_routing = self.dlg.mode_routing.currentText()
-        self.speed_max = self.dlg.speed_max.value()
         
         self.iface = qgis.utils.iface
         
@@ -69,7 +71,6 @@ class routing:
         self.dlg.end_layer.currentIndexChanged.connect(self.endPopBox)
         self.dlg.mode_travel.currentIndexChanged.connect(self.valueChanged)
         self.dlg.mode_routing.currentIndexChanged.connect(self.valueChanged)
-        self.dlg.speed_max.valueChanged.connect(self.valueChanged)
         self.dlg.add_start_button.clicked.connect(self.initMapTool)
         self.dlg.add_end_button.clicked.connect(self.initMapTool)
         self.dlg.add_via_button.clicked.connect(self.initMapTool)
@@ -149,7 +150,6 @@ class routing:
     def valueChanged(self):
         self.mode_travel = self.dlg.mode_travel.currentText()
         self.mode_routing = self.dlg.mode_routing.currentText()
-        self.speed_max = self.dlg.speed_max.value()
         
     
     # Event for API key change
@@ -239,25 +239,28 @@ class routing:
         # Rules for creating routing features
         if len(start_features) == 1:
             if len(end_features) == 1:
-                route_features = zip(start_features, end_features)
-                route_ids = zip(start_ids, end_ids)
+                route_features = list(zip(start_features, end_features))
+                route_ids = list(zip(start_ids, end_ids))
             else:
-                route_features = zip(itertools.cycle(start_features), end_features)
-                route_ids = zip(itertools.cycle(start_ids), end_ids)
+                route_features = list(zip(itertools.cycle(start_features), end_features))
+                route_ids = list(zip(itertools.cycle(start_ids), end_ids))
         else:
             if len(end_features) == 1:
-                route_features = zip(start_features, itertools.cycle(end_features))
-                route_ids = zip(start_ids, itertools.cycle(end_ids))
+                route_features = list(zip(start_features, itertools.cycle(end_features)))
+                route_ids = list(zip(start_ids, itertools.cycle(end_ids)))
             else:
                 if self.dlg.radio_one.isChecked():
-                    route_features = zip(start_features, end_features)
-                    route_ids = zip(start_ids, end_ids)
+                    route_features = list(zip(start_features, end_features))
+                    route_ids = list(zip(start_ids, end_ids))
                 else:
                     route_features = list(itertools.product(start_features, end_features))
                     route_ids = list(itertools.product(start_ids, end_ids))
+                    
+        # Convert tuple list into list list
+        route_features = [list(feat) for feat in route_features]
 
         # Read route details from GUI
-        route_via = " ".join(self.dlg.add_via.text().split("\n")[:-1])
+        route_via = ",".join(self.dlg.add_via.text().split("\n")[:-1])
         
         # Set up progress bar
         route_count = len(route_features)
@@ -270,69 +273,69 @@ class routing:
         
         for i, route in enumerate(route_features):
             # Skip route if start and end are identical
-            if route[0] == route[1]:
+            if route[0] == route[-1]:
                 continue
             else:
                 try:
+                    # Insert via point if present and make string    
+                    if route_via != "":
+                        route_features[0].insert(1, route_via)
+                        
+                    route_string = "|".join(route_features[0])
                     # Create URL
-                    req = "{}api_key={}&start={}&end={}&routepref={}&weighting={}&maxspeed={}&instructions=False".format(self.url, 
+                    req = "{}api_key={}&coordinates={}&profile={}&preference={}&instructions=False&geometry_format=geojson&units=m".format(self.url, 
                                                         self.api_key, 
-                                                        route[0],
-                                                        route[1],
+                                                       route_string,
                                                         self.mode_travel,
-                                                        self.mode_routing,
-                                                        self.speed_max
+                                                        self.mode_routing
                                                         )
                     print req
-                    if route_via != "":
-                        req += "&via={}".format(route_via)
                         
                     # Get response from API and read into element tree
                     response = requests.get(req)
-                    root = ET.fromstring(response.content)
-                    access_path = root.find("xls:Response/"
-                                            "xls:DetermineRouteResponse",
-                                            self.ns)
+                    root = json.loads(response.text)
                     
                     feat_out = QgsFeature()
                     
                     # Read all coordinates
                     coords_list = []
-                    for coords in access_path.findall("xls:RouteGeometry/gml:LineString/gml:pos", self.ns):
-                        coords_tuple = tuple([float(coord) for coord in coords.text.split(" ")])
-                        qgis_coords = QgsPoint(coords_tuple[0], coords_tuple[1])
+                    for coords in root['routes'][0]['geometry']['coordinates']:
+    #                        coords_tuple = tuple([float(coord) for coord in coords.text.split(" ")])
+                        qgis_coords = QgsPoint(coords[0], coords[1])
                         coords_list.append(qgis_coords)
                     
                     # Read total time
-                    time_path = access_path.find("xls:RouteSummary/xls:TotalTime", self.ns)
-                    time_text = time_path.text
-                    if 'D' not in time_text:
-                        time_text = re.sub(r'(P)', r'P0D', time_text)
-                    if 'H' not in time_text:
-                        time_text = re.sub(r'(T)', r'T0H', time_text)
-                    if 'M' not in time_text:
-                        time_text = re.sub(r'(H)', r'H0M', time_text)
+                    time_path = root['routes'][0]['summary']['duration']
                     
-                    time_list = list(reversed(re.split('DT|H|M', time_text[1:-1])))
-                    while len(time_list) < 4:
-                        time_list.append('0')
-                    secs, mins, hours, days = [int(x) for x in time_list]
-                    hours += (days*24)
-                    #hours = "{0:.3f}".format(hours)
-                                         
+                    if time_path/3600 >= 1:
+                        hours = int(time_path)/3600
+                        rest = time_path%3600
+                        if rest/60 >= 1:
+                            minutes = int(rest)/60
+                            seconds = rest%60
+                        else:
+                            minutes = 0
+                            seconds = rest
+                    else:
+                        hours = 0
+                        minutes = int(time_path)/60
+                        if minutes >= 1:
+                            seconds = time_path%60
+                            
+                                             
                     # Read total distance
-                    distance = float(access_path.find("xls:RouteSummary/xls:TotalDistance", self.ns).get("value"))
+                    distance = root['routes'][0]['summary']['distance'] / 1000
                     
                     # Read X and Y
                     route_start_x, route_start_y = [float(coord) for coord in route[0].split(",")]
-                    route_end_x, route_end_y = [float(coord) for coord in route[1].split(",")]
+                    route_end_x, route_end_y = [float(coord) for coord in route[-1].split(",")]
                         
                     # Set feature geometry and attributes
                     feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
                     feat_out.setAttributes([distance,
                                             hours,
-                                            mins,
-                                            secs,
+                                            minutes,
+                                            seconds,
                                             self.mode_travel,
                                             self.mode_routing,
                                             route_start_y,
@@ -345,6 +348,7 @@ class routing:
                     layer_out_prov.addFeatures([feat_out])
                     
                     progress.setValue(i)    
+                    
                 except (AttributeError, TypeError):
                     msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
                     qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
