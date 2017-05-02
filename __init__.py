@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- ORStools
+ OSMtools
                                  A QGIS plugin
  falk
                              -------------------
@@ -25,11 +25,11 @@
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
-    """Load ORStools class from file ORStools.
+    """Load OSMtools class from file OS;tools.
 
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
     #
-    from .ors_tools import ORStools
-    return ORStools(iface)
+    from .osm_tools import OSMtools
+    return OSMtools(iface)

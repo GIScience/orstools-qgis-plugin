@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- ORStools
+ OSMtools
                                  A QGIS plugin
  falk
                               -------------------
@@ -31,11 +31,11 @@ from PyQt4.QtGui import *
 # Initialize Qt resources from file resources.py
 import resources_rc
 # Import the code for the dialog
-from ors_tools_dialog import ORStoolsDialog
+from osm_tools_dialog import OSMtoolsDialog
 import os.path
 
-import ors_tools_access
-import ors_tools_routing
+import osm_tools_access
+import osm_tools_routing
 
 from qgis.core import *
 import qgis.gui
@@ -45,7 +45,7 @@ import logging
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO)
 
-class ORStools:
+class OSMtools:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -65,7 +65,7 @@ class ORStools:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'ORStools_{}.qm'.format(locale))
+            'OSMtools_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -76,13 +76,13 @@ class ORStools:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&ORS Tools')
+        self.menu = self.tr(u'&OSM Tools')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'ORStools')
-        self.toolbar.setObjectName(u'ORStools')
+        self.toolbar = self.iface.addToolBar(u'OSMtools')
+        self.toolbar.setObjectName(u'OSMtools')
         
         #custom __init__ declarations
-        self.dlg = ORStoolsDialog()
+        self.dlg = OSMtoolsDialog()
         
         self.canvas = qgis.utils.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -100,7 +100,7 @@ class ORStools:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('ORStools', message)
+        return QCoreApplication.translate('OSMtools', message)
 
 
     def add_action(
@@ -182,16 +182,16 @@ class ORStools:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/ORStools/icon.png'
+        icon_path = ':/plugins/OSMtools/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'ORS Tools'),
+            text=self.tr(u'OSM Tools'),
             callback=self.run,
             parent=self.iface.mainWindow())
         
         self.dlg.api_key.textChanged.connect(self.keyWriter)
         
-        self.dlg.key_order.setText("<a href = 'mailto:openrouteservice@geog.uni-heidelberg.de?subject=ORS API key request'>Get Key!</a>") 
+        self.dlg.key_order.setText("<a href = 'https://developers.openrouteservice.org/portal/apis/'>Get Key!</a>") 
         self.dlg.key_order.connect(self.dlg.key_order, SIGNAL("linkActivated(QString)"), self.OpenURL) 
         self.dlg.header_2.linkActivated.connect(self.OpenURL)
         self.dlg.header_3.linkActivated.connect(self.OpenURL)
@@ -214,10 +214,10 @@ class ORStools:
             self.dlg.api_key.setText(key.read())
         
         # Initiate analysis classes
-        self.access_anal = ors_tools_access.accessAnalysis(self.dlg)
-        self.route_anal = ors_tools_routing.routing(self.dlg)
+        self.access_anal = osm_tools_access.accessAnalysis(self.dlg)
+        self.route_anal = osm_tools_routing.routing(self.dlg)
         
-        self.dlg.setFixedSize(self.dlg.size())  
+        self.dlg.setFixedSize(self.dlg.size())
         
         self.dlg.show()
         
@@ -226,10 +226,10 @@ class ORStools:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            if self.dlg.tabWidget.currentIndex() == 0 and self.dlg.use_layer.isChecked():
+            if self.dlg.tabWidget.currentIndex() == 1 and self.dlg.use_layer.isChecked():
                 self.access_anal.iterAnalysis()
             
-            elif self.dlg.tabWidget.currentIndex() == 1:
+            elif self.dlg.tabWidget.currentIndex() == 0:
                 self.route_anal.route()
         else:
             self.unload()

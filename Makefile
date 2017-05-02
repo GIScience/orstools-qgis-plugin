@@ -1,5 +1,5 @@
 #/***************************************************************************
-# ORStools
+# OSMtools
 #
 # falk
 #							 -------------------
@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	ors_tools.py ors_tools_dialog.py
+	osm_tools.py osm_tools_dialog.py
 
-PLUGINNAME = ORStools
+PLUGINNAME = OSMtools
 
 PY_FILES = \
 	__init__.py \
-	ors_tools.py ors_tools_dialog.py
+	osm_tools.py osm_tools_dialog.py
 
-UI_FILES = ors_tools_dialog_base.ui
+UI_FILES = osm_tools_dialog_base.ui
 
 EXTRAS = metadata.txt icon.png
 
