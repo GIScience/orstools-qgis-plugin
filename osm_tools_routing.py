@@ -228,9 +228,10 @@ class routing:
             _point_geo = osm_tools_geocode.Geocode(self.dlg, self.api_key)
             loc_dict = _point_geo.reverseGeocode(point_geom)
             
-            print loc_dict
-            
-            start_ids.append(loc_dict.get('CITY', start_features[0]))
+            if loc_dict:       
+                start_ids.append(loc_dict.get('CITY', start_features[0]))
+            else:
+                return
             
         # Create end features
         if self.dlg.end_radio_layer.isChecked():
@@ -250,9 +251,10 @@ class routing:
             _point_geo = osm_tools_geocode.Geocode(self.dlg, self.api_key)
             loc_dict = _point_geo.reverseGeocode(point_geom)
             
-            print loc_dict
-            
-            end_ids.append(loc_dict.get('CITY', end_features[0]))
+            if loc_dict:       
+                end_ids.append(loc_dict.get('CITY', end_features[0]))
+            else:
+                return
             
         # Rules for creating routing features
         if len(start_features) == 1:
