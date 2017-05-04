@@ -19,6 +19,7 @@ import os.path
 import osm_tools       
 import osm_tools_geocode
 import osm_tools_pointtool
+import osm_tools_aux
         
 class accessAnalysis:
     def __init__(self, dlg):
@@ -131,9 +132,19 @@ class accessAnalysis:
                                                                 self.iso_max,
                                                                 self.iso_int,
                                                                 self.iso_mode)
-        print req
+        
         response = requests.get(req)
         root = json.loads(response.text)
+        
+        # Check if there was an HTTP error and terminate
+        http_status = response.status_code
+        try:
+            if http_status > 200:
+                osm_tools_aux.CheckStatus(http_status, req)
+                raise
+        except: 
+            qgis.utils.iface.messageBar().clearWidgets()
+            return
         
         QApplication.restoreOverrideCursor()
         
@@ -243,7 +254,7 @@ class accessAnalysis:
                 acc_input_lyr = layer
                 break
         #TODO: Maybe reproject when other than WGS84?! Now it`s just closing the window
-        if osm_tools.CheckCRS(self, acc_input_lyr.crs().authid()) == False:
+        if osm_tools_aux.CheckCRS(self, acc_input_lyr.crs().authid()) == False:
             return
         
         # Define polygon .shp
@@ -261,13 +272,14 @@ class accessAnalysis:
         feature_count = acc_input_lyr.featureCount()
         progressMessageBar = self.iface.messageBar().createMessage("Requesting analysis from ORS...")
         progress = QProgressBar()
-        progress.setMaximum(feature_count)
+        progress.setMaximum(100)
         progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         progressMessageBar.layout().addWidget(progress)
         self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
                 
         for i, feat_in in enumerate(features):
-            progress.setValue(i)
+            percent = (i/feature_count) * 100
+            progress.setValue(percent)
             
             feat_list, isochrone_list = self.accRequest(feat_in.geometry())
             
@@ -280,11 +292,13 @@ class accessAnalysis:
         id_field = self.dlg.id_field.currentText()
         fields_diss = ["AA_MINS", id_field]
         
+        qgis.utils.iface.messageBar().clearWidgets() 
+        
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
         self.dissolveFields(layer_out, fields_diss)
     
         
-    def dissolveFields(self, layer_out, fields_diss):        
+    def dissolveFields(self, layer_out, fields_diss):
         # Dissolve output for interval 'AA_MINS' and id_layer, remove non-dissolved layer
         
         processing.runandload("qgis:dissolve", layer_out , False,

@@ -18,7 +18,10 @@ import os.path
 import re
 import itertools
 import json
+import logging
 
+import osm_tools_aux
+import osm_tools_geocode
 import osm_tools_pointtool
 
 class routing:
@@ -183,11 +186,6 @@ class routing:
         
     def route(self):
         
-#        if osm_tools.CheckCRS(self, self.layer_start.crs().authid()) == False:
-#            return
-#        if osm_tools.CheckCRS(self, self.layer_end.crs().authid()) == False:
-#            return
-        
         # Create memory routing layer with fields
         layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route", "memory")
         layer_out_prov = layer_out.dataProvider()
@@ -198,12 +196,12 @@ class routing:
         layer_out_prov.addAttributes([QgsField("MODE", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("PREF", QVariant.String)])
         #layer_out_prov.addAttributes([QgsField("SPEED_MAX", QVariant.String)])
+        layer_out_prov.addAttributes([QgsField("FROM_ID", QVariant.String)])
+        layer_out_prov.addAttributes([QgsField("TO_ID", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_LAT", QVariant.Double)])
         layer_out_prov.addAttributes([QgsField("FROM_LONG", QVariant.Double)])
         layer_out_prov.addAttributes([QgsField("TO_LAT", QVariant.Double)])
         layer_out_prov.addAttributes([QgsField("TO_LONG", QVariant.Double)])
-        layer_out_prov.addAttributes([QgsField("FROM_ID", QVariant.String)])
-        layer_out_prov.addAttributes([QgsField("TO_ID", QVariant.String)])
         
         layer_out.updateFields()
         
@@ -214,6 +212,9 @@ class routing:
 
         # Create start features
         if self.dlg.start_radio_layer.isChecked():
+            # Exit if CRS != WGS84
+            if osm_tools_aux.CheckCRS(self, self.layer_start.crs().authid()) == False:
+                return
             start_feat = self.layer_start.getFeatures()
             field_id = self.layer_start.fieldNameIndex(self.dlg.start_layer_id.currentText())
             for feat in start_feat:
@@ -222,19 +223,36 @@ class routing:
                 start_ids.append(feat.attributes()[field_id])
         else:
             start_features.append(self.dlg.add_start.text())
-            start_ids.append(self.dlg.add_start.text())
+            point_list = [float(x) for x in start_features[0].split(",")]
+            point_geom = QgsGeometry.fromPoint(QgsPoint(point_list[0], point_list[1]))
+            _point_geo = osm_tools_geocode.Geocode(self.dlg, self.api_key)
+            loc_dict = _point_geo.reverseGeocode(point_geom)
+            
+            print loc_dict
+            
+            start_ids.append(loc_dict.get('CITY', start_features[0]))
             
         # Create end features
         if self.dlg.end_radio_layer.isChecked():
+            # Exit if CRS != WGS84
+            if osm_tools_aux.CheckCRS(self, self.layer_end.crs().authid()) == False:
+                return
             end_feat = self.layer_end.getFeatures()
             field_id = self.layer_end.fieldNameIndex(self.dlg.end_layer_id.currentText())
             for feat in end_feat:
                 x, y = feat.geometry().asPoint()
                 end_features.append(",".join([str(x), str(y)]))
                 end_ids.append(feat.attributes()[field_id])
-        else:
+        else:            
             end_features.append(self.dlg.add_end.text())
-            end_ids.append(self.dlg.add_end.text())
+            point_list = [float(x) for x in end_features[0].split(",")]
+            point_geom = QgsGeometry.fromPoint(QgsPoint(point_list[0], point_list[1]))
+            _point_geo = osm_tools_geocode.Geocode(self.dlg, self.api_key)
+            loc_dict = _point_geo.reverseGeocode(point_geom)
+            
+            print loc_dict
+            
+            end_ids.append(loc_dict.get('CITY', end_features[0]))
             
         # Rules for creating routing features
         if len(start_features) == 1:
@@ -266,7 +284,7 @@ class routing:
         route_count = len(route_features)
         progressMessageBar = self.iface.messageBar().createMessage("Requesting routes from ORS...")
         progress = QProgressBar()
-        progress.setMaximum(route_count)
+        progress.setMaximum(100)
         progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         progressMessageBar.layout().addWidget(progress)
         self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
@@ -279,9 +297,9 @@ class routing:
                 try:
                     # Insert via point if present and make string    
                     if route_via != "":
-                        route_features[0].insert(1, route_via)
+                        route.insert(1, route_via)
                         
-                    route_string = "|".join(route_features[0])
+                    route_string = "|".join(route)
                     # Create URL
                     req = "{}api_key={}&coordinates={}&profile={}&preference={}&instructions=False&geometry_format=geojson&units=m".format(self.url, 
                                                         self.api_key, 
@@ -289,12 +307,21 @@ class routing:
                                                         self.mode_travel,
                                                         self.mode_routing
                                                         )
-                    print req
-                        
+
                     # Get response from API and read into element tree
                     response = requests.get(req)
                     root = json.loads(response.text)
                     
+                    # Check if there was an HTTP error and terminate
+                    http_status = response.status_code
+                    try:
+                        if http_status > 200:
+                            osm_tools_aux.CheckStatus(http_status, req)
+                            raise
+                    except: 
+                        #qgis.utils.iface.messageBar().clearWidgets()
+                        return
+                        
                     feat_out = QgsFeature()
                     
                     # Read all coordinates
@@ -319,8 +346,7 @@ class routing:
                     else:
                         hours = 0
                         minutes = int(time_path)/60
-                        if minutes >= 1:
-                            seconds = time_path%60
+                        seconds = time_path%60
                             
                                              
                     # Read total distance
@@ -338,16 +364,18 @@ class routing:
                                             seconds,
                                             self.mode_travel,
                                             self.mode_routing,
+                                            route_ids[i][0],
+                                            route_ids[i][1],
                                             route_start_y,
                                             route_start_x,
                                             route_end_y,
-                                            route_end_x,
-                                            route_ids[i][0],
-                                            route_ids[i][1]]) 
+                                            route_end_x])
                     
                     layer_out_prov.addFeatures([feat_out])
                     
-                    progress.setValue(i)    
+                    percent = (i/float(route_count)) * 100
+                    
+                    progress.setValue(percent)
                     
                 except (AttributeError, TypeError):
                     msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
@@ -355,5 +383,7 @@ class routing:
                     return
                 
         layer_out.updateExtents()
+        
+        qgis.utils.iface.messageBar().clearWidgets() 
 
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)

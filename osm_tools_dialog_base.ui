@@ -85,6 +85,9 @@
      </property>
     </widget>
     <widget class="QLabel" name="label_13">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -118,6 +121,9 @@
      </property>
     </widget>
     <widget class="QSpinBox" name="speed_max">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>90</x>

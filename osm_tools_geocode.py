@@ -16,6 +16,8 @@ import requests
 import json
 import xml.etree.ElementTree as ET
 
+import osm_tools_aux
+
 class Geocode:
     def __init__(self, dlg, api_key):
         self.dlg = dlg
@@ -34,6 +36,15 @@ class Geocode:
                                             y)
         response = requests.get(req)
         root = json.loads(response.text)
+        
+        # Check if there was an HTTP error and terminate
+        http_status = response.status_code
+        try:
+            if http_status > 200:
+                osm_tools_aux.CheckStatus(http_status, req)
+                raise
+        except: 
+            return
         
         loc_place_dict = dict()
         
