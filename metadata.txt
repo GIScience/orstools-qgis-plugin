@@ -9,12 +9,13 @@
 [general]
 name=OSM Tools
 qgisMinimumVersion=2.0
-description=OSM Tools provides access to the most of the functions of OpenRouteService.org, based on OpenStreetMap. The tool set includes basic routing and calculation of accessibility areas, both either interactive or from QGIS point files.
+description=OpenRouteService routing and accessibility areas for QGIS
 version=0.1
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
-about=Blabla
+about=OSM Tools provides access to the most of the functions of OpenRouteService.org, based on OpenStreetMap. The tool set includes basic routing and calculation of accessibility areas, both either interactive or from QGIS point files.
+
 
 tracker=https://github.com/nilsnolde/ORStools/issues
 repository=https://github.com/nilsnolde/ORStools.git
