@@ -14,7 +14,7 @@ version=0.1
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
-about=OSM Tools provides access to most of the functions of OpenRouteService.org, based on OpenStreetMap. The tool set includes most routing features and calculation of accessibility areas, both either interactive in the map canvas or from point files.
+about=OSM Tools provides access to most of the functions of OpenRouteService.org, based on OpenStreetMap. The tool set includes most routing features and calculation of accessibility areas, both either interactive in the map canvas or from point files. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
 
 tracker=https://github.com/nilsnolde/ORStools/issues

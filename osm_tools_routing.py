@@ -164,6 +164,7 @@ class routing:
     
     # Connect to PointTool and set as mapTool
     def initMapTool(self):
+        self.dlg.showMinimized()
         sending_button = self.dlg.sender().objectName() 
         self.mapTool = osm_tools_pointtool.PointTool(qgis.utils.iface.mapCanvas(), sending_button)        
         self.iface.mapCanvas().setMapTool(self.mapTool)     
@@ -183,6 +184,7 @@ class routing:
         if button == self.dlg.add_via_button.objectName():
             self.dlg.add_via.setText("{0:.5f},{1:.5f}\n".format(x, y))
             
+        self.dlg.showNormal()
         
     def route(self):
         

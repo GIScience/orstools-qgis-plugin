@@ -81,7 +81,7 @@ class accessAnalysis:
             
     
     def valueChanged(self):
-        self.iso_max = self.dlg.iso_max.value()
+        self.iso_max = self.dlg.iso_max.value() * 60
         self.iso_int = self.dlg.iso_int.value() * 60
         self.iso_mode = self.dlg.mode.currentText()
         self.iso_method = self.dlg.method.currentText()
@@ -111,6 +111,7 @@ class accessAnalysis:
         
     # Connect to PointTool and set as mapTool
     def initMapTool(self):
+        self.dlg.showMinimized()
         sending_button = self.dlg.sender().objectName()
         self.mapTool = osm_tools_pointtool.PointTool(qgis.utils.iface.mapCanvas(), sending_button)        
         self.iface.mapCanvas().setMapTool(self.mapTool)     
@@ -241,7 +242,8 @@ class accessAnalysis:
         fields_diss = ["AA_MINS"]
         self.dissolveFields(layer_out, fields_diss)
         
-        # Unset Map Tool
+        # Unset Map Tool and show dialog again
+        self.dlg.showNormal()
         self.iface.mapCanvas().unsetMapTool(self.mapTool)
         self.mapTool = None
 
