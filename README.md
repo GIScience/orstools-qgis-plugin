@@ -23,4 +23,4 @@ Either from QGIS plugin repository or manually:
 ## License
 This project is published under the MIT license, see [LICENSE.md](https://github.com/nilsnolde/ORStools/blob/master/LICENSE.md) for details.
 
-By using the ORS API´s published with this tool, you agree to the terms and conditions of OpenRouteService, as outlined [here](https://developers.openrouteservice.org/portal/about).
+By using this plugin, you also agree to the terms and conditions of OpenRouteService, as outlined [here](https://developers.openrouteservice.org/portal/about).
