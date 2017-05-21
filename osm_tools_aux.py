@@ -15,7 +15,7 @@ def CheckCRS(self,crs):
     check = True
     if crs != "EPSG:4326":
         msg = "CRS is {}. Must be EPSG:4326 (WGS84)".format(crs)
-        qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+        qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL, duration=10)
         check = False
     return check
 
