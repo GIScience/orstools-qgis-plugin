@@ -91,7 +91,7 @@
    <item row="6" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -110,7 +110,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-219</y>
+            <y>0</y>
             <width>315</width>
             <height>679</height>
            </rect>
@@ -436,7 +436,6 @@
            </widget>
           </item>
          </layout>
-         <zorder>widget_4</zorder>
          <zorder>method</zorder>
          <zorder>label_5</zorder>
         </widget>
@@ -986,13 +985,61 @@
   <zorder>button_box</zorder>
   <zorder>label_7</zorder>
   <zorder>header_2</zorder>
-  <zorder>groupBox</zorder>
   <zorder>tabWidget</zorder>
   <zorder>groupBox_4</zorder>
   <zorder>header_3</zorder>
  </widget>
  <tabstops>
+  <tabstop>api_key</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>start_radio_map</tabstop>
+  <tabstop>start_radio_map</tabstop>
+  <tabstop>add_start_button</tabstop>
+  <tabstop>add_start_button</tabstop>
+  <tabstop>start_radio_layer</tabstop>
+  <tabstop>start_radio_layer</tabstop>
+  <tabstop>end_radio_layer</tabstop>
+  <tabstop>end_layer</tabstop>
+  <tabstop>end_layer_id</tabstop>
   <tabstop>button_box</tabstop>
+  <tabstop>radio_one</tabstop>
+  <tabstop>radio_many</tabstop>
+  <tabstop>mode</tabstop>
+  <tabstop>method</tabstop>
+  <tabstop>iso_max</tabstop>
+  <tabstop>iso_int</tabstop>
+  <tabstop>access_map</tabstop>
+  <tabstop>use_layer</tabstop>
+  <tabstop>layer</tabstop>
+  <tabstop>mode_routing</tabstop>
+  <tabstop>start_layer</tabstop>
+  <tabstop>use_layer</tabstop>
+  <tabstop>method</tabstop>
+  <tabstop>access_map</tabstop>
+  <tabstop>add_via_button</tabstop>
+  <tabstop>iso_max</tabstop>
+  <tabstop>mode</tabstop>
+  <tabstop>iso_int</tabstop>
+  <tabstop>start_layer_id</tabstop>
+  <tabstop>layer</tabstop>
+  <tabstop>add_end_button</tabstop>
+  <tabstop>mode_travel</tabstop>
+  <tabstop>start_layer</tabstop>
+  <tabstop>end_radio_map</tabstop>
+  <tabstop>end_radio_map</tabstop>
+  <tabstop>add_end_button</tabstop>
+  <tabstop>end_radio_layer</tabstop>
+  <tabstop>end_layer</tabstop>
+  <tabstop>end_layer_id</tabstop>
+  <tabstop>radio_one</tabstop>
+  <tabstop>radio_many</tabstop>
+  <tabstop>add_via_button</tabstop>
+  <tabstop>add_via_button_clear</tabstop>
+  <tabstop>mode_travel</tabstop>
+  <tabstop>mode_routing</tabstop>
+  <tabstop>start_layer_id</tabstop>
+  <tabstop>add_via_button_clear</tabstop>
  </tabstops>
  <resources/>
  <connections>
