@@ -87,6 +87,7 @@ class OSMtools:
         self.canvas = qgis.utils.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
+        
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -237,13 +238,3 @@ class OSMtools:
     def keyWriter(self):
         with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
             return key.write(self.dlg.api_key.text())
-        
-        
-def CheckCRS(self,crs):
-    check = True
-    if crs != "EPSG:4326":
-        msg = "CRS is {}. Must be EPSG:4326 (WGS84)".format(crs)
-        qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
-        check = False
-    return check
-    
