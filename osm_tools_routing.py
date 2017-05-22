@@ -197,7 +197,6 @@ class routing:
         layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
         layer_out_prov.addAttributes([QgsField("MODE", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("PREF", QVariant.String)])
-        #layer_out_prov.addAttributes([QgsField("SPEED_MAX", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_ID", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("TO_ID", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_LAT", QVariant.Double)])

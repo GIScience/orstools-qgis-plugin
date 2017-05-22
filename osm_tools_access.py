@@ -47,7 +47,7 @@ class accessAnalysis:
                 self.dlg.layer.addItem(layer.name())
                   
         # GUI Init
-        self.popBox()
+        #self.popBox()
         
         # API parameters
         self.api_key = self.dlg.api_key.text()
@@ -68,8 +68,8 @@ class accessAnalysis:
         self.dlg.api_key.textChanged.connect(self.keyWriter)
         
         # Populate field ID dynamically when combobox selection changes
-        self.dlg.layer.currentIndexChanged.connect(self.popBox)
-        self.dlg.check_dissolve.stateChanged.connect(self.popBox)
+#        self.dlg.layer.currentIndexChanged.connect(self.popBox)
+#        self.dlg.check_dissolve.stateChanged.connect(self.popBox)
         self.dlg.access_map.clicked.connect(self.initMapTool)
     
     
@@ -94,19 +94,19 @@ class accessAnalysis:
         
         
     # Populate field ID
-    def popBox(self):              
-        if self.dlg.check_dissolve.isChecked() == True:
-            self.dlg.id_field.setEnabled(True)
-            self.dlg.id_field.clear()
-            layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.layer.currentText()]
-            if layer_list:
-                layer_selected = layer_list[0]
-                fields_selected = layer_selected.fields()
-                for field in fields_selected:
-                    self.dlg.id_field.addItem(field.name())
-        else:
-            self.dlg.id_field.setEnabled(False)
-        return
+#    def popBox(self):              
+#        if self.dlg.check_dissolve.isChecked() == True:
+#            self.dlg.id_field.setEnabled(True)
+#            self.dlg.id_field.clear()
+#            layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.layer.currentText()]
+#            if layer_list:
+#                layer_selected = layer_list[0]
+#                fields_selected = layer_selected.fields()
+#                for field in fields_selected:
+#                    self.dlg.id_field.addItem(field.name())
+#        else:
+#            self.dlg.id_field.setEnabled(False)
+#        return
     
         
     # Connect to PointTool and set as mapTool
@@ -239,8 +239,8 @@ class accessAnalysis:
         QgsMapLayerRegistry.instance().addMapLayer(layer_out_point)
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
 
-        fields_diss = ["AA_MINS"]
-        self.dissolveFields(layer_out, fields_diss)
+#        fields_diss = ["AA_MINS"]
+#        self.dissolveFields(layer_out, fields_diss)
         
         # Unset Map Tool and show dialog again
         self.dlg.showNormal()
@@ -291,20 +291,20 @@ class accessAnalysis:
 
             layer_out.updateExtents()
         
-        id_field = self.dlg.id_field.currentText()
-        fields_diss = ["AA_MINS", id_field]
+#        id_field = self.dlg.id_field.currentText()
+#        fields_diss = ["AA_MINS", id_field]
         
         qgis.utils.iface.messageBar().clearWidgets() 
         
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
-        self.dissolveFields(layer_out, fields_diss)
+#        self.dissolveFields(layer_out, fields_diss)
     
         
-    def dissolveFields(self, layer_out, fields_diss):
-        # Dissolve output for interval 'AA_MINS' and id_layer, remove non-dissolved layer
-        
-        processing.runandload("qgis:dissolve", layer_out , False,
-                          fields_diss, "memory:dissolved")
-        layer_dissolved = QgsMapLayerRegistry.instance().mapLayersByName("Dissolved")[-1]
-        layer_dissolved.setLayerName(layer_out.name())
-        QgsMapLayerRegistry.instance().removeMapLayers([layer_out.id()])
+#    def dissolveFields(self, layer_out, fields_diss):
+#        # Dissolve output for interval 'AA_MINS' and id_layer, remove non-dissolved layer
+#        
+#        processing.runandload("qgis:dissolve", layer_out , False,
+#                          fields_diss, "memory:dissolved")
+#        layer_dissolved = QgsMapLayerRegistry.instance().mapLayersByName("Dissolved")[-1]
+#        layer_dissolved.setLayerName(layer_out.name())
+#        QgsMapLayerRegistry.instance().removeMapLayers([layer_out.id()])
