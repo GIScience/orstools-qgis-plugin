@@ -13,12 +13,9 @@ from qgis.gui import *
 import qgis.utils
 
 import requests
-import xml.etree.ElementTree as ET
 import os.path
-import re
 import itertools
 import json
-import logging
 
 import osm_tools_aux
 import osm_tools_geocode
@@ -297,93 +294,95 @@ class routing:
             if route[0] == route[-1]:
                 continue
             else:
+#                try:
+                # Insert via point if present and make string    
+                if route_via != "":
+                    route.insert(1, route_via)
+                    
+                route_string = "|".join(route)
+                # Create URL
+                req = "{}api_key={}&coordinates={}&profile={}&preference={}&instructions=False&geometry_format=geojson&units=m".format(self.url, 
+                                                    self.api_key, 
+                                                   route_string,
+                                                    self.mode_travel,
+                                                    self.mode_routing
+                                                    )
+                
+                print req
+                
+                # Get response from API and read into element tree
+                response = requests.get(req)
+                root = json.loads(response.text)
+                
+                # Check if there was an HTTP error and terminate
+                http_status = response.status_code
                 try:
-                    # Insert via point if present and make string    
-                    if route_via != "":
-                        route.insert(1, route_via)
-                        
-                    route_string = "|".join(route)
-                    # Create URL
-                    req = "{}api_key={}&coordinates={}&profile={}&preference={}&instructions=False&geometry_format=geojson&units=m".format(self.url, 
-                                                        self.api_key, 
-                                                       route_string,
-                                                        self.mode_travel,
-                                                        self.mode_routing
-                                                        )
-
-                    # Get response from API and read into element tree
-                    response = requests.get(req)
-                    root = json.loads(response.text)
-                    
-                    # Check if there was an HTTP error and terminate
-                    http_status = response.status_code
-                    try:
-                        if http_status > 200:
-                            osm_tools_aux.CheckStatus(http_status, req)
-                            raise
-                    except: 
-                        #qgis.utils.iface.messageBar().clearWidgets()
+                    if http_status > 200:
+                        osm_tools_aux.CheckStatus(http_status, req)
                         return
-                        
-                    feat_out = QgsFeature()
-                    
-                    # Read all coordinates
-                    coords_list = []
-                    for coords in root['routes'][0]['geometry']['coordinates']:
-    #                        coords_tuple = tuple([float(coord) for coord in coords.text.split(" ")])
-                        qgis_coords = QgsPoint(coords[0], coords[1])
-                        coords_list.append(qgis_coords)
-                    
-                    # Read total time
-                    time_path = root['routes'][0]['summary']['duration']
-                    
-                    if time_path/3600 >= 1:
-                        hours = int(time_path)/3600
-                        rest = time_path%3600
-                        if rest/60 >= 1:
-                            minutes = int(rest)/60
-                            seconds = rest%60
-                        else:
-                            minutes = 0
-                            seconds = rest
-                    else:
-                        hours = 0
-                        minutes = int(time_path)/60
-                        seconds = time_path%60
-                            
-                                             
-                    # Read total distance
-                    distance = root['routes'][0]['summary']['distance'] / 1000
-                    
-                    # Read X and Y
-                    route_start_x, route_start_y = [float(coord) for coord in route[0].split(",")]
-                    route_end_x, route_end_y = [float(coord) for coord in route[-1].split(",")]
-                        
-                    # Set feature geometry and attributes
-                    feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
-                    feat_out.setAttributes([distance,
-                                            hours,
-                                            minutes,
-                                            seconds,
-                                            self.mode_travel,
-                                            self.mode_routing,
-                                            route_ids[i][0],
-                                            route_ids[i][1],
-                                            route_start_y,
-                                            route_start_x,
-                                            route_end_y,
-                                            route_end_x])
-                    
-                    layer_out_prov.addFeatures([feat_out])
-                    
-                    percent = (i/float(route_count)) * 100
-                    
-                    progress.setValue(percent)
-                    
-                except (AttributeError, TypeError):
-                    msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
-                    qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+                except: 
+                    #qgis.utils.iface.messageBar().clearWidgets()
                     return
+                    
+                feat_out = QgsFeature()
+                
+                # Read all coordinates
+                coords_list = []
+                for coords in root['routes'][0]['geometry']['coordinates']:
+#                        coords_tuple = tuple([float(coord) for coord in coords.text.split(" ")])
+                    qgis_coords = QgsPoint(coords[0], coords[1])
+                    coords_list.append(qgis_coords)
+                
+                # Read total time
+                time_path = root['routes'][0]['summary']['duration']
+                
+                if time_path/3600 >= 1:
+                    hours = int(time_path)/3600
+                    rest = time_path%3600
+                    if rest/60 >= 1:
+                        minutes = int(rest)/60
+                        seconds = rest%60
+                    else:
+                        minutes = 0
+                        seconds = rest
+                else:
+                    hours = 0
+                    minutes = int(time_path)/60
+                    seconds = time_path%60
+                        
+                                         
+                # Read total distance
+                distance = root['routes'][0]['summary']['distance'] / 1000
+                
+                # Read X and Y
+                route_start_x, route_start_y = [float(coord) for coord in route[0].split(",")]
+                route_end_x, route_end_y = [float(coord) for coord in route[-1].split(",")]
+                    
+                # Set feature geometry and attributes
+                feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
+                feat_out.setAttributes([distance,
+                                        hours,
+                                        minutes,
+                                        seconds,
+                                        self.mode_travel,
+                                        self.mode_routing,
+                                        route_ids[i][0],
+                                        route_ids[i][1],
+                                        route_start_y,
+                                        route_start_x,
+                                        route_end_y,
+                                        route_end_x])
+                
+                layer_out_prov.addFeatures([feat_out])
+                
+                percent = (i/float(route_count)) * 100
+                
+                progress.setValue(percent)
+                    
+#                except (AttributeError, TypeError):
+#                    msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
+#                    qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+#                    return
                 
         layer_out.updateExtents()
         
