@@ -91,7 +91,7 @@
    <item row="6" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -415,20 +415,20 @@
           <item>
            <widget class="QLabel" name="label_5">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defaults to 'RecursiveGrid', 'TIN' not available yet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Isochrone method</string>
+             <string>Isochrone unit</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="method">
+           <widget class="QComboBox" name="unit">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defaults to 'RecursiveGrid', 'TIN' not available yet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -436,30 +436,43 @@
            </widget>
           </item>
          </layout>
-         <zorder>method</zorder>
+         <zorder>unit</zorder>
          <zorder>label_5</zorder>
         </widget>
        </item>
        <item>
         <widget class="QWidget" name="widget_6" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_3" columnstretch="14,12,3">
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="iso_max">
+            <property name="decimals">
+             <number>0</number>
+            </property>
+            <property name="value">
+             <double>10.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_6">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>mins</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
            <widget class="QLabel" name="label_2">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum accessibility distance in minutes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Maximum isochrone [min]</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="iso_max">
-            <property name="maximum">
-             <number>120</number>
-            </property>
-            <property name="value">
-             <number>10</number>
+             <string>Maximum isochrone</string>
             </property>
            </widget>
           </item>
@@ -468,24 +481,34 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_7" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="14,12,3">
           <item>
            <widget class="QLabel" name="label_4">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The interval 'Maximum isochrone' will be incremented by&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Interval [min]</string>
+             <string>Interval</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="iso_int">
-            <property name="maximum">
-             <number>60</number>
+           <widget class="QDoubleSpinBox" name="iso_int">
+            <property name="decimals">
+             <number>0</number>
             </property>
             <property name="value">
-             <number>5</number>
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>mins</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -1006,21 +1029,17 @@
   <tabstop>radio_one</tabstop>
   <tabstop>radio_many</tabstop>
   <tabstop>mode</tabstop>
-  <tabstop>method</tabstop>
-  <tabstop>iso_max</tabstop>
-  <tabstop>iso_int</tabstop>
+  <tabstop>unit</tabstop>
   <tabstop>access_map</tabstop>
   <tabstop>use_layer</tabstop>
   <tabstop>layer</tabstop>
   <tabstop>mode_routing</tabstop>
   <tabstop>start_layer</tabstop>
   <tabstop>use_layer</tabstop>
-  <tabstop>method</tabstop>
+  <tabstop>unit</tabstop>
   <tabstop>access_map</tabstop>
   <tabstop>add_via_button</tabstop>
-  <tabstop>iso_max</tabstop>
   <tabstop>mode</tabstop>
-  <tabstop>iso_int</tabstop>
   <tabstop>start_layer_id</tabstop>
   <tabstop>layer</tabstop>
   <tabstop>add_end_button</tabstop>

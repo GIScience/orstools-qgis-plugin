@@ -30,7 +30,9 @@ class accessAnalysis:
 
         self.dlg.mode.clear()
         self.dlg.layer.clear()
-        self.dlg.method.clear()  
+        self.dlg.unit.clear() 
+        self.dlg.unit.addItem('time')
+        self.dlg.unit.addItem('distance')
         self.dlg.mode.addItem('driving-car')
         self.dlg.mode.addItem('driving-hgv')
         self.dlg.mode.addItem('cycling-regular')
@@ -51,10 +53,10 @@ class accessAnalysis:
         
         # API parameters
         self.api_key = self.dlg.api_key.text()
-        self.iso_max = self.dlg.iso_max.value() * 60
-        self.iso_int = self.dlg.iso_int.value() * 60
         self.iso_mode = self.dlg.mode.currentText()
-        self.iso_range_type = 'time'
+        self.iso_max = self.dlg.iso_max.value()
+        self.iso_int = self.dlg.iso_int.value()
+        self.iso_range_type = self.dlg.unit.currentText()
         self.iface = qgis.utils.iface
         
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,7 +65,7 @@ class accessAnalysis:
         self.dlg.iso_max.valueChanged.connect(self.valueChanged)
         self.dlg.iso_int.valueChanged.connect(self.valueChanged)
         self.dlg.mode.currentIndexChanged.connect(self.valueChanged)
-        self.dlg.method.currentIndexChanged.connect(self.valueChanged)
+        self.dlg.unit.currentIndexChanged.connect(self.valueChanged)
         self.dlg.use_layer.stateChanged.connect(self.enableLayer)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
         
@@ -81,10 +83,20 @@ class accessAnalysis:
             
     
     def valueChanged(self):
-        self.iso_max = self.dlg.iso_max.value() * 60
-        self.iso_int = self.dlg.iso_int.value() * 60
+        self.iso_max = self.dlg.iso_max.value()
+        self.iso_int = self.dlg.iso_int.value()
         self.iso_mode = self.dlg.mode.currentText()
-        self.iso_method = self.dlg.method.currentText()
+        self.iso_range_type = self.dlg.unit.currentText()
+        if self.iso_range_type == 'time':
+            self.dlg.iso_max.setDecimals(0)
+            self.dlg.iso_int.setDecimals(0)
+            self.dlg.label_6.setText('mins')
+            self.dlg.label_8.setText('mins')
+        else:
+            self.dlg.iso_max.setDecimals(3)
+            self.dlg.iso_int.setDecimals(3)
+            self.dlg.label_6.setText('km')
+            self.dlg.label_8.setText('km')
         
     
     def keyWriter(self):
@@ -123,8 +135,10 @@ class accessAnalysis:
         #geometry_in = QgsGeometry.fromPoint(point_in)
         x, y = point_in.asPoint()
         
+        if self.iso_range_type == 'time':
+            self.iso_max = self.dlg.iso_max.value() * 60
+            self.iso_int = self.dlg.iso_int.value() * 60
         
-        #TODO: 'method' does not seem to be available over get()?! Ask GIScience team
         req = "{}api_key={}&locations={},{}&range_type={}&range={}&interval={}&profile={}&location_type=start".format(self.url, 
                                                                 self.api_key, 
                                                                 x, 
@@ -134,15 +148,20 @@ class accessAnalysis:
                                                                 self.iso_int,
                                                                 self.iso_mode)
         
+        if self.iso_range_type == 'distance':
+            req += '&units=km'
+        print req
+        
         response = requests.get(req)
         root = json.loads(response.text)
         
         # Check if there was an HTTP error and terminate
         http_status = response.status_code
+        
         try:
             if http_status > 200:
                 osm_tools_aux.CheckStatus(http_status, req)
-                raise
+                return
         except: 
             qgis.utils.iface.messageBar().clearWidgets()
             return
@@ -152,39 +171,42 @@ class accessAnalysis:
         isochrone_list = []
         feat_list = []
 
-        try:
-            for isochrone in root['features']:
-                feat_out = QgsFeature()
-                
-                coord_list = []
-                
-                # First find the exterior ring
-                for coords in isochrone['geometry']['coordinates'][0]:
-                    qgis_coords = QgsPoint(coords[0], coords[1])
-                    coord_list.append(qgis_coords)
-                        
-                feat_out.setGeometry(QgsGeometry.fromPolygon([coord_list]))
-                feat_list.append(feat_out)
-                isochrone_list.append(isochrone['properties']['value']/60.0)
-        except (AttributeError, TypeError):
-            msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
-            qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
-            return
+#        try:
+        for isochrone in root['features']:
+            feat_out = QgsFeature()
+            
+            coord_list = []
+            
+            # First find the exterior ring
+            for coords in isochrone['geometry']['coordinates'][0]:
+                qgis_coords = QgsPoint(coords[0], coords[1])
+                coord_list.append(qgis_coords)
+                    
+            feat_out.setGeometry(QgsGeometry.fromPolygon([coord_list]))
+            feat_list.append(feat_out)
+            iso_value = isochrone['properties']['value']
+            if self.iso_range_type == 'time':
+                iso_value /= 60.0
+            isochrone_list.append(iso_value)
+#        except (AttributeError, TypeError):
+#            msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
+#            qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+#            return
         
         return feat_list, isochrone_list
 
         
     def pointAnalysis(self, point):
+        point_geometry = QgsGeometry.fromPoint(point)
         try:
-            point_geometry = QgsGeometry.fromPoint(point)
             feat_list, isochrone_list = self.accRequest(point_geometry)
-            
-            _point_geocode = osm_tools_geocode.Geocode(self.dlg, self.api_key)
-            loc_dict = _point_geocode.reverseGeocode(point_geometry)
-        except (AttributeError, TypeError):
-            msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
-            qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
+        except:
+            self.dlg.close()
+            QApplication.restoreOverrideCursor()
             return
+        
+        _point_geocode = osm_tools_geocode.Geocode(self.dlg, self.api_key)
+        loc_dict = _point_geocode.reverseGeocode(point_geometry)
         
         out_str = u"Long: {0:.3f}, Lat:{1:.3f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
                                                         loc_dict.get('Lat', ""),
@@ -198,7 +220,10 @@ class accessAnalysis:
         layer_out_point = QgsVectorLayer("Point?crs=EPSG:4326", "Point_{0:.3f},{1:.3f}".format(loc_dict['Lon'], loc_dict['Lat']), "memory")
         
         layer_out_prov = layer_out.dataProvider()
-        layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.Int)])
+        if self.iso_range_type == 'time':
+            layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.Int)])
+        else:
+            layer_out_prov.addAttributes([QgsField("AA_METERS", QVariant.Int)])            
         layer_out_prov.addAttributes([QgsField("AA_MODE", QVariant.String)])
         layer_out.updateFields()
         
@@ -264,7 +289,11 @@ class accessAnalysis:
         layer_out_prov = layer_out.dataProvider()
         for field in acc_input_lyr.fields():
             layer_out_prov.addAttributes([field])
-        layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.Int)])
+        # Add field depending on range type
+        if self.iso_range_type == 'time':
+            layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.Int)])
+        else:
+            layer_out_prov.addAttributes([QgsField("AA_METERS", QVariant.Int)])
         layer_out_prov.addAttributes([QgsField("AA_MODE", QVariant.String)])
         layer_out.updateFields()
         

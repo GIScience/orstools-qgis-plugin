@@ -39,16 +39,17 @@ class Geocode:
         
         # Check if there was an HTTP error and terminate
         http_status = response.status_code
+        
         try:
             if http_status > 200:
                 osm_tools_aux.CheckStatus(http_status, req)
-                raise
+                return
         except: 
             return
         
         loc_place_dict = dict()
         
-        x, y = root['features'][0]['geometry']['coordinates']
+        x, y = root['features'][0]['geometry'].get('coordinates',None)
         loc_place_dict['Lon'] = x
         loc_place_dict['Lat'] = y
         loc_place_dict['COUNTRY'] = root['features'][0]['properties'].get('country', None)
