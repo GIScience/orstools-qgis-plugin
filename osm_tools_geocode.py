@@ -14,7 +14,6 @@ import qgis.utils
 
 import requests
 import json
-import xml.etree.ElementTree as ET
 
 import osm_tools_aux
 

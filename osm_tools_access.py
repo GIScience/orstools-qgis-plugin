@@ -4,19 +4,19 @@ Created on Mon Feb 06 15:26:47 2017
 
 @author: nnolde
 """
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from qgis.core import *
 from qgis.gui import * 
 import qgis.utils
-import processing
 
 import requests
 import json
 import os.path
-
-import osm_tools       
+from math import ceil
+      
 import osm_tools_geocode
 import osm_tools_pointtool
 import osm_tools_aux
@@ -27,6 +27,10 @@ class accessAnalysis:
         self.url = r"https://api.openrouteservice.org/isochrones?"
                   
         self.mapTool = None
+        
+        self.loc_limit = 5
+        
+        self.iso_amount = ceil(self.dlg.iso_max.value()/self.dlg.iso_int.value())
 
         self.dlg.mode.clear()
         self.dlg.layer.clear()
@@ -47,9 +51,6 @@ class accessAnalysis:
             layerType = layer.type()
             if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
                 self.dlg.layer.addItem(layer.name())
-                  
-        # GUI Init
-        #self.popBox()
         
         # API parameters
         self.api_key = self.dlg.api_key.text()
@@ -87,6 +88,8 @@ class accessAnalysis:
         self.iso_int = self.dlg.iso_int.value()
         self.iso_mode = self.dlg.mode.currentText()
         self.iso_range_type = self.dlg.unit.currentText()
+        self.iso_amount = ceil(self.dlg.iso_max.value()/self.dlg.iso_int.value())
+
         if self.iso_range_type == 'time':
             self.dlg.iso_max.setDecimals(0)
             self.dlg.iso_int.setDecimals(0)
@@ -130,23 +133,41 @@ class accessAnalysis:
         self.mapTool.canvasClicked.connect(self.pointAnalysis)
         
         
-    def accRequest(self, point_in):
+    def accRequest(self, points_in):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         #geometry_in = QgsGeometry.fromPoint(point_in)
-        x, y = point_in.asPoint()
+
+        # Collect all points in a list
+        coord_list = []
+        for point_in in points_in:
+            coord_list.append(point_in.asPoint())
         
+        # Set isochrone dimension
         if self.iso_range_type == 'time':
             self.iso_max = self.dlg.iso_max.value() * 60
             self.iso_int = self.dlg.iso_int.value() * 60
         
-        req = "{}api_key={}&locations={},{}&range_type={}&range={}&interval={}&profile={}&location_type=start".format(self.url, 
-                                                                self.api_key, 
-                                                                x, 
-                                                                y,
+        req = "{}api_key={}&range_type={}&range={}&interval={}&profile={}&location_type=start&locations={},{}".format(self.url, 
+                                                                self.api_key,
                                                                 self.iso_range_type,
                                                                 self.iso_max,
                                                                 self.iso_int,
-                                                                self.iso_mode)
+                                                                self.iso_mode, 
+                                                                "{0:.5f}".format(coord_list[0][0]),
+                                                                "{0:.5f}".format(coord_list[0][1]))
+        
+        # Append optional parameters
+        if len(points_in) > 1:
+            for coord in coord_list[1:]:
+                req += "%7C{0:.5f},{1:.5f}".format(coord[0], coord[1])
+        
+        if self.iso_range_type == 'distance':
+            req += '&units=km'
+            
+        if self.dlg.iso_overlap.isChecked() and self.dlg.iso_overlap.isEnabled():
+            req += "&intersections=true"
+        
+        print req
         
         if self.iso_range_type == 'distance':
             req += '&units=km'
@@ -170,6 +191,7 @@ class accessAnalysis:
         
         isochrone_list = []
         feat_list = []
+        isochrone_parse = self.iso_amount * len(points_in)
 
 #        try:
         for isochrone in root['features']:
@@ -181,9 +203,16 @@ class accessAnalysis:
             for coords in isochrone['geometry']['coordinates'][0]:
                 qgis_coords = QgsPoint(coords[0], coords[1])
                 coord_list.append(qgis_coords)
-                    
+            
             feat_out.setGeometry(QgsGeometry.fromPolygon([coord_list]))
             feat_list.append(feat_out)
+            
+            #TODO: Put geometry output in other functions, allowing for separate overlap shapefile
+            # Leave loop if feature is an overlap area
+            if "contours" in isochrone['properties']:
+                isochrone_list.append(isochrone['properties']["contours"])
+                continue
+            
             iso_value = isochrone['properties']['value']
             if self.iso_range_type == 'time':
                 iso_value /= 60.0
@@ -192,14 +221,14 @@ class accessAnalysis:
 #            msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
 #            qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
 #            return
-        
+
         return feat_list, isochrone_list
 
         
     def pointAnalysis(self, point):
         point_geometry = QgsGeometry.fromPoint(point)
         try:
-            feat_list, isochrone_list = self.accRequest(point_geometry)
+            feat_list, isochrone_list = self.accRequest([point_geometry])
         except:
             self.dlg.close()
             QApplication.restoreOverrideCursor()
@@ -291,13 +320,11 @@ class accessAnalysis:
             layer_out_prov.addAttributes([field])
         # Add field depending on range type
         if self.iso_range_type == 'time':
-            layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.Int)])
+            layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.String)])
         else:
-            layer_out_prov.addAttributes([QgsField("AA_METERS", QVariant.Int)])
+            layer_out_prov.addAttributes([QgsField("AA_METERS", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("AA_MODE", QVariant.String)])
         layer_out.updateFields()
-        
-        features = acc_input_lyr.getFeatures()
         
         # Progress Bar
         feature_count = acc_input_lyr.featureCount()
@@ -307,15 +334,33 @@ class accessAnalysis:
         progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         progressMessageBar.layout().addWidget(progress)
         self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
+        
+        # Chunk features
+        n = self.loc_limit
+        features_list = []
+        for feature in acc_input_lyr.getFeatures():
+            features_list.append(feature)
+            
+        features_chunked = [features_list[i:i+n] for i in xrange(0, feature_count, n)]
+        
+        for chunk in features_chunked:
+            feat_in_list = []
+            for i, feat_in in enumerate(chunk):
+                percent = (i/feature_count) * 100
+                progress.setValue(percent)
                 
-        for i, feat_in in enumerate(features):
-            percent = (i/feature_count) * 100
-            progress.setValue(percent)
+                feat_in_list.append(feat_in.geometry())
+                
+            feat_list, isochrone_list = self.accRequest(feat_in_list)
             
-            feat_list, isochrone_list = self.accRequest(feat_in.geometry())
-            
-            for ind, feat in enumerate(feat_list):                
-                feat.setAttributes(feat_in.attributes() + [isochrone_list[ind], self.iso_mode])
+            for ind, feat in enumerate(feat_list):
+                # Map attributes on features
+                if type(isochrone_list[ind]) == list:
+                    attr_amount = len(chunk[0].attributes())
+                    feat.setAttributes( [None] * attr_amount + ['overlap', self.iso_mode])
+                else:
+                    att_counter = ind/self.iso_amount
+                    feat.setAttributes(chunk[att_counter].attributes() + [isochrone_list[ind], self.iso_mode])
                 layer_out_prov.addFeatures([feat])
 
             layer_out.updateExtents()

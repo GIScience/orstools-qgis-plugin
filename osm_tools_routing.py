@@ -13,12 +13,9 @@ from qgis.gui import *
 import qgis.utils
 
 import requests
-import xml.etree.ElementTree as ET
 import os.path
-import re
 import itertools
 import json
-import logging
 
 import osm_tools_aux
 import osm_tools_geocode
@@ -310,7 +307,9 @@ class routing:
                                                     self.mode_travel,
                                                     self.mode_routing
                                                     )
-
+                
+                print req
+                
                 # Get response from API and read into element tree
                 response = requests.get(req)
                 root = json.loads(response.text)
