@@ -89,7 +89,7 @@ class accessAnalysis:
         self.iso_mode = self.dlg.mode.currentText()
         self.iso_range_type = self.dlg.unit.currentText()
         self.iso_amount = ceil(self.dlg.iso_max.value()/self.dlg.iso_int.value())
-        
+
         if self.iso_range_type == 'time':
             self.dlg.iso_max.setDecimals(0)
             self.dlg.iso_int.setDecimals(0)
@@ -136,7 +136,7 @@ class accessAnalysis:
     def accRequest(self, points_in):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         #geometry_in = QgsGeometry.fromPoint(point_in)
-        
+
         # Collect all points in a list
         coord_list = []
         for point_in in points_in:
@@ -167,6 +167,10 @@ class accessAnalysis:
         if self.dlg.iso_overlap.isChecked() and self.dlg.iso_overlap.isEnabled():
             req += "&intersections=true"
         
+        print req
+        
+        if self.iso_range_type == 'distance':
+            req += '&units=km'
         print req
         
         response = requests.get(req)
