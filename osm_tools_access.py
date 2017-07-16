@@ -13,6 +13,7 @@ from qgis.gui import *
 import qgis.utils
 
 import requests
+from shapely.geometry import MultiPolygon, shape
 import json
 import os.path
 from math import ceil
@@ -169,10 +170,6 @@ class accessAnalysis:
         
         print req
         
-        if self.iso_range_type == 'distance':
-            req += '&units=km'
-        print req
-        
         response = requests.get(req)
         root = json.loads(response.text)
         
@@ -191,15 +188,17 @@ class accessAnalysis:
         
         isochrone_list = []
         feat_list = []
-        isochrone_parse = self.iso_amount * len(points_in)
+#        
+#        vlayer = QgsVectorLayer(response.text,"mygeojson","ogr")
+#        QgsMapLayerRegistry.instance().addMapLayer(vlayer)
 
-#        try:
+        #self.getGeometry(root)
+
         for isochrone in root['features']:
             feat_out = QgsFeature()
             
             coord_list = []
             
-            # First find the exterior ring
             for coords in isochrone['geometry']['coordinates'][0]:
                 qgis_coords = QgsPoint(coords[0], coords[1])
                 coord_list.append(qgis_coords)
@@ -217,14 +216,49 @@ class accessAnalysis:
             if self.iso_range_type == 'time':
                 iso_value /= 60.0
             isochrone_list.append(iso_value)
-#        except (AttributeError, TypeError):
-#            msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
-#            qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
-#            return
 
         return feat_list, isochrone_list
 
+    
+    def getGeometry(self,root):
+        indices = [] #[group, isochrone]
+        feat_list_iso = []
+        iso_list_iso = []
+        feat_list_overlap = []
         
+        feat_dict =  dict()
+        
+        for feature in root['features']:
+            if 'contours' not in feature['properties']:
+                feat_dict['feature'] = feature
+                
+            props = feature['properties']
+            geom = feature['geometry']
+            
+            feat = QgsFeature()
+            polygon = shape(geom)
+            geometry = QgsGeometry.fromWkt(polygon.wkt)
+            feat.setGeometry(geometry)
+            feat_list_iso.append(feat)
+            
+            # First look for isochrones
+            if 'contours' not in props:
+                iso_value = props['value']
+                if self.iso_range_type == 'time':
+                    iso_value /= 60.0
+                    
+                feat_list_iso.append(feat)
+                indices.append([props['group_index'], props['value']])
+                iso_list_iso.append(iso_value)
+            # Then for overlap areas
+            else:
+                feat_list_overlap.append(feat)
+                
+        print indices
+        print feat_list_iso
+        print feat_list_overlap
+    
+    
     def pointAnalysis(self, point):
         point_geometry = QgsGeometry.fromPoint(point)
         try:
@@ -234,7 +268,7 @@ class accessAnalysis:
             QApplication.restoreOverrideCursor()
             return
         
-        _point_geocode = osm_tools_geocode.Geocode(self.dlg, self.api_key)
+        _point_geocode = osm_tools_geocode.Geocode(self.dlg)
         loc_dict = _point_geocode.reverseGeocode(point_geometry)
         
         out_str = u"Long: {0:.3f}, Lat:{1:.3f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
@@ -283,15 +317,15 @@ class accessAnalysis:
                                 ])
         layer_out_point_prov.addFeatures([point_out])
         
-        for ind, feat in enumerate(feat_list):
-            feat.setAttributes([isochrone_list[ind], self.iso_mode])
+        for ind, feat in enumerate(feat_list[::-1]):
+            feat.setAttributes([isochrone_list[::-1][ind], self.iso_mode])
             layer_out_prov.addFeatures([feat])
 
         layer_out.updateExtents()
         layer_out_point.updateExtents()
         
-        QgsMapLayerRegistry.instance().addMapLayer(layer_out_point)
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
+        QgsMapLayerRegistry.instance().addMapLayer(layer_out_point)
 
 #        fields_diss = ["AA_MINS"]
 #        self.dissolveFields(layer_out, fields_diss)
@@ -353,11 +387,13 @@ class accessAnalysis:
                 
             feat_list, isochrone_list = self.accRequest(feat_in_list)
             
+            #TODO: need to create another layer for overlaps
             for ind, feat in enumerate(feat_list):
+                
                 # Map attributes on features
                 if type(isochrone_list[ind]) == list:
                     attr_amount = len(chunk[0].attributes())
-                    feat.setAttributes( [None] * attr_amount + ['overlap', self.iso_mode])
+                    feat.setAttributes( [None] * attr_amount + [str(isochrone_list[ind]), self.iso_mode])
                 else:
                     att_counter = ind/self.iso_amount
                     feat.setAttributes(chunk[att_counter].attributes() + [isochrone_list[ind], self.iso_mode])
@@ -371,14 +407,4 @@ class accessAnalysis:
         qgis.utils.iface.messageBar().clearWidgets() 
         
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
-#        self.dissolveFields(layer_out, fields_diss)
     
-        
-#    def dissolveFields(self, layer_out, fields_diss):
-#        # Dissolve output for interval 'AA_MINS' and id_layer, remove non-dissolved layer
-#        
-#        processing.runandload("qgis:dissolve", layer_out , False,
-#                          fields_diss, "memory:dissolved")
-#        layer_dissolved = QgsMapLayerRegistry.instance().mapLayersByName("Dissolved")[-1]
-#        layer_dissolved.setLayerName(layer_out.name())
-#        QgsMapLayerRegistry.instance().removeMapLayers([layer_out.id()])

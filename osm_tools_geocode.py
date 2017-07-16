@@ -18,18 +18,19 @@ import json
 import osm_tools_aux
 
 class Geocode:
-    def __init__(self, dlg, api_key):
+    def __init__(self, dlg):
         self.dlg = dlg
-        self.url = r"https://api.openrouteservice.org/geocoding?"
+        self.url_ors = r"https://api.openrouteservice.org/geocoding?"
+        self.url_gh = r"https://graphhopper.com/api/1/geocode?"
                   
         # API parameters
-        self.api_key = api_key
+        self.api_key = self.dlg.api_key.text()
         
         self.iface = qgis.utils.iface    
         
     def reverseGeocode(self, point_in):
         x, y = point_in.asPoint()
-        req = "{}lang=en&api_key={}&location={},{}".format(self.url, 
+        req = "{}lang=en&api_key={}&location={},{}".format(self.url_ors, 
                                             self.api_key, 
                                             x, 
                                             y)
@@ -58,5 +59,40 @@ class Geocode:
         loc_place_dict['STREET'] = root['features'][0]['properties'].get('street', None)
         loc_place_dict['NUMBER'] = root['features'][0]['properties'].get('number', None)
         loc_place_dict['NAME'] = root['features'][0]['properties'].get('name', None)
+                           
+        return loc_place_dict     
+    
+    
+    def reverseGeocodeGH(self, point_in):
+        x, y = point_in.asPoint()
+        req = "{}reverse=true&point={},{}&key={}&provider=nominatim".format(self.url_gh,
+                                               y,
+                                               x,
+                                               self.api_key)
+        
+        print req
+        
+        response = requests.get(req)
+        root = json.loads(response.text)
+        
+        # Check if there was an HTTP error and terminate
+        http_status = response.status_code
+        
+        try:
+            if http_status > 200:
+                osm_tools_aux.CheckStatus(http_status, req)
+                return
+        except: 
+            return
+        
+        loc_place_dict = dict()
+        
+        print root
+        
+        loc_place_dict['Lon'] = root['hits'][0]['point'].get('lng',None)
+        loc_place_dict['Lat'] = root['hits'][0]['point'].get('lat',None)
+        loc_place_dict['COUNTRY'] = root['hits'][0].get('country', None)
+        loc_place_dict['CITY'] = root['hits'][0].get('city', None)
+        loc_place_dict['NAME'] = root['hits'][0].get('name', None)
                            
         return loc_place_dict
