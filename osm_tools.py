@@ -45,7 +45,7 @@ import logging
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO)
 
-class OSMtools:
+class OSMtools():
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
