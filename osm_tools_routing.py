@@ -329,7 +329,7 @@ class routing:
                                                     self.mode_routing
                                                     )
                 
-                print req
+                #print req
                 
                 # Get response from API and read into element tree
                 response = requests.get(req)
@@ -531,7 +531,7 @@ class routing:
                     
                 route_string = "&point=".join(route)
                 # Create URL
-                req = "{}api_key={}&point={}&vehicle={}&points_encoded=false&instructions=false".format(self.url_gh, 
+                req = "{}key={}&point={}&vehicle={}&points_encoded=false&instructions=false".format(self.url_gh, 
                                                     self.api_key, 
                                                    route_string,
                                                     self.mode_travel
