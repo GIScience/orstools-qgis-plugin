@@ -16,6 +16,7 @@ import requests
 import os.path
 import itertools
 import json
+import time
 
 import osm_tools_aux
 import osm_tools_geocode
@@ -292,6 +293,9 @@ class routing:
         progressMessageBar.layout().addWidget(progress)
         self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
         
+        # Server limit parameters
+        start = time.time()
+        counter = 0
         for i, route in enumerate(route_features):
             # Skip route if start and end are identical
             if route[0] == route[-1]:
@@ -304,7 +308,7 @@ class routing:
                     
                 route_string = "|".join(route)
                 # Create URL
-                req = "{}api_key={}&coordinates={}&profile={}&preference={}&instructions=False&geometry_format=geojson&units=m".format(self.url_ors, 
+                req = "{}api_key={}&coordinates={}&profile={}&preference={}&instructions=False&geometry_format=geojson&units=m".format(self.url, 
                                                     self.api_key, 
                                                    route_string,
                                                     self.mode_travel,
@@ -312,6 +316,19 @@ class routing:
                                                     )
                 
                 #print req
+                
+                # Avoid the 40 req/min limit
+                counter +=1
+                timer = time.time() - start
+                print counter, timer
+                if counter > 40 and timer <= 60:     
+                    wait = 60.1 - timer
+                    msg = "Limit of 40 requests/minute reached. You had to wait for {} secs.".format(int(wait))
+                    qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL, duration=10)
+                    time.sleep(wait)
+                    # reset counter and timer
+                    counter = 0
+                    start = time.time()
                 
                 # Get response from API and read into element tree
                 response = requests.get(req)

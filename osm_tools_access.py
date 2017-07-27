@@ -165,10 +165,10 @@ class accessAnalysis:
         if self.iso_range_type == 'distance':
             req += '&units=km'
             
-        if self.dlg.iso_overlap.isChecked() and self.dlg.iso_overlap.isEnabled():
-            req += "&intersections=true"
-        
-        print req
+#        if self.dlg.iso_overlap.isChecked() and self.dlg.iso_overlap.isEnabled():
+#            req += "&intersections=true"
+#        
+#        print req
         
         response = requests.get(req)
         root = json.loads(response.text)
@@ -208,9 +208,9 @@ class accessAnalysis:
             
             #TODO: Put geometry output in other functions, allowing for separate overlap shapefile
             # Leave loop if feature is an overlap area
-            if "contours" in isochrone['properties']:
-                isochrone_list.append(isochrone['properties']["contours"])
-                continue
+#            if "contours" in isochrone['properties']:
+#                isochrone_list.append(isochrone['properties']["contours"])
+#                continue
             
             iso_value = isochrone['properties']['value']
             if self.iso_range_type == 'time':
@@ -219,44 +219,44 @@ class accessAnalysis:
 
         return feat_list, isochrone_list
 
-    
-    def getGeometry(self,root):
-        indices = [] #[group, isochrone]
-        feat_list_iso = []
-        iso_list_iso = []
-        feat_list_overlap = []
-        
-        feat_dict =  dict()
-        
-        for feature in root['features']:
-            if 'contours' not in feature['properties']:
-                feat_dict['feature'] = feature
-                
-            props = feature['properties']
-            geom = feature['geometry']
-            
-            feat = QgsFeature()
-            polygon = shape(geom)
-            geometry = QgsGeometry.fromWkt(polygon.wkt)
-            feat.setGeometry(geometry)
-            feat_list_iso.append(feat)
-            
-            # First look for isochrones
-            if 'contours' not in props:
-                iso_value = props['value']
-                if self.iso_range_type == 'time':
-                    iso_value /= 60.0
-                    
-                feat_list_iso.append(feat)
-                indices.append([props['group_index'], props['value']])
-                iso_list_iso.append(iso_value)
-            # Then for overlap areas
-            else:
-                feat_list_overlap.append(feat)
-                
-        print indices
-        print feat_list_iso
-        print feat_list_overlap
+    # Early attempt to separate overlap areas and isochrones
+#    def getGeometry(self,root):
+#        indices = [] #[group, isochrone]
+#        feat_list_iso = []
+#        iso_list_iso = []
+#        feat_list_overlap = []
+#        
+#        feat_dict =  dict()
+#        
+#        for feature in root['features']:
+#            if 'contours' not in feature['properties']:
+#                feat_dict['feature'] = feature
+#                
+#            props = feature['properties']
+#            geom = feature['geometry']
+#            
+#            feat = QgsFeature()
+#            polygon = shape(geom)
+#            geometry = QgsGeometry.fromWkt(polygon.wkt)
+#            feat.setGeometry(geometry)
+#            feat_list_iso.append(feat)
+#            
+#            # First look for isochrones
+#            if 'contours' not in props:
+#                iso_value = props['value']
+#                if self.iso_range_type == 'time':
+#                    iso_value /= 60.0
+#                    
+#                feat_list_iso.append(feat)
+#                indices.append([props['group_index'], props['value']])
+#                iso_list_iso.append(iso_value)
+#            # Then for overlap areas
+#            else:
+#                feat_list_overlap.append(feat)
+#                
+#        print indices
+#        print feat_list_iso
+#        print feat_list_overlap
     
     
     def pointAnalysis(self, point):
@@ -354,9 +354,9 @@ class accessAnalysis:
             layer_out_prov.addAttributes([field])
         # Add field depending on range type
         if self.iso_range_type == 'time':
-            layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.String)])
+            layer_out_prov.addAttributes([QgsField("AA_MINS", QVariant.Int)])
         else:
-            layer_out_prov.addAttributes([QgsField("AA_METERS", QVariant.String)])
+            layer_out_prov.addAttributes([QgsField("AA_METERS", QVariant.Int)])
         layer_out_prov.addAttributes([QgsField("AA_MODE", QVariant.String)])
         layer_out.updateFields()
         
@@ -387,20 +387,15 @@ class accessAnalysis:
                 
             feat_list, isochrone_list = self.accRequest(feat_in_list)
             
-            #TODO: need to create another layer for overlaps
-            for ind, feat in enumerate(feat_list):
+            for ind, feat in enumerate(feat_list[::-1]):
                 
                 # Map attributes on features
-                if type(isochrone_list[ind]) == list:
-                    attr_amount = len(chunk[0].attributes())
-                    feat.setAttributes( [None] * attr_amount + [str(isochrone_list[ind]), self.iso_mode])
-                else:
-                    att_counter = ind/self.iso_amount
-                    feat.setAttributes(chunk[att_counter].attributes() + [isochrone_list[ind], self.iso_mode])
+                att_counter = ind/self.iso_amount
+                feat.setAttributes(chunk[::-1][att_counter].attributes() + [isochrone_list[::-1][ind], self.iso_mode])
                 layer_out_prov.addFeatures([feat])
 
             layer_out.updateExtents()
-        
+
 #        id_field = self.dlg.id_field.currentText()
 #        fields_diss = ["AA_MINS", id_field]
         
