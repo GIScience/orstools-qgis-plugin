@@ -45,7 +45,7 @@ import logging
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO)
 
-class OSMtools:
+class OSMtools():
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -77,7 +77,7 @@ class OSMtools:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&OSM Tools')
-        # TODO: We are going to let the user set this up in a future iteration
+
         self.toolbar = self.iface.addToolBar(u'OSMtools')
         self.toolbar.setObjectName(u'OSMtools')
         
@@ -86,6 +86,11 @@ class OSMtools:
         
         self.canvas = qgis.utils.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Add GraphHopper
+        self.dlg.provider.clear()
+        self.dlg.provider.addItem('ORS')
+        self.dlg.provider.addItem('GraphHopper')
         
         
     # noinspection PyMethodMayBeStatic
@@ -190,9 +195,11 @@ class OSMtools:
             callback=self.run,
             parent=self.iface.mainWindow())
         
+        self.dlg.provider.currentIndexChanged.connect(self.providerReader)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
         
-        self.dlg.key_order.setText("<a href = 'https://developers.openrouteservice.org/portal/apis/'>Get Key!</a>") 
+        
+        self.dlg.key_order.setText("<a href = 'https://developers.openrouteservice.org/portal/apis/'>Get Key!</a>")     
         self.dlg.key_order.connect(self.dlg.key_order, SIGNAL("linkActivated(QString)"), self.OpenURL) 
         self.dlg.header_2.linkActivated.connect(self.OpenURL)
         self.dlg.header_3.linkActivated.connect(self.OpenURL)
@@ -211,8 +218,7 @@ class OSMtools:
         """Run method that performs all the real work"""
         
         # Populate the api key lineEdit widget
-        with open(os.path.join(self.script_dir, "apikey.txt")) as key:
-            self.dlg.api_key.setText(key.read())
+        self.providerReader()
         
         # Initiate analysis classes
         self.access_anal = osm_tools_access.accessAnalysis(self.dlg)
@@ -230,11 +236,39 @@ class OSMtools:
             if self.dlg.tabWidget.currentIndex() == 1 and self.dlg.use_layer.isChecked():
                 self.access_anal.iterAnalysis()
             
-            elif self.dlg.tabWidget.currentIndex() == 0:
-                self.route_anal.route()
+            elif self.dlg.tabWidget.currentIndex() == 0 and self.dlg.provider.currentText()=='ORS':
+                self.route_anal.routeORS()
+                
+            elif self.dlg.tabWidget.currentIndex() == 0 and self.dlg.provider.currentText()=='GraphHopper':
+                self.route_anal.routeGH()
         else:
             self.unload()
                 
     def keyWriter(self):
-        with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
-            return key.write(self.dlg.api_key.text())
+        if self.dlg.provider.currentText()=='ORS':
+            with open(os.path.join(self.script_dir, "ors_key.txt"), 'w') as key:
+                return key.write(self.dlg.api_key.text())
+        elif self.dlg.provider.currentText()=='GraphHopper':
+            with open(os.path.join(self.script_dir, "gh_key.txt"), 'w') as key:
+                return key.write(self.dlg.api_key.text())
+    
+    
+    def providerReader(self):
+        self.dlg.key_order.linkActivated.disconnect()
+        if self.dlg.provider.currentText()=='ORS':
+            with open(os.path.join(self.script_dir, "ors_key.txt")) as key:
+                self.dlg.api_key.setText(key.read())
+            self.dlg.key_order.setText("<a href = 'https://developers.openrouteservice.org/portal/apis/'>Get Key!</a>") 
+            self.dlg.widget_2.setEnabled(True)
+            self.dlg.tabWidget.setTabEnabled(1,True)
+            
+        # As of now, the shortest route function doesn´t work properly..
+        # Also, accessibility areas are not implemented yet
+        elif self.dlg.provider.currentText()=='GraphHopper':
+            with open(os.path.join(self.script_dir, "gh_key.txt")) as key:
+                self.dlg.api_key.setText(key.read())
+            self.dlg.key_order.setText("<a href = 'https://graphhopper.com/dashboard/#/register'>Get Key!</a>") 
+            self.dlg.widget_2.setEnabled(False)
+            self.dlg.tabWidget.setTabEnabled(1,False)
+            
+        self.dlg.key_order.connect(self.dlg.key_order, SIGNAL("linkActivated(QString)"), self.OpenURL) 
