@@ -24,16 +24,22 @@ import osm_tools_pointtool
 class routing:
     def __init__(self, dlg):
         self.dlg = dlg
-        self.url_ors = r"https://api.openrouteservice.org/directions?"
-        self.url_gh = r"https://graphhopper.com/api/1/route?"
+        self.url = r"https://api.openrouteservice.org/directions?"
         
         # GUI init
         self.dlg.start_layer.clear()
         self.dlg.end_layer.clear()
         self.dlg.mode_travel.clear()
-        self.dlg.mode_routing.clear()
-        
-        self.initPopBoxes()
+        self.dlg.mode_routing.clear()           
+        self.dlg.mode_travel.addItem('driving-car')
+        self.dlg.mode_travel.addItem('driving-hgv')
+        self.dlg.mode_travel.addItem('cycling-regular')
+        self.dlg.mode_travel.addItem('cycling-road')
+        self.dlg.mode_travel.addItem('cycling-safe')
+        self.dlg.mode_travel.addItem('cycling-mountain')
+        self.dlg.mode_travel.addItem('cycling-tour')
+        self.dlg.mode_travel.addItem('foot-walking')
+        self.dlg.mode_travel.addItem('foot-hiking')
             
         self.dlg.mode_routing.addItem('fastest')
         self.dlg.mode_routing.addItem('shortest')
@@ -71,34 +77,10 @@ class routing:
         self.dlg.add_via_button.clicked.connect(self.initMapTool)
         self.dlg.add_via_button_clear.clicked.connect(self.clearVia)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
-        self.dlg.provider.currentIndexChanged.connect(self.initPopBoxes)
     
     
     def clearVia(self):
         self.dlg.add_via.setText("Long,Lat")
-        
-    
-    def initPopBoxes(self):
-        self.dlg.mode_travel.clear()
-        if self.dlg.provider.currentText()=='ORS':            
-            self.dlg.mode_travel.addItem('driving-car')
-            self.dlg.mode_travel.addItem('driving-hgv')
-            self.dlg.mode_travel.addItem('cycling-regular')
-            self.dlg.mode_travel.addItem('cycling-road')
-            self.dlg.mode_travel.addItem('cycling-safe')
-            self.dlg.mode_travel.addItem('cycling-mountain')
-            self.dlg.mode_travel.addItem('cycling-tour')
-            self.dlg.mode_travel.addItem('foot-walking')
-            self.dlg.mode_travel.addItem('foot-hiking')
-        if self.dlg.provider.currentText()=='GraphHopper':            
-            self.dlg.mode_travel.addItem('car')
-            self.dlg.mode_travel.addItem('small_truck')
-            self.dlg.mode_travel.addItem('truck')
-            self.dlg.mode_travel.addItem('foot')
-            self.dlg.mode_travel.addItem('hike')
-            self.dlg.mode_travel.addItem('bike')
-            self.dlg.mode_travel.addItem('mtb')
-            self.dlg.mode_travel.addItem('racing_bike')
     
     
     def startPopBox(self):
@@ -204,7 +186,7 @@ class routing:
             
         self.dlg.showNormal()
         
-    def routeORS(self):
+    def route(self):
         
         # Create memory routing layer with fields
         layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
@@ -329,7 +311,7 @@ class routing:
                                                     self.mode_routing
                                                     )
                 
-                print req
+                #print req
                 
                 # Get response from API and read into element tree
                 response = requests.get(req)
@@ -408,213 +390,6 @@ class routing:
         layer_out.updateExtents()
         
         qgis.utils.iface.messageBar().clearWidgets() 
-
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
         
-    def routeGH(self):
-        
-        # Create memory routing layer with fields
-        layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_GH", "memory")
-        layer_out_prov = layer_out.dataProvider()
-        layer_out_prov.addAttributes([QgsField("DISTANCE", QVariant.Double)])
-        layer_out_prov.addAttributes([QgsField("TIME_H", QVariant.Int)])
-        layer_out_prov.addAttributes([QgsField("TIME_MIN", QVariant.Int)])
-        layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
-        layer_out_prov.addAttributes([QgsField("MODE", QVariant.String)])
-        layer_out_prov.addAttributes([QgsField("PREF", QVariant.String)])
-        layer_out_prov.addAttributes([QgsField("FROM_ID", QVariant.String)])
-        layer_out_prov.addAttributes([QgsField("TO_ID", QVariant.String)])
-        layer_out_prov.addAttributes([QgsField("FROM_LAT", QVariant.Double)])
-        layer_out_prov.addAttributes([QgsField("FROM_LONG", QVariant.Double)])
-        layer_out_prov.addAttributes([QgsField("TO_LAT", QVariant.Double)])
-        layer_out_prov.addAttributes([QgsField("TO_LONG", QVariant.Double)])
-        
-        layer_out.updateFields()
-        
-        start_features = []
-        end_features = []
-        start_ids = []
-        end_ids = []
-
-        # Create start features
-        if self.dlg.start_radio_layer.isChecked():
-            # Exit if CRS != WGS84
-            if osm_tools_aux.CheckCRS(self, self.layer_start.crs().authid()) == False:
-                return
-            start_feat = self.layer_start.getFeatures()
-            field_id = self.layer_start.fieldNameIndex(self.dlg.start_layer_id.currentText())
-            for feat in start_feat:
-                x, y = feat.geometry().asPoint()
-                start_features.append(",".join([str(y), str(x)]))
-                start_ids.append(feat.attributes()[field_id])
-        else:
-            x = self.dlg.add_start.text().split(',')[0]
-            y = self.dlg.add_start.text().split(',')[1]
-            start_features.append(','.join([y,x]))
-            point_geom = QgsGeometry.fromPoint(QgsPoint(float(x), float(y)))
-            _point_geo = osm_tools_geocode.Geocode(self.dlg)
-            loc_dict = _point_geo.reverseGeocodeGH(point_geom)
-            
-            if loc_dict:       
-                start_ids.append(loc_dict.get('CITY', start_features[0]))
-            else:
-                return
-            
-        # Create end features
-        if self.dlg.end_radio_layer.isChecked():
-            # Exit if CRS != WGS84
-            if osm_tools_aux.CheckCRS(self, self.layer_end.crs().authid()) == False:
-                return
-            end_feat = self.layer_end.getFeatures()
-            field_id = self.layer_end.fieldNameIndex(self.dlg.end_layer_id.currentText())
-            for feat in end_feat:
-                x, y = feat.geometry().asPoint()
-                end_features.append(",".join([str(y), str(x)]))
-                end_ids.append(feat.attributes()[field_id])
-        else:
-            x = self.dlg.add_end.text().split(',')[0]
-            y = self.dlg.add_end.text().split(',')[1]
-            end_features.append(','.join([y,x]))
-            point_geom = QgsGeometry.fromPoint(QgsPoint(float(x), float(y)))
-            _point_geo = osm_tools_geocode.Geocode(self.dlg)
-            loc_dict = _point_geo.reverseGeocodeGH(point_geom)
-            
-            if loc_dict:       
-                end_ids.append(loc_dict.get('CITY', end_features[0]))
-            else:
-                return
-            
-        # Rules for creating routing features
-        if len(start_features) == 1:
-            if len(end_features) == 1:
-                route_features = list(zip(start_features, end_features))
-                route_ids = list(zip(start_ids, end_ids))
-            else:
-                route_features = list(zip(itertools.cycle(start_features), end_features))
-                route_ids = list(zip(itertools.cycle(start_ids), end_ids))
-        else:
-            if len(end_features) == 1:
-                route_features = list(zip(start_features, itertools.cycle(end_features)))
-                route_ids = list(zip(start_ids, itertools.cycle(end_ids)))
-            else:
-                if self.dlg.radio_one.isChecked():
-                    route_features = list(zip(start_features, end_features))
-                    route_ids = list(zip(start_ids, end_ids))
-                else:
-                    route_features = list(itertools.product(start_features, end_features))
-                    route_ids = list(itertools.product(start_ids, end_ids))
-                    
-        # Convert tuple list into list list
-        route_features = [list(feat) for feat in route_features]
-
-        # Read route details from GUI
-        route_via = ",".join(self.dlg.add_via.text().split("\n")[:-1:-1]) #first lat, then long
-        
-        # Set up progress bar
-        route_count = len(route_features)
-        progressMessageBar = self.iface.messageBar().createMessage("Requesting routes from GraphHopper...")
-        progress = QProgressBar()
-        progress.setMaximum(100)
-        progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
-        progressMessageBar.layout().addWidget(progress)
-        self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
-        
-        for i, route in enumerate(route_features):
-            # Skip route if start and end are identical
-            if route[0] == route[-1]:
-                continue
-            else:
-#                try:
-                # Insert via point if present and make string    
-                if route_via != "":
-                    route.insert(1, route_via)
-                    
-                route_string = "&point=".join(route)
-                # Create URL
-                req = "{}api_key={}&point={}&vehicle={}&points_encoded=false&instructions=false".format(self.url_gh, 
-                                                    self.api_key, 
-                                                   route_string,
-                                                    self.mode_travel
-                                                    )
-                
-                print req
-                
-                # Get response from API and read into element tree
-                response = requests.get(req)
-                root = json.loads(response.text)
-                
-                # Check if there was an HTTP error and terminate
-                http_status = response.status_code
-                try:
-                    if http_status > 200:
-                        osm_tools_aux.CheckStatus(http_status, req)
-                        return
-                except: 
-                    #qgis.utils.iface.messageBar().clearWidgets()
-                    return
-                    
-                feat_out = QgsFeature()
-                
-                # Read all coordinates
-                coords_list = []
-                for coords in root['paths'][0]['points']:
-#                        coords_tuple = tuple([float(coord) for coord in coords.text.split(" ")])
-                    qgis_coords = QgsPoint(coords[0], coords[1])
-                    coords_list.append(qgis_coords)
-                
-                # Read total time
-                time_path = root['paths'][0]['time']
-                
-                if time_path/3600000 >= 1:
-                    hours = int(time_path)/3600000
-                    rest = time_path%3600000
-                    if rest/60 >= 1:
-                        minutes = int(rest)/60
-                        seconds = rest%60
-                    else:
-                        minutes = 0
-                        seconds = rest
-                else:
-                    hours = 0
-                    minutes = int(time_path)/60
-                    seconds = time_path%60
-                        
-                                         
-                # Read total distance
-                distance = root['paths'][0]['distance'] / 1000
-                
-                # Read X and Y
-                route_start_x, route_start_y = [float(coord) for coord in route[0].split(",")]
-                route_end_x, route_end_y = [float(coord) for coord in route[-1].split(",")]
-                    
-                # Set feature geometry and attributes
-                feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
-                feat_out.setAttributes([distance,
-                                        hours,
-                                        minutes,
-                                        seconds,
-                                        self.mode_travel,
-                                        self.mode_routing,
-                                        route_ids[i][0],
-                                        route_ids[i][1],
-                                        route_start_y,
-                                        route_start_x,
-                                        route_end_y,
-                                        route_end_x])
-                
-                layer_out_prov.addFeatures([feat_out])
-                
-                percent = (i/float(route_count)) * 100
-                
-                progress.setValue(percent)
-                    
-#                except (AttributeError, TypeError):
-#                    msg = "Request is not valid! Check parameters. TIP: Coordinates must plot within 1 km of a road."
-#                    qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL)
-#                    return
-                
-        layer_out.updateExtents()
-        
-        qgis.utils.iface.messageBar().clearWidgets() 
-
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
