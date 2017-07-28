@@ -18,18 +18,19 @@ import json
 import osm_tools_aux
 
 class Geocode:
-    def __init__(self, dlg, api_key):
+    def __init__(self, dlg):
         self.dlg = dlg
-        self.url = r"https://api.openrouteservice.org/geocoding?"
+        self.url_ors = r"https://api.openrouteservice.org/geocoding?"
+        self.url_gh = r"https://graphhopper.com/api/1/geocode?"
                   
         # API parameters
-        self.api_key = api_key
+        self.api_key = self.dlg.api_key.text()
         
         self.iface = qgis.utils.iface    
         
     def reverseGeocode(self, point_in):
         x, y = point_in.asPoint()
-        req = "{}lang=en&api_key={}&location={},{}".format(self.url, 
+        req = "{}lang=en&api_key={}&location={},{}".format(self.url_ors, 
                                             self.api_key, 
                                             x, 
                                             y)
@@ -59,4 +60,4 @@ class Geocode:
         loc_place_dict['NUMBER'] = root['features'][0]['properties'].get('number', None)
         loc_place_dict['NAME'] = root['features'][0]['properties'].get('name', None)
                            
-        return loc_place_dict
+        return loc_place_dict     

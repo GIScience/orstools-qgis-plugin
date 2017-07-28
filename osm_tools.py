@@ -77,7 +77,7 @@ class OSMtools():
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&OSM Tools')
-        # TODO: We are going to let the user set this up in a future iteration
+
         self.toolbar = self.iface.addToolBar(u'OSMtools')
         self.toolbar.setObjectName(u'OSMtools')
         
@@ -192,7 +192,7 @@ class OSMtools():
         
         self.dlg.api_key.textChanged.connect(self.keyWriter)
         
-        self.dlg.key_order.setText("<a href = 'https://developers.openrouteservice.org/portal/apis/'>Get Key!</a>") 
+        self.dlg.key_order.setText("<a href = 'https://developers.openrouteservice.org/portal/apis/'>Get Key!</a>")     
         self.dlg.key_order.connect(self.dlg.key_order, SIGNAL("linkActivated(QString)"), self.OpenURL) 
         self.dlg.header_2.linkActivated.connect(self.OpenURL)
         self.dlg.header_3.linkActivated.connect(self.OpenURL)
@@ -213,7 +213,7 @@ class OSMtools():
         # Populate the api key lineEdit widget
         with open(os.path.join(self.script_dir, "apikey.txt")) as key:
             self.dlg.api_key.setText(key.read())
-        
+            
         # Initiate analysis classes
         self.access_anal = osm_tools_access.accessAnalysis(self.dlg)
         self.route_anal = osm_tools_routing.routing(self.dlg)

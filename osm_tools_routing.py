@@ -16,6 +16,7 @@ import requests
 import os.path
 import itertools
 import json
+import time
 
 import osm_tools_aux
 import osm_tools_geocode
@@ -30,7 +31,7 @@ class routing:
         self.dlg.start_layer.clear()
         self.dlg.end_layer.clear()
         self.dlg.mode_travel.clear()
-        self.dlg.mode_routing.clear()
+        self.dlg.mode_routing.clear()           
         self.dlg.mode_travel.addItem('driving-car')
         self.dlg.mode_travel.addItem('driving-hgv')
         self.dlg.mode_travel.addItem('cycling-regular')
@@ -40,6 +41,7 @@ class routing:
         self.dlg.mode_travel.addItem('cycling-tour')
         self.dlg.mode_travel.addItem('foot-walking')
         self.dlg.mode_travel.addItem('foot-hiking')
+            
         self.dlg.mode_routing.addItem('fastest')
         self.dlg.mode_routing.addItem('shortest')
         
@@ -77,8 +79,10 @@ class routing:
         self.dlg.add_via_button_clear.clicked.connect(self.clearVia)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
     
+    
     def clearVia(self):
         self.dlg.add_via.setText("Long,Lat")
+    
     
     def startPopBox(self):
         if self.dlg.start_radio_layer.isChecked():
@@ -186,7 +190,7 @@ class routing:
     def route(self):
         
         # Create memory routing layer with fields
-        layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route", "memory")
+        layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
         layer_out_prov = layer_out.dataProvider()
         layer_out_prov.addAttributes([QgsField("DISTANCE", QVariant.Double)])
         layer_out_prov.addAttributes([QgsField("TIME_H", QVariant.Int)])
@@ -223,7 +227,7 @@ class routing:
             start_features.append(self.dlg.add_start.text())
             point_list = [float(x) for x in start_features[0].split(",")]
             point_geom = QgsGeometry.fromPoint(QgsPoint(point_list[0], point_list[1]))
-            _point_geo = osm_tools_geocode.Geocode(self.dlg, self.api_key)
+            _point_geo = osm_tools_geocode.Geocode(self.dlg)
             loc_dict = _point_geo.reverseGeocode(point_geom)
             
             if loc_dict:       
@@ -246,7 +250,7 @@ class routing:
             end_features.append(self.dlg.add_end.text())
             point_list = [float(x) for x in end_features[0].split(",")]
             point_geom = QgsGeometry.fromPoint(QgsPoint(point_list[0], point_list[1]))
-            _point_geo = osm_tools_geocode.Geocode(self.dlg, self.api_key)
+            _point_geo = osm_tools_geocode.Geocode(self.dlg)
             loc_dict = _point_geo.reverseGeocode(point_geom)
             
             if loc_dict:       
@@ -289,6 +293,9 @@ class routing:
         progressMessageBar.layout().addWidget(progress)
         self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
         
+        # Server limit parameters
+        start = time.time()
+        counter = 0
         for i, route in enumerate(route_features):
             # Skip route if start and end are identical
             if route[0] == route[-1]:
@@ -308,7 +315,20 @@ class routing:
                                                     self.mode_routing
                                                     )
                 
-                print req
+                #print req
+                
+                # Avoid the 40 req/min limit
+                counter +=1
+                timer = time.time() - start
+                print counter, timer
+                if counter > 40 and timer <= 60:     
+                    wait = 60.1 - timer
+                    msg = "Limit of 40 requests/minute reached. You had to wait for {} secs.".format(int(wait))
+                    qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL, duration=10)
+                    time.sleep(wait)
+                    # reset counter and timer
+                    counter = 0
+                    start = time.time()
                 
                 # Get response from API and read into element tree
                 response = requests.get(req)
@@ -387,5 +407,6 @@ class routing:
         layer_out.updateExtents()
         
         qgis.utils.iface.messageBar().clearWidgets() 
-
+        QgsMapLayerRegistry.instance().addMapLayer(layer_out)
+        
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)

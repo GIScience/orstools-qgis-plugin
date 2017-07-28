@@ -110,8 +110,8 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-21</y>
-            <width>315</width>
+            <y>0</y>
+            <width>296</width>
             <height>679</height>
            </rect>
           </property>
@@ -979,17 +979,7 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QGridLayout" name="gridLayout_7" columnstretch="3,0">
-          <item row="1" column="0">
-           <widget class="QComboBox" name="layer">
-            <property name="toolTip">
-             <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-           </widget>
-          </item>
+         <layout class="QGridLayout" name="gridLayout_7" columnstretch="3">
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
@@ -997,13 +987,13 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QCheckBox" name="iso_overlap">
+          <item row="1" column="0">
+           <widget class="QComboBox" name="layer">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Returns overlapping areas of isochrones from multiple locations (basically intersection of corresponding isochrones)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
             </property>
-            <property name="text">
-             <string>Return overlaps</string>
+            <property name="whatsThis">
+             <string/>
             </property>
            </widget>
           </item>
