@@ -193,9 +193,9 @@ class routing:
         layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
         layer_out_prov = layer_out.dataProvider()
         layer_out_prov.addAttributes([QgsField("DISTANCE", QVariant.Double)])
-        layer_out_prov.addAttributes([QgsField("TIME_H", QVariant.Int)])
-        layer_out_prov.addAttributes([QgsField("TIME_MIN", QVariant.Int)])
-        layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
+        layer_out_prov.addAttributes([QgsField("TIME_H", QVariant.Double)])
+#        layer_out_prov.addAttributes([QgsField("TIME_MIN", QVariant.Int)])
+#        layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
         layer_out_prov.addAttributes([QgsField("MODE", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("PREF", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_ID", QVariant.String)])
@@ -320,7 +320,6 @@ class routing:
                 # Avoid the 40 req/min limit
                 counter +=1
                 timer = time.time() - start
-                print counter, timer
                 if counter > 40 and timer <= 60:     
                     wait = 60.1 - timer
                     msg = "Limit of 40 requests/minute reached. You had to wait for {} secs.".format(int(wait))
@@ -356,20 +355,21 @@ class routing:
                 # Read total time
                 time_path = root['routes'][0]['summary']['duration']
                 
-                if time_path/3600 >= 1:
-                    hours = int(time_path)/3600
-                    rest = time_path%3600
-                    if rest/60 >= 1:
-                        minutes = int(rest)/60
-                        seconds = rest%60
-                    else:
-                        minutes = 0
-                        seconds = rest
-                else:
-                    hours = 0
-                    minutes = int(time_path)/60
-                    seconds = time_path%60
-                        
+#                if time_path/3600 >= 1:
+#                    hours = int(time_path)/3600
+#                    rest = time_path%3600
+#                    if rest/60 >= 1:
+#                        minutes = int(rest)/60
+#                        seconds = rest%60
+#                    else:
+#                        minutes = 0
+#                        seconds = rest
+#                else:
+#                    hours = 0
+#                    minutes = int(time_path)/60
+#                    seconds = time_path%60
+
+                hours = time_path/3600.0
                                          
                 # Read total distance
                 distance = root['routes'][0]['summary']['distance'] / 1000
@@ -381,9 +381,9 @@ class routing:
                 # Set feature geometry and attributes
                 feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
                 feat_out.setAttributes([distance,
-                                        hours,
-                                        minutes,
-                                        seconds,
+                                        "{0:.3f}".format(hours),
+#                                        minutes,
+#                                        seconds,
                                         self.mode_travel,
                                         self.mode_routing,
                                         route_ids[i][0],
