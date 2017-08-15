@@ -87,6 +87,37 @@ class OSMtools():
         self.canvas = qgis.utils.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
+        # Init dialoag boxes
+        # Routing
+        self.dlg.mode_travel.clear()
+        self.dlg.mode_routing.clear()           
+        self.dlg.mode_travel.addItem('driving-car')
+        self.dlg.mode_travel.addItem('driving-hgv')
+        self.dlg.mode_travel.addItem('cycling-regular')
+        self.dlg.mode_travel.addItem('cycling-road')
+        self.dlg.mode_travel.addItem('cycling-safe')
+        self.dlg.mode_travel.addItem('cycling-mountain')
+        self.dlg.mode_travel.addItem('cycling-tour')
+        self.dlg.mode_travel.addItem('foot-walking')
+        self.dlg.mode_travel.addItem('foot-hiking')
+        self.dlg.mode_routing.addItem('fastest')
+        self.dlg.mode_routing.addItem('shortest')
+        
+        # Access Analysis
+        self.dlg.mode.clear()
+        self.dlg.unit.clear() 
+        self.dlg.unit.addItem('time')
+        self.dlg.unit.addItem('distance')
+        self.dlg.mode.addItem('driving-car')
+        self.dlg.mode.addItem('driving-hgv')
+        self.dlg.mode.addItem('cycling-regular')
+        self.dlg.mode.addItem('cycling-road')
+        self.dlg.mode.addItem('cycling-safe')
+        self.dlg.mode.addItem('cycling-mountain')
+        self.dlg.mode.addItem('cycling-tour')
+        self.dlg.mode.addItem('foot-walking')
+        self.dlg.mode.addItem('foot-hiking')
+        
         
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -236,5 +267,5 @@ class OSMtools():
             self.unload()
                 
     def keyWriter(self):
-        with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
+        with open(os.path.join(self.script_dir, "api_key.txt"), 'w') as key:
             return key.write(self.dlg.api_key.text())

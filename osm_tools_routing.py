@@ -30,26 +30,6 @@ class routing:
         # GUI init
         self.dlg.start_layer.clear()
         self.dlg.end_layer.clear()
-        self.dlg.mode_travel.clear()
-        self.dlg.mode_routing.clear()           
-        self.dlg.mode_travel.addItem('driving-car')
-        self.dlg.mode_travel.addItem('driving-hgv')
-        self.dlg.mode_travel.addItem('cycling-regular')
-        self.dlg.mode_travel.addItem('cycling-road')
-        self.dlg.mode_travel.addItem('cycling-safe')
-        self.dlg.mode_travel.addItem('cycling-mountain')
-        self.dlg.mode_travel.addItem('cycling-tour')
-        self.dlg.mode_travel.addItem('foot-walking')
-        self.dlg.mode_travel.addItem('foot-hiking')
-            
-        self.dlg.mode_routing.addItem('fastest')
-        self.dlg.mode_routing.addItem('shortest')
-        
-        for layer in qgis.utils.iface.legendInterface().layers():
-            layerType = layer.type()
-            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
-                self.dlg.start_layer.addItem(layer.name())
-                self.dlg.end_layer.addItem(layer.name())
                 
         self.layer_start = None
         self.layer_end = None
@@ -78,6 +58,15 @@ class routing:
         self.dlg.add_via_button.clicked.connect(self.initMapTool)
         self.dlg.add_via_button_clear.clicked.connect(self.clearVia)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
+        self.dlg.layer_from_refresh.clicked.connect(self.refreshList)
+        
+    
+    def refreshList(self):
+        for layer in qgis.utils.iface.legendInterface().layers():
+            layerType = layer.type()
+            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
+                self.dlg.start_layer.addItem(layer.name())
+                self.dlg.end_layer.addItem(layer.name())
     
     
     def clearVia(self):
@@ -89,6 +78,7 @@ class routing:
             self.dlg.add_start_button.setEnabled(False)
             self.dlg.start_layer.setEnabled(True)
             self.dlg.start_layer_id.setEnabled(True)
+            self.dlg.layer_from_refresh.setEnabled(True)
             self.dlg.start_layer_id.clear()
             layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.start_layer.currentText()]
             if layer_list:
@@ -105,6 +95,7 @@ class routing:
         else:
             self.dlg.start_layer_id.setEnabled(False)
             self.dlg.start_layer.setEnabled(False)
+            self.dlg.layer_from_refresh.setEnabled(False)
             self.dlg.add_start_button.setEnabled(True)
             
         if self.dlg.end_radio_layer.isChecked() and self.dlg.start_radio_layer.isChecked():
@@ -122,6 +113,7 @@ class routing:
             self.dlg.add_end_button.setEnabled(False)
             self.dlg.end_layer.setEnabled(True)
             self.dlg.end_layer_id.setEnabled(True)
+            self.dlg.layer_to_refresh.setEnabled(True)
             self.dlg.end_layer_id.clear()
             layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.end_layer.currentText()]
             if layer_list:
@@ -138,6 +130,7 @@ class routing:
         else:
             self.dlg.end_layer_id.setEnabled(False)
             self.dlg.end_layer.setEnabled(False)
+            self.dlg.layer_to_refresh.setEnabled(False)
             self.dlg.add_end_button.setEnabled(True)
         
         if self.dlg.end_radio_layer.isChecked() and self.dlg.start_radio_layer.isChecked():

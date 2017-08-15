@@ -31,27 +31,7 @@ class accessAnalysis:
         
         self.loc_limit = 5
         
-        self.iso_amount = ceil(self.dlg.iso_max.value()/self.dlg.iso_int.value())
-
-        self.dlg.mode.clear()
-        self.dlg.layer.clear()
-        self.dlg.unit.clear() 
-        self.dlg.unit.addItem('time')
-        self.dlg.unit.addItem('distance')
-        self.dlg.mode.addItem('driving-car')
-        self.dlg.mode.addItem('driving-hgv')
-        self.dlg.mode.addItem('cycling-regular')
-        self.dlg.mode.addItem('cycling-road')
-        self.dlg.mode.addItem('cycling-safe')
-        self.dlg.mode.addItem('cycling-mountain')
-        self.dlg.mode.addItem('cycling-tour')
-        self.dlg.mode.addItem('foot-walking')
-        self.dlg.mode.addItem('foot-hiking')
-        
-        for layer in qgis.utils.iface.legendInterface().layers():
-            layerType = layer.type()
-            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
-                self.dlg.layer.addItem(layer.name())
+        self.iso_amount = ceil(float(self.dlg.iso_max.value())/self.dlg.iso_int.value())
         
         # API parameters
         self.api_key = self.dlg.api_key.text()
@@ -70,18 +50,29 @@ class accessAnalysis:
         self.dlg.unit.currentIndexChanged.connect(self.valueChanged)
         self.dlg.use_layer.stateChanged.connect(self.enableLayer)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
+        self.dlg.layer_iso_refresh.clicked.connect(self.refreshList)
         
         # Populate field ID dynamically when combobox selection changes
 #        self.dlg.layer.currentIndexChanged.connect(self.popBox)
 #        self.dlg.check_dissolve.stateChanged.connect(self.popBox)
         self.dlg.access_map.clicked.connect(self.initMapTool)
+
+
+    def refreshList(self):
+        self.dlg.layer.clear()
+        for layer in qgis.utils.iface.legendInterface().layers():
+            layerType = layer.type()
+            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
+                self.dlg.layer.addItem(layer.name())
     
     
     def enableLayer(self):
         if self.dlg.use_layer.isChecked() == True:
             self.dlg.frame_2.setEnabled(True)
+            self.dlg.layer_iso_refresh.setEnabled(True)
         else:
             self.dlg.frame_2.setEnabled(False)
+            self.dlg.layer_iso_refresh.setEnabled(False)
             
     
     def valueChanged(self):
@@ -326,6 +317,8 @@ class accessAnalysis:
         
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
         QgsMapLayerRegistry.instance().addMapLayer(layer_out_point)
+        
+        
 
 #        fields_diss = ["AA_MINS"]
 #        self.dissolveFields(layer_out, fields_diss)
@@ -403,3 +396,18 @@ class accessAnalysis:
         
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
     
+    #TODO: Apply styling to polygon layers
+    def styleLayer(self, layer, isochrone_list):
+        renderer_field = layer.fields()[0]
+        range_iso = [x for x in set(isochrone_list)]
+        renderer_symbol = QgsSymbolV2.defaultSymbol(layer.geometryType())
+        color_ramp = QgsStyleV2().defaultStyle().colorRampNames()[4]
+
+        renderer_colour = QColor('#ffee00')
+        renderer_symbol.setColor(renderer_colour)
+        renderer_symbol.setAlpha(0.5)
+        renderer_range = QgsRendererRangeV2(min(range_list), max(range_list), renderer_symbol)
+        myVectorLayer.setRendererV2(myRenderer)
+        myRenderer = QgsGraduatedSymbolRendererV2('', myRangeList)
+        myRenderer.setMode(QgsGraduatedSymbolRendererV2.EqualInterval)
+        myRenderer.setClassAttribute(myTargetField)
