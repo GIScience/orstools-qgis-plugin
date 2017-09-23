@@ -316,8 +316,6 @@ class routing:
                 avoid_type_str = "%7C".join(avoid_type_names)
                 if avoid_type_str != '':
                     req += '&options=%7B%22avoid_features%22:%22{0}%22%7D'.format(avoid_type_str)
-                print avoid_type_str
-                print req
                 
                 # Avoid the 40 req/min limit
                 counter +=1
