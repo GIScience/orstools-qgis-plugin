@@ -318,10 +318,9 @@ class accessAnalysis:
         QgsMapLayerRegistry.instance().addMapLayer(layer_out)
         QgsMapLayerRegistry.instance().addMapLayer(layer_out_point)
         
-        
-
-#        fields_diss = ["AA_MINS"]
-#        self.dissolveFields(layer_out, fields_diss)
+        # Call styleLayer function
+        self.styleLayer(layer_out, isochrone_list)
+        qgis.utils.iface.mapCanvas().setExtent(layer_out.extent())
         
         # Unset Map Tool and show dialog again
         self.dlg.showNormal()
@@ -389,8 +388,9 @@ class accessAnalysis:
 
             layer_out.updateExtents()
 
-#        id_field = self.dlg.id_field.currentText()
-#        fields_diss = ["AA_MINS", id_field]
+        # Call styleLayer function
+        self.styleLayer(layer_out, isochrone_list)
+        qgis.utils.iface.mapCanvas().setExtent(layer_out.extent())
         
         qgis.utils.iface.messageBar().clearWidgets() 
         
@@ -398,16 +398,37 @@ class accessAnalysis:
     
     #TODO: Apply styling to polygon layers
     def styleLayer(self, layer, isochrone_list):
-        renderer_field = layer.fields()[0]
-        range_iso = [x for x in set(isochrone_list)]
-        renderer_symbol = QgsSymbolV2.defaultSymbol(layer.geometryType())
-        color_ramp = QgsStyleV2().defaultStyle().colorRampNames()[4]
-
-        renderer_colour = QColor('#ffee00')
-        renderer_symbol.setColor(renderer_colour)
-        renderer_symbol.setAlpha(0.5)
-        renderer_range = QgsRendererRangeV2(min(range_list), max(range_list), renderer_symbol)
-        myVectorLayer.setRendererV2(myRenderer)
-        myRenderer = QgsGraduatedSymbolRendererV2('', myRangeList)
-        myRenderer.setMode(QgsGraduatedSymbolRendererV2.EqualInterval)
-        myRenderer.setClassAttribute(myTargetField)
+        if self.iso_range_type == 'time':
+            field = 'AA_MINS'
+            legend_suffix = ' mins'
+        else:
+            field = 'AA_METERS'
+            legend_suffix = ' m'
+            
+        colors = {0: '#2b83ba',
+                  1: '#64abb0',
+                  2: '#9dd3a7',
+                  3: '#c7e9ad',
+                  4: '#edf8b9',
+                  5: '#ffedaa',
+                  6: '#fec980',
+                  7: '#f99e59',
+                  8: '#e85b3a',
+                  9: '#d7191c'}
+        
+        iso_list = []
+        for cid, iso in enumerate(isochrone_list):
+            iso_list.append([iso, colors[cid], str(iso) + legend_suffix])
+            
+        categories = []
+        for classes, color, legend in iso_list:
+            symbol = QgsSymbolV2.defaultSymbol(layer.geometryType())
+            symbol.setColor(QColor(color))
+            category = QgsRendererCategoryV2(classes, symbol, legend)
+            categories.append(category)
+        
+        # set up an empty categorized renderer and assign the color ramp
+        renderer = QgsCategorizedSymbolRendererV2(field, categories)
+        layer.setRendererV2(renderer)
+        layer.setLayerTransparency(50)
+        layer.triggerRepaint()

@@ -187,10 +187,9 @@ class routing:
         layer_out_prov = layer_out.dataProvider()
         layer_out_prov.addAttributes([QgsField("DISTANCE", QVariant.Double)])
         layer_out_prov.addAttributes([QgsField("TIME_H", QVariant.Double)])
-#        layer_out_prov.addAttributes([QgsField("TIME_MIN", QVariant.Int)])
-#        layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
         layer_out_prov.addAttributes([QgsField("MODE", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("PREF", QVariant.String)])
+        layer_out_prov.addAttributes([QgsField("AVOID_TYPE", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_ID", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("TO_ID", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_LAT", QVariant.Double)])
@@ -308,7 +307,17 @@ class routing:
                                                     self.mode_routing
                                                     )
                 
-                #print req
+                # Add avoid type features if specified
+                avoid_type_names = []
+                for widget in self.dlg.avoid_type.children():
+                    if isinstance(widget, QCheckBox):
+                        if widget.isChecked():
+                            avoid_type_names.append(widget.text())
+                avoid_type_str = "%7C".join(avoid_type_names)
+                if avoid_type_str != '':
+                    req += '&options=%7B%22avoid_features%22:%22{0}%22%7D'.format(avoid_type_str)
+                print avoid_type_str
+                print req
                 
                 # Avoid the 40 req/min limit
                 counter +=1
@@ -379,6 +388,7 @@ class routing:
 #                                        seconds,
                                         self.mode_travel,
                                         self.mode_routing,
+                                        ', '.join(avoid_type_names),
                                         route_ids[i][0],
                                         route_ids[i][1],
                                         route_start_y,
