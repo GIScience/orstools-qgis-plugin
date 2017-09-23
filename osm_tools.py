@@ -87,7 +87,7 @@ class OSMtools():
         self.canvas = qgis.utils.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
-        # Init dialoag boxes
+        # Init dialog boxes
         # Routing
         self.dlg.mode_travel.clear()
         self.dlg.mode_routing.clear()           

@@ -91,7 +91,7 @@
    <item row="6" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -110,13 +110,51 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-408</y>
             <width>315</width>
-            <height>691</height>
+            <height>839</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
-           <item row="0" column="0">
+           <item row="7" column="0">
+            <widget class="QGroupBox" name="groupBox_5">
+             <property name="title">
+              <string>Via</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetDefaultConstraint</enum>
+              </property>
+              <item>
+               <widget class="QLabel" name="add_via">
+                <property name="font">
+                 <font>
+                  <italic>true</italic>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Long,Lat</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="add_via_button">
+                <property name="text">
+                 <string>Map</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="add_via_button_clear">
+                <property name="text">
+                 <string>Clear</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="2" column="0">
             <widget class="QGroupBox" name="groupBox">
              <property name="font">
               <font>
@@ -206,7 +244,45 @@
              </layout>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item row="6" column="0">
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>Two layer mode</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_6">
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="radio_one">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[2]&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Row by row</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QRadioButton" name="radio_many">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[2]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[2]&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>All rows by all rows</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="5" column="0">
             <widget class="QGroupBox" name="groupBox_2">
              <property name="title">
               <string>End Location(s)</string>
@@ -294,83 +370,7 @@
              </layout>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QGroupBox" name="groupBox_3">
-             <property name="title">
-              <string>Two layer mode</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_6">
-              <item row="0" column="0">
-               <widget class="QRadioButton" name="radio_one">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[2]&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Row by row</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QRadioButton" name="radio_many">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[1]--&amp;gt;end_layer[2]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[1]&lt;/p&gt;&lt;p&gt;start_layer[2]--&amp;gt;end_layer[2]&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>All rows by all rows</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QGroupBox" name="groupBox_5">
-             <property name="title">
-              <string>Via</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
-              <property name="sizeConstraint">
-               <enum>QLayout::SetDefaultConstraint</enum>
-              </property>
-              <item>
-               <widget class="QLabel" name="add_via">
-                <property name="font">
-                 <font>
-                  <italic>true</italic>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Long,Lat</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="add_via_button">
-                <property name="text">
-                 <string>Map</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="add_via_button_clear">
-                <property name="text">
-                 <string>Clear</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="4" column="0">
+           <item row="0" column="0">
             <widget class="QWidget" name="widget" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
@@ -386,7 +386,7 @@
              </layout>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="1" column="0">
             <widget class="QWidget" name="widget_2" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
@@ -398,6 +398,71 @@
               </item>
               <item>
                <widget class="QComboBox" name="mode_routing"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QGroupBox" name="avoid_type">
+             <property name="title">
+              <string>Avoid features</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_9">
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="checkBox">
+                <property name="text">
+                 <string>highways</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="checkBox_2">
+                <property name="text">
+                 <string>tollways</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="checkBox_4">
+                <property name="text">
+                 <string>tunnels</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QCheckBox" name="checkBox_3">
+                <property name="text">
+                 <string>ferries</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="checkBox_6">
+                <property name="text">
+                 <string>fords</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QCheckBox" name="checkBox_7">
+                <property name="text">
+                 <string>pavedroads</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QCheckBox" name="checkBox_5">
+                <property name="text">
+                 <string>tracks</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QCheckBox" name="checkBox_8">
+                <property name="text">
+                 <string>unpavedroads</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
