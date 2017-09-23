@@ -111,8 +111,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>296</width>
-            <height>679</height>
+            <width>315</width>
+            <height>691</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
@@ -127,19 +127,6 @@
               <string>Start Location(s)</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="3" column="0" colspan="2">
-               <widget class="QComboBox" name="start_layer">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
-                </property>
-                <property name="whatsThis">
-                 <string/>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="0">
                <widget class="QRadioButton" name="start_radio_layer">
                 <property name="text">
@@ -190,6 +177,29 @@
                <widget class="QComboBox" name="start_layer_id">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QComboBox" name="start_layer">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
+                </property>
+                <property name="whatsThis">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QPushButton" name="layer_from_refresh">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Refresh List</string>
                 </property>
                </widget>
               </item>
@@ -251,7 +261,14 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0" colspan="2">
+              <item row="5" column="0" colspan="2">
+               <widget class="QComboBox" name="end_layer_id">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
                <widget class="QComboBox" name="end_layer">
                 <property name="enabled">
                  <bool>false</bool>
@@ -264,10 +281,13 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="0" colspan="2">
-               <widget class="QComboBox" name="end_layer_id">
+              <item row="3" column="1">
+               <widget class="QPushButton" name="layer_to_refresh">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Refresh List</string>
                 </property>
                </widget>
               </item>
@@ -979,11 +999,21 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QGridLayout" name="gridLayout_7" columnstretch="3">
+         <layout class="QGridLayout" name="gridLayout_7" columnstretch="3,0">
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
              <string>Point Layer</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="layer_iso_refresh">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Refresh List</string>
             </property>
            </widget>
           </item>
@@ -994,6 +1024,9 @@
             </property>
             <property name="whatsThis">
              <string/>
+            </property>
+            <property name="editable">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

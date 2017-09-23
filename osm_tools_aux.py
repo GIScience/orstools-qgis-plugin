@@ -9,6 +9,8 @@ import requests
 
 import qgis.gui
 import qgis.utils
+from qgis.core import *
+from qgis.gui import *
 
 #TODO: Reproject instead of warning
 def CheckCRS(self,crs):
@@ -25,4 +27,3 @@ def CheckStatus(code, req):
     msg = "HTTP status {}: {}\nGet request: {}".format(code, code_text, req)
     qgis.utils.iface.messageBar().pushMessage(msg, level=qgis.gui.QgsMessageBar.CRITICAL, duration=20)
     return
-    

@@ -30,26 +30,6 @@ class routing:
         # GUI init
         self.dlg.start_layer.clear()
         self.dlg.end_layer.clear()
-        self.dlg.mode_travel.clear()
-        self.dlg.mode_routing.clear()           
-        self.dlg.mode_travel.addItem('driving-car')
-        self.dlg.mode_travel.addItem('driving-hgv')
-        self.dlg.mode_travel.addItem('cycling-regular')
-        self.dlg.mode_travel.addItem('cycling-road')
-        self.dlg.mode_travel.addItem('cycling-safe')
-        self.dlg.mode_travel.addItem('cycling-mountain')
-        self.dlg.mode_travel.addItem('cycling-tour')
-        self.dlg.mode_travel.addItem('foot-walking')
-        self.dlg.mode_travel.addItem('foot-hiking')
-            
-        self.dlg.mode_routing.addItem('fastest')
-        self.dlg.mode_routing.addItem('shortest')
-        
-        for layer in qgis.utils.iface.legendInterface().layers():
-            layerType = layer.type()
-            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
-                self.dlg.start_layer.addItem(layer.name())
-                self.dlg.end_layer.addItem(layer.name())
                 
         self.layer_start = None
         self.layer_end = None
@@ -78,6 +58,15 @@ class routing:
         self.dlg.add_via_button.clicked.connect(self.initMapTool)
         self.dlg.add_via_button_clear.clicked.connect(self.clearVia)
         self.dlg.api_key.textChanged.connect(self.keyWriter)
+        self.dlg.layer_from_refresh.clicked.connect(self.refreshList)
+        
+    
+    def refreshList(self):
+        for layer in qgis.utils.iface.legendInterface().layers():
+            layerType = layer.type()
+            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
+                self.dlg.start_layer.addItem(layer.name())
+                self.dlg.end_layer.addItem(layer.name())
     
     
     def clearVia(self):
@@ -89,6 +78,7 @@ class routing:
             self.dlg.add_start_button.setEnabled(False)
             self.dlg.start_layer.setEnabled(True)
             self.dlg.start_layer_id.setEnabled(True)
+            self.dlg.layer_from_refresh.setEnabled(True)
             self.dlg.start_layer_id.clear()
             layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.start_layer.currentText()]
             if layer_list:
@@ -105,6 +95,7 @@ class routing:
         else:
             self.dlg.start_layer_id.setEnabled(False)
             self.dlg.start_layer.setEnabled(False)
+            self.dlg.layer_from_refresh.setEnabled(False)
             self.dlg.add_start_button.setEnabled(True)
             
         if self.dlg.end_radio_layer.isChecked() and self.dlg.start_radio_layer.isChecked():
@@ -122,6 +113,7 @@ class routing:
             self.dlg.add_end_button.setEnabled(False)
             self.dlg.end_layer.setEnabled(True)
             self.dlg.end_layer_id.setEnabled(True)
+            self.dlg.layer_to_refresh.setEnabled(True)
             self.dlg.end_layer_id.clear()
             layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.end_layer.currentText()]
             if layer_list:
@@ -138,6 +130,7 @@ class routing:
         else:
             self.dlg.end_layer_id.setEnabled(False)
             self.dlg.end_layer.setEnabled(False)
+            self.dlg.layer_to_refresh.setEnabled(False)
             self.dlg.add_end_button.setEnabled(True)
         
         if self.dlg.end_radio_layer.isChecked() and self.dlg.start_radio_layer.isChecked():
@@ -193,9 +186,9 @@ class routing:
         layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
         layer_out_prov = layer_out.dataProvider()
         layer_out_prov.addAttributes([QgsField("DISTANCE", QVariant.Double)])
-        layer_out_prov.addAttributes([QgsField("TIME_H", QVariant.Int)])
-        layer_out_prov.addAttributes([QgsField("TIME_MIN", QVariant.Int)])
-        layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
+        layer_out_prov.addAttributes([QgsField("TIME_H", QVariant.Double)])
+#        layer_out_prov.addAttributes([QgsField("TIME_MIN", QVariant.Int)])
+#        layer_out_prov.addAttributes([QgsField("TIME_SEC", QVariant.Int)])
         layer_out_prov.addAttributes([QgsField("MODE", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("PREF", QVariant.String)])
         layer_out_prov.addAttributes([QgsField("FROM_ID", QVariant.String)])
@@ -320,7 +313,6 @@ class routing:
                 # Avoid the 40 req/min limit
                 counter +=1
                 timer = time.time() - start
-                print counter, timer
                 if counter > 40 and timer <= 60:     
                     wait = 60.1 - timer
                     msg = "Limit of 40 requests/minute reached. You had to wait for {} secs.".format(int(wait))
@@ -356,20 +348,21 @@ class routing:
                 # Read total time
                 time_path = root['routes'][0]['summary']['duration']
                 
-                if time_path/3600 >= 1:
-                    hours = int(time_path)/3600
-                    rest = time_path%3600
-                    if rest/60 >= 1:
-                        minutes = int(rest)/60
-                        seconds = rest%60
-                    else:
-                        minutes = 0
-                        seconds = rest
-                else:
-                    hours = 0
-                    minutes = int(time_path)/60
-                    seconds = time_path%60
-                        
+#                if time_path/3600 >= 1:
+#                    hours = int(time_path)/3600
+#                    rest = time_path%3600
+#                    if rest/60 >= 1:
+#                        minutes = int(rest)/60
+#                        seconds = rest%60
+#                    else:
+#                        minutes = 0
+#                        seconds = rest
+#                else:
+#                    hours = 0
+#                    minutes = int(time_path)/60
+#                    seconds = time_path%60
+
+                hours = time_path/3600.0
                                          
                 # Read total distance
                 distance = root['routes'][0]['summary']['distance'] / 1000
@@ -381,9 +374,9 @@ class routing:
                 # Set feature geometry and attributes
                 feat_out.setGeometry(QgsGeometry.fromPolyline(coords_list))
                 feat_out.setAttributes([distance,
-                                        hours,
-                                        minutes,
-                                        seconds,
+                                        "{0:.3f}".format(hours),
+#                                        minutes,
+#                                        seconds,
                                         self.mode_travel,
                                         self.mode_routing,
                                         route_ids[i][0],
