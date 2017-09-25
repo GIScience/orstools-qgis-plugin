@@ -39,7 +39,12 @@ class PointTool(QgsMapTool):
     def canvasReleaseEvent(self, event):
         #Get the click and emit a transformed point
         
-        crsSrc = self.canvas.mapRenderer().destinationCrs()
+        # mapSettings() was only introduced in QGIS 2.4, keep compatibility
+        try:
+            crsSrc = self.canvas.mapSettings().destinationCrs()
+        except:
+            crsSrc = self.canvas.mapRenderer().destinationCrs()
+            
         crsWGS = QgsCoordinateReferenceSystem(4326)
     
         point_oldcrs = self.toMapCoordinates(event.pos())

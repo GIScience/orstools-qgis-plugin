@@ -267,5 +267,5 @@ class OSMtools():
             self.unload()
                 
     def keyWriter(self):
-        with open(os.path.join(self.script_dir, "api_key.txt"), 'w') as key:
+        with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
             return key.write(self.dlg.api_key.text())
