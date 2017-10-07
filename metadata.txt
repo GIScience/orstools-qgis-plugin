@@ -11,7 +11,7 @@ name=OSM Tools
 qgisMinimumVersion=2.0
 description=OpenRouteService routing and accessibility areas for QGIS
 
-version=0.3.2
+version=0.3.4
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
@@ -26,7 +26,9 @@ repository=https://github.com/nilsnolde/ORStools.git
 
 # Uncomment the following line and add your changelog:
 
-changelog=2017/09/23 v.0.3.2 Added avoid_type feature for routing, auto-styling for acc areas
+changelog=2017/10/07 v.0.3.4 Fixed zoomToLayer bug (#35)
+   2017/09/24 v.0.3.3 Handled deprecated mapRenderer() function
+   2017/09/23 v.0.3.2 Added avoid_type feature for routing, auto-styling for acc areas
    2017/07/28 v.0.3.1 Fixed minor bugs (#20, #24, #27), removed support for overlap areas
    2017/05/30 v.0.3 Added support for overlap areas in accessibility analysis
    2017/05/22 v.0.2 Added scrollbar and removed 'dissolve' option

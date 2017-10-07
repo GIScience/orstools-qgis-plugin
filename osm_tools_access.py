@@ -320,7 +320,9 @@ class accessAnalysis:
         
         # Call styleLayer function
         self.styleLayer(layer_out, isochrone_list)
-        qgis.utils.iface.mapCanvas().setExtent(layer_out.extent())
+#        qgis.utils.iface.mapCanvas().zoomToSelected(layer_out)
+        qgis.utils.iface.setActiveLayer(layer_out)
+        qgis.utils.iface.zoomToActiveLayer()
         
         # Unset Map Tool and show dialog again
         self.dlg.showNormal()
@@ -390,7 +392,7 @@ class accessAnalysis:
 
         # Call styleLayer function
         self.styleLayer(layer_out, isochrone_list)
-        qgis.utils.iface.mapCanvas().setExtent(layer_out.extent())
+        qgis.utils.iface.mapCanvas().zoomToSelected(layer_out)
         
         qgis.utils.iface.messageBar().clearWidgets() 
         
