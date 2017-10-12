@@ -1,7 +1,7 @@
 # OSM tools
 Set of tools to use OpenRouteService (ORS) API´s as a plugin in QGIS (www.openrouteservice.org).
 
-**Note**, the included API key is disabled, you need to get your own (https://developers.openrouteservice.org/portal/apis/).
+**Note**, the included API key is disabled, you need to get your own (https://go.openrouteservice.org/sign-up/).
 
 ## Functionalities
 
@@ -12,7 +12,7 @@ Use QGIS to generate input for routing and accessibility area analysis powered b
 
 QGIS versin: min. v2.x
 
-API key: https://developers.openrouteservice.org/portal/apis/
+API key: https://go.openrouteservice.org/sign-up/
 
 ### Installation
 
