@@ -5,8 +5,7 @@ Created on Tue Feb 07 00:34:21 2017
 @author: nnolde
 """
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+#from PyQt4.QtGui import *
 
 from qgis.core import *
 from qgis.gui import * 

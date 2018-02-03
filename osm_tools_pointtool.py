@@ -4,8 +4,8 @@ Created on Mon Feb 06 23:35:16 2017
 
 @author: nnolde
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtGui import QCursor, QPixmap, QApplication
 
 from qgis.core import *
 from qgis.gui import *

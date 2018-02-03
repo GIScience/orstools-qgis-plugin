@@ -1,3 +1,5 @@
+./apikey.txt
+*.pyc
 help/
 i18n/
 test/

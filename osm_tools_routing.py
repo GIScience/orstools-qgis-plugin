@@ -5,8 +5,8 @@ Created on Wed Feb 08 21:14:48 2017
 @author: nnolde
 """
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import QVariant, Qt
+from PyQt4.QtGui import QProgressBar,QCheckBox
 
 from qgis.core import *
 from qgis.gui import * 

@@ -26,8 +26,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import QSettings, SIGNAL, QUrl
+from PyQt4.QtGui import QIcon, QAction, QDesktopServices, QApplication
 # Initialize Qt resources from file resources.py
 import resources_rc
 # Import the code for the dialog
