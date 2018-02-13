@@ -4,11 +4,14 @@ Created on Mon Feb 06 23:35:16 2017
 
 @author: nnolde
 """
-from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QCursor, QPixmap, QApplication
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QCursor, QPixmap
+from PyQt5.QtWidgets import QApplication
 
 from qgis.core import *
 from qgis.gui import *
+
+import qgis.core
 
 import os
 
@@ -35,7 +38,7 @@ class PointTool(QgsMapTool):
     def canvasMoveEvent(self, event):
         pass
     
-    canvasClicked = pyqtSignal(['QgsPoint', 'QString', 'Qt::MouseButton'])
+    canvasClicked = pyqtSignal(['QgsPointXY', 'QString', 'Qt::MouseButton'])
     def canvasReleaseEvent(self, event):
         #Get the click and emit a transformed point
         
@@ -49,7 +52,7 @@ class PointTool(QgsMapTool):
     
         point_oldcrs = self.toMapCoordinates(event.pos())
         
-        xform = QgsCoordinateTransform(crsSrc, crsWGS)
+        xform = QgsCoordinateTransform(crsSrc, crsWGS, QgsProject.instance())
         point_newcrs = xform.transform(point_oldcrs)
         
         QApplication.restoreOverrideCursor()

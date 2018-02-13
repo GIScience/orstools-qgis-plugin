@@ -5,8 +5,8 @@ Created on Wed Feb 08 21:14:48 2017
 @author: nnolde
 """
 
-from PyQt4.QtCore import QVariant, Qt
-from PyQt4.QtGui import QProgressBar,QCheckBox
+from PyQt5.QtCore import QVariant, Qt
+from PyQt5.QtWidgets import QProgressBar, QCheckBox
 
 from qgis.core import *
 from qgis.gui import * 
@@ -18,9 +18,7 @@ import itertools
 import json
 import time
 
-import osm_tools_aux
-import osm_tools_geocode
-import osm_tools_pointtool
+from ORStools import osm_tools_aux, osm_tools_geocode, osm_tools_pointtool
 
 class routing:
     def __init__(self, dlg):
@@ -62,11 +60,15 @@ class routing:
         
     
     def refreshList(self):
-        for layer in qgis.utils.iface.legendInterface().layers():
-            layerType = layer.type()
-            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
-                self.dlg.start_layer.addItem(layer.name())
-                self.dlg.end_layer.addItem(layer.name())
+        self.dlg.start_layer.clear()
+        self.dlg.end_layer.clear()
+        root = QgsProject.instance().layerTreeRoot()
+        for child in root.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                layer = child.layer()
+                if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.GeometryType(1):
+                    self.dlg.start_layer.addItem(layer.name())
+                    self.dlg.end_layer.addItem(layer.name())
     
     
     def clearVia(self):
@@ -80,7 +82,7 @@ class routing:
             self.dlg.start_layer_id.setEnabled(True)
             self.dlg.layer_from_refresh.setEnabled(True)
             self.dlg.start_layer_id.clear()
-            layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.start_layer.currentText()]
+            layer_list = [lyr for lyr in QgsProject.instance().mapLayers().values() if lyr.name() == self.dlg.start_layer.currentText()]
             if layer_list:
                 layer_selected = layer_list[0]
                 fields_selected = layer_selected.fields()
@@ -88,13 +90,17 @@ class routing:
                     self.dlg.start_layer_id.addItem(field.name())
                 
             # Determine selected layer
-            for layer in qgis.utils.iface.legendInterface().layers():
-                if layer.name() == self.dlg.start_layer.currentText():
-                    self.layer_start = layer
-                    break
+            #self.refreshList()
+            for child in QgsProject.instance().layerTreeRoot().children():
+                if isinstance(child, QgsLayerTreeLayer):
+                    layer = child.layer()
+                    if layer.name() == self.dlg.start_layer.currentText():
+                        self.layer_start = layer
+                        break            
+            
         else:
             self.dlg.start_layer_id.setEnabled(False)
-            self.dlg.start_layer.setEnabled(False)
+            self.dlg.start_layer.setEnabled(False) 
             self.dlg.layer_from_refresh.setEnabled(False)
             self.dlg.add_start_button.setEnabled(True)
             
@@ -115,7 +121,7 @@ class routing:
             self.dlg.end_layer_id.setEnabled(True)
             self.dlg.layer_to_refresh.setEnabled(True)
             self.dlg.end_layer_id.clear()
-            layer_list = [lyr for lyr in QgsMapLayerRegistry.instance().mapLayers().values() if lyr.name() == self.dlg.end_layer.currentText()]
+            layer_list = [lyr for lyr in QgsProject.instance().mapLayers().values() if lyr.name() == self.dlg.end_layer.currentText()]
             if layer_list:
                 layer_selected = layer_list[0]
                 fields_selected = layer_selected.fields()
@@ -123,10 +129,13 @@ class routing:
                     self.dlg.end_layer_id.addItem(field.name())
                     
             # Determine selected layer
-            for layer in qgis.utils.iface.legendInterface().layers():
-                if layer.name() == self.dlg.end_layer.currentText():
-                    self.layer_end = layer
-                    break            
+            #self.refreshList()
+            for child in QgsProject.instance().layerTreeRoot().children():
+                if isinstance(child, QgsLayerTreeLayer):
+                    layer = child.layer()
+                    if layer.name() == self.dlg.end_layer.currentText():
+                        self.layer_end = layer
+                        break  
         else:
             self.dlg.end_layer_id.setEnabled(False)
             self.dlg.end_layer.setEnabled(False)
@@ -210,7 +219,7 @@ class routing:
             if osm_tools_aux.CheckCRS(self, self.layer_start.crs().authid()) == False:
                 return
             start_feat = self.layer_start.getFeatures()
-            field_id = self.layer_start.fieldNameIndex(self.dlg.start_layer_id.currentText())
+            field_id = self.layer_start.dataProvider().fieldNameIndex(self.dlg.start_layer_id.currentText())
             for feat in start_feat:
                 x, y = feat.geometry().asPoint()
                 start_features.append(",".join([str(x), str(y)]))
@@ -218,7 +227,7 @@ class routing:
         else:
             start_features.append(self.dlg.add_start.text())
             point_list = [float(x) for x in start_features[0].split(",")]
-            point_geom = QgsGeometry.fromPoint(QgsPoint(point_list[0], point_list[1]))
+            point_geom = QgsGeometry.fromPointXY(QgsPointXY(point_list[0], point_list[1]))
             _point_geo = osm_tools_geocode.Geocode(self.dlg)
             loc_dict = _point_geo.reverseGeocode(point_geom)
             
@@ -233,7 +242,7 @@ class routing:
             if osm_tools_aux.CheckCRS(self, self.layer_end.crs().authid()) == False:
                 return
             end_feat = self.layer_end.getFeatures()
-            field_id = self.layer_end.fieldNameIndex(self.dlg.end_layer_id.currentText())
+            field_id = self.layer_end.dataProvider().fieldNameIndex(self.dlg.end_layer_id.currentText())
             for feat in end_feat:
                 x, y = feat.geometry().asPoint()
                 end_features.append(",".join([str(x), str(y)]))
@@ -241,7 +250,7 @@ class routing:
         else:            
             end_features.append(self.dlg.add_end.text())
             point_list = [float(x) for x in end_features[0].split(",")]
-            point_geom = QgsGeometry.fromPoint(QgsPoint(point_list[0], point_list[1]))
+            point_geom = QgsGeometry.fromPointXY(QgsPointXY(point_list[0], point_list[1]))
             _point_geo = osm_tools_geocode.Geocode(self.dlg)
             loc_dict = _point_geo.reverseGeocode(point_geom)
             
@@ -283,7 +292,7 @@ class routing:
         progress.setMaximum(100)
         progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         progressMessageBar.layout().addWidget(progress)
-        self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
+        self.iface.messageBar().pushWidget(progressMessageBar, level=Qgis.Info)
         
         # Server limit parameters
         start = time.time()
@@ -329,6 +338,7 @@ class routing:
                     counter = 0
                     start = time.time()
                 
+                print(req)
                 # Get response from API and read into element tree
                 response = requests.get(req)
                 root = json.loads(response.text)
@@ -408,6 +418,6 @@ class routing:
         layer_out.updateExtents()
         
         qgis.utils.iface.messageBar().clearWidgets() 
-        QgsMapLayerRegistry.instance().addMapLayer(layer_out)
+        QgsProject.instance().addMapLayer(layer_out)
         
-        QgsMapLayerRegistry.instance().addMapLayer(layer_out)
+        QgsProject.instance().addMapLayer(layer_out)

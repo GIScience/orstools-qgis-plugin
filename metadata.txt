@@ -8,7 +8,7 @@
 
 [general]
 name=OSM Tools
-qgisMinimumVersion=2.0
+qgisMinimumVersion=3.0
 description=OpenRouteService routing and accessibility areas for QGIS
 
 version=0.3.4

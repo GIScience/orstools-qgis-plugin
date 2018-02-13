@@ -14,7 +14,7 @@ import qgis.utils
 import requests
 import json
 
-import osm_tools_aux
+from ORStools import osm_tools_aux
 
 class Geocode:
     def __init__(self, dlg):

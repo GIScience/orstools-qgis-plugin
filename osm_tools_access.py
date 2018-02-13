@@ -5,22 +5,20 @@ Created on Mon Feb 06 15:26:47 2017
 @author: nnolde
 """
 
-from PyQt4.QtCore import QVariant, Qt
-from PyQt4.QtGui import QApplication, QProgressBar, QColor
+from PyQt5.QtCore import QVariant, Qt
+from PyQt5.QtWidgets import QApplication, QProgressBar
+from PyQt5.QtGui import QColor
 
 from qgis.core import *
 from qgis.gui import * 
 import qgis.utils
 
 import requests
-from shapely.geometry import MultiPolygon, shape
 import json
 import os.path
 from math import ceil
       
-import osm_tools_geocode
-import osm_tools_pointtool
-import osm_tools_aux
+from ORStools import osm_tools_geocode, osm_tools_pointtool, osm_tools_aux
         
 class accessAnalysis:
     def __init__(self, dlg):
@@ -60,10 +58,12 @@ class accessAnalysis:
 
     def refreshList(self):
         self.dlg.layer.clear()
-        for layer in qgis.utils.iface.legendInterface().layers():
-            layerType = layer.type()
-            if layerType == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
-                self.dlg.layer.addItem(layer.name())
+        root = QgsProject.instance().layerTreeRoot()
+        for child in root.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                layer = child.layer()
+                if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.GeometryType(1):
+                    self.dlg.layer.addItem(layer.name())
     
     
     def enableLayer(self):
@@ -121,7 +121,7 @@ class accessAnalysis:
         self.dlg.showMinimized()
         sending_button = self.dlg.sender().objectName()
         self.mapTool = osm_tools_pointtool.PointTool(qgis.utils.iface.mapCanvas(), sending_button)        
-        self.iface.mapCanvas().setMapTool(self.mapTool)     
+        self.iface.mapCanvas().setMapTool(self.mapTool)
         self.mapTool.canvasClicked.connect(self.pointAnalysis)
         
         
@@ -138,6 +138,9 @@ class accessAnalysis:
         if self.iso_range_type == 'time':
             self.iso_max = self.dlg.iso_max.value() * 60
             self.iso_int = self.dlg.iso_int.value() * 60
+        else:
+            self.iso_max = self.dlg.iso_max.value() * 1000
+            self.iso_int = self.dlg.iso_int.value() * 1000
         
         req = "{}api_key={}&range_type={}&range={}&interval={}&profile={}&location_type=start&locations={},{}".format(self.url, 
                                                                 self.api_key,
@@ -152,14 +155,8 @@ class accessAnalysis:
         if len(points_in) > 1:
             for coord in coord_list[1:]:
                 req += "%7C{0:.5f},{1:.5f}".format(coord[0], coord[1])
-        
-        if self.iso_range_type == 'distance':
-            req += '&units=km'
-            
-#        if self.dlg.iso_overlap.isChecked() and self.dlg.iso_overlap.isEnabled():
-#            req += "&intersections=true"
-#        
-#        print req
+                
+        print(req)
         
         response = requests.get(req)
         root = json.loads(response.text)
@@ -191,10 +188,10 @@ class accessAnalysis:
             coord_list = []
             
             for coords in isochrone['geometry']['coordinates'][0]:
-                qgis_coords = QgsPoint(coords[0], coords[1])
+                qgis_coords = QgsPointXY(coords[0], coords[1])
                 coord_list.append(qgis_coords)
             
-            feat_out.setGeometry(QgsGeometry.fromPolygon([coord_list]))
+            feat_out.setGeometry(QgsGeometry.fromPolygonXY([coord_list]))
             feat_list.append(feat_out)
             
             #TODO: Put geometry output in other functions, allowing for separate overlap shapefile
@@ -251,16 +248,17 @@ class accessAnalysis:
     
     
     def pointAnalysis(self, point):
-        point_geometry = QgsGeometry.fromPoint(point)
+        point_geometry = QgsGeometry.fromPointXY(point)
+        
+        _point_geocode = osm_tools_geocode.Geocode(self.dlg)
+        loc_dict = _point_geocode.reverseGeocode(point_geometry)
+        
         try:
             feat_list, isochrone_list = self.accRequest([point_geometry])
         except:
             self.dlg.close()
             QApplication.restoreOverrideCursor()
-            return
-        
-        _point_geocode = osm_tools_geocode.Geocode(self.dlg)
-        loc_dict = _point_geocode.reverseGeocode(point_geometry)
+            raise
         
         out_str = u"Long: {0:.3f}, Lat:{1:.3f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
                                                         loc_dict.get('Lat', ""),
@@ -315,11 +313,11 @@ class accessAnalysis:
         layer_out.updateExtents()
         layer_out_point.updateExtents()
         
-        QgsMapLayerRegistry.instance().addMapLayer(layer_out)
-        QgsMapLayerRegistry.instance().addMapLayer(layer_out_point)
+        QgsProject.instance().addMapLayer(layer_out)
+        QgsProject.instance().addMapLayer(layer_out_point)
         
         # Call styleLayer function
-        self.styleLayer(layer_out, isochrone_list)
+#        self.styleLayer(layer_out, isochrone_list)
 #        qgis.utils.iface.mapCanvas().zoomToSelected(layer_out)
         qgis.utils.iface.setActiveLayer(layer_out)
         qgis.utils.iface.zoomToActiveLayer()
@@ -330,7 +328,11 @@ class accessAnalysis:
         self.mapTool = None
 
     def iterAnalysis(self):
-        allLayers = self.iface.legendInterface().layers()
+        allLayers = []
+        root = QgsProject.instance().layerTreeRoot()
+        for child in root.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                allLayers.append(child.layer())
                 
         # Determine selected layer
         for layer in allLayers:
@@ -361,7 +363,7 @@ class accessAnalysis:
         progress.setMaximum(100)
         progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         progressMessageBar.layout().addWidget(progress)
-        self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
+        self.iface.messageBar().pushWidget(progressMessageBar, level=Qgis.Info)
         
         # Chunk features
         n = self.loc_limit
@@ -369,7 +371,7 @@ class accessAnalysis:
         for feature in acc_input_lyr.getFeatures():
             features_list.append(feature)
             
-        features_chunked = [features_list[i:i+n] for i in xrange(0, feature_count, n)]
+        features_chunked = [features_list[i:i+n] for i in range(0, feature_count, n)]
         
         for chunk in features_chunked:
             feat_in_list = []
@@ -384,19 +386,19 @@ class accessAnalysis:
             for ind, feat in enumerate(feat_list[::-1]):
                 
                 # Map attributes on features
-                att_counter = ind/self.iso_amount
+                att_counter = int(ind/self.iso_amount)
                 feat.setAttributes(chunk[::-1][att_counter].attributes() + [isochrone_list[::-1][ind], self.iso_mode])
                 layer_out_prov.addFeatures([feat])
 
             layer_out.updateExtents()
 
         # Call styleLayer function
-        self.styleLayer(layer_out, isochrone_list)
+        #self.styleLayer(layer_out, isochrone_list)
         qgis.utils.iface.mapCanvas().zoomToSelected(layer_out)
         
         qgis.utils.iface.messageBar().clearWidgets() 
         
-        QgsMapLayerRegistry.instance().addMapLayer(layer_out)
+        QgsProject.instance().addMapLayer(layer_out)
     
     #TODO: Apply styling to polygon layers
     def styleLayer(self, layer, isochrone_list):

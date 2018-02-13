@@ -26,16 +26,16 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, SIGNAL, QUrl
-from PyQt4.QtGui import QIcon, QAction, QDesktopServices, QApplication
-# Initialize Qt resources from file resources.py
-import resources_rc
-# Import the code for the dialog
-from osm_tools_dialog import OSMtoolsDialog
+from PyQt5.QtCore import QSettings, QUrl, QTranslator, QCoreApplication
+from PyQt5.Qt import PYQT_VERSION_STR
+from PyQt5.QtGui import QIcon, QDesktopServices
+from PyQt5.QtWidgets import QAction, QApplication
 import os.path
 
-import osm_tools_access
-import osm_tools_routing
+# Initialize Qt resources from file resources.py
+from ORStools import resources_rc, osm_tools_access, osm_tools_routing
+# Import the code for the dialog
+from ORStools.osm_tools_dialog import OSMtoolsDialog
 
 from qgis.core import *
 import qgis.gui
@@ -71,7 +71,7 @@ class OSMtools():
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
+            if PYQT_VERSION_STR > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
         # Declare instance attributes
@@ -154,7 +154,8 @@ class OSMtools():
 
         :param text: Text that should be shown in menu items for this action.
         :type text: str
-
+.osm_tools_access
+from . import osm_tools_routing
         :param callback: Function to be called when the action is triggered.
         :type callback: function
 
@@ -224,7 +225,7 @@ class OSMtools():
         self.dlg.api_key.textChanged.connect(self.keyWriter)
         
         self.dlg.key_order.setText("<a href = 'https://go.openrouteservice.org/sign-up/'>Get Key!</a>")     
-        self.dlg.key_order.connect(self.dlg.key_order, SIGNAL("linkActivated(QString)"), self.OpenURL) 
+        self.dlg.key_order.linkActivated.connect(self.OpenURL) 
         self.dlg.header_2.linkActivated.connect(self.OpenURL)
         self.dlg.header_3.linkActivated.connect(self.OpenURL)
         
@@ -265,7 +266,7 @@ class OSMtools():
                 self.route_anal.route()
         else:
             self.unload()
-                
+                 
     def keyWriter(self):
         with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
             return key.write(self.dlg.api_key.text())

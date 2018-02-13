@@ -23,13 +23,13 @@
 
 import os
 
-from PyQt4 import QtGui, uic
+from PyQt5 import QtWidgets, uic
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'osm_tools_dialog_base.ui'))
 
 
-class OSMtoolsDialog(QtGui.QDialog, FORM_CLASS):
+class OSMtoolsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
         super(OSMtoolsDialog, self).__init__(parent)
