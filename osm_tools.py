@@ -26,14 +26,14 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QUrl, QTranslator, QCoreApplication
+from PyQt5.QtCore import QSettings, QUrl, QTranslator, QCoreApplication, Qt
 from PyQt5.Qt import PYQT_VERSION_STR
-from PyQt5.QtGui import QIcon, QDesktopServices
-from PyQt5.QtWidgets import QAction, QApplication
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QAction, QApplication, QLabel
 import os.path
 
 # Initialize Qt resources from file resources.py
-from ORStools import resources_rc, osm_tools_access, osm_tools_routing
+#from ORStools import resources_rc, osm_tools_gui
 # Import the code for the dialog
 from ORStools.osm_tools_dialog import OSMtoolsDialog
 
@@ -45,6 +45,9 @@ import logging
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO)
 
+def unload():
+    pass
+
 class OSMtools():
     """QGIS Plugin Implementation."""
 
@@ -54,7 +57,9 @@ class OSMtools():
         :param iface: An interface instance that will be passed to this class
             which provides the hook by which you can manipulate the QGIS
             application at run time.
-        :type iface: QgsInterface
+        :type iface: QgsInt
+    self.dlg.close()
+#            self.unload()erface
         """
         # Save reference to the QGIS interface
         self.iface = iface
@@ -74,50 +79,16 @@ class OSMtools():
             if PYQT_VERSION_STR > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Declare instance attributes
-        self.actions = []
-        self.menu = self.tr(u'&OSM Tools')
 
         self.toolbar = self.iface.addToolBar(u'OSMtools')
         self.toolbar.setObjectName(u'OSMtools')
         
         #custom __init__ declarations
-        self.dlg = OSMtoolsDialog()
+        self.dlg = OSMtoolsDialog(self.iface)
         
         self.canvas = qgis.utils.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        
-        # Init dialog boxes
-        # Routing
-        self.dlg.mode_travel.clear()
-        self.dlg.mode_routing.clear()           
-        self.dlg.mode_travel.addItem('driving-car')
-        self.dlg.mode_travel.addItem('driving-hgv')
-        self.dlg.mode_travel.addItem('cycling-regular')
-        self.dlg.mode_travel.addItem('cycling-road')
-        self.dlg.mode_travel.addItem('cycling-safe')
-        self.dlg.mode_travel.addItem('cycling-mountain')
-        self.dlg.mode_travel.addItem('cycling-tour')
-        self.dlg.mode_travel.addItem('foot-walking')
-        self.dlg.mode_travel.addItem('foot-hiking')
-        self.dlg.mode_routing.addItem('fastest')
-        self.dlg.mode_routing.addItem('shortest')
-        
-        # Access Analysis
-        self.dlg.mode.clear()
-        self.dlg.unit.clear() 
-        self.dlg.unit.addItem('time')
-        self.dlg.unit.addItem('distance')
-        self.dlg.mode.addItem('driving-car')
-        self.dlg.mode.addItem('driving-hgv')
-        self.dlg.mode.addItem('cycling-regular')
-        self.dlg.mode.addItem('cycling-road')
-        self.dlg.mode.addItem('cycling-safe')
-        self.dlg.mode.addItem('cycling-mountain')
-        self.dlg.mode.addItem('cycling-tour')
-        self.dlg.mode.addItem('foot-walking')
-        self.dlg.mode.addItem('foot-hiking')
-        
+                
         
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -134,139 +105,84 @@ class OSMtools():
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('OSMtools', message)
 
-
-    def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
-        """Add a toolbar icon to the toolbar.
-
-        :param icon_path: Path to the icon for this action. Can be a resource
-            path (e.g. ':/plugins/foo/bar.png') or a normal file system path.
-        :type icon_path: str
-
-        :param text: Text that should be shown in menu items for this action.
-        :type text: str
-.osm_tools_access
-from . import osm_tools_routing
-        :param callback: Function to be called when the action is triggered.
-        :type callback: function
-
-        :param enabled_flag: A flag indicating if the action should be enabled
-            by default. Defaults to True.
-        :type enabled_flag: bool
-
-        :param add_to_menu: Flag indicating whether the action should also
-            be added to the menu. Defaults to True.
-        :type add_to_menu: bool
-
-        :param add_to_toolbar: Flag indicating whether the action should also
-            be added to the toolbar. Defaults to True.
-        :type add_to_toolbar: bool
-
-        :param status_tip: Optional text to show in a popup when mouse pointer
-            hovers over the action.
-        :type status_tip: str
-
-        :param parent: Parent widget for the new action. Defaults None.
-        :type parent: QWidget
-
-        :param whats_this: Optional text to show in the status bar when the
-            mouse pointer hovers over the action.
-
-        :returns: The action that was created. Note that the action is also
-            added to self.actions list.
-        :rtype: QAction
-        """
-
-        # Create the dialog (after translation) and keep reference
-        
-
-        icon = QIcon(icon_path)
-        action = QAction(icon, text, parent)
-        action.triggered.connect(callback)
-        action.setEnabled(enabled_flag)
-
-        if status_tip is not None:
-            action.setStatusTip(status_tip)
-
-        if whats_this is not None:
-            action.setWhatsThis(whats_this)
-
-        if add_to_toolbar:
-            self.toolbar.addAction(action)
-
-        if add_to_menu:
-            self.iface.addPluginToMenu(
-                self.menu,
-                action)
-
-        self.actions.append(action)
-            
-        return action
     
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/OSMtools/icon.png'
-        self.add_action(
-            icon_path,
-            text=self.tr(u'OSM Tools'),
-            callback=self.run,
-            parent=self.iface.mainWindow())
-        
-        self.dlg.api_key.textChanged.connect(self.keyWriter)
-        
-        self.dlg.key_order.setText("<a href = 'https://go.openrouteservice.org/sign-up/'>Get Key!</a>")     
-        self.dlg.key_order.linkActivated.connect(self.OpenURL) 
-        self.dlg.header_2.linkActivated.connect(self.OpenURL)
-        self.dlg.header_3.linkActivated.connect(self.OpenURL)
+        icon_path = os.path.join(os.path.dirname(__file__),'icon.png')
+        self.action = QAction(QIcon(icon_path),
+                            self.tr(u'OSM Tools'), # tr text
+                            self.iface.mainWindow() # parent
+                            )
+        self.iface.addPluginToMenu(u'&OSM Tools',
+                                    self.action)
+        self.iface.addToolBarIcon(self.action)
+        self.action.triggered.connect(self.run)
         
         
-    def OpenURL(self, URL): 
-          QDesktopServices().openUrl(QUrl(URL))
-                
-    
+        
+#        
+#        self.dlg.api_key.textChanged.connect(self.keyWriter)
+#        
+#        self.dlg.key_order.setText("<a href = 'https://go.openrouteservice.org/sign-up/'>Get Key!</a>")     
+#        self.dlg.key_order.linkActivated.connect(self.OpenURL) 
+#        self.dlg.header_2.linkActivated.connect(self.OpenURL)
+#        self.dlg.header_3.linkActivated.connect(self.OpenURL)
+        
+#        
+#    def OpenURL(self, URL): 
+#          QDesktopServices().openUrl(QUrl(URL))
+#                
+#    
+            
     def unload(self):        
-        self.dlg.close()
+#        self.dlg.close()
         QApplication.restoreOverrideCursor()
+        self.iface.removePluginWebMenu(u"&OSM Tools", self.action)
+        self.iface.removeToolBarIcon(self.action)
+        del self.toolbar
         
         
     def run(self):
         """Run method that performs all the real work"""
+#        
+#        # Populate the api key lineEdit widget
+#        with open(os.path.join(self.script_dir, "apikey.txt")) as key:
+#            self.dlg.api_key.setText(key.read())
+#            
+#        # Initiate analysis classes
+#        self.access_anal = osm_tools_access.accessAnalysis(self.dlg)
+#        self.route_anal = osm_too
         
-        # Populate the api key lineEdit widget
-        with open(os.path.join(self.script_dir, "apikey.txt")) as key:
-            self.dlg.api_key.setText(key.read())
-            
-        # Initiate analysis classes
-        self.access_anal = osm_tools_access.accessAnalysis(self.dlg)
-        self.route_anal = osm_tools_routing.routing(self.dlg)
+#    def resizeEvent(self, event):
+#        pixmap1 = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
+#        self.pixmap = pixmap1.scaled(self.width(), self.height(),
+#                                    aspectRatioMode=Qt.KeepAspectRatio,
+#                                    transformMode=Qt.SmoothTransformation
+#                                    )
+#        self.header_pic.setPixmap(self.pixmap)ls_routing.routing(self.dlg)
+#        
+#        self.dlg.setFixedSize(self.dlg.size())
         
-        self.dlg.setFixedSize(self.dlg.size())
+        # Set up combo boxes
         
         self.dlg.show()
         
+        self.dlg._layerTreeChanged()
         # show the dialog
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            if self.dlg.tabWidget.currentIndex() == 1 and self.dlg.use_layer.isChecked():
-                self.access_anal.iterAnalysis()
-            
-            elif self.dlg.tabWidget.currentIndex() == 0:
-                self.route_anal.route()
-        else:
-            self.unload()
+            self.dlg.close()
+#            if self.dlg.tabWidget.currentIndex() == 1 and self.dlg.use_layer.isChecked():
+#                self.access_anal.iterAnalysis()
+#            
+#            elif self.dlg.tabWidget.currentIndex() == 0:
+#                self.route_anal.route()
+#        else:
+#            self.unload()
                  
-    def keyWriter(self):
-        with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
-            return key.write(self.dlg.api_key.text())
+#    def keyWriter(self):
+#        with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
+#            return key.write(self.dlg.api_key.text())

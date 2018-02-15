@@ -17,21 +17,7 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="label_7">
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;OSM Tools&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="3">
+   <item row="6" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="button_box">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -41,31 +27,14 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QLabel" name="header_2">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;powered by &lt;a href=&quot;www.openrouteservice.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;OpenRouteService&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="header_3">
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;brought to you by &lt;a href=&quot;mailto:nilsnolde@gmail.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
       <string>API key</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QLineEdit" name="api_key">
+       <widget class="QLineEdit" name="api_key_dlg">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get your personal API key!&lt;/p&gt;&lt;p&gt;500 requests/day and 40 requests/minute limitations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -81,14 +50,17 @@
          </font>
         </property>
         <property name="text">
-         <string>Order Key</string>
+         <string>&lt;a href=&quot;https://go.openrouteservice.org/sign-up/&quot; style=&quot;font-size: 14px; color: #b5152b&quot;&gt;Order Key!&lt;/a&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="5" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
@@ -110,9 +82,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-408</y>
-            <width>315</width>
-            <height>839</height>
+            <y>-395</y>
+            <width>340</width>
+            <height>852</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
@@ -121,31 +93,49 @@
              <property name="title">
               <string>Via</string>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+             <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,0,0">
               <property name="sizeConstraint">
                <enum>QLayout::SetDefaultConstraint</enum>
               </property>
               <item>
-               <widget class="QLabel" name="add_via">
+               <widget class="QLabel" name="via_label">
                 <property name="font">
                  <font>
                   <italic>true</italic>
                  </font>
                 </property>
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
                 <property name="text">
                  <string>Long,Lat</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="add_via_button">
+               <widget class="QPushButton" name="via_map_button">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="text">
                  <string>Map</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="add_via_button_clear">
+               <widget class="QPushButton" name="via_clear_button">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -158,87 +148,128 @@
             <widget class="QGroupBox" name="groupBox">
              <property name="font">
               <font>
-               <pointsize>8</pointsize>
+               <pointsize>9</pointsize>
               </font>
              </property>
              <property name="title">
               <string>Start Location(s)</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="start_radio_layer">
-                <property name="text">
-                 <string>From Layer</string>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0" colspan="2">
-               <widget class="QLabel" name="label_15">
-                <property name="text">
-                 <string>Select Unique ID field</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0">
-               <widget class="QRadioButton" name="start_radio_map">
-                <property name="text">
-                 <string>From Map</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="add_start_button">
-                <property name="text">
-                 <string>Map Coordinates</string>
-                </property>
+               <widget class="QWidget" name="widget_8" native="true">
+                <layout class="QGridLayout" name="gridLayout_10">
+                 <property name="topMargin">
+                  <number>6</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>6</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QRadioButton" name="start_map_radio">
+                   <property name="font">
+                    <font>
+                     <pointsize>9</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>From Map</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">start_buttongroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="start_map_label">
+                   <property name="font">
+                    <font>
+                     <pointsize>9</pointsize>
+                     <italic>true</italic>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Long,Lat</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="start_map_button">
+                   <property name="font">
+                    <font>
+                     <pointsize>9</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Map Coordinates</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="add_start">
-                <property name="font">
-                 <font>
-                  <italic>true</italic>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Long,Lat</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0" colspan="2">
-               <widget class="QComboBox" name="start_layer_id">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QComboBox" name="start_layer">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
-                </property>
-                <property name="whatsThis">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QPushButton" name="layer_from_refresh">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Refresh List</string>
-                </property>
+               <widget class="QWidget" name="widget_9" native="true">
+                <layout class="QGridLayout" name="gridLayout_11">
+                 <property name="topMargin">
+                  <number>6</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>6</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QRadioButton" name="start_layer_radio">
+                   <property name="text">
+                    <string>From Layer</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">start_buttongroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QComboBox" name="start_layer_combo">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
+                   </property>
+                   <property name="whatsThis">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="start_layer_refresh">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Refresh List</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0" colspan="2">
+                  <widget class="QLabel" name="label_15">
+                   <property name="text">
+                    <string>Select Unique ID field</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0" colspan="2">
+                  <widget class="QComboBox" name="start_layer_id">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -284,87 +315,122 @@
            </item>
            <item row="5" column="0">
             <widget class="QGroupBox" name="groupBox_2">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
              <property name="title">
               <string>End Location(s)</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="0" column="0">
-               <widget class="QRadioButton" name="end_radio_map">
-                <property name="text">
-                 <string>From Map</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="add_end">
-                <property name="font">
-                 <font>
-                  <italic>true</italic>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Long,Lat</string>
-                </property>
+               <widget class="QWidget" name="widget_11" native="true">
+                <layout class="QGridLayout" name="gridLayout_13">
+                 <property name="topMargin">
+                  <number>6</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>6</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QRadioButton" name="end_layer_radio">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="text">
+                    <string>From Layer</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">end_buttongroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QComboBox" name="end_layer_combo">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
+                   </property>
+                   <property name="whatsThis">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="end_layer_refresh">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Refresh List</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0" colspan="2">
+                  <widget class="QLabel" name="label_17">
+                   <property name="text">
+                    <string>Select Unique ID field</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0" colspan="2">
+                  <widget class="QComboBox" name="end_layer_id">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="add_end_button">
-                <property name="text">
-                 <string>Map Coordinates</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0" colspan="2">
-               <widget class="QLabel" name="label_17">
-                <property name="text">
-                 <string>Select Unique ID field</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="end_radio_layer">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="text">
-                 <string>From Layer</string>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0" colspan="2">
-               <widget class="QComboBox" name="end_layer_id">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QComboBox" name="end_layer">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
-                </property>
-                <property name="whatsThis">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QPushButton" name="layer_to_refresh">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Refresh List</string>
-                </property>
+              <item row="0" column="0">
+               <widget class="QWidget" name="widget_10" native="true">
+                <layout class="QGridLayout" name="gridLayout_12">
+                 <property name="topMargin">
+                  <number>6</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>6</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QRadioButton" name="end_map_radio">
+                   <property name="text">
+                    <string>From Map</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">end_buttongroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="end_map_label">
+                   <property name="font">
+                    <font>
+                     <italic>true</italic>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Long,Lat</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="end_map_button">
+                   <property name="text">
+                    <string>Map Coordinates</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -381,7 +447,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="mode_travel"/>
+               <widget class="QComboBox" name="route_mode_combo"/>
               </item>
              </layout>
             </widget>
@@ -392,18 +458,23 @@
               <item>
                <widget class="QLabel" name="label_12">
                 <property name="text">
-                 <string>Routing mode</string>
+                 <string>Preference</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="mode_routing"/>
+               <widget class="QComboBox" name="route_pref_combo"/>
               </item>
              </layout>
             </widget>
            </item>
            <item row="8" column="0">
             <widget class="QGroupBox" name="avoid_type">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+              </font>
+             </property>
              <property name="title">
               <string>Avoid features</string>
              </property>
@@ -489,7 +560,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="mode"/>
+           <widget class="QComboBox" name="access_mode_combo"/>
           </item>
          </layout>
         </widget>
@@ -511,7 +582,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="unit">
+           <widget class="QComboBox" name="access_unit_combo">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -521,7 +592,7 @@
            </widget>
           </item>
          </layout>
-         <zorder>unit</zorder>
+         <zorder>access_unit_combo</zorder>
          <zorder>label_5</zorder>
         </widget>
        </item>
@@ -539,7 +610,7 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QLabel" name="label_6">
+           <widget class="QLabel" name="unit_label">
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
@@ -566,45 +637,14 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_7" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="14,12,3">
-          <item>
-           <widget class="QLabel" name="label_4">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The interval 'Maximum isochrone' will be incremented by&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Interval</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDoubleSpinBox" name="iso_int">
-            <property name="decimals">
-             <number>0</number>
-            </property>
-            <property name="value">
-             <double>5.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>mins</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QHBoxLayout" name="horizontalLayout_8"/>
         </widget>
        </item>
        <item>
         <widget class="QWidget" name="widget_3" native="true">
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
-           <widget class="QLabel" name="access_text">
+           <widget class="QLabel" name="access_map_label">
             <property name="palette">
              <palette>
               <active>
@@ -1034,7 +1074,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QPushButton" name="access_map">
+           <widget class="QPushButton" name="access_map_button">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click on map canvas to select a point source for accessibility area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
@@ -1102,61 +1142,87 @@
      </widget>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="header_text">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://go.openrouteservice.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;openrouteservice.org&lt;/span&gt;&lt;/a&gt; | by &lt;a href=&quot;mailto:nils@openrouteservice.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="header_pic">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="header_subpic">
+     <property name="text">
+      <string>&lt;a href=&quot;https://github.com/GIScience/openrouteservice&quot; style=&quot;color: black; text-decoration: none&quot;&gt;We truly &lt;span style=&quot;color: #b5152b&quot;&gt;♥&lt;/span&gt; Open Source.&lt;/a&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
   <zorder>button_box</zorder>
-  <zorder>label_7</zorder>
-  <zorder>header_2</zorder>
   <zorder>tabWidget</zorder>
   <zorder>groupBox_4</zorder>
-  <zorder>header_3</zorder>
+  <zorder>header_pic</zorder>
+  <zorder>header_text</zorder>
+  <zorder>header_subpic</zorder>
  </widget>
  <tabstops>
-  <tabstop>api_key</tabstop>
+  <tabstop>api_key_dlg</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>scrollArea_2</tabstop>
-  <tabstop>start_radio_map</tabstop>
-  <tabstop>start_radio_map</tabstop>
-  <tabstop>add_start_button</tabstop>
-  <tabstop>add_start_button</tabstop>
-  <tabstop>start_radio_layer</tabstop>
-  <tabstop>start_radio_layer</tabstop>
-  <tabstop>end_radio_layer</tabstop>
-  <tabstop>end_layer</tabstop>
-  <tabstop>end_layer_id</tabstop>
+  <tabstop>start_map_radio</tabstop>
+  <tabstop>start_map_button</tabstop>
+  <tabstop>start_layer_radio</tabstop>
   <tabstop>button_box</tabstop>
   <tabstop>radio_one</tabstop>
   <tabstop>radio_many</tabstop>
-  <tabstop>mode</tabstop>
-  <tabstop>unit</tabstop>
-  <tabstop>access_map</tabstop>
+  <tabstop>access_mode_combo</tabstop>
+  <tabstop>access_unit_combo</tabstop>
+  <tabstop>access_map_button</tabstop>
   <tabstop>use_layer</tabstop>
   <tabstop>layer</tabstop>
-  <tabstop>mode_routing</tabstop>
-  <tabstop>start_layer</tabstop>
+  <tabstop>route_pref_combo</tabstop>
   <tabstop>use_layer</tabstop>
-  <tabstop>unit</tabstop>
-  <tabstop>access_map</tabstop>
-  <tabstop>add_via_button</tabstop>
-  <tabstop>mode</tabstop>
-  <tabstop>start_layer_id</tabstop>
+  <tabstop>access_unit_combo</tabstop>
+  <tabstop>access_map_button</tabstop>
+  <tabstop>via_map_button</tabstop>
+  <tabstop>access_mode_combo</tabstop>
   <tabstop>layer</tabstop>
-  <tabstop>add_end_button</tabstop>
-  <tabstop>mode_travel</tabstop>
-  <tabstop>start_layer</tabstop>
-  <tabstop>end_radio_map</tabstop>
-  <tabstop>end_radio_map</tabstop>
-  <tabstop>add_end_button</tabstop>
-  <tabstop>end_radio_layer</tabstop>
-  <tabstop>end_layer</tabstop>
+  <tabstop>route_mode_combo</tabstop>
+  <tabstop>start_layer_combo</tabstop>
+  <tabstop>end_map_radio</tabstop>
+  <tabstop>end_map_button</tabstop>
+  <tabstop>end_layer_radio</tabstop>
+  <tabstop>end_layer_combo</tabstop>
   <tabstop>end_layer_id</tabstop>
   <tabstop>radio_one</tabstop>
   <tabstop>radio_many</tabstop>
-  <tabstop>add_via_button</tabstop>
-  <tabstop>add_via_button_clear</tabstop>
-  <tabstop>mode_travel</tabstop>
-  <tabstop>mode_routing</tabstop>
+  <tabstop>via_map_button</tabstop>
+  <tabstop>via_clear_button</tabstop>
+  <tabstop>route_mode_combo</tabstop>
+  <tabstop>route_pref_combo</tabstop>
   <tabstop>start_layer_id</tabstop>
-  <tabstop>add_via_button_clear</tabstop>
+  <tabstop>via_clear_button</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -1193,4 +1259,8 @@
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="end_buttongroup"/>
+  <buttongroup name="start_buttongroup"/>
+ </buttongroups>
 </ui>
