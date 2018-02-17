@@ -17,7 +17,7 @@ def CheckCRS(self,crs):
     check = True
     if crs != "EPSG:4326":
         msg = "CRS is {}. Must be EPSG:4326 (WGS84)".format(crs)
-        qgis.utils.iface.messageBar().pushMessage(msg, level = qgis.gui.QgsMessageBar.CRITICAL, duration=10)
+        qgis.utils.iface.messageBar().pushMessage(msg, level = Qgis.Critical, duration=10)
         check = False
     return check
 
@@ -25,5 +25,5 @@ def CheckCRS(self,crs):
 def CheckStatus(code, req):
     code_text = requests.status_codes._codes[code]
     msg = "HTTP status {}: {}\nGet request: {}".format(code, code_text, req)
-    qgis.utils.iface.messageBar().pushMessage(msg, level=qgis.gui.QgsMessageBar.CRITICAL, duration=20)
+    qgis.utils.iface.messageBar().pushMessage(msg, level=Qgis.Critical, duration=20)
     return

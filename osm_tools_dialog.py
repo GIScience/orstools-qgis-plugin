@@ -39,6 +39,7 @@ from qgis.core import (QgsGeometry,
                        )
 
 import qgis.core
+import yaml
 
 from . import osm_tools_pointtool, osm_tools_geocode
 
@@ -76,8 +77,9 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
         # Read API key file
-        with open(os.path.join(self.script_dir, "apikey.txt")) as key:
-            self.api_key_dlg.setText(key.read())
+        with open(os.path.join(self.script_dir, "config.yml")) as f:
+            doc = yaml.safe_load(f)
+            self.api_key_dlg.setText(doc['api_key'])
             
         self.api_key = self.api_key_dlg.text()
         self.project = QgsProject.instance()
@@ -110,6 +112,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.start_layer_refresh.clicked.connect(self._layerTreeChanged) 
         self.end_layer_refresh.clicked.connect(self._layerTreeChanged) 
         
+        # Programmtically invoke ORS logo
         header_pic = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
         self.pixmap = header_pic.scaled(self.width(), self.height(),
                                         aspectRatioMode=Qt.KeepAspectRatio,
@@ -121,6 +124,10 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         
     
     def _layerTreeChanged(self):
+        """
+        Re-populate layers for dropdowns dynamically when layers were 
+        added/removed.
+        """
         #TODO: Connect layer QComboBoxes to iface.layerTree  change event
         start_layer_id = self.start_layer_combo.currentIndex()
         end_layer_id = self.end_layer_combo.currentIndex()
@@ -142,7 +149,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         children of the parent widget of the calling radio button. 
         
         :param index: Index of the calling radio button within the QButtonGroup.
-        :type index: integer
+        :type index: int
         """
         parent_widget = self.sender().button(index).parentWidget()
         parent_widget_name = parent_widget.objectName()
@@ -162,26 +169,43 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         
         
     def _layerSeletedChanged(self, index):
-        #Todo: connect field comboboxes to change event in layer comboboxes
+        """
+        Populates dropdowns with QgsProject layers.
+        
+        :param index: Index of previously selected layer in dropdown. -1 if no
+            layer was selected.
+        :type index: int
+        """
         
         if index != -1:
             sending_widget = self.sender()
             sending_widget_name = sending_widget.objectName()
             parent_widget = self.sender().parentWidget()
             layer_selected = [lyr for lyr in self.project.mapLayers().values() if lyr.name() == sending_widget.currentText()][0]
-            for widget in parent_widget.findChildren(QComboBox):
+            for widget in parent_widget.findChildren(QComboBox):config
                 if widget.objectName() != sending_widget_name:   
                     widget.clear()
                     widget.addItems([field.name() for field in layer_selected.fields()])
                 
     
     def _clearVia(self):
+        """
+        Clears the 'via' coordinates label.
+        """
         self.via_label.setText("Long,Lat")
             
             
     def _keyWriter(self):
-        with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
-            key.write(self.api_key_dlg.text())
+        #TODO: Place inside of a yaml config file, along with base_url, requests_per_minute etc.
+        """
+        Writes key to text file when api key text field changes.
+        """
+        config_file = os.path.join(self.script_dir, "config.yml")
+        with open(config_file) as config:
+            doc = yaml.safe_load(config)
+        doc['api_key'] = self.api_key_dlg.text()
+        with open(config_file, 'w') as f:
+            yaml.safe_dump(doc, f)
            
             
     def _unitChanged(self):
@@ -195,15 +219,29 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
 
 
     def _initMapTool(self):
+        """
+        Initialize the mapTool to select coordinates in map canvas.
+        """
+        
         self.setWindowState(Qt.WindowMinimized)
         sending_button = self.sender().objectName()
         self.mapTool = osm_tools_pointtool.PointTool(self.iface.mapCanvas(), sending_button)        
         self.iface.mapCanvas().setMapTool(self.mapTool)
-        self.mapTool.canvasClicked.connect(self._writeText)
+        self.mapTool.canvasClicked.connect(self._writeCoordinateLabel)
         
         
     # Write map coordinates to text fields
-    def _writeText(self, point, button):
+    def _writeCoordinateLabel(self, point, button):
+        """
+        Writes the selected coordinates from map canvas to its accompanying label.
+        
+        :param point: Point selected with mapTool.
+        :type point: QgsPointXY
+        
+        :param button: Button name which intialized mapTool.
+        :param button: str
+        """
+        
         x, y = point
         
         if button == self.start_map_button.objectName():

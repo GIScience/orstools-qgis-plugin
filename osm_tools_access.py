@@ -41,14 +41,14 @@ class accessAnalysis:
         
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
-        # Connect events to signals
-        self.dlg.iso_max.valueChanged.connect(self.valueChanged)
-        self.dlg.iso_int.valueChanged.connect(self.valueChanged)
-        self.dlg.mode.currentIndexChanged.connect(self.valueChanged)
-        self.dlg.unit.currentIndexChanged.connect(self.valueChanged)
-        self.dlg.use_layer.stateChanged.connect(self.enableLayer)
-        self.dlg.api_key.textChanged.connect(self.keyWriter)
-        self.dlg.layer_iso_refresh.clicked.connect(self.refreshList)
+#        # Connect events to signals
+#        self.dlg.iso_max.valueChanged.connect(self.valueChanged)
+#        self.dlg.iso_int.valueChanged.connect(self.valueChanged)
+#        self.dlg.mode.currentIndexChanged.connect(self.valueChanged)
+#        self.dlg.unit.currentIndexChanged.connect(self.valueChanged)
+#        self.dlg.use_layer.stateChanged.connect(self.enableLayer)
+#        self.dlg.api_key.textChanged.connect(self.keyWriter)
+#        self.dlg.layer_iso_refresh.clicked.connect(self.refreshList)
         
         # Populate field ID dynamically when combobox selection changes
 #        self.dlg.layer.currentIndexChanged.connect(self.popBox)
