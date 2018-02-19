@@ -36,7 +36,7 @@ import os.path
 #from ORStools import resources_rc, osm_tools_gui
 # Import the code for the dialog
 from ORStools.osm_tools_dialog import OSMtoolsDialog
-from ORStools import isochrones, osm_tools_client
+from ORStools import isochrones, osm_tools_client, directions
 
 from qgis.core import *
 import qgis.gui
@@ -175,6 +175,9 @@ class OSMtools():
             if self.dlg.tabWidget.currentIndex() == 1:
                 iso = isochrones.isochrones(self.dlg, client, self.iface)
                 iso.main()
+            if self.dlg.tabWidget.currentIndex() == 0:
+                route = directions.directions(self.dlg, client, self.iface)
+                route.directions()
 #            self.dlg.close()
 #            if self.dlg.tabWidget.currentIndex() == 1 and self.dlg.use_layer.isChecked():
 #                self.access_anal.iterAnalysis()
