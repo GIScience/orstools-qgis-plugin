@@ -33,6 +33,8 @@ class isochrones:
         self.dlg = dlg
         self.client = client
         self.iface = iface
+        
+        self.url = '/isochrones'
     
         self.iso_mode = self.dlg.access_mode_combo.currentText()
         try:
@@ -59,12 +61,7 @@ class isochrones:
             layer_name = self.dlg.access_layer_combo.currentText()
             layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
             
-            layer_crs = layer.crs().authid()
-            if layer_crs.split(':')[1] != '4326':
-                layer = layer = osm_tools_aux.transformToWGS(layer, layer_crs)
-                self.iface.messageBar().pushInfo('CRS conflict',
-                                                 'The input layer CRS is {}, the output layer '
-                                                 'CRS will be EPSG:4326'.format(layer_crs))
+            osm_tools_aux.checkCRS(layer, self.iface.messageBar())
                 
             feats = layer.getFeatures()
             feat_count = layer.featureCount()
@@ -81,9 +78,8 @@ class isochrones:
                 
                 # Get response
                 self.params['locations'] = convert._build_coords(coords)
-                responses.append(self.client.request('/isochrones', self.params))
+                responses.append(self.client.request(self.url, self.params))
                 
-            self.iface.messageBar().clearWidgets() 
             poly_out = self._addPolygon(responses, layer_name)
             
         else:  
@@ -95,7 +91,7 @@ class isochrones:
             self.params['locations'] = convert._build_coords(coords)
             
             # Fire request
-            response = self.client.request('/isochrones', self.params)
+            response = self.client.request(self.url, self.params)
             
             name_ext = "{0:.3f},{1:.3f}".format(*response['features'][0]['properties']['center'])
             
@@ -111,6 +107,8 @@ class isochrones:
 #        self.iface.setActiveLayer(poly_out)
         QgsProject.instance().addMapLayer(poly_out)
         self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
+        
+        self.iface.messageBar().clearWidgets() 
             
         
     def _addPoint(self, response_dict, point_geom, name_ext):
