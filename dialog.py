@@ -31,14 +31,13 @@ from PyQt5.QtWidgets import (QDialog,
                              )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from qgis.core import (QgsGeometry, 
-                       QgsProject, 
+from qgis.core import (QgsProject, 
                        QgsLayerTreeLayer, 
                        QgsMapLayer,
                        QgsWkbTypes
                        )
 
-from . import osm_tools_pointtool, osm_tools_geocode, osm_tools_aux
+from . import pointtool, geocode, aux, client
 
 FORM_CLASS, _ = loadUiType(os.path.join(
     os.path.dirname(__file__), 'osm_tools_dialog_base.ui'))
@@ -73,7 +72,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
         # Read API key file
-        self.api_key_dlg.setText(osm_tools_aux.readConfig()['api_key'])
+        self.api_key_dlg.setText(aux.readConfig()['api_key'])
             
         self.api_key = self.api_key_dlg.text()
         self.project = QgsProject.instance()
@@ -204,7 +203,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         """
         Writes key to text file when api key text field changes.
         """
-        osm_tools_aux.writeConfig('api_key',
+        aux.writeConfig('api_key',
                                   self.api_key_dlg.text())
            
             
@@ -225,7 +224,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         
         self.setWindowState(Qt.WindowMinimized)
         sending_button = self.sender().objectName()
-        self.mapTool = osm_tools_pointtool.PointTool(self.iface.mapCanvas(), sending_button)        
+        self.mapTool = pointtool.PointTool(self.iface.mapCanvas(), sending_button)        
         self.iface.mapCanvas().setMapTool(self.mapTool)
         self.mapTool.canvasClicked.connect(self._writeCoordinateLabel)
         
@@ -253,10 +252,10 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         if button == self.via_map_button.objectName():
             self.via_label.setText("{0:.5f},{1:.5f}".format(x, y))
             
-        if button == self.access_map_button.objectName():            
-            point_geometry = QgsGeometry.fromPointXY(point)
-            loc_dict = osm_tools_geocode.reverseGeocode(point_geometry,
-                                                        self.api_key_dlg.text())
+        if button == self.access_map_button.objectName():
+            clt = client.Client()
+            loc_dict = geocode.reverseGeocode(clt,
+                                              point)
             
             out_str = u"{0:.6f}\n{1:.6f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
                                                             loc_dict.get('Lat', ""),

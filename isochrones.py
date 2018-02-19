@@ -23,7 +23,7 @@ from qgis.core import (QgsPointXY,
 
 from ORStools import (geocode,
                       convert,
-                      osm_tools_aux
+                      aux
                       )
 
 class isochrones:
@@ -60,7 +60,7 @@ class isochrones:
             layer_name = self.dlg.access_layer_combo.currentText()
             layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
             
-            osm_tools_aux.checkCRS(layer, self.iface.messageBar())
+            aux.checkCRS(layer, self.iface.messageBar())
             
             # If features are selected, calculate with those
             if layer.selectedFeatureCount() == 0:
@@ -70,7 +70,7 @@ class isochrones:
                 feats = layer.selectedFeatures()
                 feat_count = layer.selectedFeatureCount()
             
-            message_bar = osm_tools_aux.pushProgressBar(self.iface)
+            message_bar = aux.pushProgressBar(self.iface)
             
             responses = []
             for i, feat in enumerate(feats):

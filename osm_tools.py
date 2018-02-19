@@ -33,8 +33,8 @@ from PyQt5.Qt import PYQT_VERSION_STR
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QApplication
 
-from ORStools.osm_tools_dialog import OSMtoolsDialog
-from . import isochrones, osm_tools_client, directions, exceptions
+from ORStools.dialog import OSMtoolsDialog
+from . import isochrones, client, directions, exceptions
 
 import logging
 
@@ -131,12 +131,12 @@ class OSMtools():
         # See if OK was pressed
         if result:
             try:
-                client = osm_tools_client.Client(self.iface)
+                clt = client.Client(self.iface)
                 if self.dlg.tabWidget.currentIndex() == 1:
-                    iso = isochrones.isochrones(self.dlg, client, self.iface)
+                    iso = isochrones.isochrones(self.dlg, clt, self.iface)
                     iso.main()
                 if self.dlg.tabWidget.currentIndex() == 0:
-                    route = directions.directions(self.dlg, client, self.iface)
+                    route = directions.directions(self.dlg, clt, self.iface)
                     route.directions()
             except exceptions.Timeout:
                 self.iface.messageBar().pushCritical('Time out',

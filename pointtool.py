@@ -8,10 +8,11 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QCursor, QPixmap
 from PyQt5.QtWidgets import QApplication
 
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import (QgsCoordinateReferenceSystem,
+                       QgsCoordinateTransform,
+                       QgsProject)
+from qgis.gui import QgsMapTool
 
-import qgis.core
 
 import os
 

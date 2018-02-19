@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore
+from PyQt5.QtCore import qRegisterResourceData
 
 qt_resource_data = b"\
 \x00\x00\x08\x69\
@@ -161,7 +161,7 @@ qt_resource_name = b"\
 \x0a\x61\x5a\xa7\
 \x00\x69\
 \x00\x63\x00\x6f\x00\x6e\x00\x2e\x00\x70\x00\x6e\x00\x67\
-"
+"qRegisterResourceData
 
 qt_resource_struct = b"\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x01\

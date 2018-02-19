@@ -23,7 +23,7 @@ from qgis.core import (QgsVectorLayer,
                        QgsProject
                        )
 
-from . import convert, geocode, osm_tools_aux
+from . import convert, geocode, aux
 
 class directions:
     def __init__(self, dlg, client, iface):
@@ -94,7 +94,7 @@ class directions:
         if self.dlg.via_label.text() != 'Long,Lat':
             route_via = [float(x) for x in self.dlg.via_label.text().split(",")]
                 
-        message_bar = osm_tools_aux.pushProgressBar(self.iface)
+        message_bar = aux.pushProgressBar(self.iface)
         
         responses = []
         delete_values = []
@@ -183,7 +183,7 @@ class directions:
                 layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
                 
                 # Check CRS and transform if necessary
-                osm_tools_aux.checkCRS(layer,
+                aux.checkCRS(layer,
                                        self.iface.messageBar())
                 
                 # If features are selected, calculate with those

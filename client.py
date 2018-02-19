@@ -15,7 +15,7 @@ import collections
 from urllib.parse import urlencode
 
 import ORStools
-from . import exceptions
+from . import exceptions, aux
 
 _USER_AGENT = "ORSClientQGIS/%s".format(ORStools.__version__)
 _RETRIABLE_STATUSES = [503]
@@ -58,7 +58,7 @@ class Client(object):
         :type requests_kwargs: dict
         """
         
-        base_params = ORStools.osm_tools_aux.readConfig()
+        base_params = aux.readConfig()
         
         (self.key, 
          self.base_url, 
@@ -181,7 +181,7 @@ class Client(object):
         try:
             result = self._get_body(response)
             self.sent_times.append(time.time())
-            return result
+            return resultORStools.
 #        except exceptions._RetriableRequest as e:
 #            if isinstance(e, exceptions._OverQueryLimit) and not self.retry_over_query_limit:
 #                raise
