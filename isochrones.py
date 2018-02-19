@@ -20,7 +20,6 @@ from qgis.core import (QgsPointXY,
                        QgsSimpleFillSymbolLayer,
                        QgsRendererCategory,
                        QgsCategorizedSymbolRenderer)
-from qgis.gui import QgsMessageBar
 
 from ORStools import (geocode,
                       convert,
@@ -62,9 +61,14 @@ class isochrones:
             layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
             
             osm_tools_aux.checkCRS(layer, self.iface.messageBar())
-                
-            feats = layer.getFeatures()
-            feat_count = layer.featureCount()
+            
+            # If features are selected, calculate with those
+            if layer.selectedFeatureCount() == 0:
+                feats = layer.getFeatures()
+                feat_count = layer.featureCount()
+            else:
+                feats = layer.selectedFeatures()
+                feat_count = layer.selectedFeatureCount()
             
             message_bar = osm_tools_aux.pushProgressBar(self.iface)
             

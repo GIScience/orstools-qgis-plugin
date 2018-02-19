@@ -9,10 +9,8 @@ Created on Mon Feb 19 10:39:11 2018
 from itertools import product
 
 from PyQt5.QtWidgets import (QComboBox,
-                             QRadioButton,
                              QLabel,
-                             QCheckBox,
-                             QWidget
+                             QCheckBox
                              )
 
 from PyQt5.QtCore import QVariant
@@ -188,8 +186,14 @@ class directions:
                 osm_tools_aux.checkCRS(layer,
                                        self.iface.messageBar())
                 
+                # If features are selected, calculate with those
+                if layer.selectedFeatureCount() == 0:
+                    feats = layer.getFeatures()
+                else:
+                    feats = layer.selectedFeatures()
+                    
                 # Get features
-                point_geom = [feat.geometry().asPoint() for feat in layer.getFeatures()]
+                point_geom = [feat.geometry().asPoint() for feat in feats]
                 
                 # Find field combo box
                 field_combo = [combo for combo in all_combos if combo.objectName().endswith('layer_id')][0] 
