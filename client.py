@@ -24,7 +24,7 @@ _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
 class Client(object):
     """Performs requests to the ORS API services."""
 
-    def __init__(self,
+    def __init__(self, iface,
 #                 key=None,
 #                 base_url=_DEFAULT_BASE_URL, 
                  timeout=None, 
@@ -63,7 +63,8 @@ class Client(object):
         (self.key, 
          self.base_url, 
          self.queries_per_minute) = [v for (k, v) in sorted(base_params.items())]
-    
+        self.iface = iface
+        
         self.session = requests.Session()
         
         self.timeout = timeout
@@ -150,8 +151,9 @@ class Client(object):
         if self.sent_times and len(self.sent_times) == self.queries_per_minute:
             elapsed_since_earliest = time.time() - self.sent_times[0]
             if elapsed_since_earliest < 60:
-                print("Request limit of {} per minute exceeded. Wait for {} seconds".format(self.queries_per_minute, 
-                                                                                              60 - elapsed_since_earliest))
+                self.iface.messageBar().pushInfo('Request limit of {} per minute exceeded. '
+                                                 'Wait for {} seconds'.format(self.queries_per_minute, 
+                                                                               60 - elapsed_since_earliest))
                 time.sleep(60 - elapsed_since_earliest)
         
         # Determine GET/POST.
