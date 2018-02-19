@@ -110,7 +110,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         
         # Programmtically invoke ORS logo
         header_pic = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
-        self.pixmap = header_pic.scaled(self.width(), self.height(),
+        self.pixmap = header_pic.scaled(150, 50,
                                         aspectRatioMode=Qt.KeepAspectRatio,
                                         transformMode=Qt.SmoothTransformation
                                         )

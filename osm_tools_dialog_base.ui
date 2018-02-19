@@ -36,7 +36,7 @@
       <item>
        <widget class="QLineEdit" name="api_key_dlg">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get your personal API key!&lt;/p&gt;&lt;p&gt;500 requests/day and 40 requests/minute limitations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get your personal API key!&lt;/p&gt;&lt;p&gt;2500 requests/day and 40 requests/minute limitations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -48,6 +48,9 @@
           <weight>75</weight>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Register for access to ORS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>&lt;a href=&quot;https://go.openrouteservice.org/sign-up/&quot; style=&quot;font-size: 14px; color: #b5152b&quot;&gt;Order Key!&lt;/a&gt;</string>
@@ -82,7 +85,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-232</y>
+            <y>-395</y>
             <width>340</width>
             <height>852</height>
            </rect>
@@ -600,7 +603,11 @@
         <widget class="QWidget" name="widget_6" native="true">
          <layout class="QGridLayout" name="gridLayout_3" columnstretch="10,15,0">
           <item row="0" column="1">
-           <widget class="QLineEdit" name="access_range"/>
+           <widget class="QLineEdit" name="access_range">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comma separated list of isochrone ranges&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
           </item>
           <item row="0" column="2">
            <widget class="QLabel" name="unit_label">
@@ -618,7 +625,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_2">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum accessibility distance in minutes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comma separated list of isochrone ranges&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>Isochrone ranges</string>
@@ -1247,7 +1254,7 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="end_buttongroup"/>
   <buttongroup name="start_buttongroup"/>
+  <buttongroup name="end_buttongroup"/>
  </buttongroups>
 </ui>
