@@ -63,7 +63,7 @@
    <item row="5" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -82,7 +82,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-232</y>
             <width>340</width>
             <height>852</height>
            </rect>
@@ -238,7 +238,7 @@
                     <bool>false</bool>
                    </property>
                    <property name="toolTip">
-                    <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
+                    <string>Input Layer must be of type 'Point' </string>
                    </property>
                    <property name="whatsThis">
                     <string/>
@@ -282,7 +282,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout_6">
               <item row="0" column="0">
-               <widget class="QRadioButton" name="radio_one">
+               <widget class="QRadioButton" name="row_by_row">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -298,7 +298,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QRadioButton" name="radio_many">
+               <widget class="QRadioButton" name="many_by_many">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -469,7 +469,7 @@
             </widget>
            </item>
            <item row="8" column="0">
-            <widget class="QGroupBox" name="avoid_type">
+            <widget class="QGroupBox" name="avoid_frame">
              <property name="font">
               <font>
                <family>Sans Serif</family>
@@ -1184,8 +1184,8 @@
   <tabstop>start_map_button</tabstop>
   <tabstop>start_layer_radio</tabstop>
   <tabstop>button_box</tabstop>
-  <tabstop>radio_one</tabstop>
-  <tabstop>radio_many</tabstop>
+  <tabstop>row_by_row</tabstop>
+  <tabstop>many_by_many</tabstop>
   <tabstop>access_mode_combo</tabstop>
   <tabstop>access_unit_combo</tabstop>
   <tabstop>access_map_button</tabstop>
@@ -1202,8 +1202,8 @@
   <tabstop>end_layer_radio</tabstop>
   <tabstop>end_layer_combo</tabstop>
   <tabstop>end_layer_id</tabstop>
-  <tabstop>radio_one</tabstop>
-  <tabstop>radio_many</tabstop>
+  <tabstop>row_by_row</tabstop>
+  <tabstop>many_by_many</tabstop>
   <tabstop>via_map_button</tabstop>
   <tabstop>via_clear_button</tabstop>
   <tabstop>route_mode_combo</tabstop>

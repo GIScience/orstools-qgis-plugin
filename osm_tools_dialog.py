@@ -169,8 +169,8 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
                     child.setEnabled(False)
         
         condition = self.end_layer_radio.isChecked() and self.start_layer_radio.isChecked()
-        self.radio_one.setEnabled(condition)
-        self.radio_many.setEnabled(condition)
+        self.row_by_row.setEnabled(condition)
+        self.many_by_many.setEnabled(condition)
         
         
     def _layerSeletedChanged(self, index):
