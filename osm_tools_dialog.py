@@ -38,11 +38,7 @@ from qgis.core import (QgsGeometry,
                        QgsWkbTypes
                        )
 
-import qgis.core
-import yaml
-
-from . import osm_tools_pointtool, osm_tools_geocode
-
+from . import osm_tools_pointtool, osm_tools_geocode, osm_tools_aux
 
 FORM_CLASS, _ = loadUiType(os.path.join(
     os.path.dirname(__file__), 'osm_tools_dialog_base.ui'))
@@ -77,9 +73,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
         # Read API key file
-        with open(os.path.join(self.script_dir, "config.yml")) as f:
-            doc = yaml.safe_load(f)
-            self.api_key_dlg.setText(doc['api_key'])
+        self.api_key_dlg.setText(osm_tools_aux.readConfig()['api_key'])
             
         self.api_key = self.api_key_dlg.text()
         self.project = QgsProject.instance()
@@ -97,6 +91,8 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         # Isochrone tab
         self.access_map_button.clicked.connect(self._initMapTool)
         self.access_unit_combo.currentIndexChanged.connect(self._unitChanged)
+        self.access_layer_check.stateChanged.connect(self._accessLayerChanged)
+        self.access_layer_refresh.clicked.connect(self._layerTreeChanged) 
         
         # Routing tab
         self.start_map_button.clicked.connect(self._initMapTool)
@@ -104,13 +100,13 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.end_map_button.clicked.connect(self._initMapTool)
         self.start_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
         self.end_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
-        self.start_layer_combo.currentIndexChanged[int].connect(self._layerSeletedChanged)
-        self.end_layer_combo.currentIndexChanged[int].connect(self._layerSeletedChanged)
         self.via_clear_button.clicked.connect(self._clearVia)
         self.project.layerWasAdded.connect(self._layerTreeChanged)
         self.project.layersRemoved.connect(self._layerTreeChanged) 
         self.start_layer_refresh.clicked.connect(self._layerTreeChanged) 
         self.end_layer_refresh.clicked.connect(self._layerTreeChanged) 
+        self.start_layer_combo.currentIndexChanged[int].connect(self._layerSeletedChanged)
+        self.end_layer_combo.currentIndexChanged[int].connect(self._layerSeletedChanged)
         
         # Programmtically invoke ORS logo
         header_pic = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
@@ -122,17 +118,24 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.header_text.setAlignment(Qt.AlignHCenter)
         self.header_subpic.setAlignment(Qt.AlignHCenter)
         
+
+    def _accessLayerChanged(self):
+        for child in self.sender().parentWidget().children():  
+            if not child.objectName() == self.sender().objectName():
+                child.setEnabled(self.sender().isChecked())
+            
     
     def _layerTreeChanged(self):
         """
         Re-populate layers for dropdowns dynamically when layers were 
         added/removed.
         """
-        #TODO: Connect layer QComboBoxes to iface.layerTree  change event
         start_layer_id = self.start_layer_combo.currentIndex()
         end_layer_id = self.end_layer_combo.currentIndex()
+        access_layer_id = self.access_layer_combo.currentIndex()
         self.start_layer_combo.clear()
         self.end_layer_combo.clear()
+        self.access_layer_combo.clear()
         root = self.project.layerTreeRoot()
         for child in root.children():
             if isinstance(child, QgsLayerTreeLayer):
@@ -140,8 +143,10 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
                 if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.Type(1):
                     self.start_layer_combo.addItem(layer.name())
                     self.end_layer_combo.addItem(layer.name())
+                    self.access_layer_combo.addItem(layer.name())
         self.start_layer_combo.setCurrentIndex(start_layer_id)
         self.end_layer_combo.setCurrentIndex(end_layer_id)
+        self.access_layer_combo.setCurrentIndex(access_layer_id)
                     
                     
     def _mappingMethodChanged(self, index):
@@ -182,7 +187,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
             sending_widget_name = sending_widget.objectName()
             parent_widget = self.sender().parentWidget()
             layer_selected = [lyr for lyr in self.project.mapLayers().values() if lyr.name() == sending_widget.currentText()][0]
-            for widget in parent_widget.findChildren(QComboBox):config
+            for widget in parent_widget.findChildren(QComboBox):
                 if widget.objectName() != sending_widget_name:   
                     widget.clear()
                     widget.addItems([field.name() for field in layer_selected.fields()])
@@ -196,16 +201,11 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
             
             
     def _keyWriter(self):
-        #TODO: Place inside of a yaml config file, along with base_url, requests_per_minute etc.
         """
         Writes key to text file when api key text field changes.
         """
-        config_file = os.path.join(self.script_dir, "config.yml")
-        with open(config_file) as config:
-            doc = yaml.safe_load(config)
-        doc['api_key'] = self.api_key_dlg.text()
-        with open(config_file, 'w') as f:
-            yaml.safe_dump(doc, f)
+        osm_tools_aux.writeConfig('api_key',
+                                  self.api_key_dlg.text())
            
             
     def _unitChanged(self):
@@ -255,9 +255,10 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
             
         if button == self.access_map_button.objectName():            
             point_geometry = QgsGeometry.fromPointXY(point)
-            loc_dict = osm_tools_geocode.reverseGeocode(point_geometry,self.api_key)
+            loc_dict = osm_tools_geocode.reverseGeocode(point_geometry,
+                                                        self.api_key_dlg.text())
             
-            out_str = u"Long: {0:.3f}, Lat:{1:.3f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
+            out_str = u"{0:.6f}\n{1:.6f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
                                                             loc_dict.get('Lat', ""),
                                                             loc_dict.get('CITY', "NA"),
                                                             loc_dict.get('STATE', "NA"),

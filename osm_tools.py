@@ -26,16 +26,17 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QUrl, QTranslator, QCoreApplication, Qt
+from PyQt5.QtCore import QSettings, QTranslator, QCoreApplication
 from PyQt5.Qt import PYQT_VERSION_STR
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QAction, QApplication, QLabel
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction, QApplication
 import os.path
 
 # Initialize Qt resources from file resources.py
 #from ORStools import resources_rc, osm_tools_gui
 # Import the code for the dialog
 from ORStools.osm_tools_dialog import OSMtoolsDialog
+from ORStools import isochrones, osm_tools_client
 
 from qgis.core import *
 import qgis.gui
@@ -44,9 +45,6 @@ import qgis.utils
 import logging
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO)
-
-def unload():
-    pass
 
 class OSMtools():
     """QGIS Plugin Implementation."""
@@ -164,7 +162,6 @@ class OSMtools():
 #        
 #        self.dlg.setFixedSize(self.dlg.size())
         
-        # Set up combo boxes
         
         self.dlg.show()
         
@@ -174,7 +171,11 @@ class OSMtools():
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            self.dlg.close()
+            client = osm_tools_client.Client()
+            if self.dlg.tabWidget.currentIndex() == 1:
+                iso = isochrones.isochrones(self.dlg, client, self.iface)
+                iso.main()
+#            self.dlg.close()
 #            if self.dlg.tabWidget.currentIndex() == 1 and self.dlg.use_layer.isChecked():
 #                self.access_anal.iterAnalysis()
 #            

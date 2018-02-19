@@ -63,7 +63,7 @@
    <item row="5" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -82,7 +82,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-395</y>
+            <y>0</y>
             <width>340</width>
             <height>852</height>
            </rect>
@@ -548,7 +548,7 @@
       <attribute name="title">
        <string>Accessibility Areas</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,3,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,3,0">
        <item>
         <widget class="QWidget" name="widget_4" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -598,16 +598,9 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_6" native="true">
-         <layout class="QGridLayout" name="gridLayout_3" columnstretch="14,12,3">
+         <layout class="QGridLayout" name="gridLayout_3" columnstretch="10,15,0">
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="iso_max">
-            <property name="decimals">
-             <number>0</number>
-            </property>
-            <property name="value">
-             <double>10.000000000000000</double>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="access_range"/>
           </item>
           <item row="0" column="2">
            <widget class="QLabel" name="unit_label">
@@ -628,7 +621,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum accessibility distance in minutes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Maximum isochrone</string>
+             <string>Isochrone ranges</string>
             </property>
            </widget>
           </item>
@@ -1087,33 +1080,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="use_layer">
-         <property name="text">
-          <string>Use Layer</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="frame_2">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7" columnstretch="3,0">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Point Layer</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="layer_iso_refresh">
+        <widget class="QWidget" name="widget_12" native="true">
+         <layout class="QGridLayout" name="gridLayout_14">
+          <item row="3" column="2">
+           <widget class="QPushButton" name="access_layer_refresh">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -1122,8 +1092,28 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QComboBox" name="layer">
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="label">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Point Layer</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="access_layer_check">
+            <property name="text">
+             <string>Use Layer</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QComboBox" name="access_layer_combo">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="toolTip">
              <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
             </property>
@@ -1199,15 +1189,12 @@
   <tabstop>access_mode_combo</tabstop>
   <tabstop>access_unit_combo</tabstop>
   <tabstop>access_map_button</tabstop>
-  <tabstop>use_layer</tabstop>
-  <tabstop>layer</tabstop>
   <tabstop>route_pref_combo</tabstop>
-  <tabstop>use_layer</tabstop>
   <tabstop>access_unit_combo</tabstop>
   <tabstop>access_map_button</tabstop>
   <tabstop>via_map_button</tabstop>
   <tabstop>access_mode_combo</tabstop>
-  <tabstop>layer</tabstop>
+  <tabstop>access_layer_combo</tabstop>
   <tabstop>route_mode_combo</tabstop>
   <tabstop>start_layer_combo</tabstop>
   <tabstop>end_map_radio</tabstop>
