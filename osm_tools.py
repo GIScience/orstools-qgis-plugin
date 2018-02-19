@@ -26,21 +26,15 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os.path
+
 from PyQt5.QtCore import QSettings, QTranslator, QCoreApplication
 from PyQt5.Qt import PYQT_VERSION_STR
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QApplication
-import os.path
 
-# Initialize Qt resources from file resources.py
-#from ORStools import resources_rc, osm_tools_gui
-# Import the code for the dialog
 from ORStools.osm_tools_dialog import OSMtoolsDialog
-from ORStools import isochrones, osm_tools_client, directions
-
-from qgis.core import *
-import qgis.gui
-import qgis.utils
+from . import isochrones, osm_tools_client, directions, exceptions
 
 import logging
 
@@ -48,6 +42,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO)
 
 class OSMtools():
     """QGIS Plugin Implementation."""
+        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
 
     def __init__(self, iface):
         """Constructor.
@@ -71,6 +66,7 @@ class OSMtools():
             'OSMtools_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
+        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
@@ -84,7 +80,7 @@ class OSMtools():
         #custom __init__ declarations
         self.dlg = OSMtoolsDialog(self.iface)
         
-        self.canvas = qgis.utils.iface.mapCanvas()
+        self.canvas = self.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
                 
         
@@ -100,7 +96,6 @@ class OSMtools():
         :returns: Translated version of message.
         :rtype: QString
         """
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('OSMtools', message)
 
     
@@ -117,24 +112,7 @@ class OSMtools():
         self.iface.addToolBarIcon(self.action)
         self.action.triggered.connect(self.run)
         
-        
-        
-#        
-#        self.dlg.api_key.textChanged.connect(self.keyWriter)
-#        
-#        self.dlg.key_order.setText("<a href = 'https://go.openrouteservice.org/sign-up/'>Get Key!</a>")     
-#        self.dlg.key_order.linkActivated.connect(self.OpenURL) 
-#        self.dlg.header_2.linkActivated.connect(self.OpenURL)
-#        self.dlg.header_3.linkActivated.connect(self.OpenURL)
-        
-#        
-#    def OpenURL(self, URL): 
-#          QDesktopServices().openUrl(QUrl(URL))
-#                
-#    
-            
     def unload(self):        
-#        self.dlg.close()
         QApplication.restoreOverrideCursor()
         self.iface.removePluginWebMenu(u"&OSM Tools", self.action)
         self.iface.removeToolBarIcon(self.action)
@@ -143,25 +121,6 @@ class OSMtools():
         
     def run(self):
         """Run method that performs all the real work"""
-#        
-#        # Populate the api key lineEdit widget
-#        with open(os.path.join(self.script_dir, "apikey.txt")) as key:
-#            self.dlg.api_key.setText(key.read())
-#            
-#        # Initiate analysis classes
-#        self.access_anal = osm_tools_access.accessAnalysis(self.dlg)
-#        self.route_anal = osm_too
-        
-#    def resizeEvent(self, event):
-#        pixmap1 = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
-#        self.pixmap = pixmap1.scaled(self.width(), self.height(),
-#                                    aspectRatioMode=Qt.KeepAspectRatio,
-#                                    transformMode=Qt.SmoothTransformation
-#                                    )
-#        self.header_pic.setPixmap(self.pixmap)ls_routing.routing(self.dlg)
-#        
-#        self.dlg.setFixedSize(self.dlg.size())
-        
         
         self.dlg.show()
         
@@ -171,22 +130,25 @@ class OSMtools():
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            client = osm_tools_client.Client()
-            if self.dlg.tabWidget.currentIndex() == 1:
-                iso = isochrones.isochrones(self.dlg, client, self.iface)
-                iso.main()
-            if self.dlg.tabWidget.currentIndex() == 0:
-                route = directions.directions(self.dlg, client, self.iface)
-                route.directions()
-#            self.dlg.close()
-#            if self.dlg.tabWidget.currentIndex() == 1 and self.dlg.use_layer.isChecked():
-#                self.access_anal.iterAnalysis()
-#            
-#            elif self.dlg.tabWidget.currentIndex() == 0:
-#                self.route_anal.route()
-#        else:
-#            self.unload()
-                 
-#    def keyWriter(self):
-#        with open(os.path.join(self.script_dir, "apikey.txt"), 'w') as key:
-#            return key.write(self.dlg.api_key.text())
+            try:
+                client = osm_tools_client.Client(self.iface)
+                if self.dlg.tabWidget.currentIndex() == 1:
+                    iso = isochrones.isochrones(self.dlg, client, self.iface)
+                    iso.main()
+                if self.dlg.tabWidget.currentIndex() == 0:
+                    route = directions.directions(self.dlg, client, self.iface)
+                    route.directions()
+            except exceptions.Timeout:
+                self.iface.messageBar().pushCritical('Time out',
+                                                     'The connection exceeded the '
+                                                     'timeout limit of 60 seconds')
+            
+            except (exceptions._OverQueryLimit,
+                    exceptions.ApiError,
+                    exceptions.TransportError,
+                    ValueError) as e:
+                self.iface.messageBar().pushCritical("{}: ".format(type(e)),
+                                                      "{}".format(str(e)))
+            
+            finally:
+                self.dlg.close()
