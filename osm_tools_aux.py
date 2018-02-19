@@ -11,14 +11,21 @@ import requests
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtCore import Qt
 
-import qgis.gui
+from qgis.gui import QgisInterface
 import qgis.utils
 from qgis.core import QgsVectorLayer, Qgis, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsProject
 from qgis.gui import *
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-#TODO: Reproject instead of warning
+def checkCRS(layer, messageBar):
+    layer_crs = layer.crs().authid()
+    if layer_crs.split(':')[1] != '4326':
+        layer = layer = transformToWGS(layer, layer_crs)
+        messageBar.pushInfo('CRS conflict',
+                                         'The input layer CRS is {}, the output layer '
+                                         'CRS will be EPSG:4326'.format(layer_crs))
+
 def transformToWGS(old_layer, old_crs):
     new_layer = QgsVectorLayer("Polygon?crs=EPSG:4326", old_layer.name(), "memory")
     new_crs = QgsCoordinateReferenceSystem(4326)
