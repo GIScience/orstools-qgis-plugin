@@ -123,9 +123,8 @@ class isochrones:
         poly_out.updateExtents()
         
         self._stylePoly(poly_out)
-#        self.iface.setActiveLayer(poly_out)
         QgsProject.instance().addMapLayer(poly_out)
-        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
+#        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
         
         self.iface.messageBar().clearWidgets() 
             
