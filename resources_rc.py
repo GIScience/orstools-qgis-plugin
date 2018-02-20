@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5.QtCore import qRegisterResourceData
+from PyQt5.QtCore import qRegisterResourceData, qUnregisterResourceData
 
 qt_resource_data = b"\
 \x00\x00\x08\x69\

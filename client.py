@@ -25,31 +25,19 @@ class Client(object):
     """Performs requests to the ORS API services."""
 
     def __init__(self, iface,
-#                 key=None,
-#                 base_url=_DEFAULT_BASE_URL, 
-                 timeout=None, 
                  retry_timeout=60, 
                  requests_kwargs=None,
-                 #queries_per_minute=40,
                  retry_over_query_limit=False):
         """
         :param key: ORS API key. Required.
         :type key: string
-
-        :param timeout: Combined connect and read timeout for HTTP requests, in
-            seconds. Specify "None" for no timeout.
-        :type timeout: int
+        
+        :param iface: A QGIS interface instance.
+        :type iface: QgisInterface
 
         :param retry_timeout: Timeout across multiple retriable requests, in
             seconds.
         :type retry_timeout: int
-
-        :param queries_per_minute: Number of queries per second permitted.
-            If the rate limit is reached, the client will sleep for the
-            appropriate amount of time before it runs the current query.
-            Note, it won't help to initiate another client. This saves you the 
-            trouble of raised exceptions.
-        :type queries_per_second: int
 
         :param requests_kwargs: Extra keyword arguments for the requests
             library, which among other things allow for proxy auth to be
@@ -67,7 +55,6 @@ class Client(object):
         
         self.session = requests.Session()
         
-        self.timeout = timeout
         self.retry_over_query_limit = retry_over_query_limit
         self.retry_timeout = timedelta(seconds=retry_timeout)
         self.requests_kwargs = dict()
@@ -82,12 +69,11 @@ class Client(object):
                  url, params, 
                  first_request_time=None, 
                  retry_counter=0,
-                 requests_kwargs=None, 
-                 post_json=None):
+                 requests_kwargs=None):
         """Performs HTTP GET/POST with credentials, returning the body asdlg
         JSON.
 
-        :param url: URL path for the request. Should begin with a slash.
+        :param url: URL extension for request. Should begin with a slash.
         :type url: string
 
         :param params: HTTP GET parameters.
@@ -100,17 +86,10 @@ class Client(object):
         :param retry_counter: The number of this retry, or zero for first attempt.
         :type retry_counter: int
 
-        :param base_url: The base URL for the request. Defaults to the ORS API
-            server. Should not have a trailing slash.
-        :type base_url: string
-
         :param requests_kwargs: Same extra keywords arg for requests as per
             __init__, but provided here to allow overriding internally on a
             per-request basis.
         :type requests_kwargs: dict
-
-        :param post_json: HTTP POST parameters. Only specified by calling method.
-        :type post_json: dict
 
         :raises ApiError: when the API returns an error.
         :raises Timeout: if the request timed out.
@@ -151,7 +130,8 @@ class Client(object):
         if self.sent_times and len(self.sent_times) == self.queries_per_minute:
             elapsed_since_earliest = time.time() - self.sent_times[0]
             if elapsed_since_earliest < 60:
-                self.iface.messageBar().pushInfo('Request limit of {} per minute exceeded. '
+                self.iface.messageBar().pushInfo('Limit exceeded',
+                                                 'Request limit of {} per minute exceeded. '
                                                  'Wait for {} seconds'.format(self.queries_per_minute, 
                                                                                60 - elapsed_since_earliest))
                 time.sleep(60 - elapsed_since_earliest)
@@ -159,10 +139,6 @@ class Client(object):
         # Determine GET/POST.
         # post_json is so far only sent from matrix call
         requests_method = self.session.get
-        
-        if post_json is not None:
-            requests_method = self.session.post
-            final_requests_kwargs["json"] = post_json
         try:
             response = requests_method(self.base_url + authed_url,
                                        **final_requests_kwargs)
@@ -176,26 +152,32 @@ class Client(object):
             print('Server down.\nRetrying for the {}th time.'.format(retry_counter + 1))
             
             return self.request(url, params, first_request_time,
-                                 retry_counter + 1, requests_kwargs, post_json)
+                                 retry_counter + 1, requests_kwargs)
 
         try:
             result = self._get_body(response)
             self.sent_times.append(time.time())
-            return resultORStools.
-#        except exceptions._RetriableRequest as e:
-#            if isinstance(e, exceptions._OverQueryLimit) and not self.retry_over_query_limit:
-#                raise
-#            
-#            print('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
-#            # Retry request.
-#            return self.request(url, params, first_request_time,
-#                                 retry_counter + 1, requests_kwargs,
-#                                 post_json)
+            return result
+        except exceptions._RetriableRequest as e:
+            if isinstance(e, exceptions._OverQueryLimit) and not self.retry_over_query_limit:
+                raise
+            
+            self.iface.messageBar().pushInfo('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
+            return self.request(url, params, first_request_time,
+                                 retry_counter + 1, requests_kwargs)
         except:
             raise
 
 
-    def _get_body(self, response):
+    def _get_body(self, response): 
+        """
+        Casts JSON response to dict
+        
+        :param response: The HTTP response of the request.
+        :type reponse: JSON object
+        
+        :rtype: dict from JSON
+        """
         body = response.json()
         error = body.get('error')
         status_code = response.status_code
@@ -205,7 +187,7 @@ class Client(object):
                 str(status_code), error)
         if status_code != 200:
             raise exceptions.ApiError(status_code,
-                                                       error['message'])
+                                      error['message'])
 
         return body
 

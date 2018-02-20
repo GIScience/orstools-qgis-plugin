@@ -253,8 +253,8 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
             self.via_label.setText("{0:.5f},{1:.5f}".format(x, y))
             
         if button == self.access_map_button.objectName():
-            clt = client.Client()
-            loc_dict = geocode.reverseGeocode(clt,
+            clt = client.Client(self.iface)
+            loc_dict = geocode.reverse_geocode(clt,
                                               point)
             
             out_str = u"{0:.6f}\n{1:.6f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),

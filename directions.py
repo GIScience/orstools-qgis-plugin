@@ -26,8 +26,20 @@ from qgis.core import (QgsVectorLayer,
 from . import convert, geocode, aux
 
 class directions:
+    """
+    Performs requests to the ORS directions API.
+    """
     def __init__(self, dlg, client, iface):
+        """
+        :param dlg: Main OSMtools dialog window.
+        :type dlg: QDialog
         
+        :param client: Client to ORS API.
+        :type client: OSMtools.client.Client()
+        
+        :param iface: A QGIS interface instance.
+        :type iface: QgisInterface
+        """
         self.dlg = dlg
         self.client = client
         self.iface = iface
@@ -66,7 +78,10 @@ class directions:
             self.params['options'] = str(self.avoid_dict)
     
                     
-    def directions(self):
+    def directions_calc(self):
+        """
+        Main method to perform the actual request
+        """
         
         # create route_dict, {'radio_button_name': {'geometries': list of coords,
         #                                           'values': list of values}}
@@ -130,6 +145,15 @@ class directions:
         
         
     def _addLine(self, responses, values_list):
+        """
+        :param responses: Collection of HTTP responses.
+        :type responses: list
+        
+        :param values_list: List of feature ID's.
+        :type values_list: list
+        
+        :rtype: QgsMapLayer
+        """
         
         # Create memory routing layer with fields
         layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
@@ -184,7 +208,7 @@ class directions:
                 
                 # Check CRS and transform if necessary
                 aux.checkCRS(layer,
-                                       self.iface.messageBar())
+                             self.iface.messageBar())
                 
                 # If features are selected, calculate with those
                 if layer.selectedFeatureCount() == 0:
@@ -198,7 +222,7 @@ class directions:
                 # Find field combo box
                 field_combo = [combo for combo in all_combos if combo.objectName().endswith('layer_id')][0] 
                 field_id = layer.fields().lookupField(field_combo.currentText())
-                field_values = [feat[field_id] for feat in layer.getFeatures()]
+                field_values = [feat[field_id] for feat in feats]
                 
             else:
                 parent_widget = radio_button.parentWidget()

@@ -27,8 +27,20 @@ from ORStools import (geocode,
                       )
 
 class isochrones:
+    """
+    Performs requests to ORS isochrone API:
+    """
     def __init__(self, dlg, client, iface):
+        """
+        :param dlg: Main OSMtools dialog window.
+        :type dlg: QDialog
         
+        :param client: Client to ORS API.
+        :type client: OSMtools.client.Client()
+        
+        :param iface: A QGIS interface instance.
+        :type iface: QgisInterface
+        """
         self.dlg = dlg
         self.client = client
         self.iface = iface
@@ -38,11 +50,8 @@ class isochrones:
         self.iso_mode = self.dlg.access_mode_combo.currentText()
         try:
             self.access_range_input = list(map(int,self.dlg.access_range.text().split(',')))
-        except ValueError:
-            self.iface.messageBar().pushCritical('ValueError', 
-                                                 'Only specify comma separated '
-                                                 'integer values for isochrone ranges')
-            self.dlg.close()
+        except (ValueError, AttributeError) as e:
+            raise
         
         self.dimension = self.dlg.access_unit_combo.currentText()
         self.factor = 60 if self.dimension == 'time' else 1000
@@ -55,7 +64,10 @@ class isochrones:
                        }
         
     
-    def main(self):
+    def isochrones_calc(self):
+        """
+        Performs requests to the ORS isochrone API.
+        """
         if self.dlg.access_layer_check.isChecked():
             layer_name = self.dlg.access_layer_combo.currentText()
             layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
@@ -86,22 +98,25 @@ class isochrones:
                 
             poly_out = self._addPolygon(responses, layer_name)
             
+            
         else:  
             # Define the mapped point
             coords = [float(x) for x in self.dlg.access_map_label.text().split('\n')[:2]]
-            point_geom = QgsPointXY(*coords)
-            response_dict = geocode.reverse_geocode(self.client, point_geom)
+            in_point_geom = QgsPointXY(*coords)
+            response_dict = geocode.reverse_geocode(self.client, in_point_geom)
             
             self.params['locations'] = convert._build_coords(coords)
             
             # Fire request
             response = self.client.request(self.url, self.params)
             
+            out_point_geom = QgsPointXY(*response['features'][0]['properties']['center'])
+            
             name_ext = "{0:.3f},{1:.3f}".format(*response['features'][0]['properties']['center'])
             
             poly_out = self._addPolygon([response], name_ext)
             
-            point_out = self._addPoint(response_dict, point_geom, name_ext)
+            point_out = self._addPoint(response_dict, out_point_geom, name_ext)
             point_out.updateExtents()
             QgsProject.instance().addMapLayer(point_out)        
         
@@ -116,6 +131,20 @@ class isochrones:
             
         
     def _addPoint(self, response_dict, point_geom, name_ext):
+        """
+        Get point layer from Map button.
+        
+        :param response_dict: Response from geocoding request.
+        :type response_dict: dict from JSON
+        
+        :param point_geom: Point coordinates from geocoding request.
+        :type point_geom: QgsPointXY
+        
+        :param name_ext: Name extension for layer.
+        :type name_ext: str
+        
+        :rtype: QgsMapLayer
+        """
         layer_name = "Point_{}".format(name_ext)
         point_layer = QgsVectorLayer("Point?crs=EPSG:4326", layer_name, "memory")
         
@@ -149,6 +178,17 @@ class isochrones:
         
             
     def _addPolygon(self, responses, name_ext):
+        """
+        Get polygon layer from Map button.
+        
+        :param responses: Responses from isochrone request.
+        :type responses: list of JSON
+        
+        :param name_ext: Name extension for layer.
+        :type name_ext: str
+        
+        :rtype: QgsMapLayer
+        """
         layer_name = "Isochrone_{}".format(name_ext)
         poly_out = QgsVectorLayer("Polygon?crs=EPSG:4326", layer_name, "memory")
         
@@ -177,6 +217,12 @@ class isochrones:
     
 
     def _stylePoly(self, layer):
+        """
+        Style isochrone polygon layer
+        
+        :param layer: Polygon layer to be styled.
+        :type layer: QgsMapLayer
+        """
         if self.dimension == 'time':
             field_name = 'AA_MINS'
             legend_suffix = ' mins'

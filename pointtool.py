@@ -32,12 +32,6 @@ class PointTool(QgsMapTool):
         self.cursor = QCursor(QPixmap(self.imgdir).scaledToWidth(24), 12, 12)
         
         #QApplication.setOverrideCursor(QCursor(QPixmap('/icon_locate.png')))
-
-    def canvasPressEvent(self, event):
-        pass
-
-    def canvasMoveEvent(self, event):
-        pass
     
     canvasClicked = pyqtSignal(['QgsPointXY', 'QString', 'Qt::MouseButton'])
     def canvasReleaseEvent(self, event):
@@ -62,11 +56,6 @@ class PointTool(QgsMapTool):
         
     def activate(self):
         QApplication.setOverrideCursor(self.cursor)
-        #self.canvas.setCursor(self.cursor)
-
-
-    def deactivate(self):
-        pass
 
     def isZoomTool(self):
         return False

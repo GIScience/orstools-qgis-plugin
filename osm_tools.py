@@ -134,10 +134,10 @@ class OSMtools():
                 clt = client.Client(self.iface)
                 if self.dlg.tabWidget.currentIndex() == 1:
                     iso = isochrones.isochrones(self.dlg, clt, self.iface)
-                    iso.main()
+                    iso.isochrones_calc()
                 if self.dlg.tabWidget.currentIndex() == 0:
                     route = directions.directions(self.dlg, clt, self.iface)
-                    route.directions()
+                    route.directions_calc()
             except exceptions.Timeout:
                 self.iface.messageBar().pushCritical('Time out',
                                                      'The connection exceeded the '
@@ -146,9 +146,11 @@ class OSMtools():
             except (exceptions._OverQueryLimit,
                     exceptions.ApiError,
                     exceptions.TransportError,
-                    ValueError) as e:
+                    exceptions._OverQueryLimit) as e:
                 self.iface.messageBar().pushCritical("{}: ".format(type(e)),
                                                       "{}".format(str(e)))
             
+            except Exception:
+                raise
             finally:
                 self.dlg.close()
