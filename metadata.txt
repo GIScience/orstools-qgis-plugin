@@ -11,22 +11,23 @@ name=OSM Tools
 qgisMinimumVersion=3.0
 description=OpenRouteService routing and accessibility areas for QGIS
 
-version=0.3.4
+version=3.0.4b
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
 about=OSM Tools provides access to most of the functions of OpenRouteService.org, based on OpenStreetMap. The tool set includes most routing features and calculation of accessibility areas, both either interactive in the map canvas or from point files. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
 
-tracker=https://github.com/nilsnolde/ORStools/issues
-repository=https://github.com/nilsnolde/ORStools.git
+tracker=https://github.com/nilsnolde/OSMtools/issues
+repository=https://github.com/nilsnolde/OSMtools.git
 # End of mandatory metadata
 
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
 
-changelog=2017/10/07 v.0.3.4 Fixed zoomToLayer bug (#35)
+changelog=2018/02/20 v.4b3 beta for QGIS2.99. Complete code refactoring with major improvements (isochrone ranges as list, calculate from selected points in map canvas), solved #4, #38, #40
+   2017/10/07 v.0.3.4 Fixed zoomToLayer bug (#35)
    2017/09/24 v.0.3.3 Handled deprecated mapRenderer() function
    2017/09/23 v.0.3.2 Added avoid_type feature for routing, auto-styling for acc areas
    2017/07/28 v.0.3.1 Fixed minor bugs (#20, #24, #27), removed support for overlap areas
@@ -41,7 +42,7 @@ homepage=https://github.com/nilsnolde/ORStools
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=False
+experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
