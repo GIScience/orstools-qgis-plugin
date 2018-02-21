@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Feb 17 17:31:12 2018
-
-@author: nilsnolde
+Contains isochrones class to perform requests to ORS isochrone API.
 """
 
 
