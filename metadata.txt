@@ -11,7 +11,7 @@ name=OSM Tools
 qgisMinimumVersion=3.0
 description=OpenRouteService routing and accessibility areas for QGIS
 
-version=3.0.5b
+version=3.0.6b
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
@@ -38,7 +38,7 @@ changelog=2018/02/20 v.4b3 beta for QGIS2.99. Complete code refactoring with maj
 # Tags are comma separated with spaces allowed
 tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility area, route
 
-homepage=https://github.com/nilsnolde/ORStools
+homepage=https://openrouteservice.org
 category=Plugins
 icon=icon.png
 # experimental flag
