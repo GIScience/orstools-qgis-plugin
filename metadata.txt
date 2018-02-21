@@ -11,7 +11,7 @@ name=OSM Tools
 qgisMinimumVersion=3.0
 description=OpenRouteService routing and accessibility areas for QGIS
 
-version=3.0.4b
+version=3.0.5b
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
