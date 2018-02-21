@@ -139,10 +139,13 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         for child in root.children():
             if isinstance(child, QgsLayerTreeLayer):
                 layer = child.layer()
-                if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.Type(1):
-                    self.start_layer_combo.addItem(layer.name())
-                    self.end_layer_combo.addItem(layer.name())
-                    self.access_layer_combo.addItem(layer.name())
+                try:
+                    if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.Type(1):
+                        self.start_layer_combo.addItem(layer.name())
+                        self.end_layer_combo.addItem(layer.name())
+                        self.access_layer_combo.addItem(layer.name())
+                except AttributeError:
+                    continue
         self.start_layer_combo.setCurrentIndex(start_layer_id)
         self.end_layer_combo.setCurrentIndex(end_layer_id)
         self.access_layer_combo.setCurrentIndex(access_layer_id)
