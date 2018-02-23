@@ -46,8 +46,8 @@ class directions:
         
         self.url = '/directions'        
         
-        self.start_layer_radio = self.dlg.start_layer_radio
-        self.end_layer_radio = self.dlg.end_layer_radio
+        self.radio_buttons = (self.dlg.start_layer_radio,
+                              self.dlg.end_layer_radio)
         
         # API parameters
         self.route_mode = self.dlg.route_mode_combo.currentText()
@@ -87,11 +87,9 @@ class directions:
         #                                           'values': list of values}}
         route_dict = self._selectInput()
         
-        # generate lists with locations and values 
-        radio_buttons = (self.start_layer_radio, self.end_layer_radio)    
-        
+        # generate lists with locations and values         
         (start_layer_name,
-         end_layer_name) = [x.objectName() for x in radio_buttons]
+         end_layer_name) = [x.objectName() for x in self.radio_buttons]
         
         locations_list = list(product(route_dict[start_layer_name]['geometries'],
                                       route_dict[end_layer_name]['geometries']))
@@ -99,7 +97,7 @@ class directions:
                                    route_dict[end_layer_name]['values']))
         
         # If row-by-row in two-layer mode, then only zip the locations
-        if all([button.isChecked() for button in radio_buttons]) and self.dlg.row_by_row.isChecked():
+        if all([button.isChecked() for button in self.radio_buttons]) and self.dlg.row_by_row.isChecked():
             locations_list = list(zip(route_dict[start_layer_name]['geometries'],
                                           route_dict[end_layer_name]['geometries']))
             values_list = list(zip(route_dict[start_layer_name]['values'],
@@ -197,7 +195,7 @@ class directions:
             'values': list of values}, 'other_radio_button':...}
         """
         route_dict = dict()
-        for radio_button in (self.start_layer_radio, self.end_layer_radio):
+        for radio_button in self.radio_buttons:
             if radio_button.isChecked():
                 # Find layer combo box
                 all_combos = radio_button.parent().findChildren(QComboBox)
