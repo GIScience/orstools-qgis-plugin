@@ -58,6 +58,9 @@ preferences = ['fastest', 'shortest']
 
 units = ['time', 'distance']
 
+# For matrix API only
+metrics =['duration', 'distance'] 
+
 class OSMtoolsDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         """Constructor."""
@@ -71,6 +74,16 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.iface = iface
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         
+        # Programmtically invoke ORS logo
+        header_pic = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
+        self.pixmap = header_pic.scaled(150, 50,
+                                        aspectRatioMode=Qt.KeepAspectRatio,
+                                        transformMode=Qt.SmoothTransformation
+                                        )
+        self.header_pic.setPixmap(self.pixmap)
+        self.header_text.setAlignment(Qt.AlignHCenter)
+        self.header_subpic.setAlignment(Qt.AlignHCenter)
+        
         # Read API key file
         self.api_key_dlg.setText(aux.readConfig()['api_key'])
             
@@ -79,6 +92,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         
         self.route_mode_combo.addItems(profiles)
         self.access_mode_combo.addItems(profiles)
+        self.matrix_mode_combo.addItems(profiles)
         self.route_pref_combo.addItems(preferences)
         self.access_unit_combo.addItems(units)
         
@@ -86,6 +100,12 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         
         # API key text line
         self.api_key_dlg.textChanged.connect(self._keyWriter)
+        
+        # Matrix tab
+        self.matrix_start_combo.currentIndexChanged.connect(self._layerSeletedChanged)
+        self.matrix_end_combo.currentIndexChanged.connect(self._layerSeletedChanged)
+        self.matrix_start_refresh.clicked.connect(self._layerTreeChanged)
+        self.matrix_end_refresh.clicked.connect(self._layerTreeChanged)
         
         # Isochrone tab
         self.access_map_button.clicked.connect(self._initMapTool)
@@ -107,16 +127,6 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.start_layer_combo.currentIndexChanged[int].connect(self._layerSeletedChanged)
         self.end_layer_combo.currentIndexChanged[int].connect(self._layerSeletedChanged)
         
-        # Programmtically invoke ORS logo
-        header_pic = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
-        self.pixmap = header_pic.scaled(150, 50,
-                                        aspectRatioMode=Qt.KeepAspectRatio,
-                                        transformMode=Qt.SmoothTransformation
-                                        )
-        self.header_pic.setPixmap(self.pixmap)
-        self.header_text.setAlignment(Qt.AlignHCenter)
-        self.header_subpic.setAlignment(Qt.AlignHCenter)
-        
 
     def _accessLayerChanged(self):
         for child in self.sender().parentWidget().children():  
@@ -129,26 +139,34 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         Re-populate layers for dropdowns dynamically when layers were 
         added/removed.
         """
-        start_layer_id = self.start_layer_combo.currentIndex()
-        end_layer_id = self.end_layer_combo.currentIndex()
-        access_layer_id = self.access_layer_combo.currentIndex()
-        self.start_layer_combo.clear()
-        self.end_layer_combo.clear()
-        self.access_layer_combo.clear()
+        
+        # First get all point layers in map canvas
+        layer_names = []
         root = self.project.layerTreeRoot()
         for child in root.children():
             if isinstance(child, QgsLayerTreeLayer):
                 layer = child.layer()
+                # Handle weird project startup behaviour of QGIS (apparently 
+                # doesn't find layers on project startup and throws AttributeError)
                 try:
                     if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.Type(1):
-                        self.start_layer_combo.addItem(layer.name())
-                        self.end_layer_combo.addItem(layer.name())
-                        self.access_layer_combo.addItem(layer.name())
+                        layer_names.append(layer.name())
                 except AttributeError:
                     continue
-        self.start_layer_combo.setCurrentIndex(start_layer_id)
-        self.end_layer_combo.setCurrentIndex(end_layer_id)
-        self.access_layer_combo.setCurrentIndex(access_layer_id)
+                
+        comboboxes = [self.start_layer_combo,
+                      self.end_layer_combo,
+                      self.access_layer_combo,
+                      self.matrix_start_combo,
+                      self.matrix_end_combo]
+
+        for box in comboboxes:
+            old_text = box.currentText()
+            box.clear()
+            for layer in layer_names:
+                box.addItem(layer)
+            new_text_id = box.findText(old_text)
+            box.setCurrentIndex(new_text_id)
                     
                     
     def _mappingMethodChanged(self, index):
