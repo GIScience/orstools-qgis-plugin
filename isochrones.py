@@ -19,7 +19,7 @@ from qgis.core import (QgsPointXY,
                        QgsRendererCategory,
                        QgsCategorizedSymbolRenderer)
 
-from ORStools import (geocode,
+from . import (geocode,
                       convert,
                       aux
                       )

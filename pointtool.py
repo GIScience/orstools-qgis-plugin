@@ -13,7 +13,6 @@ from qgis.core import (QgsCoordinateReferenceSystem,
                        QgsProject)
 from qgis.gui import QgsMapTool
 
-
 import os
 
 # Find cursor icon in plugin tree

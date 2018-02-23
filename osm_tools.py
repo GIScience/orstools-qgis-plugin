@@ -33,7 +33,7 @@ from PyQt5.Qt import PYQT_VERSION_STR
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QApplication
 
-from ORStools.dialog import OSMtoolsDialog
+from OSMtools.dialog import OSMtoolsDialog
 from . import isochrones, client, directions, exceptions
 
 import logging

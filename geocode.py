@@ -6,7 +6,7 @@ Created on Sun Feb 18 00:49:36 2018
 @author: nilsnolde
 """
 
-from ORStools import convert
+from . import convert
 
 def reverse_geocode(client, point_in):
     params = dict()

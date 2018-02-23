@@ -26,7 +26,9 @@ repository=https://github.com/nilsnolde/OSMtools.git
 
 # Uncomment the following line and add your changelog:
 
-changelog=2018/02/20 v.4b3 beta for QGIS2.99. Complete code refactoring with major improvements (isochrone ranges as list, calculate from selected points in map canvas), solved #4, #38, #40
+changelog=2018/02/21 v3.0.6b fixed calls to ORStools instead of OSMtools
+   2018/02/20 v3.0.5b handles Python error on Project startup
+   2018/02/20 v.4b3 beta for QGIS2.99. Complete code refactoring with major improvements (isochrone ranges as list, calculate from selected points in map canvas), solved #4, #38, #40
    2017/10/07 v.0.3.4 Fixed zoomToLayer bug (#35)
    2017/09/24 v.0.3.3 Handled deprecated mapRenderer() function
    2017/09/23 v.0.3.2 Added avoid_type feature for routing, auto-styling for acc areas

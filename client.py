@@ -14,10 +14,10 @@ import time
 import collections
 from urllib.parse import urlencode
 
-import ORStools
+import OSMtools
 from . import exceptions, aux
 
-_USER_AGENT = "ORSClientQGIS/%s".format(ORStools.__version__)
+_USER_AGENT = "ORSClientQGIS/%s".format(OSMtools.__version__)
 _RETRIABLE_STATUSES = [503]
 _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
 
@@ -218,7 +218,7 @@ class Client(object):
             return path + "?" + _urlencode_params(params)
 
         raise ValueError("No API key specified. "
-                         "Visit https://go.ORStools.org/dev-dashboard/ "
+                         "Visit https://go.openrouteservice.org/dev-dashboard/ "
                          "to create one.")
         
 
