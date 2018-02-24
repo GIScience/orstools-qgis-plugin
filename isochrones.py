@@ -84,7 +84,7 @@ class isochrones:
             
             responses = []
             for i, feat in enumerate(feats):
-                percent = (i/feat_count) * 100
+                percent = (i/float(feat_count)) * 100
                 message_bar.setValue(percent)
                 # Get coordinates
                 geom = feat.geometry().asPoint()
