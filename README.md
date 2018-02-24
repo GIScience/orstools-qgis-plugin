@@ -12,7 +12,7 @@ See also:
 ## Functionalities
 
 ### General
-Use QGIS to generate input for routing, isochrones and matrix calculations powered by ORS, either via clicking coordinates in the map canvas or using point layers for batch operation.
+Use QGIS to generate input for **routing**, **isochrones** and **matrix calculations** powered by ORS, either via clicking coordinates in the map canvas or using point layers for batch operation.
 
 ### Customization
 From v2.x/3.x, the tool includes a `config.yml` to set the basic config parameters for openrouteservice:
@@ -22,7 +22,7 @@ base_url: https://api.openrouteservice.org
 api_key: 
 req_per_min: 40
 ```
-Use QGIS to generate input for **routing**, **isochrones** and **matrix calculations** powered by ORS, either via clicking coordinates in the map canvas or using point layers for batch operation.
+The `api_key` is updated dynamically from the UI. However, if you're running a local ORS version, you want to change the `base_url`. If your API key is eligible for higher rate limits than 40 req/min, you can also specify this here.
 
 ## Getting Started
 ### Prerequisite
