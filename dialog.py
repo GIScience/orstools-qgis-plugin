@@ -253,7 +253,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         
         self.setWindowState(Qt.WindowMinimized)
         sending_button = self.sender().objectName()
-        self.mapTool = pointtool.PointTool(self.iface.mapCanvas(), sending_button)        
+        self.mapTool = pointtool.PointTool(self.iface.mapCanvas(), sending_button)
         self.iface.mapCanvas().setMapTool(self.mapTool)
         self.mapTool.canvasClicked.connect(self._writeCoordinateLabel)
         

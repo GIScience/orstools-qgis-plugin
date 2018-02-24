@@ -41,7 +41,7 @@ def transformToWGS(old_layer, old_crs):
     new_layer = QgsVectorLayer("Polygon?crs=EPSG:4326", old_layer.name(), "memory")
     new_crs = QgsCoordinateReferenceSystem(4326)
     old_crs = QgsCoordinateReferenceSystem(old_crs)
-    xform = QgsCoordinateTransform(old_crs, new_crs, QgsProject.instance())
+    xform = QgsCoordinateTransform(old_crs, new_crs)
     feats = []
     for f in old_layer.getFeatures():
         g = f.geometry()
@@ -77,6 +77,6 @@ def pushProgressBar(iface):
     progress.setMaximum(100)
     progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
     progressMessageBar.layout().addWidget(progress)
-    iface.messageBar().pushWidget(progressMessageBar, level=Qgis.Info)
+    iface.messageBar().pushWidget(progressMessageBar, level=iface.messageBar().INFO)
     
     return progress, progressMessageBar

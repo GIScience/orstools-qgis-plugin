@@ -16,7 +16,7 @@ from PyQt4.QtCore import QVariant
 from qgis.core import (QgsVectorLayer,
                        QgsField,
                        QgsFeature,
-                       QgsProject
+                       QgsMapLayerRegistry
                        )
 
 from OSMtools import auxiliary
@@ -103,11 +103,11 @@ class matrix:
                              values_list[row][1],
                              durations[row]/3600,
                              distances[row]/1000])
-            layer_out_prov.addFeature(feat)
+            layer_out_prov.addFeatures([feat])
         
         layer_out.updateFields()
     
-        QgsProject.instance().addMapLayer(layer_out)
+        QgsMapLayerRegistry.instance().addMapLayer(layer_out)
         
         
     def _selectInput(self):
@@ -127,7 +127,7 @@ class matrix:
         for combo in self.combo_boxes: 
             # Get selected layer                              
             layer_name = combo.currentText()
-            layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
+            layer = [layer for layer in QgsMapLayerRegistry.instance().mapLayers().values() if layer.name() == layer_name][0]
             
             # Check CRS and transform if necessary
             auxiliary.checkCRS(layer,
@@ -144,10 +144,10 @@ class matrix:
             
             # Find field combo box
             all_combos = combo.parent().findChildren(QComboBox)
-            field_combo = [combo for combo in all_combos if combo.objectName().endswith('_id')][0] 
-            field_id = layer.fields().lookupField(field_combo.currentText())
+            field_combo = [box for box in all_combos if box.objectName().endswith('_id')][0] 
+            field_id = layer.fields().indexFromName(field_combo.currentText())
             field_values = [feat[field_id] for feat in feats]
-        
+            
             # Get all id attributes from field
             route_dict[combo.objectName()] = {'geometries': point_geom,
                                               'values': field_values}

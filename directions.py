@@ -20,7 +20,7 @@ from qgis.core import (QgsVectorLayer,
                        QgsPoint,
                        QgsGeometry,
                        QgsFeature,
-                       QgsProject
+                       QgsMapLayerRegistry
                        )
 
 from OSMtools import convert, geocode, auxiliary
@@ -122,7 +122,7 @@ class directions:
                 coords_tuple.insert(1, route_via)
             
             # Update progress bar
-            percent = (i/len(locations_list)) * 100
+            percent = (i/float(len(locations_list))) * 100
             message_bar.setValue(percent)
             
             # Make the request
@@ -137,7 +137,7 @@ class directions:
             layer_out = self._addLine(responses, values_list)
             layer_out.updateExtents()
             
-            QgsProject.instance().addMapLayer(layer_out)
+            QgsMapLayerRegistry.instance().addMapLayer(layer_out)
             
         self.iface.messageBar().popWidget(progress_widget)
         
@@ -174,7 +174,7 @@ class directions:
             distance = resp_minified['summary']['distance']
             duration = resp_minified['summary']['duration']
             qgis_coords = [QgsPoint(x, y) for x, y in coordinates]
-            feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
+            feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
             feat.setAttributes(["{0:.3f}".format(distance/1000),
                                "{0:.3f}".format(duration/3600),
                                self.route_mode,
@@ -183,7 +183,7 @@ class directions:
                                values_list[i][0],
                                values_list[i][1]
                                ])
-            layer_out.dataProvider().addFeature(feat)
+            layer_out.dataProvider().addFeatures([feat])
                 
         return layer_out
                 
@@ -219,7 +219,7 @@ class directions:
                 
                 # Find field combo box
                 field_combo = [combo for combo in all_combos if combo.objectName().endswith('layer_id')][0] 
-                field_id = layer.fields().lookupField(field_combo.currentText())
+                field_id = layer.fields().indexFromName(field_combo.currentText())
                 field_values = [feat[field_id] for feat in feats]
                 
             else:

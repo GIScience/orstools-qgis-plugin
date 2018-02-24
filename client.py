@@ -221,7 +221,7 @@ class Client(object):
         elif self.base_url != _DEFAULT_BASE_URL:
             return path + "?" + _urlencode_params(params)
 
-        raise ValueError("No API key specified. "
+        raise exceptions.ApiError("No API key specified. "
                          "Visit https://go.openrouteservice.org/dev-dashboard/ "
                          "to create one.")
         

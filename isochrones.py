@@ -13,7 +13,7 @@ from qgis.core import (QgsPoint,
                        QgsFeature,
                        QgsField,
                        QgsGeometry,
-                       QgsProject,
+                       QgsMapLayerRegistry,
                        QgsSymbolV2,
                        QgsSimpleFillSymbolLayerV2,
                        QgsRendererCategoryV2,
@@ -118,12 +118,13 @@ class isochrones:
             
             point_out = self._addPoint(response_dict, out_point_geom, name_ext)
             point_out.updateExtents()
-            QgsProject.instance().addMapLayer(point_out)        
+            QgsMapLayerRegistry.instance().addMapLayer(point_out)
+        
         
         poly_out.updateExtents()
         
         self._stylePoly(poly_out)
-        QgsProject.instance().addMapLayer(poly_out)
+        QgsMapLayerRegistry.instance().addMapLayer(poly_out)
 #        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
         
             
@@ -159,7 +160,7 @@ class isochrones:
         
         # Add clicked point feature to point feature class
         point_feat = QgsFeature()
-        point_feat.setGeometry(QgsGeometry.fromPointXY(point_geom))
+        point_feat.setGeometry(QgsGeometry.fromPoint(point_geom))
         point_feat.setAttributes([response_dict.get("Lat", None),
                                 response_dict.get("Lon", None),
                                 response_dict.get("NAME", None),
@@ -206,10 +207,10 @@ class isochrones:
                 coordinates = isochrone['geometry']['coordinates']
                 iso_value = isochrone['properties']['value']
                 qgis_coords = [QgsPoint(x, y) for x, y in coordinates[0]]
-                feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
+                feat.setGeometry(QgsGeometry.fromPolygon([qgis_coords]))
                 feat.setAttributes([iso_value / 60 if self.dimension == 'time' else iso_value,
                                    self.iso_mode])
-                poly_out.dataProvider().addFeature(feat)
+                poly_out.dataProvider().addFeatures([feat])
         
         return poly_out
     
@@ -227,7 +228,7 @@ class isochrones:
         else:
             field_name = 'AA_METERS'
             legend_suffix = ' m'
-        field = layer.fields().lookupField(field_name)
+        field = layer.fields().indexFromName(field_name)
         unique_values = sorted(layer.uniqueValues(field))
             
         colors = {0: QColor('#2b83ba'),
@@ -249,7 +250,8 @@ class isochrones:
         
             # configure a symbol layer
             symbol_layer = QgsSimpleFillSymbolLayerV2(color=colors[cid],
-                                                    strokeColor=QColor('#000000'))
+                                                    #strokeColor=QColor('#000000')
+                                                    )
         
             # replace default symbol layer with the configured one
             if symbol_layer is not None:
@@ -265,7 +267,7 @@ class isochrones:
         
         # assign the created renderer to the layer
         if renderer is not None:
-            layer.setRenderer(renderer)
-        layer.setOpacity(0.5)
+            layer.setRendererV2(renderer)
+        layer.setLayerTransparency(50)
         
         layer.triggerRepaint()
