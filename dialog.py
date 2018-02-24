@@ -23,14 +23,14 @@
 
 import os.path
 
-from PyQt5.uic import loadUiType
-from PyQt5.QtWidgets import (QDialog, 
-                             QApplication,
-                             QComboBox,
-                             QPushButton,                     
-                             )
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt4.uic import loadUiType
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import (QPixmap,
+                         QFont,
+                         QDialog,
+                         QApplication,
+                         QComboBox,
+                         QPushButton,)
 from qgis.core import (QgsProject, 
                        QgsLayerTreeLayer, 
                        QgsMapLayer,

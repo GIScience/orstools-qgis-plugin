@@ -7,8 +7,8 @@ Created on Thu May 04 09:38:00 2017
 import os.path
 import yaml
 
-from PyQt5.QtWidgets import QProgressBar
-from PyQt5.QtCore import Qt
+from PyQt4.QtGui import QProgressBar
+from PyQt4.QtCore import Qt
 
 from qgis.core import (QgsVectorLayer,
                        Qgis,

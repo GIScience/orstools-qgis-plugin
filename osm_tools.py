@@ -28,10 +28,9 @@
 """
 import os.path
 
-from PyQt5.QtCore import QSettings, QTranslator, QCoreApplication
-from PyQt5.Qt import PYQT_VERSION_STR
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QApplication
+from PyQt4.QtCore import QSettings, QTranslator, QCoreApplication
+from PyQt4.Qt import PYQT_VERSION_STR
+from PyQt4.QtGui import QIcon, QAction, QApplication
 
 from OSMtools.dialog import OSMtoolsDialog
 from . import isochrones, client, directions, exceptions, matrix

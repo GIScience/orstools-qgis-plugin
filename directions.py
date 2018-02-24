@@ -8,12 +8,12 @@ Created on Mon Feb 19 10:39:11 2018
 
 from itertools import product
 
-from PyQt5.QtWidgets import (QComboBox,
+from PyQt4.QtGui import (QComboBox,
                              QLabel,
                              QCheckBox
                              )
 
-from PyQt5.QtCore import QVariant
+from PyQt4.QtCore import QVariant
 
 from qgis.core import (QgsVectorLayer,
                        QgsField, 

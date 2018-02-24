@@ -5,8 +5,8 @@ Contains isochrones class to perform requests to ORS isochrone API.
 """
 
 
-from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
+from PyQt4.QtCore import QVariant
+from PyQt4.QtGui import QColor
 
 from qgis.core import (QgsPointXY,
                        QgsVectorLayer,

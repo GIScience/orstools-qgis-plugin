@@ -4,9 +4,8 @@ Created on Mon Feb 06 23:35:16 2017
 
 @author: nnolde
 """
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QCursor, QPixmap
-from PyQt5.QtWidgets import QApplication
+from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtGui import QCursor, QPixmap,QApplication
 
 from qgis.core import (QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform,
