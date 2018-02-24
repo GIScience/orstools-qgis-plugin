@@ -1,6 +1,8 @@
 # OSM tools
 Set of tools to use openrouteservice (ORS) API's as a plugin in QGIS (www.openrouteservice.org).
 
+This branch is backported from master for QGIS **v.2.x**!
+
 See also:
 - [Rate limits](https://openrouteservice.org/ratelimits/)
 - [ORS developer documentation](https://openrouteservice.org/documentation/)
@@ -25,7 +27,7 @@ The `api_key` is updated dynamically from the UI. However, if you're running a l
 ## Getting Started
 ### Prerequisite
 
-QGIS versin: min. v2.99
+QGIS versin: min. **v2.x**
 
 API key: https://openrouteservice.org/sign-up/
 
