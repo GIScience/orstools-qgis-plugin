@@ -69,7 +69,8 @@ class Client(object):
                  url, params, 
                  first_request_time=None, 
                  retry_counter=0,
-                 requests_kwargs=None):
+                 requests_kwargs=None,
+                 post_json=None):
         """Performs HTTP GET/POST with credentials, returning the body asdlg
         JSON.
 
@@ -119,7 +120,7 @@ class Client(object):
                                              params,
                                              )
 
-        # Default to the client-level self.requests_kwargs, with method-level
+        # Default to the client-level self.requests_kwargs, withmemory method-level
         # requests_kwargs arg overriding.
         requests_kwargs = requests_kwargs or {}
         final_requests_kwargs = dict(self.requests_kwargs, **requests_kwargs)
@@ -139,20 +140,23 @@ class Client(object):
         # Determine GET/POST.
         # post_json is so far only sent from matrix call
         requests_method = self.session.get
+        if post_json is not None:
+            requests_method = self.session.post
+            final_requests_kwargs["json"] = post_json
         try:
             response = requests_method(self.base_url + authed_url,
                                        **final_requests_kwargs)
         except requests.exceptions.Timeout:
             raise exceptions.Timeout()
         except Exception as e:
-            raise exceptions.TransportError(e)
+            raise #exceptions.TransportError(e)
 
         if response.status_code in _RETRIABLE_STATUSES:
             # Retry request.
             print('Server down.\nRetrying for the {}th time.'.format(retry_counter + 1))
             
             return self.request(url, params, first_request_time,
-                                 retry_counter + 1, requests_kwargs)
+                                 retry_counter + 1, requests_kwargs, post_json)
 
         try:
             result = self._get_body(response)
@@ -164,7 +168,7 @@ class Client(object):
             
             self.iface.messageBar().pushInfo('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
             return self.request(url, params, first_request_time,
-                                 retry_counter + 1, requests_kwargs)
+                                 retry_counter + 1, requests_kwargs, post_json)
         except:
             raise
 
@@ -214,7 +218,7 @@ class Client(object):
         if self.key:
             params.append(("api_key", self.key))
             return path + "?" + _urlencode_params(params)
-        elif self.base_url != self._DEFAULT_BASE_URL:
+        elif self.base_url != _DEFAULT_BASE_URL:
             return path + "?" + _urlencode_params(params)
 
         raise ValueError("No API key specified. "
