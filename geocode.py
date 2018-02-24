@@ -13,7 +13,10 @@ def reverse_geocode(client, point_in):
     point_in_list = convert._comma_list([point_in.x(), point_in.y()])
     params['location'] = point_in_list
     
-    response = client.request('/geocoding', params)['features'][0]
+    try:
+        response = client.request('/geocoding', params)['features'][0]
+    except:
+        raise ValueError("Your input coordinates are invalid for geocoding.")
     
     response_dict = dict()
     
