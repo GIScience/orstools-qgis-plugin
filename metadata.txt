@@ -9,13 +9,13 @@
 [general]
 name=OSM Tools
 qgisMinimumVersion=2.0
-description=OpenRouteService routing and accessibility areas for QGIS
+description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
 version=2.1
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
-about=OSM Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes most routing features and calculation of accessibility areas, both either interactive in the map canvas or from point files. Extensive attributes are set for output files, incl. duration, length and start/end locations.
+about=OSM Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
 
 tracker=https://github.com/nilsnolde/OSMtools/issues
@@ -39,13 +39,13 @@ changelog=2018/02/23 v2.1/3.1 adds matrix API, backported to QGIS v2.x
 
 
 # Tags are comma separated with spaces allowed
-tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility area, route
+tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility, route, isochrones, matrix, ORS
 
 homepage=https://openrouteservice.org
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
