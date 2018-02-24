@@ -59,7 +59,7 @@ preferences = ['fastest', 'shortest']
 units = ['time', 'distance']
 
 # For matrix API only
-metrics =['duration', 'distance'] 
+metrics =['duration', 'distance', 'distance|duration'] 
 
 class OSMtoolsDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -93,6 +93,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.route_mode_combo.addItems(profiles)
         self.access_mode_combo.addItems(profiles)
         self.matrix_mode_combo.addItems(profiles)
+#        self.matrix_metric_combo.addItems(metrics)
         self.route_pref_combo.addItems(preferences)
         self.access_unit_combo.addItems(units)
         

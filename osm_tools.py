@@ -34,7 +34,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QApplication
 
 from OSMtools.dialog import OSMtoolsDialog
-from . import isochrones, client, directions, exceptions
+from . import isochrones, client, directions, exceptions, matrix
 
 import logging
 
@@ -124,6 +124,7 @@ class OSMtools():
         
         self.dlg.show()
         
+        # Populate layer tree in comboboxes
         self.dlg._layerTreeChanged()
         # show the dialog
         # Run the dialog event loop
@@ -132,6 +133,10 @@ class OSMtools():
         if result:
             try:
                 clt = client.Client(self.iface)
+                
+                if self.dlg.tabWidget.currentIndex() == 2:
+                    m = matrix.matrix(self.dlg, clt, self.iface)
+                    m.matrix_calc()
                 if self.dlg.tabWidget.currentIndex() == 1:
                     iso = isochrones.isochrones(self.dlg, clt, self.iface)
                     iso.isochrones_calc()

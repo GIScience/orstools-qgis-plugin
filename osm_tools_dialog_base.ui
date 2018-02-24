@@ -63,10 +63,52 @@
      </layout>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="header_text">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://go.openrouteservice.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;openrouteservice.org&lt;/span&gt;&lt;/a&gt; | by &lt;a href=&quot;mailto:nils@openrouteservice.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="header_pic">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="header_subpic">
+     <property name="text">
+      <string>&lt;a href=&quot;https://github.com/GIScience/openrouteservice&quot; style=&quot;color: black; text-decoration: none&quot;&gt;We truly &lt;span style=&quot;color: #b5152b&quot;&gt;♥&lt;/span&gt; Open Source.&lt;/a&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="0">
     <widget class="QTabWidget" name="tabWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -86,7 +128,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>283</width>
+            <width>340</width>
             <height>852</height>
            </rect>
           </property>
@@ -1151,7 +1193,7 @@
       <attribute name="title">
        <string>Matrix</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,2">
        <item>
         <widget class="QWidget" name="widget_14" native="true">
          <layout class="QGridLayout" name="gridLayout_15">
@@ -1164,16 +1206,6 @@
              <string>Travel mode</string>
             </property>
            </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="Metric">
-            <property name="text">
-             <string>Metric</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="matrix_metric_combo"/>
           </item>
          </layout>
         </widget>
@@ -1301,42 +1333,6 @@
      </widget>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="header_text">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://go.openrouteservice.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;openrouteservice.org&lt;/span&gt;&lt;/a&gt; | by &lt;a href=&quot;mailto:nils@openrouteservice.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="header_pic">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="header_subpic">
-     <property name="text">
-      <string>&lt;a href=&quot;https://github.com/GIScience/openrouteservice&quot; style=&quot;color: black; text-decoration: none&quot;&gt;We truly &lt;span style=&quot;color: #b5152b&quot;&gt;♥&lt;/span&gt; Open Source.&lt;/a&gt;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
   </layout>
   <zorder>button_box</zorder>
   <zorder>tabWidget</zorder>
@@ -1416,7 +1412,7 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="end_buttongroup"/>
   <buttongroup name="start_buttongroup"/>
+  <buttongroup name="end_buttongroup"/>
  </buttongroups>
 </ui>
