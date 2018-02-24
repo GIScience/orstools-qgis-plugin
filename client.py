@@ -15,7 +15,7 @@ import collections
 from urllib.parse import urlencode
 
 import OSMtools
-from . import exceptions, auxiliary
+from OSMtools import exceptions, auxiliary
 
 _USER_AGENT = "ORSClientQGIS/%s".format(OSMtools.__version__)
 _RETRIABLE_STATUSES = [503]

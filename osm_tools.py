@@ -33,7 +33,7 @@ from PyQt4.Qt import PYQT_VERSION_STR
 from PyQt4.QtGui import QIcon, QAction, QApplication
 
 from OSMtools.dialog import OSMtoolsDialog
-from . import isochrones, client, directions, exceptions, matrix
+from OSMtools import isochrones, client, directions, exceptions, matrix
 
 import logging
 

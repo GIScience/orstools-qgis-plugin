@@ -31,7 +31,7 @@ class PointTool(QgsMapTool):
         
         #QApplication.setOverrideCursor(QCursor(QPixmap('/icon_locate.png')))
     
-    canvasClicked = pyqtSignal(['QgsPointXY', 'QString', 'Qt::MouseButton'])
+    canvasClicked = pyqtSignal(['QgsPoint', 'QString', 'Qt::MouseButton'])
     def canvasReleaseEvent(self, event):
         #Get the click and emit a transformed point
         
@@ -45,7 +45,7 @@ class PointTool(QgsMapTool):
     
         point_oldcrs = self.toMapCoordinates(event.pos())
         
-        xform = QgsCoordinateTransform(crsSrc, crsWGS, QgsProject.instance())
+        xform = QgsCoordinateTransform(crsSrc, crsWGS)
         point_newcrs = xform.transform(point_oldcrs)
         
         QApplication.restoreOverrideCursor()

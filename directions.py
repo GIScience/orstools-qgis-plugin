@@ -17,13 +17,13 @@ from PyQt4.QtCore import QVariant
 
 from qgis.core import (QgsVectorLayer,
                        QgsField, 
-                       QgsPointXY,
+                       QgsPoint,
                        QgsGeometry,
                        QgsFeature,
                        QgsProject
                        )
 
-from . import convert, geocode, auxiliary
+from OSMtools import convert, geocode, auxiliary
 
 class directions:
     """
@@ -173,7 +173,7 @@ class directions:
             coordinates = resp_minified['geometry']['coordinates']
             distance = resp_minified['summary']['distance']
             duration = resp_minified['summary']['duration']
-            qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
+            qgis_coords = [QgsPoint(x, y) for x, y in coordinates]
             feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
             feat.setAttributes(["{0:.3f}".format(distance/1000),
                                "{0:.3f}".format(duration/3600),
@@ -231,7 +231,7 @@ class directions:
                 point_label = parent_widget_label.findChild(QLabel)
                 point_coords = [float(x) for x in point_label.text().split(",")]
                 
-                point_geom = [QgsPointXY(*point_coords)]
+                point_geom = [QgsPoint(*point_coords)]
                 response_dict = geocode.reverse_geocode(self.client, *point_geom)
                 
                 field_values = [response_dict.get('CITY', point_label.text())]

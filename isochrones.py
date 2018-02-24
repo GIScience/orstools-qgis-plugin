@@ -8,18 +8,18 @@ Contains isochrones class to perform requests to ORS isochrone API.
 from PyQt4.QtCore import QVariant
 from PyQt4.QtGui import QColor
 
-from qgis.core import (QgsPointXY,
+from qgis.core import (QgsPoint,
                        QgsVectorLayer,
                        QgsFeature,
                        QgsField,
                        QgsGeometry,
                        QgsProject,
-                       QgsSymbol,
-                       QgsSimpleFillSymbolLayer,
-                       QgsRendererCategory,
-                       QgsCategorizedSymbolRenderer)
+                       QgsSymbolV2,
+                       QgsSimpleFillSymbolLayerV2,
+                       QgsRendererCategoryV2,
+                       QgsCategorizedSymbolRendererV2)
 
-from . import (geocode,
+from OSMtools import (geocode,
                       convert,
                       auxiliary
                       )
@@ -102,7 +102,7 @@ class isochrones:
         else:  
             # Define the mapped point
             coords = [float(x) for x in self.dlg.access_map_label.text().split('\n')[:2]]
-            in_point_geom = QgsPointXY(*coords)
+            in_point_geom = QgsPoint(*coords)
             response_dict = geocode.reverse_geocode(self.client, in_point_geom)
             
             self.params['locations'] = convert._build_coords(coords)
@@ -110,7 +110,7 @@ class isochrones:
             # Fire request
             response = self.client.request(self.url, self.params)
             
-            out_point_geom = QgsPointXY(*response['features'][0]['properties']['center'])
+            out_point_geom = QgsPoint(*response['features'][0]['properties']['center'])
             
             name_ext = "{0:.3f},{1:.3f}".format(*response['features'][0]['properties']['center'])
             
@@ -136,7 +136,7 @@ class isochrones:
         :type response_dict: dict from JSON
         
         :param point_geom: Point coordinates from geocoding request.
-        :type point_geom: QgsPointXY
+        :type point_geom: QgsPoint
         
         :param name_ext: Name extension for layer.
         :type name_ext: str
@@ -205,7 +205,7 @@ class isochrones:
                 feat = QgsFeature()
                 coordinates = isochrone['geometry']['coordinates']
                 iso_value = isochrone['properties']['value']
-                qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
+                qgis_coords = [QgsPoint(x, y) for x, y in coordinates[0]]
                 feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
                 feat.setAttributes([iso_value / 60 if self.dimension == 'time' else iso_value,
                                    self.iso_mode])
@@ -245,10 +245,10 @@ class isochrones:
         
         for cid, unique_value in enumerate(unique_values):
             # initialize the default symbol for this geometry type
-            symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+            symbol = QgsSymbolV2.defaultSymbol(layer.geometryType())
         
             # configure a symbol layer
-            symbol_layer = QgsSimpleFillSymbolLayer(color=colors[cid],
+            symbol_layer = QgsSimpleFillSymbolLayerV2(color=colors[cid],
                                                     strokeColor=QColor('#000000'))
         
             # replace default symbol layer with the configured one
@@ -256,12 +256,12 @@ class isochrones:
                 symbol.changeSymbolLayer(0, symbol_layer)
         
             # create renderer object
-            category = QgsRendererCategory(unique_value, symbol, str(unique_value) + legend_suffix)
+            category = QgsRendererCategoryV2(unique_value, symbol, str(unique_value) + legend_suffix)
             # entry for the list of category items
             categories.append(category)
         
         # create renderer object
-        renderer = QgsCategorizedSymbolRenderer(field_name, categories)
+        renderer = QgsCategorizedSymbolRendererV2(field_name, categories)
         
         # assign the created renderer to the layer
         if renderer is not None:

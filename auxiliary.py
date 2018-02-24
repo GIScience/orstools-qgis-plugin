@@ -11,7 +11,7 @@ from PyQt4.QtGui import QProgressBar
 from PyQt4.QtCore import Qt
 
 from qgis.core import (QgsVectorLayer,
-                       Qgis,
+                       QGis,
                        QgsCoordinateTransform,
                        QgsCoordinateReferenceSystem,
                        QgsProject)

@@ -34,10 +34,11 @@ from PyQt4.QtGui import (QPixmap,
 from qgis.core import (QgsProject, 
                        QgsLayerTreeLayer, 
                        QgsMapLayer,
-                       QgsWkbTypes
+                       QGis,
+                       QgsMapLayerRegistry
                        )
 
-from . import pointtool, geocode, auxiliary, client
+from OSMtools import pointtool, geocode, auxiliary, client
 
 FORM_CLASS, _ = loadUiType(os.path.join(
     os.path.dirname(__file__), 'osm_tools_dialog_base.ui'))
@@ -73,6 +74,8 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.iface = iface
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        self.mapInstance = QgsMapLayerRegistry.instance()
         
         # Programmtically invoke ORS logo
         header_pic = QPixmap(os.path.join(self.script_dir, "openrouteservice.png"))
@@ -125,8 +128,8 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.start_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
         self.end_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
         self.via_clear_button.clicked.connect(self._clearVia)
-        self.project.layerWasAdded.connect(self._layerTreeChanged)
-        self.project.layersRemoved.connect(self._layerTreeChanged) 
+        self.mapInstance.layerWasAdded.connect(self._layerTreeChanged)
+        self.mapInstance.layersRemoved.connect(self._layerTreeChanged) 
         self.start_layer_refresh.clicked.connect(self._layerTreeChanged) 
         self.end_layer_refresh.clicked.connect(self._layerTreeChanged) 
         self.start_layer_combo.currentIndexChanged[int].connect(self._layerSeletedChanged)
@@ -154,7 +157,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
                 # Handle weird project startup behaviour of QGIS (apparently 
                 # doesn't find layers on project startup and throws AttributeError)
                 try:
-                    if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.Type(1):
+                    if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QGis.WKBPoint:
                         layer_names.append(layer.name())
                 except AttributeError:
                     continue
@@ -211,7 +214,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
             sending_widget = self.sender()
             sending_widget_name = sending_widget.objectName()
             parent_widget = self.sender().parentWidget()
-            layer_selected = [lyr for lyr in self.project.mapLayers().values() if lyr.name() == sending_widget.currentText()][0]
+            layer_selected = [lyr for lyr in self.mapInstance.mapLayers().values() if lyr.name() == sending_widget.currentText()][0]
             for widget in parent_widget.findChildren(QComboBox):
                 if widget.objectName() != sending_widget_name:   
                     widget.clear()

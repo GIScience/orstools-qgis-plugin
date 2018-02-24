@@ -14,14 +14,12 @@ from PyQt4.QtGui import QComboBox
 from PyQt4.QtCore import QVariant
 
 from qgis.core import (QgsVectorLayer,
-                       QgsField, 
-                       QgsPointXY,
-                       QgsGeometry,
+                       QgsField,
                        QgsFeature,
                        QgsProject
                        )
 
-from . import convert, geocode, auxiliary
+from OSMtools import auxiliary
 
 
 class matrix:
