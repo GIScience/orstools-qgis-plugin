@@ -1,6 +1,8 @@
 # OSM tools
 Set of tools to use openrouteservice (ORS) API's as a plugin in QGIS (www.openrouteservice.org).
 
+**Note**, the master branch is for QGIS **v3.x**.
+
 See also:
 - [Rate limits](https://openrouteservice.org/ratelimits/)
 - [ORS developer documentation](https://openrouteservice.org/documentation/)
@@ -10,7 +12,7 @@ See also:
 ## Functionalities
 
 ### General
-Use QGIS to generate input for routing and accessibility area analysis powered by ORS, either via clicking coordinates in the map canvas or using point layers for batch operation.
+Use QGIS to generate input for **routing**, **isochrones** and **matrix calculations** powered by ORS, either via clicking coordinates in the map canvas or using point layers for batch operation.
 
 ### Customization
 From v2.x/3.x, the tool includes a `config.yml` to set the basic config parameters for openrouteservice:
