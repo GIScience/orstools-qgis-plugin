@@ -149,7 +149,7 @@ class matrix:
             
             # Find field combo box
             all_combos = combo.parent().findChildren(QComboBox)
-            field_combo = [combo for combo in all_combos if combo.objectName().endswith('_id')][0] 
+            field_combo = [box for box in all_combos if box.objectName().endswith('_id')][0] 
             field_id = layer.fields().lookupField(field_combo.currentText())
             field_values = [feat[field_id] for feat in feats]
         
