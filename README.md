@@ -35,7 +35,7 @@ API key: https://openrouteservice.org/sign-up/
 
 Either from QGIS plugin repository or manually:
   - Copy branch contents to folder named 'OSMtools'
-  - Copy folder to .../.qgis2/python/plugins
+  - Copy folder to OS dependent plugin directory
   
 ## Contributing
 The plugin has undergone a major refactoring while moving to QGIS v3. I'm still in the process of writing unit tests. However, if you'd like to contribute, feel free to fork and create PR's. 
