@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import (QDialog,
                              QPushButton,                     
                              )
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QFont
 from qgis.core import (QgsProject, 
                        QgsLayerTreeLayer, 
                        QgsMapLayer,
@@ -83,6 +83,10 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.header_pic.setPixmap(self.pixmap)
         self.header_text.setAlignment(Qt.AlignHCenter)
         self.header_subpic.setAlignment(Qt.AlignHCenter)
+        
+        # Set fonts for few widgets, which dialog.ui somehow messes up
+        self.tabWidget.setFont(QFont("Sans Serif", 10))
+#        self.groupBox_2.setFont(QFont("Sans Serif", 9))
         
         # Read API key file
         self.api_key_dlg.setText(aux.readConfig()['api_key'])

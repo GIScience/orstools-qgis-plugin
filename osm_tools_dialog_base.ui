@@ -108,7 +108,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -127,7 +127,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-169</y>
             <width>340</width>
             <height>852</height>
            </rect>
@@ -207,7 +207,7 @@
              <layout class="QGridLayout" name="gridLayout_4">
               <item row="0" column="0">
                <widget class="QWidget" name="widget_8" native="true">
-                <layout class="QGridLayout" name="gridLayout_10">
+                <layout class="QGridLayout" name="gridLayout_10" columnstretch="1,0">
                  <property name="topMargin">
                   <number>6</number>
                  </property>
@@ -264,7 +264,7 @@
               </item>
               <item row="1" column="0">
                <widget class="QWidget" name="widget_9" native="true">
-                <layout class="QGridLayout" name="gridLayout_11">
+                <layout class="QGridLayout" name="gridLayout_11" columnstretch="1,0">
                  <property name="topMargin">
                   <number>6</number>
                  </property>
@@ -381,7 +381,7 @@
              <layout class="QGridLayout" name="gridLayout_5">
               <item row="1" column="0">
                <widget class="QWidget" name="widget_11" native="true">
-                <layout class="QGridLayout" name="gridLayout_13">
+                <layout class="QGridLayout" name="gridLayout_13" columnstretch="1,0">
                  <property name="topMargin">
                   <number>6</number>
                  </property>
@@ -446,7 +446,7 @@
               </item>
               <item row="0" column="0">
                <widget class="QWidget" name="widget_10" native="true">
-                <layout class="QGridLayout" name="gridLayout_12">
+                <layout class="QGridLayout" name="gridLayout_12" columnstretch="1,0">
                  <property name="topMargin">
                   <number>6</number>
                  </property>
@@ -694,7 +694,7 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_3" native="true">
-         <layout class="QGridLayout" name="gridLayout_2">
+         <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0">
           <item row="0" column="0">
            <widget class="QLabel" name="access_map_label">
             <property name="palette">
@@ -1161,13 +1161,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="access_layer_check">
-            <property name="text">
-             <string>Use Layer</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="0" colspan="2">
            <widget class="QComboBox" name="access_layer_combo">
             <property name="enabled">
@@ -1181,6 +1174,13 @@
             </property>
             <property name="editable">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="access_layer_check">
+            <property name="text">
+             <string>Use Layer</string>
             </property>
            </widget>
           </item>
@@ -1212,7 +1212,7 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_15" native="true">
-         <layout class="QGridLayout" name="gridLayout_16">
+         <layout class="QGridLayout" name="gridLayout_16" columnstretch="1,0">
           <item row="1" column="1">
            <widget class="QPushButton" name="matrix_start_refresh">
             <property name="enabled">
@@ -1254,14 +1254,16 @@
            <widget class="QLabel" name="label_4">
             <property name="font">
              <font>
-              <pointsize>11</pointsize>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
              <string>Start Locations</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -1270,7 +1272,7 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_16" native="true">
-         <layout class="QGridLayout" name="gridLayout_17">
+         <layout class="QGridLayout" name="gridLayout_17" columnstretch="1,0">
           <item row="1" column="0">
            <widget class="QComboBox" name="matrix_end_combo">
             <property name="enabled">
@@ -1312,14 +1314,16 @@
            <widget class="QLabel" name="label_6">
             <property name="font">
              <font>
-              <pointsize>11</pointsize>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
              <string>End Locations</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>

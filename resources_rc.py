@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5.QtCore import qRegisterResourceData, qUnregisterResourceData
+from PyQt5 import QtCore
 
 qt_resource_data = b"\
 \x00\x00\x08\x69\
@@ -171,9 +171,9 @@ qt_resource_struct = b"\
 "
 
 def qInitResources():
-    qRegisterResourceData(0x01, qt_resource_struct, qt_resource_name, qt_resource_data)
+    QtCore.qRegisterResourceData(0x01, qt_resource_struct, qt_resource_name, qt_resource_data)
 
 def qCleanupResources():
-    qUnregisterResourceData(0x01, qt_resource_struct, qt_resource_name, qt_resource_data)
+    QtCore.qUnregisterResourceData(0x01, qt_resource_struct, qt_resource_name, qt_resource_data)
 
 qInitResources()
