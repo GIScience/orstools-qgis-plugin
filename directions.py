@@ -107,7 +107,7 @@ class directions:
         if self.dlg.via_label.text() != 'Long,Lat':
             route_via = [float(x) for x in self.dlg.via_label.text().split(",")]
                 
-        message_bar = aux.pushProgressBar(self.iface)
+        message_bar, progress_widget = aux.pushProgressBar(self.iface)
         
         responses = []
         delete_values = []
@@ -139,7 +139,7 @@ class directions:
             
             QgsProject.instance().addMapLayer(layer_out)
             
-        self.iface.messageBar().clearWidgets() 
+        self.iface.messageBar().popWidget(progress_widget)
         
         
     def _addLine(self, responses, values_list):

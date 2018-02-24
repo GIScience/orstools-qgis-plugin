@@ -80,7 +80,7 @@ class isochrones:
                 feats = layer.selectedFeatures()
                 feat_count = layer.selectedFeatureCount()
             
-            message_bar = aux.pushProgressBar(self.iface)
+            message_bar, progress_widget = aux.pushProgressBar(self.iface)
             
             responses = []
             for i, feat in enumerate(feats):
@@ -95,6 +95,8 @@ class isochrones:
                 responses.append(self.client.request(self.url, self.params))
                 
             poly_out = self._addPolygon(responses, layer_name)
+            
+            self.iface.messageBar().popWidget(progress_widget)
             
             
         else:  
@@ -124,7 +126,6 @@ class isochrones:
         QgsProject.instance().addMapLayer(poly_out)
 #        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
         
-        self.iface.messageBar().clearWidgets() 
             
         
     def _addPoint(self, response_dict, point_geom, name_ext):

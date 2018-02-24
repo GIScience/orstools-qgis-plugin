@@ -79,4 +79,4 @@ def pushProgressBar(iface):
     progressMessageBar.layout().addWidget(progress)
     iface.messageBar().pushWidget(progressMessageBar, level=Qgis.Info)
     
-    return progress
+    return progress, progressMessageBar
