@@ -23,7 +23,7 @@ from qgis.core import (QgsVectorLayer,
                        QgsProject
                        )
 
-from . import convert, geocode, aux
+from . import convert, geocode, auxiliary
 
 class directions:
     """
@@ -107,7 +107,7 @@ class directions:
         if self.dlg.via_label.text() != 'Long,Lat':
             route_via = [float(x) for x in self.dlg.via_label.text().split(",")]
                 
-        message_bar, progress_widget = aux.pushProgressBar(self.iface)
+        message_bar, progress_widget = auxiliary.pushProgressBar(self.iface)
         
         responses = []
         delete_values = []
@@ -205,7 +205,7 @@ class directions:
                 layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
                 
                 # Check CRS and transform if necessary
-                aux.checkCRS(layer,
+                auxiliary.checkCRS(layer,
                              self.iface.messageBar())
                 
                 # If features are selected, calculate with those

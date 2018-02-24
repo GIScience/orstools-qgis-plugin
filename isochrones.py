@@ -21,7 +21,7 @@ from qgis.core import (QgsPointXY,
 
 from . import (geocode,
                       convert,
-                      aux
+                      auxiliary
                       )
 
 class isochrones:
@@ -70,7 +70,7 @@ class isochrones:
             layer_name = self.dlg.access_layer_combo.currentText()
             layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
             
-            aux.checkCRS(layer, self.iface.messageBar())
+            auxiliary.checkCRS(layer, self.iface.messageBar())
             
             # If features are selected, calculate with those
             if layer.selectedFeatureCount() == 0:
@@ -80,7 +80,7 @@ class isochrones:
                 feats = layer.selectedFeatures()
                 feat_count = layer.selectedFeatureCount()
             
-            message_bar, progress_widget = aux.pushProgressBar(self.iface)
+            message_bar, progress_widget = auxiliary.pushProgressBar(self.iface)
             
             responses = []
             for i, feat in enumerate(feats):

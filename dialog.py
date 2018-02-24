@@ -37,7 +37,7 @@ from qgis.core import (QgsProject,
                        QgsWkbTypes
                        )
 
-from . import pointtool, geocode, aux, client
+from . import pointtool, geocode, auxiliary, client
 
 FORM_CLASS, _ = loadUiType(os.path.join(
     os.path.dirname(__file__), 'osm_tools_dialog_base.ui'))
@@ -89,7 +89,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
 #        self.groupBox_2.setFont(QFont("Sans Serif", 9))
         
         # Read API key file
-        self.api_key_dlg.setText(aux.readConfig()['api_key'])
+        self.api_key_dlg.setText(auxiliary.readConfig()['api_key'])
             
         self.api_key = self.api_key_dlg.text()
         self.project = QgsProject.instance()
@@ -229,7 +229,7 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         """
         Writes key to text file when api key text field changes.
         """
-        aux.writeConfig('api_key',
+        auxiliary.writeConfig('api_key',
                                   self.api_key_dlg.text())
            
             

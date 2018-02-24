@@ -24,7 +24,7 @@ from qgis.core import (QgsVectorLayer,
                        QgsProject
                        )
 
-from . import convert, geocode, aux
+from . import convert, geocode, auxiliary
 
 
 class matrix:
@@ -135,7 +135,7 @@ class matrix:
             layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
             
             # Check CRS and transform if necessary
-            aux.checkCRS(layer,
+            auxiliary.checkCRS(layer,
                          self.iface.messageBar())
             
             # If features are selected, calculate with those

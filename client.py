@@ -15,7 +15,7 @@ import collections
 from urllib.parse import urlencode
 
 import OSMtools
-from . import exceptions, aux
+from . import exceptions, auxiliary
 
 _USER_AGENT = "ORSClientQGIS/%s".format(OSMtools.__version__)
 _RETRIABLE_STATUSES = [503]
@@ -46,7 +46,7 @@ class Client(object):
         :type requests_kwargs: dict
         """
         
-        base_params = aux.readConfig()
+        base_params = auxiliary.readConfig()
         
         (self.key, 
          self.base_url, 
