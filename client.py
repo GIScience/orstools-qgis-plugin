@@ -120,7 +120,7 @@ class Client(object):
                                              params,
                                              )
 
-        # Default to the client-level self.requests_kwargs, withmemory method-level
+        # Default to the client-level self.requests_kwargs, with method-level
         # requests_kwargs arg overriding.
         requests_kwargs = requests_kwargs or {}
         final_requests_kwargs = dict(self.requests_kwargs, **requests_kwargs)
