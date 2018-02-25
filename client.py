@@ -189,8 +189,11 @@ class Client(object):
             raise exceptions._OverQueryLimit(
                 str(status_code), error)
         if status_code != 200:
-            raise exceptions.ApiError(status_code,
-                                      error['message'])
+            try:
+                errorMsg = error['message']
+            except TypeError:
+                errorMsg = error
+            raise exceptions.ApiError(status_code, errorMsg)
 
         return body
 
