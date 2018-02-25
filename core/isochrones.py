@@ -119,7 +119,7 @@ def layerFromRequests(responses, layer=None):
             iso_value = isochrone['properties']['value']
             qgis_coords = [QgsPoint(x, y) for x, y in coordinates[0]]
             feat.setGeometry(QgsGeometry.fromPolygon([qgis_coords]))
-            feat.setAttributes([iso_value / 60 if metric == 'time' else None,
+            feat.setAttributes([float(iso_value) / 60 if metric == 'time' else None,
                                 iso_value if metric == 'distance' else None,
                                 profile])
             poly_out.dataProvider().addFeatures([feat])
