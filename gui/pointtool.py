@@ -19,39 +19,39 @@ def resolve(name, basepath=None):
     if not basepath:
       basepath = os.path.dirname(os.path.realpath(__file__))
     return os.path.join(basepath, name)
-    
 
-class PointTool(QgsMapTool):   
+
+class PointTool(QgsMapTool):
     def __init__(self, canvas, button):
         QgsMapTool.__init__(self, canvas)
-        self.canvas = canvas    
+        self.canvas = canvas
         self.button = button
-        self.imgdir = resolve('icon_locate.png')
+        self.imgdir = resolve('../icon_locate.png')
         self.cursor = QCursor(QPixmap(self.imgdir).scaledToWidth(24), 12, 12)
-        
-        #QApplication.setOverrideCursor(QCursor(QPixmap('/icon_locate.png')))
-    
+
+        #QApplication.setOverrideCursor(QCursor(QPixmap('../icon_locate.png')))
+
     canvasClicked = pyqtSignal(['QgsPoint', 'QString', 'Qt::MouseButton'])
     def canvasReleaseEvent(self, event):
         #Get the click and emit a transformed point
-        
+
         # mapSettings() was only introduced in QGIS 2.4, keep compatibility
         try:
             crsSrc = self.canvas.mapSettings().destinationCrs()
         except:
             crsSrc = self.canvas.mapRenderer().destinationCrs()
-            
+
         crsWGS = QgsCoordinateReferenceSystem(4326)
-    
+
         point_oldcrs = self.toMapCoordinates(event.pos())
-        
+
         xform = QgsCoordinateTransform(crsSrc, crsWGS)
         point_newcrs = xform.transform(point_oldcrs)
-        
+
         QApplication.restoreOverrideCursor()
-        
+
         self.canvasClicked.emit(point_newcrs, self.button, event.button())
-        
+
     def activate(self):
         QApplication.setOverrideCursor(self.cursor)
 

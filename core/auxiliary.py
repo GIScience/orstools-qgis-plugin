@@ -21,10 +21,10 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 def checkCRS(layer, messageBar):
     """
     Check if layer CRS is EPSG:4326.
-    
+
     :param layer: Layer to be inspected.
     :type layer: QgsMapLayer
-    
+
     :param messageBar: QGIS interface message bar.
     :type messageBar: QgsMessageBar
     """
@@ -34,7 +34,7 @@ def checkCRS(layer, messageBar):
         messageBar.pushInfo('CRS conflict',
                                          'The input layer CRS is {}, the output layer '
                                          'CRS will be EPSG:4326'.format(layer_crs))
-    
+
     return layer
 
 def transformToWGS(old_layer, old_crs):
@@ -48,29 +48,29 @@ def transformToWGS(old_layer, old_crs):
         g.transform(xform)
         f.setGeometry(g)
         feats.append(f)
-    
+
     new_layer.dataProvider().addFeatures(feats)
     attrs = old_layer.dataProvider().fields().toList()
     new_layer.dataProvider().addAttributes(attrs)
-    new_layer.updateFields()    
-    
+    new_layer.updateFields()
+
     return new_layer
 
 
 def readConfig():
-    with open(os.path.join(script_dir, "config.yml")) as f:
+    with open(os.path.join(script_dir, '../config.yml')) as f:
         doc = yaml.safe_load(f)
-        
+
     return doc
 
 def writeConfig(key, value):
-    
+
     doc = readConfig()
     doc[key] = value
-    with open(os.path.join(script_dir, "config.yml"), 'w') as f:
+    with open(os.path.join(script_dir, '../config.yml'), 'w') as f:
         yaml.safe_dump(doc, f)
-        
-        
+
+
 def pushProgressBar(iface):
     progressMessageBar = iface.messageBar().createMessage("Requesting analysis from ORS...")
     progress = QProgressBar(progressMessageBar)
@@ -78,5 +78,5 @@ def pushProgressBar(iface):
     progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
     progressMessageBar.layout().addWidget(progress)
     iface.messageBar().pushWidget(progressMessageBar, level=iface.messageBar().INFO)
-    
+
     return progress, progressMessageBar

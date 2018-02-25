@@ -37,21 +37,19 @@ LOCALES =
 PLUGINNAME = OSMtools
 
 PY_FILES = \
-	auxiliary.py  dialog.py      geocode.py     matrix.py     resources.py \
-	client.py     directions.py  __init__.py    osm_tools.py  resources_rc.py \
-	convert.py    exceptions.py  isochrones.py  pointtool.py \
-	osmtools_processing
+	__init__.py osm_tools.py \
+	core gui osmtools_processing
 
 # translation
 SOURCES = $(PY_FILES)
 
-UI_FILES = *.ui
+UI_FILES = gui/*.ui
 
 EXTRAS = metadata.txt *.png config.yml
 
 EXTRA_DIRS =
 
-COMPILED_RESOURCE_FILES = resources.py resources_rc.py
+COMPILED_RESOURCE_FILES = gui/resources.py gui/resources_rc.py
 
 PEP8EXCLUDE=pydev,resources.py,conf.py,third_party,ui
 

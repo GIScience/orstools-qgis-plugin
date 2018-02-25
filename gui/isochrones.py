@@ -19,10 +19,10 @@ from qgis.core import (QgsPoint,
                        QgsRendererCategoryV2,
                        QgsCategorizedSymbolRendererV2)
 
-from OSMtools import (geocode,
-                      convert,
-                      auxiliary
-                      )
+from OSMtools.core import (geocode,
+                           convert,
+                           auxiliary
+                          )
 
 class isochrones:
     """

@@ -33,8 +33,9 @@ from PyQt4.Qt import PYQT_VERSION_STR
 from PyQt4.QtGui import QIcon, QAction, QApplication
 from processing.core.Processing import Processing
 
-from OSMtools.dialog import OSMtoolsDialog
-from OSMtools import isochrones, client, directions, exceptions, matrix
+from OSMtools.core import client, exceptions
+from OSMtools.gui import isochrones, directions, matrix
+from OSMtools.gui.dialog import OSMtoolsDialog
 from OSMtools.osmtools_processing.provider import OSMtoolsAlgoProvider
 
 import logging

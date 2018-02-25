@@ -38,8 +38,8 @@ from processing.core.parameters import ParameterVector, ParameterString, Paramet
 from processing.core.outputs import OutputVector
 from processing.tools.dataobjects import getObjectFromUri
 
-from OSMtools.exceptions import InvalidParameterException
-from OSMtools.convert import _comma_list
+from OSMtools.core.exceptions import InvalidParameterException
+from OSMtools.core.convert import _comma_list
 
 class IsochronesGeoAlg(GeoAlgorithm):
     """

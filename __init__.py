@@ -35,6 +35,7 @@ def classFactory(iface):  # pylint: disable=invalid-name
     from .osm_tools import OSMtools
     return OSMtools(iface)
 
+# TODO: test if this actually works on QGIS Server?
 # noinspection PyDocstring,PyPep8Naming
 def serverClassFactory(serverIface):
     from osmtools_processing.provider import OSMtoolsAlgoProvider
