@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Contains isochrones class to perform requests to ORS isochrone API.
+GUI logic for the Isochrones tab, after clicking ok in the dialog
 """
-
 
 from PyQt4.QtCore import QVariant
 from PyQt4.QtGui import QColor
@@ -13,16 +12,9 @@ from qgis.core import (QgsPoint,
                        QgsFeature,
                        QgsField,
                        QgsGeometry,
-                       QgsMapLayerRegistry,
-                       QgsSymbolV2,
-                       QgsSimpleFillSymbolLayerV2,
-                       QgsRendererCategoryV2,
-                       QgsCategorizedSymbolRendererV2)
+                       QgsMapLayerRegistry)
 
-from OSMtools.core import (geocode,
-                           convert,
-                           auxiliary
-                          )
+from OSMtools.core import geocode, auxiliary
 
 from OSMtools.core import isochrones
 
