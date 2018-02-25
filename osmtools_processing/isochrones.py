@@ -33,13 +33,16 @@ from PyQt4.QtGui import QIcon
 from PyQt4.QtCore import QVariant
 from qgis.core import QGis, QgsFeature, QgsField, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 
+from processing import features
 from processing.core.GeoAlgorithm import GeoAlgorithm
 from processing.core.parameters import ParameterVector, ParameterString, ParameterFixedTable, ParameterSelection
 from processing.core.outputs import OutputVector
 from processing.tools.dataobjects import getObjectFromUri
 
+from OSMtools.core.client import Client
 from OSMtools.core.exceptions import InvalidParameterException
 from OSMtools.core.convert import _comma_list
+from OSMtools.core.isochrones import ISOCHRONES_METRICS, ISOCHRONES_PROFILES, requestFromPoint, layerFromRequests
 
 class IsochronesGeoAlg(GeoAlgorithm):
     """
@@ -48,12 +51,11 @@ class IsochronesGeoAlg(GeoAlgorithm):
 
     # these names will be visible in console & outputs
     IN_POINTS = 'INPUT_POINTS'
-    IN_KEY    = 'INPUT_APIKEY'
-    IN_RANGES = 'INPUT_RANGES'
+    IN_PROFILE = 'INPUT_PROFILE'
     IN_METRIC = 'INPUT_METRIC'
+    IN_RANGES = 'INPUT_RANGES'
+    IN_KEY    = 'INPUT_APIKEY'
     OUT = 'OUTPUT'
-
-    METRICS = ['duration', 'distance']
 
     def __init__(self):
         GeoAlgorithm.__init__(self)
@@ -62,19 +64,24 @@ class IsochronesGeoAlg(GeoAlgorithm):
         return QIcon(join(dirname(__file__), '../icon.png'))
 
     def defineCharacteristics(self):
-        self.name = 'OSM Isochrones'
+        self.name = 'ORS Isochrones'
         self.group = 'API'
 
-        self.addParameter(ParameterString(self.IN_KEY, 'API Key'))
         self.addParameter(ParameterVector(self.IN_POINTS,
                                           self.tr('Central Points Layer'),
                                           ParameterVector.VECTOR_TYPE_POINT))
+        self.addParameter(ParameterString(self.IN_PROFILE,
+                                          ' '.join([self.tr('Profile'), str(ISOCHRONES_PROFILES)]),
+                                          ISOCHRONES_PROFILES[0]))
         self.addParameter(ParameterString(self.IN_METRIC,
-                                          ' '.join([self.tr('Metric'), str(self.METRICS)]),
-                                          'duration')) # TODO: select between two values?
+                                          ' '.join([self.tr('Metric'), str(ISOCHRONES_METRICS)]),
+                                          ISOCHRONES_METRICS[0]))
         self.addParameter(ParameterFixedTable(self.IN_RANGES,
-                                              self.tr('Range Values'),
+                                              self.tr('Range Values (in seconds or meters'),
                                               1, ['range']))
+        self.addParameter(ParameterString(self.IN_KEY,
+                                          self.tr('API Key (can be omitted if set in config.yml)'),
+                                          optional=True))
 
         self.addOutput(OutputVector(self.OUT, self.tr('Isochrones')))
 
@@ -83,49 +90,39 @@ class IsochronesGeoAlg(GeoAlgorithm):
         progress.setInfo('Initializing')
 
         apiKey = self.getParameterValue(self.IN_KEY)
+        profile = self.getParameterValue(self.IN_PROFILE)
         metric = self.getParameterValue(self.IN_METRIC)
         ranges = self.getParameterValue(self.IN_RANGES)
         output = self.getOutputFromName(self.OUT)
 
-        if metric not in self.METRICS:
-            raise InvalidParameterException(self.IN_METRIC, metric, self.METRICS)
-
-        if ranges == '0':
-            raise InvalidParameterException(self.IN_RANGES, ranges)
-        else:
-            # ensure correct format for robustness of API changes
-            ranges = _comma_list(','.split(ranges))
-
+        ranges = list(map(int, ranges.split(',')))
+        print ranges
+        client = Client(None, apiKey)
         pointLayer = getObjectFromUri(self.getParameterValue(self.IN_POINTS))
 
-        # ORS only understands WGS85, so we convert all points before sending
+        # ORS understands WGS84 only, so we convert all points before sending
         # don't use auxiliary.checkCRS(), bc we don't want any GUI dependencies in processing
         outCrs = QgsCoordinateReferenceSystem(4326)
         transformer = QgsCoordinateTransform(pointLayer.crs(), outCrs)
 
-        isochronesFields = [] # TODO
-        writer = output.getVectorWriter(
-            isochronesFields,
-            QGis.WKBPolygon, outCrs
-        )
+        # we abuse this function for its sideeffect. to get a layer frpm the
+        # correct provider (-> ouput.layer)
+        output.getVectorWriter([], QGis.WKBPolygon, outCrs)
 
         processedFeatureCount = 0
         totalFeatureCount = pointLayer.featureCount()
         totalFeatureCount = 100.0 / max(totalFeatureCount, 1)
 
         progress.setInfo('Processing each point')
-        for feature in pointLayer.getFeatures():
+        responses = []
+        for feature in features(pointLayer):
 
             feature.geometry().transform(transformer)
+            point = feature.geometry().asPoint()
 
-            # TODO
+            responses.append(requestFromPoint(client, point, metric, ranges, profile))
 
-            self.writeFeature(feature.geometry(), [], writer)
             processedFeatureCount += 1
             progress.setPercentage(int(processedFeatureCount * totalFeatureCount))
 
-    def writeFeature(self, point, attrs, writer):
-        outFeat = QgsFeature()
-        outFeat.setGeometry(point)
-        outFeat.setAttributes([])
-        writer.addFeature(outFeat)
+        layerFromRequests(responses, output.layer)
