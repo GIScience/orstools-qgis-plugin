@@ -171,9 +171,9 @@ def _stylePoly(layer, metric):
         if symbol_layer is not None:
             symbol.changeSymbolLayer(0, symbol_layer)
 
-        # create renderer object
-        category = QgsRendererCategoryV2(unique_value, symbol, str(unique_value) + legend_suffix)
         # entry for the list of category items
+        legendtext = "{:.2f}".format(unique_value) + legend_suffix
+        category = QgsRendererCategoryV2(unique_value, symbol, legendtext)
         categories.append(category)
 
     # create renderer object
