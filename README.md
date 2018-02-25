@@ -1,7 +1,7 @@
 # OSM tools
 Set of tools to use openrouteservice (ORS) API's as a plugin in QGIS (www.openrouteservice.org).
 
-**Note**, the master branch is for QGIS **v3.x**.
+**Note**, the master branch is for QGIS **v3.x**. See branch [v2.1](https://github.com/nilsnolde/OSMtools/tree/v2.1) for QGIS **v2.x**.
 
 See also:
 - [Rate limits](https://openrouteservice.org/ratelimits/)
