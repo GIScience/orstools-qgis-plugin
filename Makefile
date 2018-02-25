@@ -34,25 +34,23 @@ LOCALES =
 #LRELEASE = lrelease
 #LRELEASE = lrelease-qt4
 
-
-# translation
-SOURCES = \
-	__init__.py \
-	osm_tools.py osm_tools_dialog.py
-
 PLUGINNAME = OSMtools
 
 PY_FILES = \
-	__init__.py \
-	osm_tools.py osm_tools_dialog.py
+	auxiliary.py  dialog.py      geocode.py     matrix.py     resources.py \
+	client.py     directions.py  __init__.py    osm_tools.py  resources_rc.py \
+	convert.py    exceptions.py  isochrones.py  pointtool.py
 
-UI_FILES = osm_tools_dialog_base.ui
+# translation
+SOURCES = $(PY_FILES)
 
-EXTRAS = metadata.txt icon.png
+UI_FILES = *.ui
+
+EXTRAS = metadata.txt *.png config.yml
 
 EXTRA_DIRS =
 
-COMPILED_RESOURCE_FILES = resources.py
+COMPILED_RESOURCE_FILES = resources.py resources_rc.py
 
 PEP8EXCLUDE=pydev,resources.py,conf.py,third_party,ui
 
@@ -79,7 +77,7 @@ compile: $(COMPILED_RESOURCE_FILES)
 %.qm : %.ts
 	$(LRELEASE) $<
 
-test: compile transcompile
+test: compile # transcompile
 	@echo
 	@echo "----------------------"
 	@echo "Regression Test Suite"
@@ -97,7 +95,7 @@ test: compile transcompile
 	@echo "e.g. source run-env-linux.sh <path to qgis install>; make test"
 	@echo "----------------------"
 
-deploy: compile doc transcompile
+deploy: compile # doc transcompile
 	@echo
 	@echo "------------------------------------------"
 	@echo "Deploying plugin to your .qgis2 directory."
@@ -111,7 +109,7 @@ deploy: compile doc transcompile
 	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
-	cp -vfr $(HELP) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/help
+	#cp -vfr $(HELP) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/help
 	# Copy extra directories if any
   # (temporarily removed)
 
@@ -194,6 +192,12 @@ clean:
 	@echo "Removing uic and rcc generated files"
 	@echo "------------------------------------"
 	rm $(COMPILED_UI_FILES) $(COMPILED_RESOURCE_FILES)
+
+watch:
+	while true; do \
+		make $(WATCHMAKE); \
+		inotifywait -qre close_write ./; \
+	done
 
 doc:
 	@echo
