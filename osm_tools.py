@@ -10,13 +10,13 @@
         copyright            : (C) 2017 by Nils Nolde
         email                : nils.nolde@gmail.com
  ***************************************************************************/
- 
- This plugin provides access to the various APIs from OpenRouteService 
- (http://openrouteservice.readthedocs.io/en/1.0/api.html), developed and 
- maintained by GIScience team at University of Heidelberg, Germany. By using 
+
+ This plugin provides access to the various APIs from OpenRouteService
+ (http://openrouteservice.readthedocs.io/en/1.0/api.html), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
  this plugin you agree to the ORS terms of service
  (http://openrouteservice.readthedocs.io/en/1.0/tos.html#terms-of-service).
- 
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -75,14 +75,14 @@ class OSMtools():
 
         self.toolbar = self.iface.addToolBar(u'OSMtools')
         self.toolbar.setObjectName(u'OSMtools')
-        
+
         #custom __init__ declarations
         self.dlg = OSMtoolsDialog(self.iface)
-        
+
         self.canvas = self.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
-                
-        
+
+
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -97,7 +97,7 @@ class OSMtools():
         """
         return QCoreApplication.translate('OSMtools', message)
 
-    
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -110,19 +110,19 @@ class OSMtools():
                                     self.action)
         self.iface.addToolBarIcon(self.action)
         self.action.triggered.connect(self.run)
-        
-    def unload(self):        
+
+    def unload(self):
         QApplication.restoreOverrideCursor()
         self.iface.removePluginWebMenu(u"&OSM Tools", self.action)
         self.iface.removeToolBarIcon(self.action)
         del self.toolbar
-        
-        
+
+
     def run(self):
         """Run method that performs all the real work"""
-        
+
         self.dlg.show()
-        
+
         # Populate layer tree in comboboxes
         self.dlg._layerTreeChanged()
         # show the dialog
@@ -132,7 +132,7 @@ class OSMtools():
         if result:
             try:
                 clt = client.Client(self.iface)
-                
+
                 if self.dlg.tabWidget.currentIndex() == 2:
                     m = matrix.matrix(self.dlg, clt, self.iface)
                     m.matrix_calc()
@@ -146,14 +146,13 @@ class OSMtools():
                 self.iface.messageBar().pushCritical('Time out',
                                                      'The connection exceeded the '
                                                      'timeout limit of 60 seconds')
-            
-            except (exceptions._OverQueryLimit,
-                    exceptions.ApiError,
+
+            except (exceptions.ApiError,
                     exceptions.TransportError,
                     exceptions._OverQueryLimit) as e:
                 self.iface.messageBar().pushCritical("{}: ".format(type(e)),
                                                       "{}".format(str(e)))
-            
+
             except Exception:
                 raise
             finally:

@@ -25,13 +25,13 @@ class Client(object):
     """Performs requests to the ORS API services."""
 
     def __init__(self, iface,
-                 retry_timeout=60, 
+                 retry_timeout=60,
                  requests_kwargs=None,
                  retry_over_query_limit=False):
         """
         :param key: ORS API key. Required.
         :type key: string
-        
+
         :param iface: A QGIS interface instance.
         :type iface: QgisInterface
 
@@ -45,16 +45,16 @@ class Client(object):
             http://docs.python-requests.org/en/latest/api/#main-interface
         :type requests_kwargs: dict
         """
-        
+
         base_params = auxiliary.readConfig()
-        
-        (self.key, 
-         self.base_url, 
+
+        (self.key,
+         self.base_url,
          self.queries_per_minute) = [v for (k, v) in sorted(base_params.items())]
         self.iface = iface
-        
+
         self.session = requests.Session()
-        
+
         self.retry_over_query_limit = retry_over_query_limit
         self.retry_timeout = timedelta(seconds=retry_timeout)
         self.requests_kwargs = dict()
@@ -65,14 +65,13 @@ class Client(object):
 
         self.sent_times = collections.deque("", self.queries_per_minute)
 
-    def request(self, 
-                 url, params, 
-                 first_request_time=None, 
+    def request(self,
+                 url, params,
+                 first_request_time=None,
                  retry_counter=0,
                  requests_kwargs=None,
                  post_json=None):
-        """Performs HTTP GET/POST with credentials, returning the body asdlg
-        JSON.
+        """Performs HTTP GET/POST with credentials, returning the body as JSON.
 
         :param url: URL extension for request. Should begin with a slash.
         :type url: string
@@ -96,7 +95,7 @@ class Client(object):
         :raises Timeout: if the request timed out.
         :raises TransportError: when something went wrong while trying to
             execute a request.
-            
+
         :rtype: dict from JSON response.
         """
 
@@ -133,10 +132,10 @@ class Client(object):
             if elapsed_since_earliest < 60:
                 self.iface.messageBar().pushInfo('Limit exceeded',
                                                  'Request limit of {} per minute exceeded. '
-                                                 'Wait for {} seconds'.format(self.queries_per_minute, 
+                                                 'Wait for {} seconds'.format(self.queries_per_minute,
                                                                                60 - elapsed_since_earliest))
                 time.sleep(60 - elapsed_since_earliest)
-        
+
         # Determine GET/POST.
         # post_json is so far only sent from matrix call
         requests_method = self.session.get
@@ -154,7 +153,7 @@ class Client(object):
         if response.status_code in _RETRIABLE_STATUSES:
             # Retry request.
             print('Server down.\nRetrying for the {}th time.'.format(retry_counter + 1))
-            
+
             return self.request(url, params, first_request_time,
                                  retry_counter + 1, requests_kwargs, post_json)
 
@@ -165,7 +164,7 @@ class Client(object):
         except exceptions._RetriableRequest as e:
             if isinstance(e, exceptions._OverQueryLimit) and not self.retry_over_query_limit:
                 raise
-            
+
             self.iface.messageBar().pushInfo('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
             return self.request(url, params, first_request_time,
                                  retry_counter + 1, requests_kwargs, post_json)
@@ -173,19 +172,19 @@ class Client(object):
             raise
 
 
-    def _get_body(self, response): 
+    def _get_body(self, response):
         """
         Casts JSON response to dict
-        
+
         :param response: The HTTP response of the request.
         :type reponse: JSON object
-        
+
         :rtype: dict from JSON
         """
         body = response.json()
         error = body.get('error')
         status_code = response.status_code
-        
+
         if status_code == 429:
             raise exceptions._OverQueryLimit(
                 str(status_code), error)
@@ -209,10 +208,10 @@ class Client(object):
         :rtype: string
 
         """
-        
+
         if type(params) is dict:
             params = sorted(dict(**params).items())
-        
+
         # Only auto-add API key when using ORS. If own instance, API key must
         # be explicitly added to params
         if self.key:
@@ -224,7 +223,7 @@ class Client(object):
         raise exceptions.ApiError("No API key specified. "
                          "Visit https://go.openrouteservice.org/dev-dashboard/ "
                          "to create one.")
-        
+
 
 def _urlencode_params(params):
     """URL encodes the parameters.
