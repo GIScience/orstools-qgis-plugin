@@ -144,7 +144,7 @@ class OSMtools():
                     m = matrix.matrix(self.dlg, clt, self.iface)
                     m.matrix_calc()
                 if self.dlg.tabWidget.currentIndex() == 1:
-                    iso = isochrones.isochrones(self.dlg, clt, self.iface)
+                    iso = isochrones.Isochrones(self.dlg, clt, self.iface)
                     iso.isochrones_calc()
                 if self.dlg.tabWidget.currentIndex() == 0:
                     route = directions.directions(self.dlg, clt, self.iface)

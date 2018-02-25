@@ -40,10 +40,12 @@ from qgis.core import (QgsProject,
 
 from OSMtools.gui import pointtool
 from OSMtools.core import auxiliary, client, geocode
+from OSMtools.core.isochrones import ISOCHRONES_METRICS, ISOCHRONES_PROFILES
 
 FORM_CLASS, _ = loadUiType(os.path.join(
     os.path.dirname(__file__), 'osm_tools_dialog_base.ui'))
 
+# TODO: move these constants to core
 profiles = [
         'driving-car',
         'driving-hgv',
@@ -57,8 +59,6 @@ profiles = [
         ]
 
 preferences = ['fastest', 'shortest']
-
-units = ['time', 'distance']
 
 # For matrix API only
 metrics =['duration', 'distance', 'distance|duration']
@@ -99,11 +99,11 @@ class OSMtoolsDialog(QDialog, FORM_CLASS):
         self.project = QgsProject.instance()
 
         self.route_mode_combo.addItems(profiles)
-        self.access_mode_combo.addItems(profiles)
+        self.access_mode_combo.addItems(ISOCHRONES_PROFILES)
         self.matrix_mode_combo.addItems(profiles)
 #        self.matrix_metric_combo.addItems(metrics)
         self.route_pref_combo.addItems(preferences)
-        self.access_unit_combo.addItems(units)
+        self.access_unit_combo.addItems(ISOCHRONES_METRICS)
 
         #### Set up signals/slots ####
 

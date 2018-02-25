@@ -24,7 +24,9 @@ from OSMtools.core import (geocode,
                            auxiliary
                           )
 
-class isochrones:
+from OSMtools.core import isochrones
+
+class Isochrones:
     """
     Performs requests to ORS isochrone API:
     """
@@ -43,23 +45,12 @@ class isochrones:
         self.client = client
         self.iface = iface
 
-        self.url = '/isochrones'
-
-        self.iso_mode = self.dlg.access_mode_combo.currentText()
-        try:
-            self.access_range_input = list(map(int,self.dlg.access_range.text().split(',')))
-        except (ValueError, AttributeError) as e:
-            raise
-
-        self.dimension = self.dlg.access_unit_combo.currentText()
-        self.factor = 60 if self.dimension == 'time' else 1000
-
-        self.access_range_input = [x * self.factor for x in self.access_range_input]
-
-        self.params = {'range_type': self.dlg.access_unit_combo.currentText(),
-                       'profile': self.dlg.access_mode_combo.currentText(),
-                       'range': convert._comma_list(self.access_range_input)
-                       }
+        # read + prepare params
+        self.profile = self.dlg.access_mode_combo.currentText() # TODO: what is this??
+        self.metric = self.dlg.access_unit_combo.currentText()
+        self.factor = 60 if self.metric == 'time' else 1000
+        self.ranges = list(map(int,self.dlg.access_range.text().split(',')))
+        self.ranges = [x * self.factor for x in self.ranges]
 
 
     def isochrones_calc(self):
@@ -87,15 +78,11 @@ class isochrones:
                 for i, feat in enumerate(feats):
                     percent = (i/float(feat_count)) * 100
                     message_bar.setValue(percent)
-                    # Get coordinates
-                    geom = feat.geometry().asPoint()
-                    coords = [geom.x(), geom.y()]
-
-                    # Get response
-                    self.params['locations'] = convert._build_coords(coords)
-                    responses.append(self.client.request(self.url, self.params))
-
-                poly_out = self._addPolygon(responses, layer_name)
+                    p = feat.geometry().asPoint()
+                    res = isochrones.requestFromPoint(self.client, p,
+                                                      self.metric, self.ranges,
+                                                      self.profile)
+                    responses.append(res)
             finally:
                 self.iface.messageBar().popWidget(progress_widget)
 
@@ -106,25 +93,21 @@ class isochrones:
             in_point_geom = QgsPoint(*coords)
             response_dict = geocode.reverse_geocode(self.client, in_point_geom)
 
-            self.params['locations'] = convert._build_coords(coords)
-
             # Fire request
-            response = self.client.request(self.url, self.params)
+            responses = [isochrones.requestFromPoint(self.client, in_point_geom,
+                                                     self.metric, self.ranges,
+                                                     self.profile)]
 
-            out_point_geom = QgsPoint(*response['features'][0]['properties']['center'])
-
-            name_ext = "{0:.3f},{1:.3f}".format(*response['features'][0]['properties']['center'])
-
-            poly_out = self._addPolygon([response], name_ext)
-
-            point_out = self._addPoint(response_dict, out_point_geom, name_ext)
+            out_point_geom = QgsPoint(*responses[0]['features'][0]['properties']['center'])
+            layer_name = "{0:.3f},{1:.3f}".format(*responses[0]['features'][0]['properties']['center'])
+            point_out = self._addPoint(response_dict, out_point_geom, layer_name)
             point_out.updateExtents()
             QgsMapLayerRegistry.instance().addMapLayer(point_out)
 
 
-        poly_out.updateExtents()
+        poly_out = isochrones.layerFromRequests(responses)
+        poly_out.setLayerName("Isochrone_{}".format(layer_name))
 
-        self._stylePoly(poly_out)
         QgsMapLayerRegistry.instance().addMapLayer(poly_out)
 #        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
 
@@ -175,100 +158,3 @@ class isochrones:
         point_layer.dataProvider().addFeatures([point_feat])
 
         return point_layer
-
-
-    def _addPolygon(self, responses, name_ext):
-        """
-        Get polygon layer from Map button.
-
-        :param responses: Responses from isochrone request.
-        :type responses: list of JSON
-
-        :param name_ext: Name extension for layer.
-        :type name_ext: str
-
-        :rtype: QgsMapLayer
-        """
-        layer_name = "Isochrone_{}".format(name_ext)
-        poly_out = QgsVectorLayer("Polygon?crs=EPSG:4326", layer_name, "memory")
-
-        if self.dimension == 'time':
-            poly_out.dataProvider().addAttributes([QgsField("AA_MINS", QVariant.Int)])
-        else:
-            poly_out.dataProvider().addAttributes([QgsField("AA_METERS", QVariant.Int)])
-        poly_out.dataProvider().addAttributes([QgsField("AA_MODE", QVariant.String)])
-        poly_out.updateFields()
-
-        # Sort features based on the isochrone value, so that longest isochrone
-        # is added first. This will plot the isochrones on top of each other.
-        l = lambda x: x['properties']['value']
-        for response in responses:
-            for isochrone in sorted(response['features'], key=l, reverse=True):
-                feat = QgsFeature()
-                coordinates = isochrone['geometry']['coordinates']
-                iso_value = isochrone['properties']['value']
-                qgis_coords = [QgsPoint(x, y) for x, y in coordinates[0]]
-                feat.setGeometry(QgsGeometry.fromPolygon([qgis_coords]))
-                feat.setAttributes([iso_value / 60 if self.dimension == 'time' else iso_value,
-                                   self.iso_mode])
-                poly_out.dataProvider().addFeatures([feat])
-
-        return poly_out
-
-
-    def _stylePoly(self, layer):
-        """
-        Style isochrone polygon layer
-
-        :param layer: Polygon layer to be styled.
-        :type layer: QgsMapLayer
-        """
-        if self.dimension == 'time':
-            field_name = 'AA_MINS'
-            legend_suffix = ' mins'
-        else:
-            field_name = 'AA_METERS'
-            legend_suffix = ' m'
-        field = layer.fields().indexFromName(field_name)
-        unique_values = sorted(layer.uniqueValues(field))
-
-        colors = {0: QColor('#2b83ba'),
-                  1: QColor('#64abb0'),
-                  2: QColor('#9dd3a7'),
-                  3: QColor('#c7e9ad'),
-                  4: QColor('#edf8b9'),
-                  5: QColor('#ffedaa'),
-                  6: QColor('#fec980'),
-                  7: QColor('#f99e59'),
-                  8: QColor('#e85b3a'),
-                  9: QColor('#d7191c')}
-
-        categories = []
-
-        for cid, unique_value in enumerate(unique_values):
-            # initialize the default symbol for this geometry type
-            symbol = QgsSymbolV2.defaultSymbol(layer.geometryType())
-
-            # configure a symbol layer
-            symbol_layer = QgsSimpleFillSymbolLayerV2(color=colors[cid],
-                                                    #strokeColor=QColor('#000000')
-                                                    )
-
-            # replace default symbol layer with the configured one
-            if symbol_layer is not None:
-                symbol.changeSymbolLayer(0, symbol_layer)
-
-            # create renderer object
-            category = QgsRendererCategoryV2(unique_value, symbol, str(unique_value) + legend_suffix)
-            # entry for the list of category items
-            categories.append(category)
-
-        # create renderer object
-        renderer = QgsCategorizedSymbolRendererV2(field_name, categories)
-
-        # assign the created renderer to the layer
-        if renderer is not None:
-            layer.setRendererV2(renderer)
-        layer.setLayerTransparency(50)
-
-        layer.triggerRepaint()
