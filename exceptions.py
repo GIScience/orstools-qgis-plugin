@@ -67,3 +67,18 @@ class _OverQueryLimit(ApiError, _RetriableRequest):
     not be retried.
     """
     pass
+
+class InvalidParameterException(Exception):
+    """Something went wrong while trying to execute the request."""
+
+    def __init__(self, paramName, paramValue, validValues=None):
+        self.parameter = paramName
+        self.value = paramValue
+        self.validValues = validValues
+
+    def __str__(self):
+        msg = "The provided parameter {} ({}) was invalid.".format(
+            self.parameter, self.value)
+        if self.validValues:
+                msg += "Valid values are: {}".format(self.validValues)
+        return msg

@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
-                                 A QGIS plugin
- falk
+ OSMtools processing
                              -------------------
-        begin                : 2017-02-01
-        copyright            : (C) 2017 by nils
-        email                : nils
+        begin                : 2017-02-25
+        copyright            : (C) 2017 by Norwin Roosen
+        email                : github.com/noerw
         git sha              : $Format:%H$
  ***************************************************************************/
 
@@ -19,23 +17,4 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- This script initializes the plugin, making it known to QGIS.
 """
-
-__version__ = "2.1"
-
-# noinspection PyPep8Naming
-def classFactory(iface):  # pylint: disable=invalid-name
-    """Load OSMtools class from file OS;tools.
-
-    :param iface: A QGIS interface instance.
-    :type iface: QgsInterface
-    """
-    #
-    from .osm_tools import OSMtools
-    return OSMtools(iface)
-
-# noinspection PyDocstring,PyPep8Naming
-def serverClassFactory(serverIface):
-    from osmtools_processing.provider import OSMtoolsAlgoProvider
-

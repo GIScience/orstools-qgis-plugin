@@ -39,7 +39,8 @@ PLUGINNAME = OSMtools
 PY_FILES = \
 	auxiliary.py  dialog.py      geocode.py     matrix.py     resources.py \
 	client.py     directions.py  __init__.py    osm_tools.py  resources_rc.py \
-	convert.py    exceptions.py  isochrones.py  pointtool.py
+	convert.py    exceptions.py  isochrones.py  pointtool.py \
+	osmtools_processing
 
 # translation
 SOURCES = $(PY_FILES)
@@ -104,7 +105,7 @@ deploy: compile # doc transcompile
 	# the Python plugin directory is located at:
 	# $HOME/$(QGISDIR)/python/plugins
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
-	cp -vf $(PY_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
+	cp -vfr $(PY_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(UI_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)

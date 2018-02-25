@@ -31,9 +31,11 @@ import os.path
 from PyQt4.QtCore import QSettings, QTranslator, QCoreApplication
 from PyQt4.Qt import PYQT_VERSION_STR
 from PyQt4.QtGui import QIcon, QAction, QApplication
+from processing.core.Processing import Processing
 
 from OSMtools.dialog import OSMtoolsDialog
 from OSMtools import isochrones, client, directions, exceptions, matrix
+from OSMtools.osmtools_processing.provider import OSMtoolsAlgoProvider
 
 import logging
 
@@ -81,6 +83,10 @@ class OSMtools():
 
         self.canvas = self.iface.mapCanvas()
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.provider = OSMtoolsAlgoProvider()
+
+        # Add to processing
+        Processing.addProvider(self.provider, True)
 
 
     # noinspection PyMethodMayBeStatic
