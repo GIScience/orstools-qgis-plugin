@@ -31,22 +31,30 @@ __revision__ = '$Format:%H$'
 from os.path import dirname, join
 from PyQt4.QtGui import QIcon
 from PyQt4.QtCore import QVariant
-from qgis.core import QGis, QgsFeature, QgsField, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import QGis, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 
 from processing import features
 from processing.core.GeoAlgorithm import GeoAlgorithm
-from processing.core.parameters import ParameterVector, ParameterString, ParameterFixedTable, ParameterSelection
+from processing.core.parameters import (
+    ParameterVector,
+    ParameterString,
+    ParameterFixedTable
+)
 from processing.core.outputs import OutputVector
 from processing.tools.dataobjects import getObjectFromUri
 
 from OSMtools.core.client import Client
 from OSMtools.core.exceptions import InvalidParameterException
-from OSMtools.core.convert import _comma_list
-from OSMtools.core.isochrones import ISOCHRONES_METRICS, ISOCHRONES_PROFILES, requestFromPoint, layerFromRequests
+from OSMtools.core.isochrones import (
+    ISOCHRONES_METRICS,
+    ISOCHRONES_PROFILES,
+    requestFromPoint,
+    layerFromRequests,
+)
 
 class IsochronesGeoAlg(GeoAlgorithm):
     """
-    Prepares the Microm Wohngebaeude data (Hausebene)
+    GeoAlgorithm fetching isochrone polygons for a point layer via ORS
     """
 
     # these names will be visible in console & outputs
@@ -93,10 +101,7 @@ class IsochronesGeoAlg(GeoAlgorithm):
         profile = self.getParameterValue(self.IN_PROFILE)
         metric = self.getParameterValue(self.IN_METRIC)
         ranges = self.getParameterValue(self.IN_RANGES)
-        output = self.getOutputFromName(self.OUT)
-
         ranges = list(map(int, ranges.split(',')))
-        print ranges
         client = Client(None, apiKey)
         pointLayer = getObjectFromUri(self.getParameterValue(self.IN_POINTS))
 
@@ -104,10 +109,6 @@ class IsochronesGeoAlg(GeoAlgorithm):
         # don't use auxiliary.checkCRS(), bc we don't want any GUI dependencies in processing
         outCrs = QgsCoordinateReferenceSystem(4326)
         transformer = QgsCoordinateTransform(pointLayer.crs(), outCrs)
-
-        # we abuse this function for its sideeffect. to get a layer frpm the
-        # correct provider (-> ouput.layer)
-        output.getVectorWriter([], QGis.WKBPolygon, outCrs)
 
         processedFeatureCount = 0
         totalFeatureCount = pointLayer.featureCount()
@@ -124,5 +125,12 @@ class IsochronesGeoAlg(GeoAlgorithm):
 
             processedFeatureCount += 1
             progress.setPercentage(int(processedFeatureCount * totalFeatureCount))
+
+        progress.setInfo('Parsing isochrones layer')
+        output = self.getOutputFromName(self.OUT)
+
+        # we abuse this function for its sideeffect. to get a layer from the
+        # correct provider (-> ouput.layer)
+        output.getVectorWriter([], QGis.WKBPolygon, outCrs)
 
         layerFromRequests(responses, output.layer)
