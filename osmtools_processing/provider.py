@@ -65,5 +65,8 @@ class OSMtoolsAlgoProvider(AlgorithmProvider):
     def supportsNonFileBasedOutput(self):
         return True
 
+    def getSupportedOutputVectorLayerExtensions(self):
+        return ['gpkg']
+
     def _loadAlgorithms(self):
         self.algs = self.alglist

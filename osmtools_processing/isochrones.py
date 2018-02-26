@@ -30,26 +30,31 @@ __revision__ = '$Format:%H$'
 
 from os.path import dirname, join
 from PyQt4.QtGui import QIcon
-from PyQt4.QtCore import QVariant
-from qgis.core import QGis, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import (
+    QGis,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsFields,
+)
 
-from processing import features
+from processing import features, runalg
 from processing.core.GeoAlgorithm import GeoAlgorithm
 from processing.core.parameters import (
     ParameterVector,
     ParameterString,
-    ParameterFixedTable
+    ParameterBoolean
 )
 from processing.core.outputs import OutputVector
-from processing.tools.dataobjects import getObjectFromUri
+from processing.tools.vector import VectorWriter
+from processing.tools.dataobjects import getObjectFromUri, getTempFilename
 
 from OSMtools.core.client import Client
-from OSMtools.core.exceptions import InvalidParameterException
 from OSMtools.core.isochrones import (
     ISOCHRONES_METRICS,
     ISOCHRONES_PROFILES,
     requestFromPoint,
     layerFromRequests,
+    _stylePoly
 )
 
 class IsochronesGeoAlg(GeoAlgorithm):
@@ -63,10 +68,8 @@ class IsochronesGeoAlg(GeoAlgorithm):
     IN_METRIC = 'INPUT_METRIC'
     IN_RANGES = 'INPUT_RANGES'
     IN_KEY    = 'INPUT_APIKEY'
+    IN_SIMPLIFY = 'INPUT_SIMPLIFY'
     OUT = 'OUTPUT'
-
-    def __init__(self):
-        GeoAlgorithm.__init__(self)
 
     def getIcon(self):
         return QIcon(join(dirname(__file__), '../icon.png'))
@@ -84,12 +87,15 @@ class IsochronesGeoAlg(GeoAlgorithm):
         self.addParameter(ParameterString(self.IN_METRIC,
                                           ' '.join([self.tr('Metric'), str(ISOCHRONES_METRICS)]),
                                           ISOCHRONES_METRICS[0]))
-        self.addParameter(ParameterFixedTable(self.IN_RANGES,
-                                              self.tr('Range Values (in seconds or meters'),
-                                              1, ['range']))
+        self.addParameter(ParameterString(self.IN_RANGES,
+                                          self.tr('Range Values (commaseparated, in seconds or meters)'),
+                                          '180'))
         self.addParameter(ParameterString(self.IN_KEY,
                                           self.tr('API Key (can be omitted if set in config.yml)'),
                                           optional=True))
+        self.addParameter(ParameterBoolean(self.IN_SIMPLIFY,
+                                           self.tr('Simplify geometry'),
+                                           True))
 
         self.addOutput(OutputVector(self.OUT, self.tr('Isochrones')))
 
@@ -97,6 +103,7 @@ class IsochronesGeoAlg(GeoAlgorithm):
         progress.setPercentage(0)
         progress.setInfo('Initializing')
 
+        simplify = self.getParameterValue(self.IN_SIMPLIFY)
         apiKey = self.getParameterValue(self.IN_KEY)
         profile = self.getParameterValue(self.IN_PROFILE)
         metric = self.getParameterValue(self.IN_METRIC)
@@ -114,7 +121,7 @@ class IsochronesGeoAlg(GeoAlgorithm):
         totalFeatureCount = pointLayer.featureCount()
         totalFeatureCount = 100.0 / max(totalFeatureCount, 1)
 
-        progress.setInfo('Processing each point')
+        progress.setInfo('Processing each selected point')
         responses = []
         for feature in features(pointLayer):
 
@@ -127,10 +134,38 @@ class IsochronesGeoAlg(GeoAlgorithm):
             progress.setPercentage(int(processedFeatureCount * totalFeatureCount))
 
         progress.setInfo('Parsing isochrones layer')
+        # get isochrones + store in temp layer
+        tmpFile = getTempFilename() + '.shp' # qgis:dissolve only supports shp as input :(
+        VectorWriter(tmpFile, 'utf-8', QgsFields(), QGis.WKBPolygon, outCrs)
+        isoLayer = getObjectFromUri(tmpFile)
+        layerFromRequests(responses, isoLayer)
+
+        if simplify:
+            progress.setInfo('Simplifying geometry')
+            # merge overlapping polygons of same range
+            groupByColumn = 'AA_MINS' if metric == 'time' else 'AA_METERS'
+            dissolved = runalg('qgis:dissolve', tmpFile, False, groupByColumn, None)
+            isoLayer = getObjectFromUri(dissolved['OUTPUT'])
+
+            # make polygons of different ranges distinct
+            isochrones = [iso for iso in isoLayer.getFeatures()]
+            isochrones = sorted(isochrones, key=lambda f: f[groupByColumn], reverse=True)
+            if len(isochrones) > 1:
+                for i in range(len(isochrones) - 1):
+                    cur = isochrones[i]
+                    nxt = isochrones[i+1]
+                    cur.setGeometry(cur.geometry().difference(nxt.geometry()))
+        else:
+            isochrones = [iso for iso in isoLayer.getFeatures()]
+
+        # FIXME: for shapefile outputs no attributes are written!
+        # heisenbug³ workaround: use gpkg instead
         output = self.getOutputFromName(self.OUT)
+        writer = output.getVectorWriter(isoLayer.fields(), QGis.WKBPolygon, outCrs)
+        for f in isochrones:
+            writer.addFeature(f)
 
-        # we abuse this function for its sideeffect. to get a layer from the
-        # correct provider (-> ouput.layer)
-        output.getVectorWriter([], QGis.WKBPolygon, outCrs)
+        if not output.layer:
+            output.layer = getObjectFromUri(output.value)
 
-        layerFromRequests(responses, output.layer)
+        _stylePoly(output.layer, metric) # reapply style to new layer
