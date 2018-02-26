@@ -101,7 +101,7 @@ def layerFromRequests(responses, layer=None):
     else:
         poly_out = layer
 
-    poly_out.dataProvider().addAttributes([QgsField("AA_MINS", QVariant.Int)])
+    poly_out.dataProvider().addAttributes([QgsField("AA_MINS", QVariant.Double, len=4, prec=2)])
     poly_out.dataProvider().addAttributes([QgsField("AA_METERS", QVariant.Int)])
     poly_out.dataProvider().addAttributes([QgsField("AA_MODE", QVariant.String)])
     poly_out.updateFields()
@@ -144,6 +144,7 @@ def _stylePoly(layer, metric):
         legend_suffix = ' m'
     field = layer.fields().indexFromName(field_name)
     unique_values = sorted(layer.uniqueValues(field))
+    unique_values.append('') # workaround for https://issues.qgis.org/issues/14779
 
     colors = {0: QColor('#2b83ba'),
               1: QColor('#64abb0'),
@@ -172,7 +173,7 @@ def _stylePoly(layer, metric):
             symbol.changeSymbolLayer(0, symbol_layer)
 
         # entry for the list of category items
-        legendtext = "{:.2f}".format(unique_value) + legend_suffix
+        legendtext = "{:.2f}".format(unique_value) + legend_suffix if unique_value else ''
         category = QgsRendererCategoryV2(unique_value, symbol, legendtext)
         categories.append(category)
 
