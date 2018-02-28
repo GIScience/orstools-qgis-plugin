@@ -86,8 +86,6 @@ class OSMtools():
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.provider = OSMtoolsAlgoProvider()
 
-        # Add to processing
-        Processing.addProvider(self.provider, True)
 
 
     # noinspection PyMethodMayBeStatic
@@ -118,10 +116,14 @@ class OSMtools():
         self.iface.addToolBarIcon(self.action)
         self.action.triggered.connect(self.run)
 
+        # Add to processing
+        Processing.addProvider(self.provider, True)
+
     def unload(self):
         QApplication.restoreOverrideCursor()
         self.iface.removePluginWebMenu(u"&OSM Tools", self.action)
         self.iface.removeToolBarIcon(self.action)
+        Processing.removeProvider(self.provider)
         del self.toolbar
 
 

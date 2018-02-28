@@ -144,7 +144,7 @@ class IsochronesGeoAlg(GeoAlgorithm):
             progress.setInfo('Simplifying geometry')
             # merge overlapping polygons of same range
             groupByColumn = 'AA_MINS' if metric == 'time' else 'AA_METERS'
-            dissolved = runalg('qgis:dissolve', tmpFile, False, groupByColumn, None)
+            dissolved = runalg('qgis:dissolve', tmpFile, False, groupByColumn, None, progress=None)
             isoLayer = getObjectFromUri(dissolved['OUTPUT'])
 
             # make polygons of different ranges distinct

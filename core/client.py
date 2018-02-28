@@ -140,6 +140,8 @@ class Client(object):
                                                     'Request limit of {} per minute exceeded. '
                                                     'Wait for {} seconds'.format(self.queries_per_minute,
                                                                                 60 - elapsed_since_earliest))
+                else:
+                    print "Ratelimit exceeded. Please wait 60s before the next request"
                 time.sleep(60 - elapsed_since_earliest)
 
         # Determine GET/POST.
@@ -173,6 +175,8 @@ class Client(object):
 
             if self.iface:
                 self.iface.messageBar().pushInfo('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
+            else:
+                print "Ratelimit exceeded. Retrying.."
             return self.request(url, params, first_request_time,
                                  retry_counter + 1, requests_kwargs, post_json)
         except:
