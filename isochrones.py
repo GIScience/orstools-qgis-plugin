@@ -92,6 +92,7 @@ class isochrones:
                 
                 # Get response
                 self.params['locations'] = convert._build_coords(coords)
+                self.params['id'] = feat.id()
                 responses.append(self.client.request(self.url, self.params))
                 
             poly_out = self._addPolygon(responses, layer_name)
@@ -106,6 +107,7 @@ class isochrones:
             response_dict = geocode.reverse_geocode(self.client, in_point_geom)
             
             self.params['locations'] = convert._build_coords(coords)
+            self.params['id'] = '-1'
             
             # Fire request
             response = self.client.request(self.url, self.params)
@@ -189,6 +191,7 @@ class isochrones:
         """
         layer_name = "Isochrone_{}".format(name_ext)
         poly_out = QgsVectorLayer("Polygon?crs=EPSG:4326", layer_name, "memory")
+        poly_out.dataProvider().addAttributes([QgsField("FTID", QVariant.Int)])
         
         if self.dimension == 'time':
             poly_out.dataProvider().addAttributes([QgsField("AA_MINS", QVariant.Int)])
@@ -201,13 +204,14 @@ class isochrones:
         # is added first. This will plot the isochrones on top of each other.
         l = lambda x: x['properties']['value']
         for response in responses:
+            ftid = response['info']['query']['id']
             for isochrone in sorted(response['features'], key=l, reverse=True):
                 feat = QgsFeature()
                 coordinates = isochrone['geometry']['coordinates']
                 iso_value = isochrone['properties']['value']
                 qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
                 feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
-                feat.setAttributes([iso_value / 60 if self.dimension == 'time' else iso_value,
+                feat.setAttributes([ftid,iso_value / 60 if self.dimension == 'time' else iso_value,
                                    self.iso_mode])
                 poly_out.dataProvider().addFeature(feat)
         
