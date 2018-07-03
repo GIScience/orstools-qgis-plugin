@@ -119,6 +119,8 @@ class Client(object):
         authed_url = self._generate_auth_url(url,
                                              params,
                                              )
+        
+        print(self.base_url + authed_url)
 
         # Default to the client-level self.requests_kwargs, with method-level
         # requests_kwargs arg overriding.

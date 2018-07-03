@@ -10,11 +10,12 @@ from . import convert
 
 def reverse_geocode(client, point_in):
     params = dict()
-    point_in_list = convert._comma_list([point_in.x(), point_in.y()])
-    params['location'] = point_in_list
+#    point_in_list = convert._comma_list([point_in.x(), point_in.y()])
+    params['point.lat'] = point_in.y()
+    params['point.lon'] = point_in.x()
     
     try:
-        response = client.request('/geocoding', params)['features'][0]
+        response = client.request('/geocode/reverse', params)['features'][0]
     except:
         raise ValueError("Your input coordinates are invalid for geocoding.")
     
@@ -24,10 +25,10 @@ def reverse_geocode(client, point_in):
     response_dict['Lon'] = x
     response_dict['Lat'] = y
     response_dict['COUNTRY'] = response['properties'].get('country', None)
-    response_dict['STATE'] = response['properties'].get('state', None)
-    response_dict['CITY'] = response['properties'].get('county', None)
-    response_dict['POSTALCODE'] = response['properties'].get('postal_code', None)
+    response_dict['STATE'] = response['properties'].get('region', None)
+    response_dict['CITY'] = response['properties'].get('locality', None)
+    response_dict['POSTALCODE'] = response['properties'].get('postalcode', None)
     response_dict['STREET'] = response['properties'].get('street', None)
-    response_dict['NUMBER'] = response['properties'].get('house_number', None)
+    response_dict['NUMBER'] = response['properties'].get('housenumber', None)
                        
     return response_dict
