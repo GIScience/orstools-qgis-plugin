@@ -11,7 +11,7 @@ name=OSM Tools
 qgisMinimumVersion=3.0
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=3.1
+version=3.1.1
 author=Nils Nolde
 email=nilsnolde@gmail.com
 
@@ -26,7 +26,8 @@ repository=https://github.com/nilsnolde/OSMtools.git
 
 # Uncomment the following line and add your changelog:
 
-changelog=2018/02/23 v2.1/3.1 adds matrix API, backported to QGIS v2.x
+changelog=2018/02/23 v2.1.1/3.1.1 replaced deprecated with new geocoding endpoint (#59)
+   2018/02/23 v2.1/3.1 adds matrix API, backported to QGIS v2.x
    2018/02/21 v3.0.6b fixed calls to ORStools instead of OSMtools
    2018/02/20 v3.0.5b handles Python error on Project startup
    2018/02/20 v.4b3 beta for QGIS2.99. Complete code refactoring with major improvements (isochrone ranges as list, calculate from selected points in map canvas), solved #4, #38, #40
