@@ -19,7 +19,7 @@ from . import exceptions, auxiliary
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtNetwork import QNetworkRequest
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import QgsNetworkAccessManager, QgsNetworkProxyFactory
 
 _USER_AGENT = "ORSClientQGIS/%s".format(OSMtools.__version__)
 _RETRIABLE_STATUSES = [503]
@@ -147,6 +147,7 @@ class Client(object):
         # post_json is so far only sent from matrix call
 
         net_manager = QgsNetworkAccessManager.instance()
+        proxy = QgsNetworkProxyFactory()
         request = QNetworkRequest(QUrl(self.base_url + authed_url))
         if post_json is not None:
             final_requests_kwargs["json"] = post_json
