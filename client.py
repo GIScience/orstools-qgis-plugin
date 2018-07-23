@@ -17,6 +17,10 @@ from urllib.parse import urlencode
 import OSMtools
 from . import exceptions, auxiliary
 
+from PyQt5.QtCore import QUrl
+from PyQt5.QtNetwork import QNetworkRequest
+from qgis.core import QgsNetworkAccessManager
+
 _USER_AGENT = "ORSClientQGIS/%s".format(OSMtools.__version__)
 _RETRIABLE_STATUSES = [503]
 _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
@@ -141,6 +145,16 @@ class Client(object):
         
         # Determine GET/POST.
         # post_json is so far only sent from matrix call
+
+        net_manager = QgsNetworkAccessManager.instance()
+        request = QNetworkRequest(QUrl(self.base_url + authed_url))
+        if post_json is not None:
+            final_requests_kwargs["json"] = post_json
+            response = net_manager.post(request, **final_requests_kwargs)
+        else:
+            response = net_manager.get(request, **final_requests_kwargs)
+
+
         requests_method = self.session.get
         if post_json is not None:
             requests_method = self.session.post
