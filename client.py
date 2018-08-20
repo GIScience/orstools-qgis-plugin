@@ -14,14 +14,15 @@ import time
 import collections
 from urllib.parse import urlencode
 
+import json
+from PyQt5.QtCore import QUrl, QEventLoop, QSettings
+from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply, QNetworkProxy
+from qgis.core import QgsNetworkAccessManager
+
 import OSMtools
 from . import exceptions, auxiliary
 
-from PyQt5.QtCore import QUrl
-from PyQt5.QtNetwork import QNetworkRequest
-from qgis.core import QgsNetworkAccessManager, QgsNetworkProxyFactory
-
-_USER_AGENT = "ORSClientQGIS/%s".format(OSMtools.__version__)
+_USER_AGENT = "ORSClientQGIS/{}".format(OSMtools.__version__)
 _RETRIABLE_STATUSES = [503]
 _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
 
@@ -96,11 +97,39 @@ class Client(object):
             per-request basis.
         :type requests_kwargs: dict
 
-        :raises ApiError: when the API returns an error.
-        :raises Timeout: if the request timed out.
-        :raises TransportError: when something went wrong while trying to
-            execute a request.
-            
+        Error Values Explanation (for developers, appropriate error message will be printed to console for user):
+        :raise 1: the remote server refused the connection (the server is not accepting requests)
+        :raise 2: the remote server closed the connection prematurely, before the entire reply was received and
+        processed
+        :raise 3: the remote host name was not found (invalid hostname)
+        :raise 4: the connection to the remote server timed out
+        :raise 5: the operation was canceled via calls to abort() or close() before it was finished.
+        :raise 6: the SSL/TLS handshake failed and the encrypted channel could not be established. The sslErrors()
+        signal should have been emitted.
+        :raise 7: the connection was broken due to disconnection from the network, however the system has initiated
+        roaming to another access point. The request should be resubmitted and will be processed as soon as the
+        connection is re-established.
+        :raise 101: the connection to the proxy server was refused (the proxy server is not accepting requests)
+        :raise 102: the proxy server closed the connection prematurely, before the entire reply was received and
+        processed
+        :raise 103: the proxy host name was not found (invalid proxy hostname)
+        :raise 104: the connection to the proxy timed out or the proxy did not reply in time to the request sent
+        :raise 105: the proxy requires authentication in order to honour the request but did not accept any credentials
+        offered (if any)
+        :raise 201: the access to the remote content was denied (similar to HTTP error 401)
+        :raise 202: the operation requested on the remote content is not permitted
+        :raise 203: the remote content was not found at the server (similar to HTTP error 404)
+        :raise 204: the remote server requires authentication to serve the content but the credentials provided were not
+        accepted (if any)
+        :raise 205: the request needed to be sent again, but this failed for example because the upload data could not
+        be read a second time.
+        :raise 301: the Network Access API cannot honor the request because the protocol is not known
+        :raise 302: the requested operation is invalid for this protocol
+        :raise 99: an unknown network-related error was detected
+        :raise 199: an unknown proxy-related error was detected
+        :raise 299: an unknown error related to the remote content was detected
+        :raise 399: a breakdown in protocol was detected (parsing error, invalid or unexpected responses, etc.)
+
         :rtype: dict from JSON response.
         """
 
@@ -142,75 +171,78 @@ class Client(object):
                                                  'Wait for {} seconds'.format(self.queries_per_minute, 
                                                                                60 - elapsed_since_earliest))
                 time.sleep(60 - elapsed_since_earliest)
-        
-        # Determine GET/POST.
-        # post_json is so far only sent from matrix call
 
-        net_manager = QgsNetworkAccessManager.instance()
-        proxy = QgsNetworkProxyFactory()
+        # init qgis network manager
+        network_manager = QgsNetworkAccessManager.instance()
+
+        # retrieve proxy setting from qgis and configurate proxy
+        qgis_settings = QSettings()
+
+        proxyEnabled = qgis_settings.value("proxy/proxyEnabled", "")
+        proxyType = qgis_settings.value("proxy/proxyType", "")
+        proxyHost = qgis_settings.value("proxy/proxyHost", "")
+        proxyPort = qgis_settings.value("proxy/proxyPort", "")
+        proxyUser = qgis_settings.value("proxy/proxyUser", "")
+        proxyPassword = qgis_settings.value("proxy/proxyPassword", "")
+
+        if proxyEnabled == "true":
+            proxy = QNetworkProxy()
+
+            if proxyType == "DefaultProxy":
+                proxy.setType(QNetworkProxy.DefaultProxy)
+            elif proxyType == "Socks5Proxy":
+                proxy.setType(QNetworkProxy.Socks5Proxy)
+            elif proxyType == "HttpProxy":
+                proxy.setType(QNetworkProxy.HttpProxy)
+            elif proxyType == "HttpCachingProxy":
+                proxy.setType(QNetworkProxy.HttpCachingProxy)
+            elif proxyType == "FtpCachingProxy":
+                proxy.setType(QNetworkProxy.FtpCachingProxy)
+
+            proxy.setHostName(proxyHost)
+            proxy.setPort(int(proxyPort))
+            proxy.setUser(proxyUser)
+            proxy.setPassword(proxyPassword)
+
+            QNetworkProxy.setApplicationProxy(proxy)
+
+            network_manager.setupDefaultProxyAndCache()
+            network_manager.setProxy(proxy)
+
+        # request
         request = QNetworkRequest(QUrl(self.base_url + authed_url))
+        for key, value in final_requests_kwargs['headers'].items():
+            request.setRawHeader(bytes(key, 'utf-8'), bytes(value, 'utf-8'))
+
         if post_json is not None:
-            final_requests_kwargs["json"] = post_json
-            response = net_manager.post(request, **final_requests_kwargs)
+            request.setRawHeader("json", post_json)
+            response = network_manager.post(request)
         else:
-            response = net_manager.get(request, **final_requests_kwargs)
+            response = network_manager.get(request)
 
+        # wait for response
+        loop = QEventLoop()
+        network_manager.finished.connect(loop.exit)
+        loop.exec()
 
-        requests_method = self.session.get
-        if post_json is not None:
-            requests_method = self.session.post
-            final_requests_kwargs["json"] = post_json
-        try:
-            response = requests_method(self.base_url + authed_url,
-                                       **final_requests_kwargs)
-        except requests.exceptions.Timeout:
-            raise exceptions.Timeout()
-        except Exception as e:
-            raise #exceptions.TransportError(e)
+        # check for errors and print error messages
+        error = response.error()
 
-        if response.status_code in _RETRIABLE_STATUSES:
-            # Retry request.
-            print('Server down.\nRetrying for the {}th time.'.format(retry_counter + 1))
-            
-            return self.request(url, params, first_request_time,
-                                 retry_counter + 1, requests_kwargs, post_json)
-
-        try:
-            result = self._get_body(response)
+        if error == QNetworkReply.NoError:
+            result = json.loads(str(response.readAll(), 'utf-8'))  # str(bytes_string, 'utf-8')
             self.sent_times.append(time.time())
             return result
-        except exceptions._RetriableRequest as e:
-            if isinstance(e, exceptions._OverQueryLimit) and not self.retry_over_query_limit:
-                raise
-            
-            self.iface.messageBar().pushInfo('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
-            return self.request(url, params, first_request_time,
-                                 retry_counter + 1, requests_kwargs, post_json)
-        except:
-            raise
+        else:
+            print("Error occured: ", error)
+            print(response.errorString())
+            print("Current Proxy Settings are:")
+            print("Use Proxy:", proxyEnabled)
+            print("Proxy Type:", proxyType)
+            print("Proxy Host:", proxyHost)
+            print("Proxy Port:", proxyPort)
+            print("Proxy User:", proxyUser)
+            print("Proxy Password:", proxyPassword)
 
-
-    def _get_body(self, response): 
-        """
-        Casts JSON response to dict
-        
-        :param response: The HTTP response of the request.
-        :type reponse: JSON object
-        
-        :rtype: dict from JSON
-        """
-        body = response.json()
-        error = body.get('error')
-        status_code = response.status_code
-        
-        if status_code == 429:
-            raise exceptions._OverQueryLimit(
-                str(status_code), error)
-        if status_code != 200:
-            raise exceptions.ApiError(status_code,
-                                      error['message'])
-
-        return body
 
 
     def _generate_auth_url(self, path, params):
