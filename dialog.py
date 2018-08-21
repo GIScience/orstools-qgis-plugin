@@ -54,7 +54,7 @@ profiles = [
         'foot-hiking',
         ]
 
-preferences = ['fastest', 'shortest']
+preferences = ['fastest', 'shortest', 'recommended']
 
 units = ['time', 'distance']
 
