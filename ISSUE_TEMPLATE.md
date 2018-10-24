@@ -7,7 +7,7 @@
 
 ---
 #### Here's what I got
-<!-- we :heart: screenshots or copy-pasted json results -->
+<!-- e.g. screenshots -->
 
 ---
 #### Here's what I was expecting
