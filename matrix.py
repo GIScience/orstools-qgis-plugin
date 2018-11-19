@@ -54,10 +54,12 @@ class matrix:
         # API parameters
         self.matrix_mode = self.dlg.matrix_mode_combo.currentText()
 #        self.matrix_metrics = self.dlg.matrix_metric_combo.currentText()
-        
-        self.params = {'profile': self.dlg.matrix_mode_combo.currentText(),
+
+        _profile = self.dlg.matrix_mode_combo.currentText()
+        self.params = {'profile': _profile,
                     'metrics': 'distance|duration'
                     }
+        self.get_params = {'profile': _profile}
         
     
     def matrix_calc(self):
@@ -89,7 +91,7 @@ class matrix:
         self.params['locations'] = locations_list
         self.params['sources'] = sources
         self.params['destinations'] = destinations
-        response = self.client.request(self.url, {}, post_json=self.params)
+        response = self.client.request(self.url, self.get_params, post_json=self.params)
         
         
         durations = [item for sublist in response['durations'] for item in sublist]
