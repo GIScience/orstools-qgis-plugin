@@ -1,3 +1,4 @@
+.idea/
 ./LICENSE.md
 ./apikey.txt
 *.pyc
