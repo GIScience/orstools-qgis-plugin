@@ -1,5 +1,31 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ OSMtools
+                                 A QGIS plugin
+ falk
+                              -------------------
+        begin                : 2017-02-01
+        git sha              : $Format:%H$
+        copyright            : (C) 2017 by Nils Nolde
+        email                : nils.nolde@gmail.com
+ ***************************************************************************/
+
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
 """
 Contains isochrones class to perform requests to ORS isochrone API.
 """
@@ -19,10 +45,10 @@ from qgis.core import (QgsPointXY,
                        QgsRendererCategory,
                        QgsCategorizedSymbolRenderer)
 
-from . import (geocode,
-                      convert,
-                      auxiliary
-                      )
+from OSMtools.utils import convert, transform
+from OSMtools.gui import progressbar
+from . import geocode
+
 
 class isochrones:
     """
@@ -45,32 +71,31 @@ class isochrones:
         
         self.url = '/isochrones'
     
-        self.iso_mode = self.dlg.access_mode_combo.currentText()
+        self.iso_mode = self.dlg.iso_travel_combo.currentText()
         try:
-            self.access_range_input = list(map(int,self.dlg.access_range.text().split(',')))
+            self.access_range_input = list(map(int,self.dlg.iso_range_text.text().split(',')))
         except (ValueError, AttributeError) as e:
             raise
         
-        self.dimension = self.dlg.access_unit_combo.currentText()
-        self.factor = 60 if self.dimension == 'time' else 1000
+        self.dimension = self.dlg.iso_unit_combo.currentText()
+        self.factor = 60 if self.dimension == 'time' else 1
         
         self.access_range_input = [x * self.factor for x in self.access_range_input]
              
-        self.params = {'range_type': self.dlg.access_unit_combo.currentText(),
-                       'profile': self.dlg.access_mode_combo.currentText(),
-                       'range': convert._comma_list(self.access_range_input)
+        self.params = {'range_type': self.dimension,
+                       'profile': self.iso_mode,
+                       'range': convert.comma_list(self.access_range_input)
                        }
-        
     
     def isochrones_calc(self):
         """
         Performs requests to the ORS isochrone API.
         """
-        if self.dlg.access_layer_check.isChecked():
-            layer_name = self.dlg.access_layer_combo.currentText()
+        if self.dlg.iso_layer_check.isChecked():
+            layer_name = self.dlg.iso_layer_combo.currentText()
             layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
             
-            auxiliary.checkCRS(layer, self.iface.messageBar())
+            layer = transform.checkCRS(layer, self.iface.messageBar())
             
             # If features are selected, calculate with those
             if layer.selectedFeatureCount() == 0:
@@ -80,7 +105,7 @@ class isochrones:
                 feats = layer.selectedFeatures()
                 feat_count = layer.selectedFeatureCount()
             
-            message_bar, progress_widget = auxiliary.pushProgressBar(self.iface)
+            message_bar, progress_widget = progressbar.pushProgressBar(self.iface)
             
             responses = []
             for i, feat in enumerate(feats):
@@ -91,22 +116,21 @@ class isochrones:
                 coords = [geom.x(), geom.y()]   
                 
                 # Get response
-                self.params['locations'] = convert._build_coords(coords)
+                self.params['locations'] = convert.build_coords(coords)
                 self.params['id'] = feat.id()
                 responses.append(self.client.request(self.url, self.params))
                 
             poly_out = self._addPolygon(responses, layer_name)
             
             self.iface.messageBar().popWidget(progress_widget)
-            
-            
+
         else:  
             # Define the mapped point
-            coords = [float(x) for x in self.dlg.access_map_label.text().split('\n')[:2]]
+            coords = [float(x) for x in self.dlg.iso_location_label.text().split('\n')[:2]]
             in_point_geom = QgsPointXY(*coords)
             response_dict = geocode.reverse_geocode(self.client, in_point_geom)
             
-            self.params['locations'] = convert._build_coords(coords)
+            self.params['locations'] = convert.build_coords(coords)
             self.params['id'] = '-1'
             
             # Fire request
@@ -211,12 +235,12 @@ class isochrones:
                 iso_value = isochrone['properties']['value']
                 qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
                 feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
-                feat.setAttributes([ftid,iso_value / 60 if self.dimension == 'time' else iso_value,
-                                   self.iso_mode])
+                feat.setAttributes([ftid,
+                                    int(iso_value / self.factor),
+                                    self.iso_mode])
                 poly_out.dataProvider().addFeature(feat)
         
         return poly_out
-    
 
     def _stylePoly(self, layer):
         """

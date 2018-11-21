@@ -4,12 +4,18 @@
  OSMtools
                                  A QGIS plugin
  falk
-                             -------------------
+                              -------------------
         begin                : 2017-02-01
-        copyright            : (C) 2017 by nils
-        email                : nils
         git sha              : $Format:%H$
+        copyright            : (C) 2017 by Nils Nolde
+        email                : nils.nolde@gmail.com
  ***************************************************************************/
+
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
 
 /***************************************************************************
  *                                                                         *
@@ -19,18 +25,21 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- This script initializes the plugin, making it known to QGIS.
 """
 
-__version__ = "3.0.6b"
+PROFILES = [
+            'driving-car',
+            'driving-hgv',
+            'cycling-regular',
+            'cycling-road',
+            'cycling-safe',
+            'cycling-mountain',
+            'cycling-electric',
+            'foot-walking',
+            'foot-hiking',
+            'wheelchair'
+            ]
 
-# noinspection PyPep8Naming
-def classFactory(iface):  # pylint: disable=invalid-name
-    """Load OSMtools class from file OS;tools.
+UNITS = ['time', 'distance']
 
-    :param iface: A QGIS interface instance.
-    :type iface: QgsInterface
-    """
-    #
-    from .osm_tools import OSMtools
-    return OSMtools(iface)
+PREFERENCES = ['fastest', 'shortest']

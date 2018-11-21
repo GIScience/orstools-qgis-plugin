@@ -1,9 +1,30 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 19 10:39:11 2018
+/***************************************************************************
+ OSMtools
+                                 A QGIS plugin
+ falk
+                              -------------------
+        begin                : 2017-02-01
+        git sha              : $Format:%H$
+        copyright            : (C) 2017 by Nils Nolde
+        email                : nils.nolde@gmail.com
+ ***************************************************************************/
 
-@author: nilsnolde
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 """
 
 from itertools import product
@@ -12,7 +33,6 @@ from PyQt5.QtWidgets import (QComboBox,
                              QLabel,
                              QCheckBox
                              )
-
 from PyQt5.QtCore import QVariant
 
 from qgis.core import (QgsVectorLayer,
@@ -23,7 +43,10 @@ from qgis.core import (QgsVectorLayer,
                        QgsProject
                        )
 
-from . import convert, geocode, auxiliary
+from OSMtools.utils import convert, transform
+from OSMtools.gui import progressbar
+from . import geocode
+
 
 class directions:
     """
@@ -46,22 +69,21 @@ class directions:
         
         self.url = '/directions'        
         
-        self.radio_buttons = (self.dlg.start_layer_radio,
-                              self.dlg.end_layer_radio)
+        self.radio_buttons = (self.dlg.routing_start_fromlayer_radio,
+                              self.dlg.routing_end_fromlayer_radio)
         
         # API parameters
-        self.route_mode = self.dlg.route_mode_combo.currentText()
-        self.route_pref = self.dlg.route_pref_combo.currentText()
-        avoid_boxes = self.dlg.avoid_frame.findChildren(QCheckBox)
+        self.route_mode = self.dlg.routing_travel_combo.currentText()
+        self.route_pref = self.dlg.routing_preference_combo.currentText()
+        avoid_boxes = self.dlg.routing_avoid_group.findChildren(QCheckBox)
         
         self.params = {'profile': self.route_mode,
-                    'preference': self.route_pref,
-                    'geometry': 'true',
-                    'geometry_format': 'geojson',
-                    'instructions': 'false'
-                    }
-        
-        
+                        'preference': self.route_pref,
+                        'geometry': 'true',
+                        'geometry_format': 'geojson',
+                        'instructions': 'false'
+                        }
+
         # Check if avoid features is checked
         self.avoid_dict = dict()
         if any(box.isChecked() for box in avoid_boxes):
@@ -69,15 +91,14 @@ class directions:
             for box in avoid_boxes:
                 if box.isChecked():
                     avoid_features.append((box.text()))
-            avoid_features = convert._pipe_list(avoid_features)
+            avoid_features = convert.pipe_list(avoid_features)
             self.avoid_dict = dict()
             
             self.avoid_dict['avoid_features'] = avoid_features
         
         if self.avoid_dict:
             self.params['options'] = str(self.avoid_dict)
-    
-                    
+
     def directions_calc(self):
         """
         Main method to perform the actual request
@@ -87,7 +108,7 @@ class directions:
         #                                           'values': list of values}}
         route_dict = self._selectInput()
         
-        # generate lists with locations and values         
+        # generate lists with locations and values
         (start_layer_name,
          end_layer_name) = [x.objectName() for x in self.radio_buttons]
         
@@ -97,17 +118,19 @@ class directions:
                                    route_dict[end_layer_name]['values']))
         
         # If row-by-row in two-layer mode, then only zip the locations
-        if all([button.isChecked() for button in self.radio_buttons]) and self.dlg.row_by_row.isChecked():
+        if all([button.isChecked() for button in self.radio_buttons]) and self.dlg.routing_twolayer_rowbyrow.isChecked():
             locations_list = list(zip(route_dict[start_layer_name]['geometries'],
-                                          route_dict[end_layer_name]['geometries']))
+                                      route_dict[end_layer_name]['geometries']))
+
             values_list = list(zip(route_dict[start_layer_name]['values'],
-                                       route_dict[end_layer_name]['values']))
-    
+                                   route_dict[end_layer_name]['values']))
+
+        # Add via point if specified
         route_via = None
-        if self.dlg.via_label.text() != 'Long,Lat':
-            route_via = [float(x) for x in self.dlg.via_label.text().split(",")]
+        if self.dlg.routing_via_label.text() != 'Long,Lat':
+            route_via = [float(x) for x in self.dlg.routing_via_label.text().split(",")]
                 
-        message_bar, progress_widget = auxiliary.pushProgressBar(self.iface)
+        message_bar, progress_widget = progressbar.pushProgressBar(self.iface)
         
         responses = []
         delete_values = []
@@ -126,7 +149,7 @@ class directions:
             message_bar.setValue(percent)
             
             # Make the request
-            self.params['coordinates'] = convert._build_coords(coords_tuple)
+            self.params['coordinates'] = convert.build_coords(coords_tuple)
             responses.append(self.client.request(self.url, self.params))
         
         # Delete entries in values_list where coords where the same
@@ -140,7 +163,6 @@ class directions:
             QgsProject.instance().addMapLayer(layer_out)
             
         self.iface.messageBar().popWidget(progress_widget)
-        
         
     def _addLine(self, responses, values_list):
         """
@@ -165,8 +187,7 @@ class directions:
         layer_out_prov.addAttributes([QgsField("TO_ID", QVariant.String)])
         
         layer_out.updateFields()
-        
-        
+
         for i, response in enumerate(responses):
             resp_minified = response['routes'][0]
             feat = QgsFeature()
@@ -176,13 +197,13 @@ class directions:
             qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
             feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
             feat.setAttributes(["{0:.3f}".format(distance/1000),
-                               "{0:.3f}".format(duration/3600),
-                               self.route_mode,
-                               self.route_pref,
-                               self.avoid_dict.get('avoid_features', ''),
-                               values_list[i][0],
-                               values_list[i][1]
-                               ])
+                                "{0:.3f}".format(duration/3600),
+                                self.route_mode,
+                                self.route_pref,
+                                self.avoid_dict.get('avoid_features', ''),
+                                values_list[i][0],
+                                values_list[i][1]
+                                ])
             layer_out.dataProvider().addFeature(feat)
                 
         return layer_out
@@ -195,34 +216,41 @@ class directions:
             'values': list of values}, 'other_radio_button':...}
         """
         route_dict = dict()
+        # select input for both, start and end features
         for radio_button in self.radio_buttons:
+            # Check if routing_*_fromlayer_button is checked
             if radio_button.isChecked():
                 # Find layer combo box
                 all_combos = radio_button.parent().findChildren(QComboBox)
-                layer_combo = [combo for combo in all_combos if combo.objectName().endswith('layer_combo')][0]  
-                # Get selected layer                              
-                layer_name = layer_combo.currentText()
+                # Get selected layer
+                layer_name = [combo.currentText() for combo in all_combos if combo.objectName().endswith('layer_combo')][0]
+
                 layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
                 
                 # Check CRS and transform if necessary
-                auxiliary.checkCRS(layer,
-                             self.iface.messageBar())
+                layer = transform.checkCRS(layer,
+                                           self.iface.messageBar())
                 
-                # If features are selected, calculate with those
+                # If features are selected, calculate with those, else the whole layer
+                # Convert to list, bcs it's a QgsFeatureIterator
                 if layer.selectedFeatureCount() == 0:
-                    feats = layer.getFeatures()
+                    feats = list(layer.getFeatures())
                 else:
-                    feats = layer.selectedFeatures()
+                    feats = list(layer.selectedFeatures())
                     
                 # Get features
                 point_geom = [feat.geometry().asPoint() for feat in feats]
                 
-                # Find field combo box
-                field_combo = [combo for combo in all_combos if combo.objectName().endswith('layer_id')][0] 
-                field_id = layer.fields().lookupField(field_combo.currentText())
-                field_values = [feat[field_id] for feat in feats]
+                # Find field combo box and save its name
+                field_name = [combo.currentText() for combo in all_combos if combo.objectName().endswith('id_combo')][0]
+                field_values = [feat.attribute(field_name) for feat in feats]
+
+                # Retrieve field type to define the output field type
+                field_id = layer.fields().lookupField(field_name)
+                field_type = layer.fields().field(field_id).type()
                 
             else:
+                # Take the coords displayed in the routing_*_frommap_label field
                 parent_widget = radio_button.parentWidget()
                 parent_widget_name = parent_widget.objectName()
                 grandparent_widget = parent_widget.parentWidget()
@@ -235,9 +263,11 @@ class directions:
                 response_dict = geocode.reverse_geocode(self.client, *point_geom)
                 
                 field_values = [response_dict.get('CITY', point_label.text())]
+                field_type = QVariant.String
             
             # Get all id attributes from field
             route_dict[radio_button.objectName()] = {'geometries': point_geom,
-                                                     'values': field_values}
+                                                     'values': field_values,
+                                                     'type': field_type}
             
         return route_dict
