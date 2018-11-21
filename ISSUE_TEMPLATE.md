@@ -7,7 +7,7 @@
 
 ---
 #### Here's what I got
-<!-- e.g. screenshots -->
+<!-- examine the QGIS Python window, OSMtools prints the URL and Parameters when querying. Paste that here -->
 
 ---
 #### Here's what I was expecting

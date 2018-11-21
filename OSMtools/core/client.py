@@ -1,11 +1,31 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Feb 17 13:51:13 2018
+/***************************************************************************
+ OSMtools
+                                 A QGIS plugin
+ falk
+                              -------------------
+        begin                : 2017-02-01
+        git sha              : $Format:%H$
+        copyright            : (C) 2017 by Nils Nolde
+        email                : nils.nolde@gmail.com
+ ***************************************************************************/
 
-@author: nilsnolde
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 """
-
 
 from datetime import datetime, timedelta
 import requests
@@ -15,38 +35,29 @@ import collections
 from urllib.parse import urlencode
 
 import OSMtools
-from . import exceptions, auxiliary
+from OSMtools.utils import exceptions, configmanager
 
-_USER_AGENT = "ORSClientQGIS/%s".format(OSMtools.__version__)
+_USER_AGENT = "ORSClientQGISv{}".format(OSMtools.__version__)
 _RETRIABLE_STATUSES = [503]
 _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
+
 
 class Client(object):
     """Performs requests to the ORS API services."""
 
     def __init__(self, iface,
-                 retry_timeout=60, 
-                 requests_kwargs=None,
+                 retry_timeout=60,
                  retry_over_query_limit=False):
         """
-        :param key: ORS API key. Required.
-        :type key: string
-        
         :param iface: A QGIS interface instance.
         :type iface: QgisInterface
 
         :param retry_timeout: Timeout across multiple retriable requests, in
             seconds.
         :type retry_timeout: int
-
-        :param requests_kwargs: Extra keyword arguments for the requests
-            library, which among other things allow for proxy auth to be
-            implemented. See the official requests docs for more info:
-            http://docs.python-requests.org/en/latest/api/#main-interface
-        :type requests_kwargs: dict
         """
         
-        base_params = auxiliary.readConfig()
+        base_params = configmanager.read()
         
         (self.key, 
          self.base_url, 
@@ -66,11 +77,11 @@ class Client(object):
         self.sent_times = collections.deque("", self.queries_per_minute)
 
     def request(self, 
-                 url, params, 
-                 first_request_time=None, 
-                 retry_counter=0,
-                 requests_kwargs=None,
-                 post_json=None):
+                url, params,
+                first_request_time=None,
+                retry_counter=0,
+                requests_kwargs=None,
+                post_json=None):
         """Performs HTTP GET/POST with credentials, returning the body asdlg
         JSON.
 
@@ -91,6 +102,9 @@ class Client(object):
             __init__, but provided here to allow overriding internally on a
             per-request basis.
         :type requests_kwargs: dict
+
+        :param post_json: Parameters for POST endpoints
+        :type post_json: dict
 
         :raises ApiError: when the API returns an error.
         :raises Timeout: if the request timed out.
@@ -119,8 +133,6 @@ class Client(object):
         authed_url = self._generate_auth_url(url,
                                              params,
                                              )
-        
-        print(self.base_url + authed_url)
 
         # Default to the client-level self.requests_kwargs, with method-level
         # requests_kwargs arg overriding.
@@ -136,7 +148,7 @@ class Client(object):
                 self.iface.messageBar().pushInfo('Limit exceeded',
                                                  'Request limit of {} per minute exceeded. '
                                                  'Wait for {} seconds'.format(self.queries_per_minute, 
-                                                                               60 - elapsed_since_earliest))
+                                                                              60 - elapsed_since_earliest))
                 time.sleep(60 - elapsed_since_earliest)
         
         # Determine GET/POST.
@@ -145,13 +157,17 @@ class Client(object):
         if post_json is not None:
             requests_method = self.session.post
             final_requests_kwargs["json"] = post_json
+
+        print("url:\n{}\nParameters:\n{}".format(self.base_url+authed_url,
+                                                 final_requests_kwargs))
+
         try:
             response = requests_method(self.base_url + authed_url,
                                        **final_requests_kwargs)
         except requests.exceptions.Timeout:
             raise exceptions.Timeout()
-        except Exception as e:
-            raise #exceptions.TransportError(e)
+        except Exception:
+            raise
 
         if response.status_code in _RETRIABLE_STATUSES:
             # Retry request.
@@ -164,23 +180,23 @@ class Client(object):
             result = self._get_body(response)
             self.sent_times.append(time.time())
             return result
-        except exceptions._RetriableRequest as e:
-            if isinstance(e, exceptions._OverQueryLimit) and not self.retry_over_query_limit:
+        except exceptions.RetriableRequest as e:
+            if isinstance(e, exceptions.OverQueryLimit) and not self.retry_over_query_limit:
                 raise
             
             self.iface.messageBar().pushInfo('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
             return self.request(url, params, first_request_time,
-                                 retry_counter + 1, requests_kwargs, post_json)
-        except:
+                                retry_counter + 1, requests_kwargs, post_json)
+        except Exception:
             raise
 
-
-    def _get_body(self, response): 
+    @staticmethod
+    def _get_body(response):
         """
         Casts JSON response to dict
         
         :param response: The HTTP response of the request.
-        :type reponse: JSON object
+        :type response: JSON object
         
         :rtype: dict from JSON
         """
@@ -189,14 +205,13 @@ class Client(object):
         status_code = response.status_code
         
         if status_code == 429:
-            raise exceptions._OverQueryLimit(
+            raise exceptions.OverQueryLimit(
                 str(status_code), error)
         if status_code != 200:
             raise exceptions.ApiError(status_code,
                                       error['message'])
 
         return body
-
 
     def _generate_auth_url(self, path, params):
         """Returns the path and query string portion of the request URL, first
@@ -226,7 +241,7 @@ class Client(object):
         raise ValueError("No API key specified. "
                          "Visit https://go.openrouteservice.org/dev-dashboard/ "
                          "to create one.")
-        
+
 
 def _urlencode_params(params):
     """URL encodes the parameters.

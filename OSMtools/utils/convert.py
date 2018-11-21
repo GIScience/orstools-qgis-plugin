@@ -1,43 +1,52 @@
-# Copyright 2014 Google Inc. All rights reserved.
-#
-# Modifications Copyright (C) 2018 HeiGIT, University of Heidelberg.
-#
-#
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License. You may obtain a copy of
-# the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations under
-# the License.
-#
+# -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ OSMtools
+                                 A QGIS plugin
+ falk
+                              -------------------
+        begin                : 2017-02-01
+        git sha              : $Format:%H$
+        copyright            : (C) 2017 by Nils Nolde
+        email                : nils.nolde@gmail.com
+ ***************************************************************************/
+
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
 
 """Converts Python types to string representations suitable for ORS API server.
 """
 
-import time as _time
 
-
-def _pipe_list(arg):
+def pipe_list(arg):
     """Convert list of values to pipe-delimited string"""
     if not _is_list(arg):
         raise TypeError(
             "Expected a list or tuple, "
             "but got {}".format(type(arg).__name__))
-    return "|".join(map(str,arg))
+    return "|".join(map(str, arg))
 
 
-def _comma_list(arg):
+def comma_list(arg):
     """Convert list to comma-separated string"""
     if not _is_list(arg):
         raise TypeError(
             "Expected a list or tuple, "
             "but got {}".format(type(arg).__name__))
-    return ",".join(map(str,arg))
+    return ",".join(map(str, arg))
 
 
 def _checkBool(boolean):
@@ -71,7 +80,7 @@ def _format_float(arg):
     return ("{}".format(round(float(arg), 6)).rstrip("0").rstrip("."))
 
 
-def _build_coords(arg):
+def build_coords(arg):
     """Converts one or many lng/lat pair(s) to a comma-separated, pipe 
     delimited string. Coordinates will be rounded to 5 digits.
 
@@ -86,7 +95,7 @@ def _build_coords(arg):
     :rtype: str
     """
     if _is_list(arg):
-        return _pipe_list(_concat_coords(arg))
+        return pipe_list(_concat_coords(arg))
     else:
         raise TypeError(
             "Expected a list or tuple of lng/lat tuples or lists, "
@@ -103,9 +112,9 @@ def _concat_coords(arg):
     """
     if all(_is_list(tup) for tup in arg):
         # Check if arg is a list/tuple of lists/tuples
-        return [_comma_list(map(_format_float, tup)) for tup in arg]
+        return [comma_list(map(_format_float, tup)) for tup in arg]
     else:
-        return [_comma_list(_format_float(coord) for coord in arg)]
+        return [comma_list(_format_float(coord) for coord in arg)]
 
 
 def _is_list(arg):
@@ -130,43 +139,3 @@ def _has_method(arg, method):
     :rtype: bool
     """
     return hasattr(arg, method) and callable(getattr(arg, method))
-
-
-def decode_polyline(polyline):
-    """Decodes a Polyline string into a GeoJSON structure.
-
-    :param polyline: An encoded polyline, only the geometry.
-    :type polyline: string
-
-    :rtype: dict as GeoJSON
-    """
-    points = []
-    index = lat = lng = 0
-
-    while index < len(polyline):
-        result = 1
-        shift = 0
-        while True:
-            b = ord(polyline[index]) - 63 - 1
-            index += 1
-            result += b << shift
-            shift += 5
-            if b < 0x1f:
-                break
-        lat += (~result >> 1) if (result & 1) != 0 else (result >> 1)
-
-        result = 1
-        shift = 0
-        while True:
-            b = ord(polyline[index]) - 63 - 1
-            index += 1
-            result += b << shift
-            shift += 5
-            if b < 0x1f:
-                break
-        lng += ~(result >> 1) if (result & 1) != 0 else (result >> 1)
-
-        points.append([round(lng * 1e-5, 6), round(lat * 1e-5, 6)])
-        geojson = {u'type': u'LineString', u'coordinates': points}
-
-    return geojson

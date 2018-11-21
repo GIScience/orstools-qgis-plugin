@@ -6,3 +6,6 @@ help/
 i18n/
 test/
 .spyproject/
+
+# QGIS tests
+tests/qgis
