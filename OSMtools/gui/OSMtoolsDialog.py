@@ -42,7 +42,7 @@ from qgis.core import (QgsProject,
                        QgsWkbTypes
                        )
 
-from OSMtools import ICON_DIR
+from OSMtools import ICON_DIR, PLUGIN_NAME
 from OSMtools.utils import exceptions, configmanager, pointtool
 from OSMtools.core import (client,
                            directions,
@@ -69,11 +69,11 @@ class OSMtoolsDialogMain:
 
     def initGui(self):
         self.action = QAction(QIcon(os.path.join(ICON_DIR, 'osmtools.png')),
-                              'OSM Tools',  # tr text
+                              PLUGIN_NAME,  # tr text
                               self._iface.mainWindow()  # parent
                               )
 
-        self._iface.addPluginToMenu('&OSM Tools',
+        self._iface.addPluginToMenu(PLUGIN_NAME,
                                     self.action)
         self._iface.addToolBarIcon(self.action)
         self.action.triggered.connect(self.run)
@@ -81,7 +81,7 @@ class OSMtoolsDialogMain:
     def unload(self):
         try:
             QApplication.restoreOverrideCursor()
-            self._iface.removePluginMenu('&OSM Tools', self.action)
+            self._iface.removePluginMenu(PLUGIN_NAME, self.action)
             self._iface.removeToolBarIcon(self.action)
         except:
             pass

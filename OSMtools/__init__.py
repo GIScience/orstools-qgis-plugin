@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
  falk
                              -------------------
@@ -19,7 +19,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- This script initializes the plugin, making it known to QGIS.
 """
 
 import os.path
@@ -41,6 +40,7 @@ __date__ = '2018-11-19'
 __copyright__ = '(C) 2018 by Nils Nolde'
 
 # Define plugin wide constants
+PLUGIN_NAME = 'ORS Tools'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ICON_DIR = os.path.join(BASE_DIR, 'static', 'img')
 CONFIG = os.path.join(BASE_DIR, 'config.yml')
