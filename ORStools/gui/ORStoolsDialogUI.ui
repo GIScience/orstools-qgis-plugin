@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>OSMtoolsDialogBase</class>
- <widget class="QDialog" name="OSMtoolsDialogBase">
+ <class>ORStoolsDialogBase</class>
+ <widget class="QDialog" name="ORStoolsDialogBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,77 +16,8 @@
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="6" column="0" colspan="2">
-    <widget class="QDialogButtonBox" name="global_buttons">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QGroupBox" name="key_group">
-     <property name="title">
-      <string>API key</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QLineEdit" name="key_text">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get your personal API key!&lt;/p&gt;&lt;p&gt;2500 requests/day and 40 requests/minute limitations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="key_link">
-        <property name="font">
-         <font>
-          <pointsize>9</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Register for access to ORS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>&lt;a href=&quot;https://openrouteservice.org/sign-up/&quot; style=&quot;font-size: 14px; color: #b5152b&quot;&gt;Order Key!&lt;/a&gt;</string>
-        </property>
-        <property name="openExternalLinks">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="header_text">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;openrouteservice.org&lt;/span&gt;&lt;/a&gt; | by &lt;a href=&quot;mailto:nils@openrouteservice.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="header_pic">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="5,0,0,0">
+   <item row="1" column="0" colspan="4">
     <widget class="QLabel" name="header_subpic">
      <property name="text">
       <string>&lt;a href=&quot;https://github.com/GIScience/openrouteservice&quot; style=&quot;color: black; text-decoration: none&quot;&gt;We truly &lt;span style=&quot;color: #b5152b&quot;&gt;♥&lt;/span&gt; Open Source.&lt;/a&gt;</string>
@@ -99,7 +30,20 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="2" column="0" colspan="4">
+    <widget class="QLabel" name="header_text">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;openrouteservice.org&lt;/span&gt;&lt;/a&gt; | by &lt;a href=&quot;mailto:nils@openrouteservice.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="4">
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -127,8 +71,8 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>340</width>
+            <y>-18</y>
+            <width>346</width>
             <height>907</height>
            </rect>
           </property>
@@ -1298,16 +1242,107 @@
      </widget>
     </widget>
    </item>
+   <item row="0" column="0" colspan="4">
+    <widget class="QLabel" name="header_pic">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="3">
+    <widget class="QDialogButtonBox" name="global_buttons">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="4">
+    <widget class="QGroupBox" name="resources_group">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Resources</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/signup&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/home&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Dashboard&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ask.openrouteservice.org/c/sdks&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Forum&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="7" column="3">
+    <widget class="QLabel" name="quota_text">
+     <property name="text">
+      <string>No request made yet</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QPushButton" name="config_button">
+     <property name="text">
+      <string>Config</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLabel" name="quota_label">
+     <property name="text">
+      <string>Remaining quota: </string>
+     </property>
+    </widget>
+   </item>
   </layout>
   <zorder>global_buttons</zorder>
   <zorder>tabWidget</zorder>
-  <zorder>key_group</zorder>
+  <zorder>resources_group</zorder>
   <zorder>header_pic</zorder>
   <zorder>header_text</zorder>
   <zorder>header_subpic</zorder>
+  <zorder>quota_text</zorder>
+  <zorder>quota_label</zorder>
+  <zorder>config_button</zorder>
  </widget>
  <tabstops>
-  <tabstop>key_text</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>routing_scrollarea</tabstop>
   <tabstop>routing_start_frommap_radio</tabstop>
@@ -1346,7 +1381,7 @@
   <connection>
    <sender>global_buttons</sender>
    <signal>accepted()</signal>
-   <receiver>OSMtoolsDialogBase</receiver>
+   <receiver>ORStoolsDialogBase</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1362,7 +1397,7 @@
   <connection>
    <sender>global_buttons</sender>
    <signal>rejected()</signal>
-   <receiver>OSMtoolsDialogBase</receiver>
+   <receiver>ORStoolsDialogBase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -45,9 +45,7 @@ from qgis.core import (QgsVectorLayer,
                        QgsProject
                        )
 
-from OSMtools.utils import convert, transform
-from OSMtools.gui import progressbar
-from . import geocode
+from ORStools.utils import transform
 
 
 class matrix:

@@ -22,6 +22,7 @@
 """
 
 import os.path
+import configparser
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
@@ -31,16 +32,22 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
 
-    from .OSMtoolsPlugin import OSMtools
-    return OSMtools(iface)
-
-__version__ = '3.2'
-__author__ = 'Nils Nolde'
-__date__ = '2018-11-19'
-__copyright__ = '(C) 2018 by Nils Nolde'
+    from .ORStoolsPlugin import ORStools
+    return ORStools(iface)
 
 # Define plugin wide constants
 PLUGIN_NAME = 'ORS Tools'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ICON_DIR = os.path.join(BASE_DIR, 'static', 'img')
-CONFIG = os.path.join(BASE_DIR, 'config.yml')
+CONFIG_PATH = os.path.join(BASE_DIR, 'config.yml')
+ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
+            'ORS_QUOTA': 'X-Ratelimit-Limit'}
+
+# Read metadata.txt
+METADATA = configparser.ConfigParser()
+METADATA.read(os.path.join(BASE_DIR, 'metadata.txt'))
+
+__version__ = METADATA['general']['version']
+__author__ = METADATA['general']['author']
+__date__ = '2018-11-19'
+__copyright__ = '(C) 2018 by ' + __author__

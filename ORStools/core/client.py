@@ -27,6 +27,7 @@
  ***************************************************************************/
 """
 
+import os
 from datetime import datetime, timedelta
 import requests
 import random
@@ -34,10 +35,10 @@ import time
 import collections
 from urllib.parse import urlencode
 
-import OSMtools
-from OSMtools.utils import exceptions, configmanager
+from ORStools import __version__, ENV_VARS
+from ORStools.utils import exceptions, configmanager
 
-_USER_AGENT = "ORSClientQGISv{}".format(OSMtools.__version__)
+_USER_AGENT = "ORSClientQGISv{}".format(__version__)
 _RETRIABLE_STATUSES = [503]
 _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
 
@@ -57,7 +58,7 @@ class Client(object):
         :type retry_timeout: int
         """
         
-        base_params = configmanager.read()
+        base_params = configmanager.read_config()
         
         (self.key, 
          self.base_url, 
@@ -179,6 +180,12 @@ class Client(object):
         try:
             result = self._get_body(response)
             self.sent_times.append(time.time())
+
+            # Write env variables if successful
+            for env_var in ENV_VARS:
+                print(response.headers[ENV_VARS[env_var]])
+                configmanager.write_env_var(env_var, response.headers[ENV_VARS[env_var]])
+
             return result
         except exceptions.RetriableRequest as e:
             if isinstance(e, exceptions.OverQueryLimit) and not self.retry_over_query_limit:
@@ -189,6 +196,7 @@ class Client(object):
                                 retry_counter + 1, requests_kwargs, post_json)
         except Exception:
             raise
+
 
     @staticmethod
     def _get_body(response):
@@ -207,9 +215,14 @@ class Client(object):
         if status_code == 429:
             raise exceptions.OverQueryLimit(
                 str(status_code), error)
-        if status_code != 200:
+
+        # Internal error message, other format than others, really fucked up
+        if status_code == 400:
             raise exceptions.ApiError(status_code,
                                       error['message'])
+        if status_code != 200:
+            raise exceptions.ApiError(status_code,
+                                      error)
 
         return body
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -27,7 +27,7 @@
  ***************************************************************************/
 """
 
-import os.path
+import os
 
 from PyQt5.QtWidgets import (QAction,
                              QDialog,
@@ -37,14 +37,13 @@ from PyQt5.QtWidgets import (QAction,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon
 from qgis.core import (QgsProject,
-                       QgsLayerTreeLayer,
                        QgsMapLayer,
                        QgsWkbTypes
                        )
 
-from OSMtools import ICON_DIR, PLUGIN_NAME
-from OSMtools.utils import exceptions, configmanager, pointtool
-from OSMtools.core import (client,
+from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS
+from ORStools.utils import exceptions, pointtool
+from ORStools.core import (client,
                            directions,
                            isochrones,
                            matrix,
@@ -52,10 +51,11 @@ from OSMtools.core import (client,
                            PROFILES,
                            PREFERENCES,
                            UNITS)
-from .OSMtoolsDialogUI import Ui_OSMtoolsDialogBase
+from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
+from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 
-class OSMtoolsDialogMain:
+class ORStoolsDialogMain:
     """Defines all mandatory QGIS things about dialog."""
 
     def __init__(self, iface):
@@ -65,10 +65,12 @@ class OSMtoolsDialogMain:
         :type iface: Qgis.Interface
         """
         self._iface = iface
-        self.dlg = OSMtoolsDialog(self._iface)
+
+        self.first_start = True
+        self.dlg = None
 
     def initGui(self):
-        self.action = QAction(QIcon(os.path.join(ICON_DIR, 'osmtools.png')),
+        self.action = QAction(QIcon(os.path.join(ICON_DIR, 'icon.png')),
                               PLUGIN_NAME,  # tr text
                               self._iface.mainWindow()  # parent
                               )
@@ -79,14 +81,25 @@ class OSMtoolsDialogMain:
         self.action.triggered.connect(self.run)
 
     def unload(self):
-        try:
-            QApplication.restoreOverrideCursor()
-            self._iface.removePluginMenu(PLUGIN_NAME, self.action)
-            self._iface.removeToolBarIcon(self.action)
-        except:
-            pass
+        QApplication.restoreOverrideCursor()
+        self._iface.removePluginMenu(PLUGIN_NAME, self.action)
+        self._iface.removeToolBarIcon(self.action)
+
+    @staticmethod
+    def get_quota():
+        """Update remaining quota from env variables"""
+        # Dirty hack out of laziness.. Prone to errors
+        text = []
+        for var in sorted(ENV_VARS.keys(), reverse=True):
+            text.append(os.environ[var])
+        return '/'.join(text)
 
     def run(self):
+        # Only populate GUI if it's the first start of the plugin within the QGIS session
+        # If not checked, GUI will be rebuild every time!
+        if self.first_start:
+            self.first_start = False
+            self.dlg = ORStoolsDialog(self._iface, self._iface.mainWindow()) # setting parent enables modal view
         self.dlg.show()
         result = self.dlg.exec_()
         if result:
@@ -105,6 +118,9 @@ class OSMtoolsDialogMain:
                     pass
                     route = directions.directions(self.dlg, clnt, self._iface)
                     route.directions_calc()
+
+                # Update quota; handled in client module after successful request
+                self.dlg.quota_text.setText(self.get_quota())
             except exceptions.Timeout:
                 self._iface.messageBar().pushCritical('Time out',
                                                       'The connection exceeded the '
@@ -123,7 +139,7 @@ class OSMtoolsDialogMain:
                 self.dlg.close()
 
 
-class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
+class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     """Define the custom behaviour of Dialog"""
 
     def __init__(self, iface, parent=None):
@@ -133,6 +149,10 @@ class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
 
+        # Set up env variables for remaining quota
+        os.environ["ORS_QUOTA"] = "None"
+        os.environ["ORS_REMAINING"] = "None"
+
         # Programmtically invoke ORS logo
         header_pic = QPixmap(os.path.join(ICON_DIR, "openrouteservice.png"))
         pixmap = header_pic.scaled(150, 50,
@@ -140,15 +160,16 @@ class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
                                    transformMode=Qt.SmoothTransformation
                                    )
         self.header_pic.setPixmap(pixmap)
-
-        # Read API key file
-        self.key_text.setText(configmanager.read()['api_key'])
-        self.api_key = self.key_text.text()
+        # Settings button icon
+        self.config_button.setIcon(QIcon(os.path.join(ICON_DIR, 'icon_settings.png')))
 
         #### Set up signals/slots ####
 
-        # API key text line
-        self.key_text.textChanged.connect(self._keyWriter)
+        # Config button
+        self.config_button.clicked.connect(self._on_config_click)
+
+        # # Apply button, to update remaining quota
+        # self.global_buttons.Apply.clicked.connect(self._on_apply_click)
 
         # Matrix tab
         self.matrix_start_combo.currentIndexChanged.connect(self._layerSelectedChanged)
@@ -184,6 +205,15 @@ class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
         self.iso_unit_combo.addItems(UNITS)
         self._layerTreeChanged()
 
+    # def _on_apply_click(self):
+    #     """Update remaining quota from env variables"""
+    #     text = os.environ['ORS_REMAINING'] + "/" + os.environ['ORS_QUOTA']
+
+    def _on_config_click(self):
+        """Pop up config window"""
+        config_dlg = ORStoolsDialogConfigMain(parent=self)
+        config_dlg.exec_()
+
     def _accessLayerChanged(self):
         for child in self.sender().parentWidget().children():
             if not child.objectName() == self.sender().objectName():
@@ -195,19 +225,10 @@ class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
         added/removed.
         """
 
-        # First get all point layers in map canvas
-        layer_names = []
-        root = self.project.layerTreeRoot()
-        for child in root.children():
-            if isinstance(child, QgsLayerTreeLayer):
-                layer = child.layer()
-                # Handle weird project startup behaviour of QGIS (apparently 
-                # doesn't find layers on project startup and throws AttributeError)
-                try:
-                    if layer.type() == QgsMapLayer.VectorLayer and layer.wkbType() == QgsWkbTypes.Type(1):
-                        layer_names.append(layer.name())
-                except AttributeError:
-                    continue
+        # Returns a list of [layer_id, layer_name] for layer == VectorLayer and layer == PointLayer
+        layers = [(layer.id(), layer.name()) for layer in self.project.mapLayers().values() if  \
+                                                    layer.type() == QgsMapLayer.VectorLayer and \
+                                                    layer.wkbType() == QgsWkbTypes.Type(1)]
 
         comboboxes = [self.routing_start_fromlayer_combo,
                       self.routing_end_fromlayer_combo,
@@ -216,12 +237,12 @@ class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
                       self.matrix_end_combo]
 
         for box in comboboxes:
-            old_text = box.currentText()
+            old_id = box.currentData()
             box.clear()
-            for layer in layer_names:
-                box.addItem(layer)
+            for layer_id, layer_name in layers:
+                box.addItem(layer_name, layer_id)
             # Make sure the old layer is still shown when this slot is triggered
-            new_text_id = box.findText(old_text)
+            new_text_id = box.findData(old_id)
             box.setCurrentIndex(0) if new_text_id == -1 else box.setCurrentIndex(new_text_id)
             # box.setCurrentIndex(new_text_id)
 
@@ -261,8 +282,7 @@ class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
             sending_widget = self.sender()
             sending_widget_name = sending_widget.objectName()
             parent_widget = self.sender().parentWidget()
-            layer_selected = \
-            [lyr for lyr in self.project.mapLayers().values() if lyr.name() == sending_widget.currentText()][0]
+            layer_selected = self.project.mapLayer(sending_widget.currentData())
             for widget in parent_widget.findChildren(QComboBox):
                 if widget.objectName() != sending_widget_name:
                     old_text = widget.currentText()
@@ -277,22 +297,13 @@ class OSMtoolsDialog(QDialog, Ui_OSMtoolsDialogBase):
         """
         self.routing_via_label.setText("Long,Lat")
 
-    def _keyWriter(self):
-        """
-        Writes key to text file when api key text field changes.
-        """
-        configmanager.write('api_key',
-                            self.key_text.text())
-
     def _unitChanged(self):
         """
         Connector to change unit label text when changing unit
         """
         if self.iso_unit_combo.currentText() == 'time':
-            self.iso_unit_label.setText('mins')
             self.iso_range_unit_label.setText('mins')
         else:
-            self.iso_unit_label.setText('m')
             self.iso_range_unit_label.setText('m')
 
     def _initMapTool(self):

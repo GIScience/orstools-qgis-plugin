@@ -43,8 +43,8 @@ from qgis.core import (QgsVectorLayer,
                        QgsProject
                        )
 
-from OSMtools.utils import convert, transform
-from OSMtools.gui import progressbar
+from ORStools.utils import convert, transform
+from ORStools.gui import progressbar
 from . import geocode
 
 

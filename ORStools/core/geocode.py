@@ -42,10 +42,7 @@ def reverse_geocode(client, point_in):
     params['point.lat'] = point_in.y()
     params['point.lon'] = point_in.x()
     
-    try:
-        response = client.request('/geocode/reverse', params)['features'][0]
-    except:
-        raise ValueError("Your input coordinates are invalid for geocoding.")
+    response = client.request('/geocode/reverse', params)['features'][0]
     
     response_dict = dict()
     

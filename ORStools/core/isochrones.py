@@ -45,8 +45,8 @@ from qgis.core import (QgsPointXY,
                        QgsRendererCategory,
                        QgsCategorizedSymbolRenderer)
 
-from OSMtools.utils import convert, transform
-from OSMtools.gui import progressbar
+from ORStools.utils import convert, transform, configmanager
+from ORStools.gui import progressbar
 from . import geocode
 
 
@@ -68,6 +68,7 @@ class isochrones:
         self.dlg = dlg
         self.client = client
         self.iface = iface
+        self.project = QgsProject().instance()
         
         self.url = '/isochrones'
     
@@ -93,7 +94,8 @@ class isochrones:
         """
         if self.dlg.iso_layer_check.isChecked():
             layer_name = self.dlg.iso_layer_combo.currentText()
-            layer = [layer for layer in self.iface.mapCanvas().layers() if layer.name() == layer_name][0]
+
+            layer = self.project.mapLayer(self.dlg.iso_layer_combo.currentData())
             
             layer = transform.checkCRS(layer, self.iface.messageBar())
             
@@ -128,31 +130,30 @@ class isochrones:
             # Define the mapped point
             coords = [float(x) for x in self.dlg.iso_location_label.text().split('\n')[:2]]
             in_point_geom = QgsPointXY(*coords)
-            response_dict = geocode.reverse_geocode(self.client, in_point_geom)
+            geocode_dict = geocode.reverse_geocode(self.client, in_point_geom)
             
             self.params['locations'] = convert.build_coords(coords)
             self.params['id'] = '-1'
             
             # Fire request
             response = self.client.request(self.url, self.params)
+            response_center = response['features'][0]['properties']['center']
             
-            out_point_geom = QgsPointXY(*response['features'][0]['properties']['center'])
+            out_point_geom = QgsPointXY(*response_center)
             
-            name_ext = "{0:.3f},{1:.3f}".format(*response['features'][0]['properties']['center'])
+            name_ext = "{0:.3f},{1:.3f}".format(*response_center)
             
             poly_out = self._addPolygon([response], name_ext)
             
-            point_out = self._addPoint(response_dict, out_point_geom, name_ext)
+            point_out = self._addPoint(geocode_dict, out_point_geom, name_ext)
             point_out.updateExtents()
-            QgsProject.instance().addMapLayer(point_out)        
+            self.project.addMapLayer(point_out)
         
         poly_out.updateExtents()
         
         self._stylePoly(poly_out)
-        QgsProject.instance().addMapLayer(poly_out)
+        self.project.addMapLayer(poly_out)
 #        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
-        
-            
         
     def _addPoint(self, response_dict, point_geom, name_ext):
         """

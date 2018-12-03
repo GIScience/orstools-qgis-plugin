@@ -29,19 +29,29 @@
 import os.path
 import yaml
 
-from OSMtools import BASE_DIR, CONFIG
+from ORStools import BASE_DIR, CONFIG_PATH
 
 
-def read():
-    with open(os.path.join(BASE_DIR, CONFIG)) as f:
+def read_config():
+    with open(os.path.join(BASE_DIR, CONFIG_PATH)) as f:
         doc = yaml.safe_load(f)
 
     return doc
 
 
-def write(key, value):
+def write_config(key, value):
 
-    doc = read()
+    doc = read_config()
     doc[key] = value
-    with open(os.path.join(BASE_DIR, CONFIG), 'w') as f:
+    with open(os.path.join(BASE_DIR, CONFIG_PATH), 'w') as f:
         yaml.safe_dump(doc, f)
+
+
+def write_config_all(new_config):
+    """Dumps new config"""
+    with open(os.path.join(BASE_DIR, CONFIG_PATH), 'w') as f:
+        yaml.safe_dump(new_config, f)
+
+def write_env_var(key, value):
+    """update quota env variables"""
+    os.environ[key] = value

@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import os.path
 
 from PyQt5.QtCore import pyqtSignal
@@ -37,7 +38,8 @@ from qgis.core import (QgsCoordinateReferenceSystem,
                        QgsProject)
 from qgis.gui import QgsMapTool
 
-from OSMtools import ICON_DIR
+from ORStools import ICON_DIR
+
 
 class PointTool(QgsMapTool):   
     def __init__(self, canvas, button):

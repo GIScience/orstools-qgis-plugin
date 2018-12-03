@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
         copyright            : (C) 2017 by Nils Nolde
         email                : nils.nolde@gmail.com
  ***************************************************************************/
- 
- This plugin provides access to the various APIs from OpenRouteService 
+
+ This plugin provides access to the various APIs from OpenRouteService
  (https://openrouteservice.org), developed and
- maintained by GIScience team at University of Heidelberg, Germany. By using 
+ maintained by GIScience team at University of Heidelberg, Germany. By using
  this plugin you agree to the ORS terms of service
  (https://openrouteservice.org/terms-of-service/).
- 
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -27,34 +27,35 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsApplication
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtGui import QIcon
 
-from .gui import ORStoolsDialog
-from .proc import provider
+from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
+from ORStools.utils import configmanager
 
 
-class ORStools():
-    """QGIS Plugin Implementation."""
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
+class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
-    def __init__(self, iface):
-        """Constructor.
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
 
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
-        :type iface: QgsInterface
-        """
-        self.dialog = ORStoolsDialog.ORStoolsDialogMain(iface)
-        self.provider = provider.ORStoolsProvider()
+        self.setupUi(self)
+        self.ok_btn = self.buttonBox.Apply
+        self.cancel_btn = self.buttonBox.Cancel
 
-    def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        self.CONFIG = configmanager.read_config()
 
-        QgsApplication.processingRegistry().addProvider(self.provider)
-        self.dialog.initGui()
-        
-    def unload(self):
-        """remove menu entry and toolbar icons"""
-        QgsApplication.processingRegistry().removeProvider(self.provider)
-        self.dialog.unload()
+        # Populate line widgets
+        self.key_text.setText(self.CONFIG['api_key'])
+        self.base_url_text.setText(self.CONFIG['base_url'])
+        self.quota_spinbox.setValue(self.CONFIG['req_per_min'])
+
+        # Set up connections
+        # self.ok_btn.clicked.connect(self.accept())
+
+    def accept(self):
+        new_config = {'api_key': self.key_text.text(),
+                      'base_url': self.base_url_text.text(),
+                      'req_per_min': self.quota_spinbox.value()}
+
+        configmanager.write_config_all(new_config)
