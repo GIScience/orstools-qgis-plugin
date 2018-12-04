@@ -59,3 +59,4 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                       'req_per_min': self.quota_spinbox.value()}
 
         configmanager.write_config_all(new_config)
+        self.close()

@@ -174,26 +174,26 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Matrix tab
         self.matrix_start_combo.currentIndexChanged.connect(self._layerSelectedChanged)
         self.matrix_end_combo.currentIndexChanged.connect(self._layerSelectedChanged)
-        self.matrix_start_refresh.clicked.connect(self._layerTreeChanged)
-        self.matrix_end_refresh.clicked.connect(self._layerTreeChanged)
+        # self.matrix_start_refresh.clicked.connect(self._layerTreeChanged)
+        # self.matrix_end_refresh.clicked.connect(self._layerTreeChanged)
 
         # Isochrone tab
         self.iso_location_button.clicked.connect(self._initMapTool)
         self.iso_unit_combo.currentIndexChanged.connect(self._unitChanged)
         self.iso_layer_check.stateChanged.connect(self._accessLayerChanged)
-        self.iso_layer_refresh.clicked.connect(self._layerTreeChanged)
+        # self.iso_layer_refresh.clicked.connect(self._layerTreeChanged)
 
         # Routing tab
         self.routing_start_frommap_button.clicked.connect(self._initMapTool)
-        self.routing_via_map_button.clicked.connect(self._initMapTool)
+        # self.routing_via_map_button.clicked.connect(self._initMapTool)
         self.routing_end_frommap_button.clicked.connect(self._initMapTool)
         self.start_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
         self.end_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
-        self.routing_via_clear_button.clicked.connect(self._clearVia)
+        # self.routing_via_clear_button.clicked.connect(self._clearVia)
         self.project.layerWasAdded.connect(self._layerTreeChanged)
         self.project.layersRemoved.connect(self._layerTreeChanged)
-        self.routing_start_fromlayer_refresh.clicked.connect(self._layerTreeChanged)
-        self.routing_end_fromlayer_refresh.clicked.connect(self._layerTreeChanged)
+        # self.routing_start_fromlayer_refresh.clicked.connect(self._layerTreeChanged)
+        # self.routing_end_fromlayer_refresh.clicked.connect(self._layerTreeChanged)
         self.routing_start_fromlayer_combo.currentIndexChanged[int].connect(self._layerSelectedChanged)
         self.routing_end_fromlayer_combo.currentIndexChanged[int].connect(self._layerSelectedChanged)
 
@@ -291,11 +291,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     new_text_id = widget.findText(old_text)
                     widget.setCurrentIndex(0) if new_text_id == -1 else widget.setCurrentIndex(new_text_id)
 
-    def _clearVia(self):
-        """
-        Clears the 'via' coordinates label.
-        """
-        self.routing_via_label.setText("Long,Lat")
+    # def _clearVia(self):
+    #     """
+    #     Clears the 'via' coordinates label.
+    #     """
+    #     self.routing_via_label.setText("Long,Lat")
 
     def _unitChanged(self):
         """
@@ -337,8 +337,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         if button == self.routing_end_frommap_button.objectName():
             self.routing_end_frommap_label.setText("{0:.5f},{1:.5f}".format(x, y))
 
-        if button == self.routing_via_map_button.objectName():
-            self.routing_via_label.setText("{0:.5f},{1:.5f}".format(x, y))
+        # if button == self.routing_via_map_button.objectName():
+        #     self.routing_via_label.setText("{0:.5f},{1:.5f}".format(x, y))
 
         if button == self.iso_location_button.objectName():
             clt = client.Client(self._iface)

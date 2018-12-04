@@ -125,10 +125,10 @@ class directions:
             values_list = list(zip(route_dict[start_layer_name]['values'],
                                    route_dict[end_layer_name]['values']))
 
-        # Add via point if specified
-        route_via = None
-        if self.dlg.routing_via_label.text() != 'Long,Lat':
-            route_via = [float(x) for x in self.dlg.routing_via_label.text().split(",")]
+        # # Add via point if specified
+        # route_via = None
+        # if self.dlg.routing_via_label.text() != 'Long,Lat':
+        #     route_via = [float(x) for x in self.dlg.routing_via_label.text().split(",")]
                 
         message_bar, progress_widget = progressbar.pushProgressBar(self.iface)
         
@@ -139,10 +139,10 @@ class directions:
                 # Skip when same location
                 delete_values.append(i)
                 continue
-            if route_via:
-                # add via coords
-                coords_tuple = list(coords_tuple)
-                coords_tuple.insert(1, route_via)
+            # if route_via:
+            #     # add via coords
+            #     coords_tuple = list(coords_tuple)
+            #     coords_tuple.insert(1, route_via)
             
             # Update progress bar
             percent = (i/len(locations_list)) * 100
