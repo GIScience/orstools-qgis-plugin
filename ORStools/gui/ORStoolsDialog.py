@@ -53,6 +53,7 @@ from ORStools.core import (client,
                            UNITS)
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
+from .ORStoolsDialogAdvanced import ORStoolsDialogAdvancedMain
 
 
 class ORStoolsDialogMain:
@@ -67,6 +68,7 @@ class ORStoolsDialogMain:
         self._iface = iface
 
         self.first_start = True
+        # Dialogs
         self.dlg = None
 
     def initGui(self):
@@ -100,6 +102,7 @@ class ORStoolsDialogMain:
         if self.first_start:
             self.first_start = False
             self.dlg = ORStoolsDialog(self._iface, self._iface.mainWindow()) # setting parent enables modal view
+
         self.dlg.show()
         result = self.dlg.exec_()
         if result:
@@ -149,6 +152,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
 
+        # Advanced dialog to access settings in directions module
+        self.advanced = None
+
         # Set up env variables for remaining quota
         os.environ["ORS_QUOTA"] = "None"
         os.environ["ORS_REMAINING"] = "None"
@@ -165,8 +171,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         #### Set up signals/slots ####
 
-        # Config button
+        # Config/Advanced dialogs
         self.config_button.clicked.connect(self._on_config_click)
+        self.routing_advanced_button.clicked.connect(self._on_advanced_click)
 
         # # Apply button, to update remaining quota
         # self.global_buttons.Apply.clicked.connect(self._on_apply_click)
@@ -213,6 +220,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         """Pop up config window"""
         config_dlg = ORStoolsDialogConfigMain(parent=self)
         config_dlg.exec_()
+
+    def _on_advanced_click(self):
+        self.advanced = ORStoolsDialogAdvancedMain(parent=self)
+        self.advanced.exec_()
 
     def _accessLayerChanged(self):
         for child in self.sender().parentWidget().children():

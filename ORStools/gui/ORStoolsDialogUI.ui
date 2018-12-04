@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>698</height>
+    <height>716</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -161,8 +161,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>399</width>
-            <height>621</height>
+            <width>413</width>
+            <height>456</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
@@ -425,7 +425,7 @@
            </item>
            <item row="0" column="0">
             <widget class="QWidget" name="routing_travel_group" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2">
+             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2,0">
               <item>
                <widget class="QLabel" name="routing_travel_label">
                 <property name="text">
@@ -439,73 +439,10 @@
               <item>
                <widget class="QComboBox" name="routing_preference_combo"/>
               </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QGroupBox" name="routing_avoid_group">
-             <property name="font">
-              <font>
-               <family>Sans Serif</family>
-              </font>
-             </property>
-             <property name="title">
-              <string>Avoid features</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_9">
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="routing_avoid_highways">
+              <item>
+               <widget class="QPushButton" name="routing_advanced_button">
                 <property name="text">
-                 <string>highways</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QCheckBox" name="routing_avoid_toll">
-                <property name="text">
-                 <string>tollways</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="routing_avoid_tunnels">
-                <property name="text">
-                 <string>tunnels</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QCheckBox" name="routing_avoid_ferries">
-                <property name="text">
-                 <string>ferries</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QCheckBox" name="routing_avoid_fords">
-                <property name="text">
-                 <string>fords</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QCheckBox" name="routing_avoid_paved">
-                <property name="text">
-                 <string>pavedroads</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QCheckBox" name="routing_avoid_tracks">
-                <property name="text">
-                 <string>tracks</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QCheckBox" name="routing_avoid_unpaved">
-                <property name="text">
-                 <string>unpavedroads</string>
+                 <string>Advanced</string>
                 </property>
                </widget>
               </item>
@@ -522,7 +459,7 @@
       <attribute name="title">
        <string>Isochrones</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,3,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,3,0,0">
        <item>
         <widget class="QWidget" name="iso_travel_group" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -1105,6 +1042,19 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

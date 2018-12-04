@@ -75,8 +75,7 @@ class directions:
         # API parameters
         self.route_mode = self.dlg.routing_travel_combo.currentText()
         self.route_pref = self.dlg.routing_preference_combo.currentText()
-        avoid_boxes = self.dlg.routing_avoid_group.findChildren(QCheckBox)
-        
+
         self.params = {'profile': self.route_mode,
                         'preference': self.route_pref,
                         'geometry': 'true',
@@ -84,20 +83,20 @@ class directions:
                         'instructions': 'false'
                         }
 
-        # Check if avoid features is checked
-        self.avoid_dict = dict()
-        if any(box.isChecked() for box in avoid_boxes):
-            avoid_features = []
-            for box in avoid_boxes:
-                if box.isChecked():
-                    avoid_features.append((box.text()))
-            avoid_features = convert.pipe_list(avoid_features)
-            self.avoid_dict = dict()
-            
-            self.avoid_dict['avoid_features'] = avoid_features
-        
-        if self.avoid_dict:
-            self.params['options'] = str(self.avoid_dict)
+        # from Advanced dialog
+        self.avoid_dict = None
+        if self.dlg.advanced is not None:
+            avoid_boxes = self.dlg.advanced.routing_avoid_group.findChildren(QCheckBox)
+            if any(box.isChecked() for box in avoid_boxes):
+                avoid_features = []
+                for box in avoid_boxes:
+                    if box.isChecked():
+                        avoid_features.append((box.text()))
+                avoid_features = convert.pipe_list(avoid_features)
+
+                self.avoid_dict = dict()
+                self.avoid_dict['avoid_features'] = avoid_features
+                self.params['options'] = str(self.avoid_dict)
 
     def directions_calc(self):
         """
