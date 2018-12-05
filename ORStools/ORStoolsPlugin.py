@@ -56,5 +56,6 @@ class ORStools():
         
     def unload(self):
         """remove menu entry and toolbar icons"""
-        QgsApplication.processingRegistry().removeProvider(self.provider)
+        if self.provider:
+            QgsApplication.processingRegistry().removeProvider(self.provider)
         self.dialog.unload()

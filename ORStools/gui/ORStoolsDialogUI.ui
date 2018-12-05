@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>716</height>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="5,0,0,0">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0">
    <item row="1" column="0" colspan="4">
     <widget class="QLabel" name="header_subpic">
      <property name="text">
@@ -111,25 +111,50 @@
      </layout>
     </widget>
    </item>
-   <item row="7" column="3">
-    <widget class="QLabel" name="quota_text">
-     <property name="text">
-      <string>No request made yet</string>
-     </property>
-    </widget>
-   </item>
    <item row="8" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="8" column="1">
     <widget class="QPushButton" name="config_button">
      <property name="text">
       <string>Config</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QLabel" name="quota_label">
-     <property name="text">
-      <string>Remaining quota: </string>
-     </property>
+   <item row="7" column="0" colspan="4">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,2">
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>No request yet</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="5" column="0" colspan="4">
@@ -141,7 +166,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -162,7 +187,7 @@
             <x>0</x>
             <y>0</y>
             <width>413</width>
-            <height>456</height>
+            <height>483</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
@@ -196,6 +221,9 @@
                  </item>
                  <item row="0" column="1">
                   <widget class="QPushButton" name="routing_start_frommap_button">
+                   <property name="toolTip">
+                    <string>Capture coordinates from the map</string>
+                   </property>
                    <property name="text">
                     <string>Map now!</string>
                    </property>
@@ -262,6 +290,9 @@
                   <widget class="QComboBox" name="routing_start_fromlayer_id_combo">
                    <property name="enabled">
                     <bool>false</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>Adds ID columns to output for joining</string>
                    </property>
                   </widget>
                  </item>
@@ -358,6 +389,9 @@
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
+                   <property name="toolTip">
+                    <string>Adds ID columns to output for joining</string>
+                   </property>
                   </widget>
                  </item>
                  <item row="1" column="0" alignment="Qt::AlignRight">
@@ -372,6 +406,9 @@
               </item>
               <item row="0" column="0">
                <widget class="QWidget" name="routing_end_frommap_group" native="true">
+                <property name="toolTip">
+                 <string>Capture coordinates from the map</string>
+                </property>
                 <layout class="QGridLayout" name="gridLayout_12" columnstretch="0,0,1">
                  <property name="topMargin">
                   <number>6</number>
@@ -434,13 +471,24 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="routing_travel_combo"/>
+               <widget class="QComboBox" name="routing_travel_combo">
+                <property name="toolTip">
+                 <string>Mode of travel</string>
+                </property>
+               </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="routing_preference_combo"/>
+               <widget class="QComboBox" name="routing_preference_combo">
+                <property name="toolTip">
+                 <string>Preference</string>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="routing_advanced_button">
+                <property name="toolTip">
+                 <string>Advanced options</string>
+                </property>
                 <property name="text">
                  <string>Advanced</string>
                 </property>
@@ -448,6 +496,19 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item row="6" column="0">
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -459,7 +520,7 @@
       <attribute name="title">
        <string>Isochrones</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,3,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,3,0,0">
        <item>
         <widget class="QWidget" name="iso_travel_group" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -541,11 +602,6 @@
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QWidget" name="widget_7" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_8"/>
         </widget>
        </item>
        <item>
@@ -1084,9 +1140,6 @@
          <property name="title">
           <string>Start Locations</string>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
          <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,2">
           <item row="3" column="1">
            <widget class="QComboBox" name="matrix_start_id_combo">
@@ -1122,9 +1175,6 @@
         <widget class="QGroupBox" name="matrix_end_group">
          <property name="title">
           <string>End Locations</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
          </property>
          <layout class="QGridLayout" name="gridLayout_16" columnstretch="1,2">
           <item row="1" column="0">
@@ -1181,9 +1231,9 @@
   <zorder>header_pic</zorder>
   <zorder>header_text</zorder>
   <zorder>header_subpic</zorder>
-  <zorder>quota_text</zorder>
-  <zorder>quota_label</zorder>
+  <zorder>widget</zorder>
   <zorder>config_button</zorder>
+  <zorder>horizontalSpacer</zorder>
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>

@@ -33,27 +33,38 @@ from PyQt5.QtWidgets import (QAction,
                              QDialog,
                              QApplication,
                              QComboBox,
-                             QPushButton)
+                             QPushButton,
+                             QMenu,
+                             QMessageBox)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon
 from qgis.core import (QgsProject,
                        QgsMapLayer,
-                       QgsWkbTypes
+                       QgsWkbTypes,
                        )
+from qgis.gui import QgisInterface
 
-from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS
+from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS, __version__
 from ORStools.utils import exceptions, pointtool
 from ORStools.core import (client,
-                           directions,
-                           isochrones,
-                           matrix,
-                           geocode,
+                           isochrones_core,
+                           directions_core,
+                           matrix_core,
+                           geocode_core,
                            PROFILES,
                            PREFERENCES,
                            UNITS)
+from ORStools.gui import (isochrones_gui)
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogAdvanced import ORStoolsDialogAdvancedMain
+
+
+def on_config_click(parent):
+    """Pop up config window. Outside of classes because it's accessed by both.
+    """
+    config_dlg = ORStoolsDialogConfigMain(parent=parent)
+    config_dlg.exec_()
 
 
 class ORStoolsDialogMain:
@@ -65,27 +76,65 @@ class ORStoolsDialogMain:
         :param iface: the current QGIS interface
         :type iface: Qgis.Interface
         """
-        self._iface = iface
+        self.iface = iface
 
         self.first_start = True
         # Dialogs
         self.dlg = None
+        self.menu = None
+        self.actions = None
 
     def initGui(self):
-        self.action = QAction(QIcon(os.path.join(ICON_DIR, 'icon.png')),
-                              PLUGIN_NAME,  # tr text
-                              self._iface.mainWindow()  # parent
-                              )
+        def create_icon(f):
+            return QIcon(os.path.join(ICON_DIR, f))
 
-        self._iface.addPluginToMenu(PLUGIN_NAME,
-                                    self.action)
-        self._iface.addToolBarIcon(self.action)
-        self.action.triggered.connect(self.run)
+        icon_plugin = create_icon('icon_orstools.png')
+
+        self.actions = [
+            QAction(
+                icon_plugin,
+                PLUGIN_NAME,  # tr text
+                self.iface.mainWindow()  # parent
+            ),
+            # Config dialog
+            QAction(
+                create_icon('icon_settings.svg'),
+                'Configuration',
+                self.iface.mainWindow()
+            ),
+            # About dialog
+            QAction(
+                create_icon('icon_about.svg'),
+                'About',
+                self.iface.mainWindow()
+            )
+        ]
+
+        self.menu = QMenu(PLUGIN_NAME)
+        self.menu.setIcon(icon_plugin)
+        self.menu.addActions(self.actions)
+
+        self.iface.webMenu().addMenu(self.menu)
+        self.iface.addWebToolBarIcon(self.actions[0])
+        self.actions[0].triggered.connect(self.run)
+        self.actions[1].triggered.connect(lambda: on_config_click(parent=self.iface.mainWindow()))
+        self.actions[2].triggered.connect(self._on_about_click)
 
     def unload(self):
-        QApplication.restoreOverrideCursor()
-        self._iface.removePluginMenu(PLUGIN_NAME, self.action)
-        self._iface.removeToolBarIcon(self.action)
+        self.iface.webMenu().removeAction(self.menu.menuAction())
+        self.iface.removeWebToolBarIcon(self.actions[0])
+
+    def _on_about_click(self):
+        info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: #b5152b">openrouteservice</a> routing functionalities.<br><br>' \
+               'Author: Nils Nolde<br>' \
+               'Email: <a href="mailto:Nils Nolde <nils@gis-ops.com>">nils@gis-ops.com</a><br>' \
+               'Web: <a href="https://gis-ops.com">https://gis-ops.com</a>' \
+               'Version: {}'.format(__version__)
+        QMessageBox.information(
+            self.iface.mainWindow(),
+            'About {}'.format(PLUGIN_NAME),
+            info
+        )
 
     @staticmethod
     def get_quota():
@@ -101,31 +150,38 @@ class ORStoolsDialogMain:
         # If not checked, GUI will be rebuild every time!
         if self.first_start:
             self.first_start = False
-            self.dlg = ORStoolsDialog(self._iface, self._iface.mainWindow()) # setting parent enables modal view
+            self.dlg = ORStoolsDialog(self.iface, self.iface.mainWindow()) # setting parent enables modal view
 
         self.dlg.show()
         result = self.dlg.exec_()
         if result:
             try:
-                clnt = client.Client(self._iface)
+                clnt = client.Client(self.iface)
+                feat_counter = 0
 
                 if self.dlg.tabWidget.currentIndex() == 2:
-                    pass
-                    m = matrix.matrix(self.dlg, clnt, self._iface)
+                    m = matrix_core.matrix(self.dlg, clnt, self.iface)
                     m.matrix_calc()
-                if self.dlg.tabWidget.currentIndex() == 1:
-                    pass
-                    iso = isochrones.isochrones(self.dlg, clnt, self._iface)
-                    iso.isochrones_calc()
-                if self.dlg.tabWidget.currentIndex() == 0:
-                    pass
-                    route = directions.directions(self.dlg, clnt, self._iface)
+
+                elif self.dlg.tabWidget.currentIndex() == 1:
+                    iso_gui = isochrones_gui.IsochronesGui(self.dlg)
+                    params = iso_gui.getParameters()
+                    for properties in iso_gui.getFeatureParameters(self.dlg.iso_layer_check.isChecked()):
+                        params['locations'], params['id'] = properties
+                        isochrones_core.isochrones_request(clnt, params)
+
+                        # Update progress bar
+                        feat_counter += 1
+                        self.dlg.progressBar.setValue(int(feat_counter/iso_gui.feature_count * 100))
+
+                elif self.dlg.tabWidget.currentIndex() == 0:
+                    route = directions_core.directions(self.dlg, clnt, self.iface)
                     route.directions_calc()
 
                 # Update quota; handled in client module after successful request
-                self.dlg.quota_text.setText(self.get_quota())
+                self.dlg.quota_text.setText(self.get_quota() + 'req')
             except exceptions.Timeout:
-                self._iface.messageBar().pushCritical('Time out',
+                self.iface.messageBar().pushCritical('Time out',
                                                       'The connection exceeded the '
                                                       'timeout limit of 60 seconds')
 
@@ -133,12 +189,13 @@ class ORStoolsDialogMain:
                     exceptions.ApiError,
                     exceptions.TransportError,
                     exceptions.OverQueryLimit) as e:
-                self._iface.messageBar().pushCritical("{}: ".format(type(e)),
-                                                      "{}".format(str(e)))
+                self.iface.messageBar().pushCritical("{}: ".format(type(e).__name__),
+                                                     "{}".format(str(e)))
 
             except Exception:
                 raise
             finally:
+                self.dlg.progressBar.setValue(0)
                 self.dlg.close()
 
 
@@ -151,6 +208,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
+        self.last_maptool = self._iface.mapCanvas().mapTool()
 
         # Advanced dialog to access settings in directions module
         self.advanced = None
@@ -167,12 +225,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                                    )
         self.header_pic.setPixmap(pixmap)
         # Settings button icon
-        self.config_button.setIcon(QIcon(os.path.join(ICON_DIR, 'icon_settings.png')))
+        self.config_button.setIcon(QIcon(os.path.join(ICON_DIR, 'icon_settings.svg')))
 
         #### Set up signals/slots ####
 
         # Config/Advanced dialogs
-        self.config_button.clicked.connect(self._on_config_click)
+        self.config_button.clicked.connect(lambda: on_config_click(self))
         self.routing_advanced_button.clicked.connect(self._on_advanced_click)
 
         # # Apply button, to update remaining quota
@@ -215,11 +273,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     # def _on_apply_click(self):
     #     """Update remaining quota from env variables"""
     #     text = os.environ['ORS_REMAINING'] + "/" + os.environ['ORS_QUOTA']
-
-    def _on_config_click(self):
-        """Pop up config window"""
-        config_dlg = ORStoolsDialogConfigMain(parent=self)
-        config_dlg.exec_()
 
     def _on_advanced_click(self):
         self.advanced = ORStoolsDialogAdvancedMain(parent=self)
@@ -353,7 +406,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         if button == self.iso_location_button.objectName():
             clt = client.Client(self._iface)
-            loc_dict = geocode.reverse_geocode(clt,
+            loc_dict = geocode_core.reverse_geocode(clt,
                                                point)
 
             out_str = u"{0:.6f}\n{1:.6f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),

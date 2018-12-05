@@ -35,24 +35,24 @@ from qgis.core import (QgsVectorLayer,
                        QgsProject)
 
 
-def checkCRS(layer, messageBar):
-    """
-    Check if layer CRS is EPSG:4326.
-
-    :param layer: Layer to be inspected.
-    :type layer: QgsMapLayer
-
-    :param messageBar: QGIS interface message bar.
-    :type messageBar: QgsMessageBar
-    """
-    layer_crs = layer.crs().authid()
-    if layer_crs.split(':')[1] != '4326':
-        layer = transformToWGS(layer, layer_crs)
-        messageBar.pushInfo('CRS conflict',
-                            'The input layer CRS is {}, the output layer '
-                            'CRS will be EPSG:4326'.format(layer_crs))
-
-    return layer
+# def checkCRS(layer, messageBar):
+#     """
+#     Check if layer CRS is EPSG:4326.
+#
+#     :param layer: Layer to be inspected.
+#     :type layer: QgsMapLayer
+#
+#     :param messageBar: QGIS interface message bar.
+#     :type messageBar: QgsMessageBar
+#     """
+#     layer_crs = layer.crs().authid()
+#     if layer_crs.split(':')[1] != '4326':
+#         layer = transformToWGS(layer, layer_crs)
+#         messageBar.pushInfo('CRS conflict',
+#                             'The input layer CRS is {}, the output layer '
+#                             'CRS will be EPSG:4326'.format(layer_crs))
+#
+#     return layer
 
 
 def transformToWGS(old_layer, old_crs):

@@ -44,8 +44,7 @@ from qgis.core import (QgsVectorLayer,
                        )
 
 from ORStools.utils import convert, transform
-from ORStools.gui import progressbar
-from . import geocode
+from . import geocode_core
 
 
 class directions:
@@ -84,7 +83,7 @@ class directions:
                         }
 
         # from Advanced dialog
-        self.avoid_dict = None
+        self.avoid_dict = dict()
         if self.dlg.advanced is not None:
             avoid_boxes = self.dlg.advanced.routing_avoid_group.findChildren(QCheckBox)
             if any(box.isChecked() for box in avoid_boxes):
@@ -94,7 +93,6 @@ class directions:
                         avoid_features.append((box.text()))
                 avoid_features = convert.pipe_list(avoid_features)
 
-                self.avoid_dict = dict()
                 self.avoid_dict['avoid_features'] = avoid_features
                 self.params['options'] = str(self.avoid_dict)
 
@@ -259,7 +257,7 @@ class directions:
                 point_coords = [float(x) for x in point_label.text().split(",")]
                 
                 point_geom = [QgsPointXY(*point_coords)]
-                response_dict = geocode.reverse_geocode(self.client, *point_geom)
+                response_dict = geocode_core.reverse_geocode(self.client, *point_geom)
                 
                 field_values = [response_dict.get('CITY', point_label.text())]
                 field_type = QVariant.String

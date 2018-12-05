@@ -214,15 +214,21 @@ class Client(object):
         
         if status_code == 429:
             raise exceptions.OverQueryLimit(
-                str(status_code), error)
+                str(status_code),
+                error
+            )
 
-        # Internal error message, other format than others, really fucked up
+        # Internal error message for Bad Request
         if status_code == 400:
-            raise exceptions.ApiError(status_code,
-                                      error['message'])
+            raise exceptions.ApiError(
+                error['code'],
+                error['message']
+            )
         if status_code != 200:
-            raise exceptions.ApiError(status_code,
-                                      error)
+            raise exceptions.ApiError(
+                status_code,
+                error
+            )
 
         return body
 

@@ -39,120 +39,83 @@ from qgis.core import (QgsPointXY,
                        QgsFeature,
                        QgsField,
                        QgsGeometry,
-                       QgsProject,
                        QgsSymbol,
                        QgsSimpleFillSymbolLayer,
                        QgsRendererCategory,
                        QgsCategorizedSymbolRenderer)
 
-from ORStools.utils import convert, transform, configmanager
-from ORStools.gui import progressbar
-from . import geocode
+from ORStools.utils import convert, transform
 
-
-class isochrones:
-    """
-    Performs requests to ORS isochrone API:
-    """
-    def __init__(self, dlg, client, iface):
-        """
-        :param dlg: Main OSMtools dialog window.
-        :type dlg: QDialog
-        
-        :param client: Client to ORS API.
-        :type client: OSMtools.client.Client()
-        
-        :param iface: A QGIS interface instance.
-        :type iface: QgisInterface
-        """
-        self.dlg = dlg
-        self.client = client
-        self.iface = iface
-        self.project = QgsProject().instance()
-        
-        self.url = '/isochrones'
     
-        self.iso_mode = self.dlg.iso_travel_combo.currentText()
-        try:
-            self.access_range_input = list(map(int,self.dlg.iso_range_text.text().split(',')))
-        except (ValueError, AttributeError) as e:
-            raise
-        
-        self.dimension = self.dlg.iso_unit_combo.currentText()
-        self.factor = 60 if self.dimension == 'time' else 1
-        
-        self.access_range_input = [x * self.factor for x in self.access_range_input]
-             
-        self.params = {'range_type': self.dimension,
-                       'profile': self.iso_mode,
-                       'range': convert.comma_list(self.access_range_input)
-                       }
-    
-    def isochrones_calc(self):
-        """
-        Performs requests to the ORS isochrone API.
-        """
-        if self.dlg.iso_layer_check.isChecked():
-            layer_name = self.dlg.iso_layer_combo.currentText()
+def isochrones_request(clnt, params):
+    """
+    Performs requests to the ORS isochrone API.
+    """
+    return clnt.request('isochrone', params)
 
-            layer = self.project.mapLayer(self.dlg.iso_layer_combo.currentData())
-            
-            layer = transform.checkCRS(layer, self.iface.messageBar())
-            
-            # If features are selected, calculate with those
-            if layer.selectedFeatureCount() == 0:
-                feats = layer.getFeatures()
-                feat_count = layer.featureCount()
-            else:
-                feats = layer.selectedFeatures()
-                feat_count = layer.selectedFeatureCount()
-            
-            message_bar, progress_widget = progressbar.pushProgressBar(self.iface)
-            
-            responses = []
-            for i, feat in enumerate(feats):
-                percent = (i/feat_count) * 100
-                message_bar.setValue(percent)
-                # Get coordinates
-                geom = feat.geometry().asPoint()
-                coords = [geom.x(), geom.y()]   
-                
-                # Get response
-                self.params['locations'] = convert.build_coords(coords)
-                self.params['id'] = feat.id()
-                responses.append(self.client.request(self.url, self.params))
-                
-            poly_out = self._addPolygon(responses, layer_name)
-            
-            self.iface.messageBar().popWidget(progress_widget)
 
-        else:  
-            # Define the mapped point
-            coords = [float(x) for x in self.dlg.iso_location_label.text().split('\n')[:2]]
-            in_point_geom = QgsPointXY(*coords)
-            geocode_dict = geocode.reverse_geocode(self.client, in_point_geom)
-            
+def dummy():
+    if self.dlg.iso_layer_check.isChecked():
+        layer_name = self.dlg.iso_layer_combo.currentText()
+
+        layer = self.project.mapLayer(self.dlg.iso_layer_combo.currentData())
+
+        layer = transform.checkCRS(layer, self.iface.messageBar())
+
+        # If features are selected, calculate with those
+        if layer.selectedFeatureCount() == 0:
+            feats = layer.getFeatures()
+            feat_count = layer.featureCount()
+        else:
+            feats = layer.selectedFeatures()
+            feat_count = layer.selectedFeatureCount()
+
+        message_bar, progress_widget = progressbar.pushProgressBar(self.iface)
+
+        responses = []
+        for i, feat in enumerate(feats):
+            percent = (i/feat_count) * 100
+            message_bar.setValue(percent)
+            # Get coordinates
+            geom = feat.geometry().asPoint()
+            coords = [geom.x(), geom.y()]
+
+            # Get response
             self.params['locations'] = convert.build_coords(coords)
-            self.params['id'] = '-1'
-            
-            # Fire request
-            response = self.client.request(self.url, self.params)
-            response_center = response['features'][0]['properties']['center']
-            
-            out_point_geom = QgsPointXY(*response_center)
-            
-            name_ext = "{0:.3f},{1:.3f}".format(*response_center)
-            
-            poly_out = self._addPolygon([response], name_ext)
-            
-            point_out = self._addPoint(geocode_dict, out_point_geom, name_ext)
-            point_out.updateExtents()
-            self.project.addMapLayer(point_out)
-        
-        poly_out.updateExtents()
-        
-        self._stylePoly(poly_out)
-        self.project.addMapLayer(poly_out)
+            self.params['id'] = feat.id()
+            responses.append(self.client.request(self.url, self.params))
+
+        poly_out = self._addPolygon(responses, layer_name)
+
+        self.iface.messageBar().popWidget(progress_widget)
+
+    else:
+        # Define the mapped point
+        coords = [float(x) for x in self.dlg.iso_location_label.text().split('\n')[:2]]
+        in_point_geom = QgsPointXY(*coords)
+        geocode_dict = geocode_core.reverse_geocode(self.client, in_point_geom)
+
+        self.params['locations'] = convert.build_coords(coords)
+        self.params['id'] = '-1'
+
+        # Fire request
+        response = self.client.request(self.url, self.params)
+        response_center = response['features'][0]['properties']['center']
+
+        out_point_geom = QgsPointXY(*response_center)
+
+        name_ext = "{0:.3f},{1:.3f}".format(*response_center)
+
+        poly_out = self._addPolygon([response], name_ext)
+
+        point_out = self._addPoint(geocode_dict, out_point_geom, name_ext)
+        point_out.updateExtents()
+        self.project.addMapLayer(point_out)
+
+    poly_out.updateExtents()
+
+    self._stylePoly(poly_out)
+    self.project.addMapLayer(poly_out)
 #        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
         
     def _addPoint(self, response_dict, point_geom, name_ext):
