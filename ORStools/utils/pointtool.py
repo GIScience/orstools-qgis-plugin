@@ -46,7 +46,7 @@ class PointTool(QgsMapTool):
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas
         self.button = button
-        self.cursor = QCursor(QPixmap(os.path.join(ICON_DIR, 'icon_locate.png')).scaledToWidth(24), 12, 12)
+        self.cursor = QCursor(QPixmap(os.path.join(ICON_DIR, 'icon_locate.png')).scaledToWidth(48), 24, 24)
         
         #QApplication.setOverrideCursor(QCursor(QPixmap('/icon_locate.png')))
     

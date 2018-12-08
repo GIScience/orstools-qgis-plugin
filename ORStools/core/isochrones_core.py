@@ -42,7 +42,8 @@ from qgis.core import (QgsPointXY,
                        QgsSymbol,
                        QgsSimpleFillSymbolLayer,
                        QgsRendererCategory,
-                       QgsCategorizedSymbolRenderer)
+                       QgsCategorizedSymbolRenderer,
+                       QgsMessageLog)
 
 from ORStools.utils import convert, transform
 
@@ -51,7 +52,7 @@ def isochrones_request(clnt, params):
     """
     Performs requests to the ORS isochrone API.
     """
-    return clnt.request('isochrone', params)
+    return clnt.request('/isochrones', params)
 
 
 def dummy():

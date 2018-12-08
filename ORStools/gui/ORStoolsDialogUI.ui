@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>455</width>
-    <height>769</height>
+    <width>477</width>
+    <height>775</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OSM Tools</string>
+   <string>ORS Tools</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -32,8 +32,14 @@
    </item>
    <item row="2" column="0" colspan="4">
     <widget class="QLabel" name="header_text">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;openrouteservice.org&lt;/span&gt;&lt;/a&gt; | by &lt;a href=&quot;mailto:nils@openrouteservice.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#a8b1f5;&quot;&gt;openrouteservice.org&lt;/span&gt;&lt;/a&gt; | by &lt;a href=&quot;mailto:nils@gis-ops.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#a8b1f5;&quot;&gt;Nils Nolde&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -80,8 +86,14 @@
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="label_3">
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/signup&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/signup&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="openExternalLinks">
          <bool>true</bool>
@@ -90,8 +102,24 @@
       </item>
       <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="label_2">
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/home&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Dashboard&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/home&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Dashboard&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/GIScience/openrouteservice/wiki/Tag-Filtering&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Tags&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="openExternalLinks">
          <bool>true</bool>
@@ -100,8 +128,24 @@
       </item>
       <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ask.openrouteservice.org/c/sdks&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b5152b;&quot;&gt;Forum&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ask.openrouteservice.org/c/sdks&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Forum&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/nilsnolde/OSMtools/issues&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="openExternalLinks">
          <bool>true</bool>
@@ -166,7 +210,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -186,8 +230,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>413</width>
-            <height>483</height>
+            <width>435</width>
+            <height>489</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
@@ -246,7 +290,7 @@
               </item>
               <item row="1" column="0">
                <widget class="QWidget" name="routing_start_fromlayer_group" native="true">
-                <layout class="QGridLayout" name="gridLayout_11" columnstretch="2,3,0">
+                <layout class="QGridLayout" name="gridLayout_11" columnstretch="2,3">
                  <property name="topMargin">
                   <number>6</number>
                  </property>
@@ -549,7 +593,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defaults to 'RecursiveGrid', 'TIN' not available yet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Isochrone unit</string>
+             <string>Dimension</string>
             </property>
            </widget>
           </item>
@@ -574,7 +618,7 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="iso_range_text">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comma separated list of isochrone ranges&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Comma separated list of isochrone ranges</string>
             </property>
            </widget>
           </item>
@@ -594,10 +638,10 @@
           <item row="0" column="0">
            <widget class="QLabel" name="iso_range_label">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comma separated list of isochrone ranges&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Comma separated list of isochrone ranges</string>
             </property>
             <property name="text">
-             <string>Isochrone ranges</string>
+             <string>Ranges</string>
             </property>
            </widget>
           </item>
@@ -1040,7 +1084,7 @@
           <item row="0" column="1">
            <widget class="QPushButton" name="iso_location_button">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click on map canvas to select a point source for accessibility area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Click on map canvas to select center point for isochrones</string>
             </property>
             <property name="text">
              <string>Map now!</string>

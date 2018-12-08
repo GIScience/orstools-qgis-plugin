@@ -24,6 +24,7 @@
 import os.path
 import configparser
 
+
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
     """Load OSMtools class from file OS;tools.
@@ -35,8 +36,10 @@ def classFactory(iface):  # pylint: disable=invalid-name
     from .ORStoolsPlugin import ORStools
     return ORStools(iface)
 
+
 # Define plugin wide constants
 PLUGIN_NAME = 'ORS Tools'
+DEFAULT_COLOR = '#a8b1f5'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ICON_DIR = os.path.join(BASE_DIR, 'static', 'img')
 CONFIG_PATH = os.path.join(BASE_DIR, 'config.yml')

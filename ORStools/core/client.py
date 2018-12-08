@@ -27,7 +27,6 @@
  ***************************************************************************/
 """
 
-import os
 from datetime import datetime, timedelta
 import requests
 import random
@@ -35,10 +34,13 @@ import time
 import collections
 from urllib.parse import urlencode
 
-from ORStools import __version__, ENV_VARS
-from ORStools.utils import exceptions, configmanager
+from PyQt5.QtWidgets import QMessageBox
 
-_USER_AGENT = "ORSClientQGISv{}".format(__version__)
+
+from ORStools import __version__, ENV_VARS, PLUGIN_NAME
+from ORStools.utils import exceptions, configmanager, logger
+
+_USER_AGENT = "ORSQGISClient.v{}".format(__version__)
 _RETRIABLE_STATUSES = [503]
 _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
 
@@ -46,9 +48,8 @@ _DEFAULT_BASE_URL = "https://api.openrouteservice.org"
 class Client(object):
     """Performs requests to the ORS API services."""
 
-    def __init__(self, iface,
-                 retry_timeout=60,
-                 retry_over_query_limit=False):
+    def __init__(self,
+                 retry_timeout=60):
         """
         :param iface: A QGIS interface instance.
         :type iface: QgisInterface
@@ -63,11 +64,9 @@ class Client(object):
         (self.key, 
          self.base_url, 
          self.queries_per_minute) = [v for (k, v) in sorted(base_params.items())]
-        self.iface = iface
         
         self.session = requests.Session()
-        
-        self.retry_over_query_limit = retry_over_query_limit
+
         self.retry_timeout = timedelta(seconds=retry_timeout)
         self.requests_kwargs = dict()
         self.requests_kwargs.update({
@@ -139,21 +138,8 @@ class Client(object):
         # requests_kwargs arg overriding.
         requests_kwargs = requests_kwargs or {}
         final_requests_kwargs = dict(self.requests_kwargs, **requests_kwargs)
-
-        # Check if the time of the nth previous query (where n is
-        # queries_per_second) is under a second ago - if so, sleep for
-        # the difference.
-        if self.sent_times and len(self.sent_times) == self.queries_per_minute:
-            elapsed_since_earliest = time.time() - self.sent_times[0]
-            if elapsed_since_earliest < 60:
-                self.iface.messageBar().pushInfo('Limit exceeded',
-                                                 'Request limit of {} per minute exceeded. '
-                                                 'Wait for {} seconds'.format(self.queries_per_minute, 
-                                                                              60 - elapsed_since_earliest))
-                time.sleep(60 - elapsed_since_earliest)
         
-        # Determine GET/POST.
-        # post_json is so far only sent from matrix call
+        # Determine GET/POST
         requests_method = self.session.get
         if post_json is not None:
             requests_method = self.session.post
@@ -166,36 +152,30 @@ class Client(object):
             response = requests_method(self.base_url + authed_url,
                                        **final_requests_kwargs)
         except requests.exceptions.Timeout:
-            raise exceptions.Timeout()
-        except Exception:
             raise
-
-        if response.status_code in _RETRIABLE_STATUSES:
-            # Retry request.
-            print('Server down.\nRetrying for the {}th time.'.format(retry_counter + 1))
-            
-            return self.request(url, params, first_request_time,
-                                 retry_counter + 1, requests_kwargs, post_json)
 
         try:
             result = self._get_body(response)
             self.sent_times.append(time.time())
+        # Other exceptions should be handled by client callers
+        except exceptions.OverQueryLimit:
+            # TODO: provide feedback to user: how to do implement for GUI and processing algo?
+            # https://stackoverflow.com/questions/40932639/pyqt-messagebox-automatically-closing-after-few-seconds
+            elapsed_since_earliest = time.time() - self.sent_times[0]
+            sleep_for = 60 - elapsed_since_earliest
 
-            # Write env variables if successful
-            for env_var in ENV_VARS:
-                print(response.headers[ENV_VARS[env_var]])
-                configmanager.write_env_var(env_var, response.headers[ENV_VARS[env_var]])
+            logger.log("started sleeping for {}".format(sleep_for), 'info')
 
-            return result
-        except exceptions.RetriableRequest as e:
-            if isinstance(e, exceptions.OverQueryLimit) and not self.retry_over_query_limit:
-                raise
-            
-            self.iface.messageBar().pushInfo('Rate limit exceeded.\nRetrying for the {}th time.'.format(retry_counter + 1))
-            return self.request(url, params, first_request_time,
-                                retry_counter + 1, requests_kwargs, post_json)
-        except Exception:
-            raise
+            time.sleep(sleep_for)
+
+            return self.request(url, params, first_request_time, retry_counter + 1, requests_kwargs, post_json)
+
+        # Write env variables if successful
+        for env_var in ENV_VARS:
+            print(response.headers[ENV_VARS[env_var]])
+            configmanager.write_env_var(env_var, response.headers[ENV_VARS[env_var]])
+
+        return result
 
 
     @staticmethod
@@ -217,13 +197,13 @@ class Client(object):
                 str(status_code),
                 error
             )
-
         # Internal error message for Bad Request
         if status_code == 400:
             raise exceptions.ApiError(
                 error['code'],
                 error['message']
             )
+        # Other HTTP errors have different formatting
         if status_code != 200:
             raise exceptions.ApiError(
                 status_code,

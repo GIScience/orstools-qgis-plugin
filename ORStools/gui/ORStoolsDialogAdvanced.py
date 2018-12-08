@@ -27,7 +27,7 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QGridLayout
 
 from .ORStoolsDialogAdvancedUI import Ui_ORStoolsDialogAdvancedBase
 
@@ -38,3 +38,6 @@ class ORStoolsDialogAdvancedMain(QDialog, Ui_ORStoolsDialogAdvancedBase):
         QDialog.__init__(self, parent)
 
         self.setupUi(self)
+        # for box in self.routing_avoid_group.children():
+        #     if not isinstance(box, QGridLayout):
+        #         box.setChecked(False)

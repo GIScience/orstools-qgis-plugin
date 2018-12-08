@@ -254,6 +254,7 @@ class directions:
                 parent_widget_label = [child for child in grandparent_widget.children() if child.objectName() != parent_widget_name][1]
                 
                 point_label = parent_widget_label.findChild(QLabel)
+                # TODO: warning message when no coordiates have been specified: QMessage.warning() or so
                 point_coords = [float(x) for x in point_label.text().split(",")]
                 
                 point_geom = [QgsPointXY(*point_coords)]

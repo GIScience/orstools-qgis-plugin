@@ -57,7 +57,6 @@ from qgis.core import (QgsVectorLayer,
 
 def transformToWGS(old_layer, old_crs):
 
-    #TODO: define layer type dynamically
     geom_string = QgsWkbTypes.geometryDisplayString(old_layer.geometryType())
     new_layer = QgsVectorLayer("{}?crs=EPSG:4326".format(geom_string), old_layer.name(), "memory")
     new_layer.dataProvider().addAttributes(old_layer.fields())

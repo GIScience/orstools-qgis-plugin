@@ -42,9 +42,8 @@ from qgis.core import (QgsProject,
                        QgsMapLayer,
                        QgsWkbTypes,
                        )
-from qgis.gui import QgisInterface
 
-from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS, __version__
+from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS, __version__, DEFAULT_COLOR
 from ORStools.utils import exceptions, pointtool
 from ORStools.core import (client,
                            isochrones_core,
@@ -81,6 +80,7 @@ class ORStoolsDialogMain:
         self.first_start = True
         # Dialogs
         self.dlg = None
+        self.advanced = None
         self.menu = None
         self.actions = None
 
@@ -104,18 +104,22 @@ class ORStoolsDialogMain:
             ),
             # About dialog
             QAction(
-                create_icon('icon_about.svg'),
+                create_icon('icon_about.png'),
                 'About',
                 self.iface.mainWindow()
             )
         ]
 
+        # Create menu
         self.menu = QMenu(PLUGIN_NAME)
         self.menu.setIcon(icon_plugin)
         self.menu.addActions(self.actions)
 
+        # Add menu to Web menu and icon to toolbar
         self.iface.webMenu().addMenu(self.menu)
         self.iface.addWebToolBarIcon(self.actions[0])
+
+        # Connect slots to events
         self.actions[0].triggered.connect(self.run)
         self.actions[1].triggered.connect(lambda: on_config_click(parent=self.iface.mainWindow()))
         self.actions[2].triggered.connect(self._on_about_click)
@@ -123,13 +127,18 @@ class ORStoolsDialogMain:
     def unload(self):
         self.iface.webMenu().removeAction(self.menu.menuAction())
         self.iface.removeWebToolBarIcon(self.actions[0])
+        QApplication.restoreOverrideCursor()
+        del self.dlg
+        del self.advanced
 
     def _on_about_click(self):
-        info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: #b5152b">openrouteservice</a> routing functionalities.<br><br>' \
+        info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {}">openrouteservice</a> routing functionalities.<br><br>' \
                'Author: Nils Nolde<br>' \
                'Email: <a href="mailto:Nils Nolde <nils@gis-ops.com>">nils@gis-ops.com</a><br>' \
-               'Web: <a href="https://gis-ops.com">https://gis-ops.com</a>' \
-               'Version: {}'.format(__version__)
+               'Web: <a href="https://gis-ops.com">gis-ops.com</a><br>' \
+               'Repo: <a href="https://github.com/nilsnolde/ORStools">github.com/nilsnolde/ORStools</a><br>' \
+               'Version: {}'.format(DEFAULT_COLOR, __version__)
+
         QMessageBox.information(
             self.iface.mainWindow(),
             'About {}'.format(PLUGIN_NAME),
@@ -145,13 +154,21 @@ class ORStoolsDialogMain:
             text.append(os.environ[var])
         return '/'.join(text)
 
+    def _on_advanced_click(self):
+        self.advanced.show()
+
     def run(self):
         # Only populate GUI if it's the first start of the plugin within the QGIS session
         # If not checked, GUI will be rebuild every time!
+
         if self.first_start:
             self.first_start = False
-            self.dlg = ORStoolsDialog(self.iface, self.iface.mainWindow()) # setting parent enables modal view
+            self.dlg = ORStoolsDialog(self.iface, self.iface.mainWindow())  # setting parent enables modal view
+            # Connect acvanced dialog
+            self.dlg.routing_advanced_button.clicked.connect(self._on_advanced_click)
 
+        # Connect Advanced dialog; makes sure that dialog is re-populated every time plugin starts
+        self.advanced = ORStoolsDialogAdvancedMain(parent=self.dlg)
         self.dlg.show()
         result = self.dlg.exec_()
         if result:
@@ -168,7 +185,7 @@ class ORStoolsDialogMain:
                     params = iso_gui.getParameters()
                     for properties in iso_gui.getFeatureParameters(self.dlg.iso_layer_check.isChecked()):
                         params['locations'], params['id'] = properties
-                        isochrones_core.isochrones_request(clnt, params)
+                        response = isochrones_request(clnt, params)
 
                         # Update progress bar
                         feat_counter += 1
@@ -185,17 +202,14 @@ class ORStoolsDialogMain:
                                                       'The connection exceeded the '
                                                       'timeout limit of 60 seconds')
 
-            except (exceptions.OverQueryLimit,
-                    exceptions.ApiError,
-                    exceptions.TransportError,
+            except (exceptions.ApiError,
                     exceptions.OverQueryLimit) as e:
                 self.iface.messageBar().pushCritical("{}: ".format(type(e).__name__),
                                                      "{}".format(str(e)))
-
-            except Exception:
-                raise
             finally:
+                # TODO: features requested up to the error need to be rendered
                 self.dlg.progressBar.setValue(0)
+                self.dlg.progressBar.close()
                 self.dlg.close()
 
 
@@ -209,9 +223,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
         self.last_maptool = self._iface.mapCanvas().mapTool()
-
-        # Advanced dialog to access settings in directions module
-        self.advanced = None
 
         # Set up env variables for remaining quota
         os.environ["ORS_QUOTA"] = "None"
@@ -231,7 +242,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         # Config/Advanced dialogs
         self.config_button.clicked.connect(lambda: on_config_click(self))
-        self.routing_advanced_button.clicked.connect(self._on_advanced_click)
 
         # # Apply button, to update remaining quota
         # self.global_buttons.Apply.clicked.connect(self._on_apply_click)
@@ -273,10 +283,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     # def _on_apply_click(self):
     #     """Update remaining quota from env variables"""
     #     text = os.environ['ORS_REMAINING'] + "/" + os.environ['ORS_QUOTA']
-
-    def _on_advanced_click(self):
-        self.advanced = ORStoolsDialogAdvancedMain(parent=self)
-        self.advanced.exec_()
 
     def _accessLayerChanged(self):
         for child in self.sender().parentWidget().children():
@@ -396,18 +402,16 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         x, y = point
 
         if button == self.routing_start_frommap_button.objectName():
-            self.routing_start_frommap_label.setText("{0:.5f},{1:.5f}".format(x, y))
+            self.routing_start_frommap_label.setText("{0:.6f},{1:.6f}".format(x, y))
 
         if button == self.routing_end_frommap_button.objectName():
-            self.routing_end_frommap_label.setText("{0:.5f},{1:.5f}".format(x, y))
+            self.routing_end_frommap_label.setText("{0:.6f},{1:.6f}".format(x, y))
 
         # if button == self.routing_via_map_button.objectName():
         #     self.routing_via_label.setText("{0:.5f},{1:.5f}".format(x, y))
 
         if button == self.iso_location_button.objectName():
-            clt = client.Client(self._iface)
-            loc_dict = geocode_core.reverse_geocode(clt,
-                                               point)
+            loc_dict = geocode_core.reverse_geocode(point)
 
             out_str = u"{0:.6f}\n{1:.6f}\n{2}\n{3}\n{4}".format(loc_dict.get('Lon', ""),
                                                                 loc_dict.get('Lat', ""),
@@ -417,9 +421,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                                                                 )
             self.iso_location_label.setText(out_str)
 
+        # Restore old behavior
         QApplication.restoreOverrideCursor()
         self.mapTool.canvasClicked.disconnect()
-        self._iface.mapCanvas().unsetMapTool(self.mapTool)
+        self._iface.mapCanvas().setMapTool(self.last_maptool)
         if self.windowState() == Qt.WindowMinimized:
             # Window is minimised. Restore it.
             self.setWindowState(Qt.WindowMaximized)

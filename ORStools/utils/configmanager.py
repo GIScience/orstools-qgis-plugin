@@ -53,6 +53,7 @@ def write_config_all(new_config):
     with open(os.path.join(BASE_DIR, CONFIG_PATH), 'w') as f:
         yaml.safe_dump(new_config, f)
 
+
 def write_env_var(key, value):
     """update quota env variables"""
     os.environ[key] = value

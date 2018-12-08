@@ -27,6 +27,8 @@
  ***************************************************************************/
 """
 
+from ORStools.core import client
+
 admin_levels = {'country': 'COUNTRY',
                 'region': 'STATE',
                 'locality': 'CITY',
@@ -37,12 +39,14 @@ admin_levels = {'country': 'COUNTRY',
                 }
 
 
-def reverse_geocode(client, point_in):
+def reverse_geocode(point_in):
+    clnt = client.Client()
+
     params = dict()
     params['point.lat'] = point_in.y()
     params['point.lon'] = point_in.x()
     
-    response = client.request('/geocode/reverse', params)['features'][0]
+    response = clnt.request('/geocode/reverse', params)['features'][0]
     
     response_dict = dict()
     
