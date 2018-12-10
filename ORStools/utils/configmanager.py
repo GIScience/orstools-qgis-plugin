@@ -30,7 +30,6 @@ import os.path
 import yaml
 
 from ORStools import BASE_DIR, CONFIG_PATH
-from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 
 def read_config():

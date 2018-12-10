@@ -5,12 +5,9 @@ description=openrouteservice routing, isochrones and matrix calculations for QGI
 
 version=4.0-dev
 author=Nils Nolde
-email=nilsnolde@gmail.com
+email=nils@gis-ops.com
 
 about=OSM Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files. Extensive attributes are set for output files, incl. duration, length and start/end locations.
-
-tracker=https://github.com/nilsnolde/OSMtools/issues
-repository=https://github.com/nilsnolde/OSMtools.git
 
 changelog=2018/12/3 v4.0.0 Change name to ORS Tools, add processing provider
    2018/11/21 v3.2.0 Refactored codebase, solved #47, #48, #49, #52, #53, #54, #59
@@ -26,12 +23,15 @@ changelog=2018/12/3 v4.0.0 Change name to ORS Tools, add processing provider
    2017/05/30 v.0.3 Added support for overlap areas in accessibility analysis
    2017/05/22 v.0.2 Added scrollbar and removed 'dissolve' option
 
-tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility, route, isochrones, matrix, ORS
+tracker=https://github.com/nilsnolde/OSMtools/issues
+repository=https://github.com/nilsnolde/OSMtools.git
+help=https://github.com/nilsnolde/OSMtools/wiki/ORS-Tools-Help
 
-homepage=https://openrouteservice.org
+homepage=https://gis-ops.com
 category=Plugins
-icon=static/img/icon.png
+icon=static/img/icon_orstools.png
 experimental=False
 
 deprecated=False
 
+tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility, route, isochrones, matrix, ORS

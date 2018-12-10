@@ -26,3 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os.path
+from ORStools import BASE_DIR
+
+HELP_DIR = os.path.join(BASE_DIR, 'help')

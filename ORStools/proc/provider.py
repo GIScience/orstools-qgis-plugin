@@ -34,6 +34,8 @@ from qgis.core import QgsProcessingProvider
 
 from ORStools import ICON_DIR, PLUGIN_NAME, __version__
 from .isochrones_proc import ORSisochronesAlgo
+from .matrix_proc import ORSmatrixAlgo
+from .directions_proc import ORSdirectionsAlgo
 
 
 class ORStoolsProvider(QgsProcessingProvider):
@@ -42,7 +44,7 @@ class ORStoolsProvider(QgsProcessingProvider):
         QgsProcessingProvider.__init__(self)
 
         # Load algorithms
-        self.alglist = [ORSisochronesAlgo()]
+        self.alglist = [ORSdirectionsAlgo(), ORSisochronesAlgo(), ORSmatrixAlgo()]
 
     def unload(self):
         """

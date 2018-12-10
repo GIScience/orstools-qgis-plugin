@@ -23,6 +23,7 @@
 
 import os.path
 import configparser
+from datetime import datetime
 
 
 # noinspection PyPep8Naming
@@ -45,12 +46,20 @@ ICON_DIR = os.path.join(BASE_DIR, 'static', 'img')
 CONFIG_PATH = os.path.join(BASE_DIR, 'config.yml')
 ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
             'ORS_QUOTA': 'X-Ratelimit-Limit'}
+ENDPOINTS = {'isochrones': '/isochrones',
+             'directions': '/directions',
+             'matrix': '/matrix',
+             'geocoding': 'geocoding'}
 
 # Read metadata.txt
 METADATA = configparser.ConfigParser()
 METADATA.read(os.path.join(BASE_DIR, 'metadata.txt'))
+today = datetime.today()
 
 __version__ = METADATA['general']['version']
 __author__ = METADATA['general']['author']
-__date__ = '2018-11-19'
-__copyright__ = '(C) 2018 by ' + __author__
+__email__ = METADATA['general']['email']
+__web__ = METADATA['general']['homepage']
+__help__ = METADATA['general']['help']
+__date__ = today.strftime('%Y-%m-%d')
+__copyright__ = '(C) {} by {}'.format(today.year, __author__)

@@ -56,4 +56,9 @@ class OverQueryLimit(Exception):
         if self.message is None:
             return self.status
         else:
-            return "%s (%s)" % (self.status, self.message)
+            return "{} ({})".format(self.status, self.message)
+
+
+class Timeout(Exception):
+    """The request timed out."""
+    pass

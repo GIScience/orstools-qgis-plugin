@@ -27,12 +27,10 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsVectorLayer,
-                       QgsFeature,
-                       QgsWkbTypes,
-                       QgsCoordinateReferenceSystem,
+from qgis.core import (QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform,
-                       QgsProject)
+                       QgsProject
+                       )
 
 
 # def checkCRS(layer, messageBar):
@@ -55,26 +53,9 @@ from qgis.core import (QgsVectorLayer,
 #     return layer
 
 
-def transformToWGS(old_layer, old_crs):
+def transformToWGS(old_crs):
+    """Transforms to WGS84"""
+    outCrs = QgsCoordinateReferenceSystem(4326)
+    xformer = QgsCoordinateTransform(old_crs, outCrs, QgsProject.instance())
 
-    geom_string = QgsWkbTypes.geometryDisplayString(old_layer.geometryType())
-    new_layer = QgsVectorLayer("{}?crs=EPSG:4326".format(geom_string), old_layer.name(), "memory")
-    new_layer.dataProvider().addAttributes(old_layer.fields())
-    new_layer.updateFields()
-
-    new_crs = QgsCoordinateReferenceSystem(4326)
-    old_crs = QgsCoordinateReferenceSystem(old_crs)
-    xform = QgsCoordinateTransform(old_crs, new_crs, QgsProject.instance())
-
-    for o in old_layer.getFeatures():
-        n = QgsFeature()
-        g = o.geometry()
-        g.transform(xform)
-        n.setGeometry(g)
-        n.setAttributes(o.attributes())
-
-        new_layer.dataProvider().addFeature(n)
-
-    new_layer.updateExtents()
-
-    return new_layer
+    return xformer

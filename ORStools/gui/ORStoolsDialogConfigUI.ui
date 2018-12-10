@@ -7,24 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>345</width>
-    <height>205</height>
+    <height>151</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>ORS Settings</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="4,1,2">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="4,0">
    <item row="2" column="0">
     <widget class="QLabel" name="base_url_label">
      <property name="text">
       <string>Base URL</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="quota_label">
-     <property name="text">
-      <string>Requests per minute</string>
      </property>
     </widget>
    </item>
@@ -35,40 +28,17 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="QSpinBox" name="quota_spinbox">
-     <property name="maximum">
-      <number>1000</number>
-     </property>
-     <property name="value">
-      <number>40</number>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="0" colspan="3">
+   <item row="3" column="0" colspan="2">
     <widget class="QLineEdit" name="base_url_text">
      <property name="text">
       <string>https://api.openrouteservice.org</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3">
+   <item row="1" column="0" colspan="2">
     <widget class="QLineEdit" name="key_text"/>
    </item>
-   <item row="7" column="0" colspan="3">
+   <item row="6" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>

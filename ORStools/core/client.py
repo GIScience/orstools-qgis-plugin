@@ -34,9 +34,6 @@ import time
 import collections
 from urllib.parse import urlencode
 
-from PyQt5.QtWidgets import QMessageBox
-
-
 from ORStools import __version__, ENV_VARS, PLUGIN_NAME
 from ORStools.utils import exceptions, configmanager, logger
 
@@ -145,34 +142,42 @@ class Client(object):
             requests_method = self.session.post
             final_requests_kwargs["json"] = post_json
 
-        print("url:\n{}\nParameters:\n{}".format(self.base_url+authed_url,
-                                                 final_requests_kwargs))
+        logger.log(
+            "url: {}\nParameters: {}".format(
+                self.base_url+authed_url,
+                final_requests_kwargs
+            ),
+            'info'
+        )
 
         try:
-            response = requests_method(self.base_url + authed_url,
-                                       **final_requests_kwargs)
+            response = requests_method(
+                self.base_url + authed_url,
+                **final_requests_kwargs
+            )
         except requests.exceptions.Timeout:
             raise
 
         try:
             result = self._get_body(response)
             self.sent_times.append(time.time())
-        # Other exceptions should be handled by client callers
-        except exceptions.OverQueryLimit:
-            # TODO: provide feedback to user: how to do implement for GUI and processing algo?
-            # https://stackoverflow.com/questions/40932639/pyqt-messagebox-automatically-closing-after-few-seconds
+
+        except exceptions.OverQueryLimit as e:
             elapsed_since_earliest = time.time() - self.sent_times[0]
             sleep_for = 60 - elapsed_since_earliest
 
-            logger.log("started sleeping for {}".format(sleep_for), 'info')
+            logger.log("{}: {}".format(e.__class__.__name__, str(e)), 0)
 
             time.sleep(sleep_for)
 
             return self.request(url, params, first_request_time, retry_counter + 1, requests_kwargs, post_json)
 
+        except exceptions.ApiError as e:
+            logger.log("Feature ID {} caused a {}: {}".format(params['id'], e.__class__.__name__, str(e)), 2)
+            raise
+
         # Write env variables if successful
         for env_var in ENV_VARS:
-            print(response.headers[ENV_VARS[env_var]])
             configmanager.write_env_var(env_var, response.headers[ENV_VARS[env_var]])
 
         return result

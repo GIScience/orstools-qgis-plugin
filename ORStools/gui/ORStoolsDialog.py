@@ -28,6 +28,7 @@
 """
 
 import os
+import webbrowser
 
 from PyQt5.QtWidgets import (QAction,
                              QDialog,
@@ -36,24 +37,24 @@ from PyQt5.QtWidgets import (QAction,
                              QPushButton,
                              QMenu,
                              QMessageBox)
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QVariant
 from PyQt5.QtGui import QPixmap, QIcon
 from qgis.core import (QgsProject,
                        QgsMapLayer,
                        QgsWkbTypes,
                        )
 
-from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS, __version__, DEFAULT_COLOR
-from ORStools.utils import exceptions, pointtool
+from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS, ENDPOINTS, DEFAULT_COLOR, __version__, __email__, __web__, __help__
+from ORStools.utils import exceptions, pointtool, logger
 from ORStools.core import (client,
                            isochrones_core,
                            directions_core,
-                           matrix_core,
                            geocode_core,
                            PROFILES,
                            PREFERENCES,
-                           UNITS)
-from ORStools.gui import (isochrones_gui)
+                           DIMENSIONS)
+from ORStools.gui import (isochrones_gui,
+                          directions_gui)
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogAdvanced import ORStoolsDialogAdvancedMain
@@ -76,6 +77,7 @@ class ORStoolsDialogMain:
         :type iface: Qgis.Interface
         """
         self.iface = iface
+        self.project = QgsProject.instance()
 
         self.first_start = True
         # Dialogs
@@ -107,7 +109,14 @@ class ORStoolsDialogMain:
                 create_icon('icon_about.png'),
                 'About',
                 self.iface.mainWindow()
+            ),
+            # Help page
+            QAction(
+                create_icon('icon_help.png'),
+                'Help',
+                self.iface.mainWindow()
             )
+
         ]
 
         # Create menu
@@ -122,6 +131,8 @@ class ORStoolsDialogMain:
         # Connect slots to events
         self.actions[0].triggered.connect(self.run)
         self.actions[1].triggered.connect(lambda: on_config_click(parent=self.iface.mainWindow()))
+        self.actions[3].triggered.connect(self._on_help_click)
+        # Connect other dialogs
         self.actions[2].triggered.connect(self._on_about_click)
 
     def unload(self):
@@ -132,18 +143,21 @@ class ORStoolsDialogMain:
         del self.advanced
 
     def _on_about_click(self):
-        info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {}">openrouteservice</a> routing functionalities.<br><br>' \
+        info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {0}">openrouteservice</a> routing functionalities.<br><br>' \
                'Author: Nils Nolde<br>' \
-               'Email: <a href="mailto:Nils Nolde <nils@gis-ops.com>">nils@gis-ops.com</a><br>' \
-               'Web: <a href="https://gis-ops.com">gis-ops.com</a><br>' \
+               'Email: <a href="mailto:Nils Nolde <{1}>">{1}</a><br>' \
+               'Web: <a href="{2}">{2}</a><br>' \
                'Repo: <a href="https://github.com/nilsnolde/ORStools">github.com/nilsnolde/ORStools</a><br>' \
-               'Version: {}'.format(DEFAULT_COLOR, __version__)
+               'Version: {3}'.format(DEFAULT_COLOR, __email__, __web__, __version__)
 
         QMessageBox.information(
             self.iface.mainWindow(),
             'About {}'.format(PLUGIN_NAME),
             info
         )
+
+    def _on_help_click(self):
+        webbrowser.open(__help__)
 
     @staticmethod
     def get_quota():
@@ -159,57 +173,95 @@ class ORStoolsDialogMain:
 
     def run(self):
         # Only populate GUI if it's the first start of the plugin within the QGIS session
-        # If not checked, GUI will be rebuild every time!
-
+        # If not checked, GUI would be rebuilt every time!
         if self.first_start:
             self.first_start = False
             self.dlg = ORStoolsDialog(self.iface, self.iface.mainWindow())  # setting parent enables modal view
-            # Connect acvanced dialog
             self.dlg.routing_advanced_button.clicked.connect(self._on_advanced_click)
 
-        # Connect Advanced dialog; makes sure that dialog is re-populated every time plugin starts
+        # Populate Advanced dialog; makes sure that dialog is re-populated every time plugin starts,
+        # but stays alive during one session
         self.advanced = ORStoolsDialogAdvancedMain(parent=self.dlg)
         self.dlg.show()
-        result = self.dlg.exec_()
+        result = self.dlg.exec()
         if result:
+            layer_out = None
             try:
-                clnt = client.Client(self.iface)
-                feat_counter = 0
+                clnt = client.Client()
 
                 if self.dlg.tabWidget.currentIndex() == 2:
-                    m = matrix_core.matrix(self.dlg, clnt, self.iface)
-                    m.matrix_calc()
+                    pass
 
                 elif self.dlg.tabWidget.currentIndex() == 1:
-                    iso_gui = isochrones_gui.IsochronesGui(self.dlg)
-                    params = iso_gui.getParameters()
-                    for properties in iso_gui.getFeatureParameters(self.dlg.iso_layer_check.isChecked()):
-                        params['locations'], params['id'] = properties
-                        response = isochrones_request(clnt, params)
+                    isochrones = isochrones_core.Isochrones()
 
-                        # Update progress bar
-                        feat_counter += 1
-                        self.dlg.progressBar.setValue(int(feat_counter/iso_gui.feature_count * 100))
+                    # Make isochrone request
+                    params = isochrones_gui.get_request_parameters(self.dlg)
+                    response = clnt.request(ENDPOINTS['isochrones'], params)
+
+                    # Populate layer_out
+                    isochrones.set_parameters(
+                        layer_name='Isochrones_' + params['locations'],
+                        profile=params['profile'],
+                        dimension=self.dlg.iso_unit_combo.currentText(),
+                        id_field_type=QVariant.Int,
+                        id_field_name='FTID',
+                        factor=60 if params['range_type'] == 'time' else 1,
+                    )
+
+                    layer_out = isochrones.get_polygon_layer()
+                    for isochrone in isochrones.get_features(response, '0'):
+                        layer_out.dataProvider().addFeature(isochrone)
+                    layer_out.updateExtents()
+
+                    isochrones.stylePoly(layer_out)
+
+                    self.dlg.progressBar.setValue(100)
 
                 elif self.dlg.tabWidget.currentIndex() == 0:
-                    route = directions_core.directions(self.dlg, clnt, self.iface)
-                    route.directions_calc()
+                    directions = directions_gui.Directions(self.dlg, self.advanced)
+                    params = directions.get_basic_paramters()
+                    layer_out = directions.get_linestring_layer()
+
+                    # Very ugly way to get the route count
+                    route_count = directions.get_route_count()
+                    counter = 0
+
+                    for coordinates, values in directions.get_request_features():
+                        params['coordinates'] = coordinates
+
+                        response = clnt.request(ENDPOINTS['directions'], params)
+                        layer_out.dataProvider().addFeature(directions_core.get_feature(
+                            response,
+                            params['profile'],
+                            params['preference'],
+                            directions.avoid,
+                            values[0],
+                            values[1]
+                        ))
+                        counter += 1
+                        self.dlg.progressBar.setValue(int(counter/route_count) * 100)
+
+                    layer_out.updateExtents()
 
                 # Update quota; handled in client module after successful request
-                self.dlg.quota_text.setText(self.get_quota() + 'req')
+                self.dlg.quota_text.setText(self.get_quota() + ' calls')
             except exceptions.Timeout:
                 self.iface.messageBar().pushCritical('Time out',
                                                       'The connection exceeded the '
                                                       'timeout limit of 60 seconds')
 
-            except (exceptions.ApiError,
-                    exceptions.OverQueryLimit) as e:
-                self.iface.messageBar().pushCritical("{}: ".format(type(e).__name__),
-                                                     "{}".format(str(e)))
+            except exceptions.ApiError as e:
+                self.iface.messageBar().pushCritical(e.__class__.__name__,
+                                                     str(e))
             finally:
-                # TODO: features requested up to the error need to be rendered
+                if layer_out.featureCount() > 0:
+                    self.project.addMapLayer(layer_out)
+                else:
+                    QMessageBox.warning(self.iface.mainWindow(),
+                                          PLUGIN_NAME,
+                                          "No features were generated!")
                 self.dlg.progressBar.setValue(0)
-                self.dlg.progressBar.close()
                 self.dlg.close()
 
 
@@ -243,46 +295,26 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Config/Advanced dialogs
         self.config_button.clicked.connect(lambda: on_config_click(self))
 
-        # # Apply button, to update remaining quota
-        # self.global_buttons.Apply.clicked.connect(self._on_apply_click)
-
-        # Matrix tab
-        self.matrix_start_combo.currentIndexChanged.connect(self._layerSelectedChanged)
-        self.matrix_end_combo.currentIndexChanged.connect(self._layerSelectedChanged)
-        # self.matrix_start_refresh.clicked.connect(self._layerTreeChanged)
-        # self.matrix_end_refresh.clicked.connect(self._layerTreeChanged)
-
         # Isochrone tab
         self.iso_location_button.clicked.connect(self._initMapTool)
         self.iso_unit_combo.currentIndexChanged.connect(self._unitChanged)
-        self.iso_layer_check.stateChanged.connect(self._accessLayerChanged)
-        # self.iso_layer_refresh.clicked.connect(self._layerTreeChanged)
 
         # Routing tab
         self.routing_start_frommap_button.clicked.connect(self._initMapTool)
-        # self.routing_via_map_button.clicked.connect(self._initMapTool)
         self.routing_end_frommap_button.clicked.connect(self._initMapTool)
         self.start_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
         self.end_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
-        # self.routing_via_clear_button.clicked.connect(self._clearVia)
         self.project.layerWasAdded.connect(self._layerTreeChanged)
         self.project.layersRemoved.connect(self._layerTreeChanged)
-        # self.routing_start_fromlayer_refresh.clicked.connect(self._layerTreeChanged)
-        # self.routing_end_fromlayer_refresh.clicked.connect(self._layerTreeChanged)
         self.routing_start_fromlayer_combo.currentIndexChanged[int].connect(self._layerSelectedChanged)
         self.routing_end_fromlayer_combo.currentIndexChanged[int].connect(self._layerSelectedChanged)
 
         # Populate combo boxes
         self.routing_travel_combo.addItems(PROFILES)
         self.iso_travel_combo.addItems(PROFILES)
-        self.matrix_travel_combo.addItems(PROFILES)
         self.routing_preference_combo.addItems(PREFERENCES)
-        self.iso_unit_combo.addItems(UNITS)
+        self.iso_unit_combo.addItems(DIMENSIONS)
         self._layerTreeChanged()
-
-    # def _on_apply_click(self):
-    #     """Update remaining quota from env variables"""
-    #     text = os.environ['ORS_REMAINING'] + "/" + os.environ['ORS_QUOTA']
 
     def _accessLayerChanged(self):
         for child in self.sender().parentWidget().children():
@@ -301,10 +333,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                                                     layer.wkbType() == QgsWkbTypes.Type(1)]
 
         comboboxes = [self.routing_start_fromlayer_combo,
-                      self.routing_end_fromlayer_combo,
-                      self.iso_layer_combo,
-                      self.matrix_start_combo,
-                      self.matrix_end_combo]
+                      self.routing_end_fromlayer_combo,]
 
         for box in comboboxes:
             old_id = box.currentData()
@@ -406,9 +435,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         if button == self.routing_end_frommap_button.objectName():
             self.routing_end_frommap_label.setText("{0:.6f},{1:.6f}".format(x, y))
-
-        # if button == self.routing_via_map_button.objectName():
-        #     self.routing_via_label.setText("{0:.5f},{1:.5f}".format(x, y))
 
         if button == self.iso_location_button.objectName():
             loc_dict = geocode_core.reverse_geocode(point)

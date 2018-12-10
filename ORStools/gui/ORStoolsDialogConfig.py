@@ -28,7 +28,6 @@
 """
 
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtGui import QIcon
 
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
 from ORStools.utils import configmanager
@@ -40,23 +39,16 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         QDialog.__init__(self, parent)
 
         self.setupUi(self)
-        self.ok_btn = self.buttonBox.Apply
-        self.cancel_btn = self.buttonBox.Cancel
 
         self.CONFIG = configmanager.read_config()
 
         # Populate line widgets
         self.key_text.setText(self.CONFIG['api_key'])
         self.base_url_text.setText(self.CONFIG['base_url'])
-        self.quota_spinbox.setValue(self.CONFIG['req_per_min'])
-
-        # Set up connections
-        # self.ok_btn.clicked.connect(self.accept())
 
     def accept(self):
         new_config = {'api_key': self.key_text.text(),
-                      'base_url': self.base_url_text.text(),
-                      'req_per_min': self.quota_spinbox.value()}
+                      'base_url': self.base_url_text.text()}
 
         configmanager.write_config_all(new_config)
         self.close()

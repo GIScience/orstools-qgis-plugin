@@ -40,6 +40,6 @@ PROFILES = [
             'wheelchair'
             ]
 
-UNITS = ['time', 'distance']
+DIMENSIONS = ['time', 'distance']
 
 PREFERENCES = ['fastest', 'shortest']

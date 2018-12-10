@@ -2,7 +2,7 @@ from qgis.core import QgsMessageLog, Qgis
 
 from ORStools import PLUGIN_NAME
 
-def log(message, level_in='info'):
+def log(message, level_in=0):
     """uses QGIS inbuilt logger accessible through panel"""
     if level_in == 0:
         level = Qgis.Info

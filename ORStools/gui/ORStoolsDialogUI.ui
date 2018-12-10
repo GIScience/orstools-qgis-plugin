@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>477</width>
+    <width>490</width>
     <height>775</height>
    </rect>
   </property>
@@ -192,7 +192,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="quota_text">
         <property name="text">
          <string>No request yet</string>
         </property>
@@ -210,7 +210,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -230,7 +230,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>435</width>
+            <width>448</width>
             <height>489</height>
            </rect>
           </property>
@@ -1095,52 +1095,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="iso_layer_group" native="true">
-         <layout class="QGridLayout" name="gridLayout_14">
-          <item row="3" column="2">
-           <widget class="QPushButton" name="iso_layer_refresh">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Refresh List</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="iso_layer_label">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Point Layer</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QComboBox" name="iso_layer_combo">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-            <property name="editable">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="iso_layer_check">
-            <property name="text">
-             <string>Use Layer</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>&lt;html&gt;
+&lt;center&gt;
+The layer option has moved to the Processing toolbox
+&lt;br&gt;&lt;br&gt;
+&lt;b&gt;Generate Isochrones&lt;/b&gt;
+&lt;/center&gt;
+&lt;/html&gt;</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -1151,7 +1115,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>100</height>
           </size>
          </property>
         </spacer>
@@ -1162,107 +1126,19 @@
       <attribute name="title">
        <string>Matrix</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
        <item>
-        <widget class="QWidget" name="matrix_travel_group" native="true">
-         <layout class="QGridLayout" name="gridLayout_15">
-          <item row="0" column="1">
-           <widget class="QComboBox" name="matrix_travel_combo"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="matrix_travel_label">
-            <property name="text">
-             <string>Travel mode</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>&lt;html&gt;
+&lt;center&gt;
+This tool has moved to the Processing toolbox
+&lt;br&gt;&lt;br&gt;
+&lt;b&gt;Generate Matrix&lt;/b&gt;
+&lt;/center&gt;
+&lt;/html&gt;</string>
+         </property>
         </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="matrix_start_group">
-         <property name="title">
-          <string>Start Locations</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,2">
-          <item row="3" column="1">
-           <widget class="QComboBox" name="matrix_start_id_combo">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="matrix_start_id_label">
-            <property name="text">
-             <string>Unique ID</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QComboBox" name="matrix_start_combo">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="toolTip">
-             <string>Input Layer must be of type 'Point' </string>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="matrix_end_group">
-         <property name="title">
-          <string>End Locations</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_16" columnstretch="1,2">
-          <item row="1" column="0">
-           <widget class="QLabel" name="matrix_end_id_label">
-            <property name="text">
-             <string>Unique ID</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="matrix_end_id_combo">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QComboBox" name="matrix_end_combo">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="toolTip">
-             <string>Input Layer must be of type 'Point' </string>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -1293,7 +1169,6 @@
   <tabstop>iso_unit_combo</tabstop>
   <tabstop>iso_location_button</tabstop>
   <tabstop>iso_travel_combo</tabstop>
-  <tabstop>iso_layer_combo</tabstop>
   <tabstop>routing_end_frommap_radio</tabstop>
   <tabstop>routing_end_fromlayer_radio</tabstop>
   <tabstop>routing_twolayer_rowbyrow</tabstop>

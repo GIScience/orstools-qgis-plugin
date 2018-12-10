@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
  falk
                               -------------------
@@ -38,191 +38,108 @@ from qgis.core import (QgsPointXY,
                        QgsVectorLayer,
                        QgsFeature,
                        QgsField,
+                       QgsFields,
                        QgsGeometry,
                        QgsSymbol,
                        QgsSimpleFillSymbolLayer,
                        QgsRendererCategory,
-                       QgsCategorizedSymbolRenderer,
-                       QgsMessageLog)
+                       QgsCategorizedSymbolRenderer)
 
-from ORStools.utils import convert, transform
+class Isochrones():
 
-    
-def isochrones_request(clnt, params):
-    """
-    Performs requests to the ORS isochrone API.
-    """
-    return clnt.request('/isochrones', params)
+    def __init__(self):
 
+        # Will all be set in self.set_parameters(), bcs Processing Algo has to initialize this class before it
+        # knows about its own parameters
+        self.layer_name = None
+        self.profile = None
+        self.dimension = None
+        self.id_field_type = None
+        self.id_field_name = None
+        self.factor = None
+        self.difference = None
+        self.field_dimension_name = None
 
-def dummy():
-    if self.dlg.iso_layer_check.isChecked():
-        layer_name = self.dlg.iso_layer_combo.currentText()
+    def set_parameters(self, layer_name, profile, dimension, id_field_type, id_field_name, factor, difference=None):
+        self.layer_name = layer_name
+        self.profile = profile
+        self.dimension = dimension
+        self.id_field_type = id_field_type
+        self.id_field_name = id_field_name
+        self.factor = factor
+        self.difference = difference or None
 
-        layer = self.project.mapLayer(self.dlg.iso_layer_combo.currentData())
+        self.field_dimension_name = "AA_MINS" if self.dimension == 'time' else "AA_METERS"
 
-        layer = transform.checkCRS(layer, self.iface.messageBar())
+    def get_fields(self):
 
-        # If features are selected, calculate with those
-        if layer.selectedFeatureCount() == 0:
-            feats = layer.getFeatures()
-            feat_count = layer.featureCount()
-        else:
-            feats = layer.selectedFeatures()
-            feat_count = layer.selectedFeatureCount()
+        fields = QgsFields()
+        fields.append(QgsField(self.id_field_name, self.id_field_type))  # ID field
+        fields.append(QgsField(self.field_dimension_name, QVariant.Int))  # Dimension field
+        fields.append(QgsField("AA_MODE", QVariant.String))
+        fields.append(QgsField("TOTAL_POP", QVariant.String))
 
-        message_bar, progress_widget = progressbar.pushProgressBar(self.iface)
+        return fields
 
-        responses = []
-        for i, feat in enumerate(feats):
-            percent = (i/feat_count) * 100
-            message_bar.setValue(percent)
-            # Get coordinates
-            geom = feat.geometry().asPoint()
-            coords = [geom.x(), geom.y()]
+    def get_polygon_layer(self):
 
-            # Get response
-            self.params['locations'] = convert.build_coords(coords)
-            self.params['id'] = feat.id()
-            responses.append(self.client.request(self.url, self.params))
+        poly_out = QgsVectorLayer("Polygon?crs=EPSG:4326", self.layer_name, "memory")
 
-        poly_out = self._addPolygon(responses, layer_name)
-
-        self.iface.messageBar().popWidget(progress_widget)
-
-    else:
-        # Define the mapped point
-        coords = [float(x) for x in self.dlg.iso_location_label.text().split('\n')[:2]]
-        in_point_geom = QgsPointXY(*coords)
-        geocode_dict = geocode_core.reverse_geocode(self.client, in_point_geom)
-
-        self.params['locations'] = convert.build_coords(coords)
-        self.params['id'] = '-1'
-
-        # Fire request
-        response = self.client.request(self.url, self.params)
-        response_center = response['features'][0]['properties']['center']
-
-        out_point_geom = QgsPointXY(*response_center)
-
-        name_ext = "{0:.3f},{1:.3f}".format(*response_center)
-
-        poly_out = self._addPolygon([response], name_ext)
-
-        point_out = self._addPoint(geocode_dict, out_point_geom, name_ext)
-        point_out.updateExtents()
-        self.project.addMapLayer(point_out)
-
-    poly_out.updateExtents()
-
-    self._stylePoly(poly_out)
-    self.project.addMapLayer(poly_out)
-#        self.iface.mapCanvas().zoomToFeatureExtent(poly_out.extent())
-        
-    def _addPoint(self, response_dict, point_geom, name_ext):
-        """
-        Get point layer from Map button.
-        
-        :param response_dict: Response from geocoding request.
-        :type response_dict: dict from JSON
-        
-        :param point_geom: Point coordinates from geocoding request.
-        :type point_geom: QgsPointXY
-        
-        :param name_ext: Name extension for layer.
-        :type name_ext: str
-        
-        :rtype: QgsMapLayer
-        """
-        layer_name = "Point_{}".format(name_ext)
-        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", layer_name, "memory")
-        
-        point_layer.dataProvider().addAttributes([QgsField("LAT", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("LONG", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("NAME", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("STREET", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("NUMBER", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("POSTALCODE", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("CITY", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("STATE", QVariant.String)])
-        point_layer.dataProvider().addAttributes([QgsField("COUNTRY", QVariant.String)])
-        point_layer.updateFields()
-        
-        # Add clicked point feature to point feature class
-        point_feat = QgsFeature()
-        point_feat.setGeometry(QgsGeometry.fromPointXY(point_geom))
-        point_feat.setAttributes([response_dict.get("Lat", None),
-                                response_dict.get("Lon", None),
-                                response_dict.get("NAME", None),
-                                response_dict.get("STREET", None),
-                                response_dict.get("NUMBER", None),
-                                response_dict.get("POSTALCODE", None),
-                                response_dict.get("CITY", None),
-                                response_dict.get("STATE", None),
-                                response_dict.get('COUNTRY', None)
-                                ])
-        point_layer.dataProvider().addFeatures([point_feat])
-        
-        return point_layer
-        
-            
-    def _addPolygon(self, responses, name_ext):
-        """
-        Get polygon layer from Map button.
-        
-        :param responses: Responses from isochrone request.
-        :type responses: list of JSON
-        
-        :param name_ext: Name extension for layer.
-        :type name_ext: str
-        
-        :rtype: QgsMapLayer
-        """
-        layer_name = "Isochrone_{}".format(name_ext)
-        poly_out = QgsVectorLayer("Polygon?crs=EPSG:4326", layer_name, "memory")
-        poly_out.dataProvider().addAttributes([QgsField("FTID", QVariant.Int)])
-        
-        if self.dimension == 'time':
-            poly_out.dataProvider().addAttributes([QgsField("AA_MINS", QVariant.Int)])
-        else:
-            poly_out.dataProvider().addAttributes([QgsField("AA_METERS", QVariant.Int)])            
-        poly_out.dataProvider().addAttributes([QgsField("AA_MODE", QVariant.String)])
+        poly_out.dataProvider().addAttributes(self.get_fields())
         poly_out.updateFields()
-        
+
+        return poly_out
+
+    def get_features(self, response, id_field_value):
+
         # Sort features based on the isochrone value, so that longest isochrone
         # is added first. This will plot the isochrones on top of each other.
         l = lambda x: x['properties']['value']
-        for response in responses:
-            ftid = response['info']['query']['id']
-            for isochrone in sorted(response['features'], key=l, reverse=True):
-                feat = QgsFeature()
-                coordinates = isochrone['geometry']['coordinates']
-                iso_value = isochrone['properties']['value']
-                qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
-                feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
-                feat.setAttributes([ftid,
-                                    int(iso_value / self.factor),
-                                    self.iso_mode])
-                poly_out.dataProvider().addFeature(feat)
-        
-        return poly_out
+        for isochrone in sorted(response['features'], key=l, reverse=True):
+            feat = QgsFeature()
+            coordinates = isochrone['geometry']['coordinates']
+            iso_value = isochrone['properties']['value']
+            total_pop = isochrone['properties']['total_pop']
+            qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
+            feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
+            feat.setAttributes([
+                id_field_value,
+                int(iso_value / self.factor),
+                self.profile,
+                total_pop
+            ])
 
-    def _stylePoly(self, layer):
+            yield feat
+
+    # def calculate_difference(self, dest_id, context):
+    #     """Something goes wrong here.. The parent algorithm can't see the dissolved layer.."""
+    #     layer = QgsProcessingUtils.mapLayerFromString(dest_id, context)
+    #
+    #     dissolve_params = {
+    #         'INPUT': layer,
+    #         'FIELD': self.field_dimension_name,
+    #         'OUTPUT': 'memory:'
+    #     }
+    #     dissolved = processing.run('qgis:dissolve', dissolve_params, context=context)['OUTPUT']
+    #
+    #     return dissolved
+
+    def stylePoly(self, layer):
         """
         Style isochrone polygon layer
-        
+
         :param layer: Polygon layer to be styled.
         :type layer: QgsMapLayer
         """
+
         if self.dimension == 'time':
-            field_name = 'AA_MINS'
             legend_suffix = ' mins'
         else:
-            field_name = 'AA_METERS'
             legend_suffix = ' m'
-        field = layer.fields().lookupField(field_name)
+
+        field = layer.fields().lookupField(self.field_dimension_name)
         unique_values = sorted(layer.uniqueValues(field))
-            
+
         colors = {0: QColor('#2b83ba'),
                   1: QColor('#64abb0'),
                   2: QColor('#9dd3a7'),
@@ -233,32 +150,32 @@ def dummy():
                   7: QColor('#f99e59'),
                   8: QColor('#e85b3a'),
                   9: QColor('#d7191c')}
-        
+
         categories = []
-        
+
         for cid, unique_value in enumerate(unique_values):
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-        
+
             # configure a symbol layer
             symbol_layer = QgsSimpleFillSymbolLayer(color=colors[cid],
                                                     strokeColor=QColor('#000000'))
-        
+
             # replace default symbol layer with the configured one
             if symbol_layer is not None:
                 symbol.changeSymbolLayer(0, symbol_layer)
-        
+
             # create renderer object
             category = QgsRendererCategory(unique_value, symbol, str(unique_value) + legend_suffix)
             # entry for the list of category items
             categories.append(category)
-        
+
         # create renderer object
-        renderer = QgsCategorizedSymbolRenderer(field_name, categories)
-        
+        renderer = QgsCategorizedSymbolRenderer(self.field_dimension_name, categories)
+
         # assign the created renderer to the layer
         if renderer is not None:
             layer.setRenderer(renderer)
         layer.setOpacity(0.5)
-        
+
         layer.triggerRepaint()
