@@ -59,7 +59,7 @@ class Client(object):
         base_params = configmanager.read_config()
         
         (self.key, 
-         self.base_url, 
+         self.base_url,
          self.queries_per_minute) = [v for (k, v) in sorted(base_params.items())]
         
         self.session = requests.Session()

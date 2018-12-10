@@ -45,10 +45,12 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         # Populate line widgets
         self.key_text.setText(self.CONFIG['api_key'])
         self.base_url_text.setText(self.CONFIG['base_url'])
+        self.request_value.setValue(self.CONFIG['req_per_min'])
 
     def accept(self):
         new_config = {'api_key': self.key_text.text(),
-                      'base_url': self.base_url_text.text()}
+                      'base_url': self.base_url_text.text(),
+                      'req_per_min': self.request_value.value()}
 
         configmanager.write_config_all(new_config)
         self.close()

@@ -62,9 +62,6 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
     IN_END_FIELD = "INPUT_END_FIELD"
     IN_PROFILE = "INPUT_PROFILE"
     OUT = 'OUTPUT'
-
-    # Init ORS client
-    clnt = client.Client()
     # Save reference to output layer
     # isochrones = isochrones_core.Isochrones()
     # dest_id = None
@@ -147,6 +144,10 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         return ORSmatrixAlgo()
 
     def processAlgorithm(self, parameters, context, feedback):
+
+        # Init ORS client
+        clnt = client.Client()
+
         params = dict()
         get_params = dict()
         get_params['profile'] = params['profile'] = PROFILES[self.parameterAsEnum(
@@ -200,10 +201,11 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         if source_equals_destination:
             features = sources_features
         else:
-            # Abort when too many features
-            if len(sources_features) + len(destination_features) > 100:
-                raise QgsProcessingException("The cumulative feature count is > 50!")
             features = sources_features + destination_features
+
+        # Abort when too many features
+        if len(features) > 100:
+            raise QgsProcessingException("The cumulative feature count is > 100!")
 
         # Get feature points after transformation
         xformer = transform.transformToWGS(source.sourceCrs())
@@ -212,6 +214,8 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         # Get IDs
         sources_ids = list(range(sources_amount)) if source_equals_destination else list(range(sources_amount))
         destination_ids = list(range(sources_amount)) if source_equals_destination else list(range(sources_amount, sources_amount + destinations_amount))
+
+        feedback.pushInfo("Amount of features: {}".format(len(features_points)))
 
         # Populate parameters further
         params.update({
@@ -224,7 +228,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = self.clnt.request(ENDPOINTS[self.ALGO_NAME], get_params, post_json=params)
+            response = clnt.request(ENDPOINTS[self.ALGO_NAME], get_params, post_json=params)
         except exceptions.ApiError as e:
             feedback.reportError("{}:\n{}".format(
                 e.__class__.__name__,
@@ -252,8 +256,8 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
                 feat.setAttributes([
                     source,
                     destination,
-                    response['durations'][s][d],
-                    response['distances'][s][d]
+                    response['durations'][s][d] / 3600,
+                    response['distances'][s][d] / 1000
                 ])
 
                 sink.addFeature(feat)

@@ -64,8 +64,6 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
     IN_DIFFERENCE = 'INPUT_DIFFERENCE'
     OUT = 'OUTPUT'
 
-    # Init ORS client
-    clnt = client.Client()
     # Save reference to output layer
     isochrones = isochrones_core.Isochrones()
     dest_id = None
@@ -158,6 +156,9 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
 
     def processAlgorithm(self, parameters, context, feedback):
+        # Init ORS client
+        clnt = client.Client()
+
         params = dict()
         params['attributes'] = 'total_pop'
 

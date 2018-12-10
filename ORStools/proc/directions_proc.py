@@ -64,9 +64,6 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
     IN_MODE = "INPUT_MODE"
     OUT = 'OUTPUT'
 
-    # Init ORS client
-    clnt = client.Client()
-
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
         self.addParameter(
@@ -163,6 +160,8 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
 
     def processAlgorithm(self, parameters, context, feedback):
+        # Init ORS client
+        clnt = client.Client()
 
         profile = PROFILES[self.parameterAsEnum(
             parameters,
@@ -252,7 +251,7 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
             feedback.setProgress(int(100.0 / route_count * counter))
 
             try:
-                response = self.clnt.request(ENDPOINTS[self.ALGO_NAME], params)
+                response = clnt.request(ENDPOINTS[self.ALGO_NAME], params)
             except exceptions.ApiError as e:
                 feedback.reportError("Route from {} to {} caused a {}:\n{}".format(
                     values[0],
