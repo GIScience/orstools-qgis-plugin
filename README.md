@@ -1,13 +1,15 @@
 # OSM tools
 **Note, only QGIS v3.x is supported.**
 
-Set of tools to use [openrouteservice](https://openrouteservice.org) (ORS) API's as a plugin in QGIS.
+Set of tools to use [openrouteservice](https://openrouteservice.org) (ORS) API's in QGIS.
 
-OSM Tools gives you easy access to the following API's:
+ORS Tools gives you easy access to the following API's:
 
 - [Directions](https://openrouteservice.org/documentation/#/reference/directions/directions/directions-service)
 - [Isochrones](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service)
 - [Matrix](https://openrouteservice.org/documentation/#/reference/matrix/matrix/matrix-service-(post))
+
+The [wiki](https://github.com/nilsnolde/OSMtools/wiki/ORS-Tools-Help) offers a tutorial on usage.
 
 In case of issues/bugs, please use the [issue tracker](https://github.com/nilsnolde/OSMtools/issues).
 
@@ -23,17 +25,19 @@ See also:
 ## Functionalities
 
 ### General
-Use QGIS to generate input for **routing**, **isochrones** and **matrix calculations** powered by ORS, either via clicking coordinates in the map canvas or using point layers for batch operation.
+Use QGIS to generate input for **routing**, **isochrones** and **matrix calculations** powered by ORS.
+
+It offers either a GUI in the Web menu and toolbar of QGIS to interactively use the API's from the map canvas.
+
+For batch operations you can find a ORS toolbox in the Processing toolbox.
 
 ### Customization
-The tool includes a `config.yml` to set the basic config parameters for openrouteservice:
 
-```yaml
-base_url: https://api.openrouteservice.org
-api_key: 
-req_per_min: 40
-```
-The `api_key` is updated dynamically from the UI. However, if you're running a local ORS version, you want to change the `base_url`. If your API key is eligible for higher rate limits than 40 req/min, you can also specify this here.
+You'll have to get an API key first: <https://openrouteservice.org/sign-up>.
+
+Additionally you can register your own base URL if you're hosting a custom ORS backend.
+
+Configuration takes place either from the Web menu entry > *Configuration*. Or from *Config* button in the GUI.
 
 ## Getting Started
 

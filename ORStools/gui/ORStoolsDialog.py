@@ -67,6 +67,10 @@ def on_config_click(parent):
     config_dlg.exec_()
 
 
+def on_help_click(self):
+    webbrowser.open(__help__)
+
+
 class ORStoolsDialogMain:
     """Defines all mandatory QGIS things about dialog."""
 
@@ -131,7 +135,7 @@ class ORStoolsDialogMain:
         # Connect slots to events
         self.actions[0].triggered.connect(self.run)
         self.actions[1].triggered.connect(lambda: on_config_click(parent=self.iface.mainWindow()))
-        self.actions[3].triggered.connect(self._on_help_click)
+        self.actions[3].triggered.connect(on_help_click)
         # Connect other dialogs
         self.actions[2].triggered.connect(self._on_about_click)
 
@@ -155,9 +159,6 @@ class ORStoolsDialogMain:
             'About {}'.format(PLUGIN_NAME),
             info
         )
-
-    def _on_help_click(self):
-        webbrowser.open(__help__)
 
     @staticmethod
     def get_quota():
@@ -205,7 +206,7 @@ class ORStoolsDialogMain:
                         profile=params['profile'],
                         dimension=self.dlg.iso_unit_combo.currentText(),
                         id_field_type=QVariant.Int,
-                        id_field_name='FTID',
+                        id_field_name='ID',
                         factor=60 if params['range_type'] == 'time' else 1,
                     )
 
@@ -289,6 +290,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.header_pic.setPixmap(pixmap)
         # Settings button icon
         self.config_button.setIcon(QIcon(os.path.join(ICON_DIR, 'icon_settings.svg')))
+        self.help_button.setIcon(QIcon(os.path.join(ICON_DIR, 'icon_help.png')))
 
         #### Set up signals/slots ####
 

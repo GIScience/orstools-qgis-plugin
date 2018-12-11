@@ -69,8 +69,8 @@ def get_request_features(route_dict, row_by_row):
 def get_fields(from_type, to_type):
 
     fields = QgsFields()
-    fields.append(QgsField("DISTANCE", QVariant.Double))
-    fields.append(QgsField("TIME_H", QVariant.Double))
+    fields.append(QgsField("DIST_KM", QVariant.Double))
+    fields.append(QgsField("DURATION_H", QVariant.Double))
     fields.append(QgsField("PROFILE", QVariant.String))
     fields.append(QgsField("PREF", QVariant.String))
     fields.append(QgsField("AVOID_TYPE", QVariant.String))

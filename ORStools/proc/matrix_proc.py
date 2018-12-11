@@ -252,12 +252,14 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
 
         for s, source in enumerate(sources_attributes):
             for d, destination in enumerate(destinations_attributes):
+                duration = response['durations'][s][d]
+                distance = response['distances'][s][d]
                 feat = QgsFeature()
                 feat.setAttributes([
                     source,
                     destination,
-                    response['durations'][s][d] / 3600,
-                    response['distances'][s][d] / 1000
+                    duration / 1000 if duration is not None else None,
+                    distance / 1000 if distance is not None else None
                 ])
 
                 sink.addFeature(feat)
@@ -270,7 +272,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         fields = QgsFields()
         fields.append(QgsField("FROM_ID", source_type))
         fields.append(QgsField("TO_ID", destination_type))
-        fields.append(QgsField("DURATION_HOURS", QVariant.Double))
-        fields.append(QgsField("DISTANCE_KM", QVariant.Double))
+        fields.append(QgsField("DURATION_H", QVariant.Double))
+        fields.append(QgsField("DIST_Km", QVariant.Double))
 
         return fields
