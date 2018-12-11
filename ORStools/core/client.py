@@ -166,7 +166,7 @@ class Client(object):
             elapsed_since_earliest = time.time() - self.sent_times[0]
             sleep_for = 60 - elapsed_since_earliest
 
-            logger.log("{}: {}".format(e.__class__.__name__, str(e)), 0)
+            logger.log("{}: {}".format(e.__class__.__name__, str(e)), 1)
 
             time.sleep(sleep_for)
 

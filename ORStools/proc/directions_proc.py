@@ -206,8 +206,8 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
         # Get fields from field name
         source_field_id = source.fields().lookupField(source_field_name)
         source_field = source.fields().field(source_field_id)
-        destination_field_id = source.fields().lookupField(destination_field_name)
-        destination_field = source.fields().field(destination_field_id)
+        destination_field_id = destination.fields().lookupField(destination_field_name)
+        destination_field = destination.fields().field(destination_field_id)
 
         params = {
             'profile': profile,
@@ -243,7 +243,6 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
-            feedback.pushInfo(coordinates)
 
             params['coordinates'] = coordinates
 

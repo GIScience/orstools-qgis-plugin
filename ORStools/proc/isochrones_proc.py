@@ -202,7 +202,7 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                response = self.clnt.request(ENDPOINTS[self.ALGO_NAME], params)
+                response = clnt.request(ENDPOINTS[self.ALGO_NAME], params)
             except exceptions.ApiError as e:
                 feedback.reportError("Feature ID {} caused a {}:\n{}".format(
                     feat[id_field_name],
