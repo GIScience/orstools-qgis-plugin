@@ -239,7 +239,7 @@ class Client(object):
             return path + "?" + _urlencode_params(params)
 
         raise ValueError("No API key specified. "
-                         "Visit https://go.openrouteservice.org/dev-dashboard/ "
+                         "Visit https://openrouteservice.org/dev/#/home "
                          "to create one.")
 
 
