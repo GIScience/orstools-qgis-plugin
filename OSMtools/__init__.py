@@ -35,7 +35,7 @@ def classFactory(iface):  # pylint: disable=invalid-name
     from .OSMtoolsPlugin import OSMtools
     return OSMtools(iface)
 
-__version__ = '3.2'
+__version__ = '3.3'
 __author__ = 'Nils Nolde'
 __date__ = '2018-11-19'
 __copyright__ = '(C) 2018 by Nils Nolde'

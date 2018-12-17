@@ -27,6 +27,10 @@
  ***************************************************************************/
 """
 
+from PyQt5.QtWidgets import QMessageBox
+
+import pyplugin_installer
+
 from .gui import OSMtoolsDialog
 
 
@@ -43,6 +47,8 @@ class OSMtools():
         :type iface: QgsInterface
         """
         self.dialog = OSMtoolsDialog.OSMtoolsDialogMain(iface)
+        QMessageBox.warning(iface.mainWindow(), "OSM Tools uninstalled", "OSM Tools is deprecated.\n\nORS Tools will be installed instead (Web menu & Web toolbar.")
+        self.uninstall()
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -51,3 +57,9 @@ class OSMtools():
         
     def unload(self):
         self.dialog.unload()
+
+    def uninstall(self):
+        self.unload()
+        pyplugin_installer.instance().uninstallPlugin('OSMtools', quiet=True)
+        # pyplugin_installer.instance().installPlugin('ORStools', quiet=False)
+        pyplugin_installer.instance().installFromZipFile('/home/nilsnolde/dev/python/ORStools/dist/OSMtools_v0.99-dev.zip')
