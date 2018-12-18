@@ -3,15 +3,15 @@
 <!-- https://ask.openrouteservice.org/c/sdks-->
 
 #### Here's what I did
-<!-- if applicable, best copy the coordinates of failing queries, so we can reproduce -->
+<!-- if applicable, best copy the coordinates of failing queries, so we can reproduce. we also :heart_eyes: -->
 
 ---
 #### Here's what I got
-<!-- examine the QGIS Python window, OSMtools prints the URL and Parameters when querying. Paste that here -->
+<!-- examine the QGIS logs (View > Panels > Log Messages), ORStools prints the URL and Parameters when querying. Paste that here -->
 
 ---
 #### Here's what I was expecting
-<!-- try being as explicit as possible here so we know how to fix this issue -->
+<!-- try being as explicit as possible here -->
 
 ---
 #### Here's what I think could be improved
