@@ -358,7 +358,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         Initialize the mapTool to select coordinates in map canvas.
         """
 
-        self.showMinimized()
+        # self.showMinimized() # Doesn't work on Mac, who knows about Windows..
         sending_button = self.sender().objectName()
         self.mapTool = pointtool.PointTool(self._iface.mapCanvas(), sending_button)
         self._iface.mapCanvas().setMapTool(self.mapTool)
@@ -399,7 +399,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         QApplication.restoreOverrideCursor()
         self.mapTool.canvasClicked.disconnect()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
-        if self.windowState() == Qt.WindowMinimized:
-            # Window is minimised. Restore it.
-            self.setWindowState(Qt.WindowMaximized)
-            self.activateWindow()
+        # if self.windowState() == Qt.WindowMinimized:
+        #     # Window is minimised. Restore it.
+        #     self.setWindowState(Qt.WindowMaximized)
+        #     self.activateWindow()
