@@ -42,6 +42,7 @@ from PyQt5.QtGui import QPixmap, QIcon
 from qgis.core import (QgsProject,
                        QgsMapLayer,
                        QgsWkbTypes,
+                       QgsMapLayerProxyModel
                        )
 
 from ORStools import ICON_DIR, PLUGIN_NAME, ENV_VARS, ENDPOINTS, DEFAULT_COLOR, __version__, __email__, __web__, __help__
@@ -54,7 +55,8 @@ from ORStools.core import (client,
                            PREFERENCES,
                            DIMENSIONS)
 from ORStools.gui import (isochrones_gui,
-                          directions_gui)
+                          directions_gui,
+                        )
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogAdvanced import ORStoolsDialogAdvancedMain
@@ -67,7 +69,7 @@ def on_config_click(parent):
     config_dlg.exec_()
 
 
-def on_help_click(self):
+def on_help_click():
     webbrowser.open(__help__)
 
 
@@ -186,10 +188,10 @@ class ORStoolsDialogMain:
         self.dlg.show()
         result = self.dlg.exec()
         if result:
+            clnt = client.Client()
+
             layer_out = None
             try:
-                clnt = client.Client()
-
                 if self.dlg.tabWidget.currentIndex() == 2:
                     pass
 
@@ -217,7 +219,7 @@ class ORStoolsDialogMain:
 
                     isochrones.stylePoly(layer_out)
 
-                    self.dlg.progressBar.setValue(100)
+                    # progress_bar.setValue(100)
 
                 elif self.dlg.tabWidget.currentIndex() == 0:
                     directions = directions_gui.Directions(self.dlg, self.advanced)
@@ -241,7 +243,7 @@ class ORStoolsDialogMain:
                             values[1]
                         ))
                         counter += 1
-                        self.dlg.progressBar.setValue(int(counter/route_count) * 100)
+                        # progress_bar.setValue(int(counter/route_count) * 100)
 
                     layer_out.updateExtents()
 
@@ -262,7 +264,6 @@ class ORStoolsDialogMain:
                     QMessageBox.warning(self.iface.mainWindow(),
                                           PLUGIN_NAME,
                                           "No features were generated!")
-                self.dlg.progressBar.setValue(0)
                 self.dlg.close()
 
 
@@ -294,8 +295,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         #### Set up signals/slots ####
 
-        # Config/Advanced dialogs
+        # Config/Help dialogs
         self.config_button.clicked.connect(lambda: on_config_click(self))
+        self.help_button.clicked.connect(on_help_click)
 
         # Isochrone tab
         self.iso_location_button.clicked.connect(self._initMapTool)
@@ -306,46 +308,18 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_end_frommap_button.clicked.connect(self._initMapTool)
         self.start_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
         self.end_buttongroup.buttonReleased[int].connect(self._mappingMethodChanged)
-        self.project.layerWasAdded.connect(self._layerTreeChanged)
-        self.project.layersRemoved.connect(self._layerTreeChanged)
-        self.routing_start_fromlayer_combo.currentIndexChanged[int].connect(self._layerSelectedChanged)
-        self.routing_end_fromlayer_combo.currentIndexChanged[int].connect(self._layerSelectedChanged)
+        self.routing_start_fromlayer_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.routing_start_fromlayer_combo.layerChanged.connect(self.routing_start_fromlayer_field_combo.setLayer)
+        self.routing_end_fromlayer_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.routing_end_fromlayer_combo.layerChanged.connect(self.routing_end_fromlayer_field_combo.setLayer)
 
         # Populate combo boxes
+        self.routing_start_fromlayer_field_combo.setLayer(self.routing_start_fromlayer_combo.currentLayer())
+        self.routing_end_fromlayer_field_combo.setLayer(self.routing_start_fromlayer_combo.currentLayer())
         self.routing_travel_combo.addItems(PROFILES)
         self.iso_travel_combo.addItems(PROFILES)
         self.routing_preference_combo.addItems(PREFERENCES)
         self.iso_unit_combo.addItems(DIMENSIONS)
-        self._layerTreeChanged()
-
-    def _accessLayerChanged(self):
-        for child in self.sender().parentWidget().children():
-            if not child.objectName() == self.sender().objectName():
-                child.setEnabled(self.sender().isChecked())
-
-    def _layerTreeChanged(self):
-        """
-        Re-populate layers for dropdowns dynamically when layers were 
-        added/removed.
-        """
-
-        # Returns a list of [layer_id, layer_name] for layer == VectorLayer and layer == PointLayer
-        layers = [(layer.id(), layer.name()) for layer in self.project.mapLayers().values() if  \
-                                                    layer.type() == QgsMapLayer.VectorLayer and \
-                                                    layer.wkbType() == QgsWkbTypes.Type(1)]
-
-        comboboxes = [self.routing_start_fromlayer_combo,
-                      self.routing_end_fromlayer_combo,]
-
-        for box in comboboxes:
-            old_id = box.currentData()
-            box.clear()
-            for layer_id, layer_name in layers:
-                box.addItem(layer_name, layer_id)
-            # Make sure the old layer is still shown when this slot is triggered
-            new_text_id = box.findData(old_id)
-            box.setCurrentIndex(0) if new_text_id == -1 else box.setCurrentIndex(new_text_id)
-            # box.setCurrentIndex(new_text_id)
 
     def _mappingMethodChanged(self, index):
         """ Generic method to enable/disable all comboboxes and buttons in the
@@ -369,34 +343,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         condition = self.routing_start_fromlayer_radio.isChecked() and self.routing_end_fromlayer_radio.isChecked()
         self.routing_twolayer_rowbyrow.setEnabled(condition)
         self.routing_twolayer_allbyall.setEnabled(condition)
-
-    def _layerSelectedChanged(self, index):
-        """
-        Populates dropdowns with QgsProject layers.
-        
-        :param index: Index of previously selected layer in dropdown. -1 if no
-            layer was selected.
-        :type index: int
-        """
-
-        if index != -1:
-            sending_widget = self.sender()
-            sending_widget_name = sending_widget.objectName()
-            parent_widget = self.sender().parentWidget()
-            layer_selected = self.project.mapLayer(sending_widget.currentData())
-            for widget in parent_widget.findChildren(QComboBox):
-                if widget.objectName() != sending_widget_name:
-                    old_text = widget.currentText()
-                    widget.clear()
-                    widget.addItems([field.name() for field in layer_selected.fields()])
-                    new_text_id = widget.findText(old_text)
-                    widget.setCurrentIndex(0) if new_text_id == -1 else widget.setCurrentIndex(new_text_id)
-
-    # def _clearVia(self):
-    #     """
-    #     Clears the 'via' coordinates label.
-    #     """
-    #     self.routing_via_label.setText("Long,Lat")
 
     def _unitChanged(self):
         """

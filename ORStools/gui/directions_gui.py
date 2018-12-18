@@ -48,8 +48,8 @@ class Directions():
         self.advanced = advanced
 
         self.radio_buttons = {
-            'start': dlg.routing_start_fromlayer_radio,
-            'end': dlg.routing_end_fromlayer_radio
+            'start': self.dlg.routing_start_fromlayer_radio,
+            'end': self.dlg.routing_end_fromlayer_radio
         }
         self.crs = QgsCoordinateReferenceSystem(4326)
         self.fieldtype_to = None
@@ -65,12 +65,11 @@ class Directions():
             if radio_button.isChecked():
                 # Find layer combo box
                 combo_layer_all = radio_button.parent().findChildren(QComboBox)
-                combo_layer_layer = [combo for combo in combo_layer_all if combo.objectName().endswith('layer_combo')][0]
-                combo_layer_field = [combo for combo in combo_layer_all if combo.objectName().endswith('id_combo')][0]
+                combo_layer_field = [combo for combo in combo_layer_all if combo.objectName().endswith('field_combo')][0]
                 # Get selected layer
-                layer = QgsProject().instance().mapLayer(combo_layer_layer.currentData())
+                layer = combo_layer_field.layer()
 
-                field_name = combo_layer_field.currentText()
+                field_name = combo_layer_field.currentField()
 
                 # Retrieve field type to define the output field type
                 field_id = layer.fields().lookupField(field_name)
@@ -170,11 +169,10 @@ class Directions():
             if radio_button.isChecked():
                 # Find layer combo box
                 combo_layer_all = radio_button.parent().findChildren(QComboBox)
-                combo_layer_layer = [combo for combo in combo_layer_all if combo.objectName().endswith('layer_combo')][0]
-                combo_layer_field = [combo for combo in combo_layer_all if combo.objectName().endswith('id_combo')][0]
+                combo_layer_field = [combo for combo in combo_layer_all if combo.objectName().endswith('field_combo')][0]
 
                 # Get selected layer
-                layer = QgsProject().instance().mapLayer(combo_layer_layer.currentData())
+                layer = combo_layer_field.layer()
 
                 # If features are selected, calculate with those, else the whole layer
                 # Convert to list, bcs it's a QgsFeatureIterator
@@ -187,7 +185,7 @@ class Directions():
                 xformer = transform.transformToWGS(layer.crs())
                 point_geom = [xformer.transform(feat.geometry().asPoint()) for feat in feats]
 
-                field_name = combo_layer_field.currentText()
+                field_name = combo_layer_field.currentField()
                 field_values = [feat.attribute(field_name) for feat in feats]
 
                 # Retrieve field type to define the output field type

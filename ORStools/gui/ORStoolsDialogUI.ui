@@ -117,16 +117,6 @@
        </widget>
       </item>
       <item alignment="Qt::AlignHCenter">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/GIScience/openrouteservice/wiki/Tag-Filtering&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Tags&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="openExternalLinks">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
@@ -136,16 +126,6 @@
         </property>
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ask.openrouteservice.org/c/sdks&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Forum&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="openExternalLinks">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignHCenter">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/nilsnolde/OSMtools/issues&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="openExternalLinks">
          <bool>true</bool>
@@ -297,19 +277,6 @@
                    </attribute>
                   </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QComboBox" name="routing_start_fromlayer_combo">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="toolTip">
-                    <string>Input Layer must be of type 'Point' </string>
-                   </property>
-                   <property name="whatsThis">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="0" alignment="Qt::AlignRight">
                   <widget class="QLabel" name="routing_start_fromlayer_id_label">
                    <property name="text">
@@ -318,12 +285,19 @@
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QComboBox" name="routing_start_fromlayer_id_combo">
+                  <widget class="QgsFieldComboBox" name="routing_start_fromlayer_field_combo">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
-                   <property name="toolTip">
-                    <string>Adds ID columns to output for joining</string>
+                   <property name="currentIndex">
+                    <number>-1</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QgsMapLayerComboBox" name="routing_start_fromlayer_combo">
+                   <property name="enabled">
+                    <bool>false</bool>
                    </property>
                   </widget>
                  </item>
@@ -402,33 +376,27 @@
                    </attribute>
                   </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QComboBox" name="routing_end_fromlayer_combo">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="toolTip">
-                    <string>Input Layer must be of type 'Point' and in EPSG:4326</string>
-                   </property>
-                   <property name="whatsThis">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QComboBox" name="routing_end_fromlayer_id_combo">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="toolTip">
-                    <string>Adds ID columns to output for joining</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="0" alignment="Qt::AlignRight">
                   <widget class="QLabel" name="routing_end_fromlayer_id_label">
                    <property name="text">
                     <string>Unique ID</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QgsFieldComboBox" name="routing_end_fromlayer_field_combo">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="currentIndex">
+                    <number>-1</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QgsMapLayerComboBox" name="routing_end_fromlayer_combo">
+                   <property name="enabled">
+                    <bool>false</bool>
                    </property>
                   </widget>
                  </item>
@@ -1169,6 +1137,18 @@ This tool has moved to the Processing toolbox
   <zorder>help_button</zorder>
   <zorder>horizontalSpacer</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsFieldComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsfieldcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>routing_scrollarea</tabstop>
@@ -1226,7 +1206,7 @@ This tool has moved to the Processing toolbox
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="start_buttongroup"/>
   <buttongroup name="end_buttongroup"/>
+  <buttongroup name="start_buttongroup"/>
  </buttongroups>
 </ui>
