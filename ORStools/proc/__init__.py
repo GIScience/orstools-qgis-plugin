@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$

@@ -3,7 +3,7 @@
 /***************************************************************************
  ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -26,16 +26,12 @@
  *                                                                         *
  ***************************************************************************/
 """
-"""
-Contains isochrones class to perform requests to ORS isochrone API.
-"""
 
 
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
 
 from qgis.core import (QgsPointXY,
-                       QgsVectorLayer,
                        QgsFeature,
                        QgsField,
                        QgsFields,
@@ -46,33 +42,53 @@ from qgis.core import (QgsPointXY,
                        QgsCategorizedSymbolRenderer)
 
 class Isochrones():
+    """convenience class to build isochrones"""
 
     def __init__(self):
 
         # Will all be set in self.set_parameters(), bcs Processing Algo has to initialize this class before it
         # knows about its own parameters
-        self.layer_name = None
         self.profile = None
         self.dimension = None
         self.id_field_type = None
         self.id_field_name = None
         self.factor = None
-        self.difference = None
         self.field_dimension_name = None
 
-    def set_parameters(self, layer_name, profile, dimension, id_field_type, id_field_name, factor, difference=None):
-        self.layer_name = layer_name
+    def set_parameters(self, profile, dimension, factor, id_field_type=QVariant.String, id_field_name='ID'):
+        """
+        Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know its parameters yet.
+
+        :param profile: Transportation mode being used
+        :type profile: str
+
+        :param dimension: Unit being used, time or distance.
+        :type dimension: str
+
+        :param factor: Unit factor being used, depending on dimension.
+        :type factor: int
+
+        :param id_field_type: field type of ID field
+        :type id_field_type: QVariant enum
+
+        :param id_field_name: field name of ID field
+        :type id_field_name: str
+        """
         self.profile = profile
         self.dimension = dimension
         self.id_field_type = id_field_type
         self.id_field_name = id_field_name
         self.factor = factor
-        self.difference = difference or None
 
         self.field_dimension_name = "AA_MINS" if self.dimension == 'time' else "AA_METERS"
 
     def get_fields(self):
+        """
+        Set all fields for output isochrone layer.
 
+        :returns: Fields object of all output fields.
+        :rtype: QgsFields
+        """
         fields = QgsFields()
         fields.append(QgsField(self.id_field_name, self.id_field_type))  # ID field
         fields.append(QgsField(self.field_dimension_name, QVariant.Int))  # Dimension field
@@ -81,16 +97,19 @@ class Isochrones():
 
         return fields
 
-    def get_polygon_layer(self):
-
-        poly_out = QgsVectorLayer("Polygon?crs=EPSG:4326", self.layer_name, "memory")
-
-        poly_out.dataProvider().addAttributes(self.get_fields())
-        poly_out.updateFields()
-
-        return poly_out
-
     def get_features(self, response, id_field_value):
+        """
+        Generator to return output isochrone features from response.
+
+        :param response: API response
+        :type response: dict
+
+        :param id_field_value: Value of ID field.
+        :type id_field_value: any
+
+        :returns: output feature
+        :rtype: QgsFeature
+        """
 
         # Sort features based on the isochrone value, so that longest isochrone
         # is added first. This will plot the isochrones on top of each other.
@@ -126,7 +145,7 @@ class Isochrones():
 
     def stylePoly(self, layer):
         """
-        Style isochrone polygon layer
+        Style isochrone polygon layer.
 
         :param layer: Polygon layer to be styled.
         :type layer: QgsMapLayer

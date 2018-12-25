@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -33,28 +33,16 @@ from qgis.core import (QgsCoordinateReferenceSystem,
                        )
 
 
-# def checkCRS(layer, messageBar):
-#     """
-#     Check if layer CRS is EPSG:4326.
-#
-#     :param layer: Layer to be inspected.
-#     :type layer: QgsMapLayer
-#
-#     :param messageBar: QGIS interface message bar.
-#     :type messageBar: QgsMessageBar
-#     """
-#     layer_crs = layer.crs().authid()
-#     if layer_crs.split(':')[1] != '4326':
-#         layer = transformToWGS(layer, layer_crs)
-#         messageBar.pushInfo('CRS conflict',
-#                             'The input layer CRS is {}, the output layer '
-#                             'CRS will be EPSG:4326'.format(layer_crs))
-#
-#     return layer
-
-
 def transformToWGS(old_crs):
-    """Transforms to WGS84"""
+    """
+    Returns a transformer to WGS84
+
+    :param old_crs: CRS to transfrom from
+    :type old_crs: QgsCoordinateReferenceSystem
+
+    :returns: transformer to use in various modules.
+    :rtype: QgsCoordinateTransform
+    """
     outCrs = QgsCoordinateReferenceSystem(4326)
     xformer = QgsCoordinateTransform(old_crs, outCrs, QgsProject.instance())
 

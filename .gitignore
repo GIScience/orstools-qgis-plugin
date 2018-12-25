@@ -3,7 +3,6 @@ docs/wiki/OSMtools.wiki/
 ./LICENSE.md
 ./apikey.txt
 *.pyc
-help/
 i18n/
 test/
 .spyproject/

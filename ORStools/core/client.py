@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -29,38 +29,41 @@
 
 from datetime import datetime, timedelta
 import requests
-import random
 import time
 import collections
 from urllib.parse import urlencode
 
-from ORStools import __version__, ENV_VARS, PLUGIN_NAME
+from PyQt5.QtCore import QObject, pyqtSignal
+
+from ORStools import __version__, ENV_VARS
 from ORStools.utils import exceptions, configmanager, logger
 
 _USER_AGENT = "ORSQGISClient.v{}".format(__version__)
-_RETRIABLE_STATUSES = [503]
-_DEFAULT_BASE_URL = "https://api.openrouteservice.org"
 
 
-class Client(object):
+class Client(QObject):
     """Performs requests to the ORS API services."""
 
     def __init__(self,
+                 provider=None,
                  retry_timeout=60):
         """
         :param iface: A QGIS interface instance.
         :type iface: QgisInterface
 
+        :param provider: A openrouteservice provider from config.yml
+        :type provider: dict
+
         :param retry_timeout: Timeout across multiple retriable requests, in
             seconds.
         :type retry_timeout: int
         """
-        
-        base_params = configmanager.read_config()
-        
-        (self.key, 
-         self.base_url,
-         self.queries_per_minute) = [v for (k, v) in sorted(base_params.items())]
+        QObject.__init__(self)
+
+        self.key = provider['key']
+        self.base_url = provider['base_url']
+        self.limit = provider['limit']
+        self.limit_unit = provider['unit']
         
         self.session = requests.Session()
 
@@ -71,15 +74,19 @@ class Client(object):
                         'Content-type': 'application/json'}
         })
 
-        self.sent_times = collections.deque("", self.queries_per_minute)
+        self.sent_times = collections.deque("", self.limit)
 
+        # Save some references to retrieve in client instances
+        self.url = None
+        self.warnings = None
+
+    overQueryLimit = pyqtSignal('int')
     def request(self, 
                 url, params,
                 first_request_time=None,
-                retry_counter=0,
                 requests_kwargs=None,
                 post_json=None):
-        """Performs HTTP GET/POST with credentials, returning the body asdlg
+        """Performs HTTP GET/POST with credentials, returning the body as
         JSON.
 
         :param url: URL extension for request. Should begin with a slash.
@@ -92,9 +99,6 @@ class Client(object):
             retries have occurred).
         :type first_request_time: datetime.datetime
 
-        :param retry_counter: The number of this retry, or zero for first attempt.
-        :type retry_counter: int
-
         :param requests_kwargs: Same extra keywords arg for requests as per
             __init__, but provided here to allow overriding internally on a
             per-request basis.
@@ -103,12 +107,10 @@ class Client(object):
         :param post_json: Parameters for POST endpoints
         :type post_json: dict
 
-        :raises ApiError: when the API returns an error.
-        :raises Timeout: if the request timed out.
-        :raises TransportError: when something went wrong while trying to
-            execute a request.
-            
-        :rtype: dict from JSON response.
+        :raises ORStools.utils.exceptions.ApiError: when the API returns an error.
+
+        :returns: openrouteservice response body
+        :rtype: dict
         """
 
         if not first_request_time:
@@ -118,18 +120,10 @@ class Client(object):
         if elapsed > self.retry_timeout:
             raise exceptions.Timeout()
 
-        if retry_counter > 0:
-            # 0.5 * (1.5 ^ i) is an increased sleep time of 1.5x per iteration,
-            # starting at 0.5s when retry_counter=1. The first retry will occur
-            # at 1, so subtract that first.
-            delay_seconds = 1.5 ** (retry_counter - 1)
-
-            # Jitter this value by 50% and pause.
-            time.sleep(delay_seconds * (random.random() + 0.5))
-
         authed_url = self._generate_auth_url(url,
                                              params,
                                              )
+        self.url = self.base_url + authed_url
 
         # Default to the client-level self.requests_kwargs, with method-level
         # requests_kwargs arg overriding.
@@ -144,7 +138,7 @@ class Client(object):
 
         logger.log(
             "url: {}\nParameters: {}".format(
-                self.base_url+authed_url,
+                self.url,
                 final_requests_kwargs
             ),
             'info'
@@ -164,13 +158,16 @@ class Client(object):
 
         except exceptions.OverQueryLimit as e:
             elapsed_since_earliest = time.time() - self.sent_times[0]
-            sleep_for = 60 - elapsed_since_earliest
+            interval = 60 if self.limit_unit == 'minute' else 1
+            sleep_for = interval - elapsed_since_earliest + 1  # Add 1 second to avoid too quick requests after error
 
+            # Let the instances know smth happened
+            self.overQueryLimit.emit(sleep_for)
             logger.log("{}: {}".format(e.__class__.__name__, str(e)), 1)
 
             time.sleep(sleep_for)
 
-            return self.request(url, params, first_request_time, retry_counter + 1, requests_kwargs, post_json)
+            return self.request(url, params, first_request_time, requests_kwargs, post_json)
 
         except exceptions.ApiError as e:
             logger.log("Feature ID {} caused a {}: {}".format(params['id'], e.__class__.__name__, str(e)), 2)
@@ -182,7 +179,6 @@ class Client(object):
 
         return result
 
-
     @staticmethod
     def _get_body(response):
         """
@@ -190,13 +186,25 @@ class Client(object):
         
         :param response: The HTTP response of the request.
         :type response: JSON object
-        
-        :rtype: dict from JSON
+
+        :raises ORStools.utils.exceptions.OverQueryLimitError: when rate limit is exhausted, HTTP 429
+        :raises ORStools.utils.exceptions.ApiError: when the backend API throws an error, HTTP 400
+        :raises ORStools.utils.exceptions.InvalidKey: when API key is invalid (or quota is exceeded), HTTP 403
+        :raises ORStools.utils.exceptions.GenericServerError: all other HTTP errors
+
+        :returns: response body
+        :rtype: dict
         """
         body = response.json()
         error = body.get('error')
         status_code = response.status_code
-        
+
+        if status_code == 403:
+            raise exceptions.InvalidKey(
+                str(status_code),
+                error
+            )
+
         if status_code == 429:
             raise exceptions.OverQueryLimit(
                 str(status_code),
@@ -210,8 +218,8 @@ class Client(object):
             )
         # Other HTTP errors have different formatting
         if status_code != 200:
-            raise exceptions.ApiError(
-                status_code,
+            raise exceptions.GenericServerError(
+                str(status_code),
                 error
             )
 
@@ -227,8 +235,8 @@ class Client(object):
         :param params: URL parameters.
         :type params: dict or list of key/value tuples
 
+        :returns: encoded URL
         :rtype: string
-
         """
         
         if type(params) is dict:
@@ -238,49 +246,5 @@ class Client(object):
         # be explicitly added to params
         if self.key:
             params.append(("api_key", self.key))
-            return path + "?" + _urlencode_params(params)
-        elif self.base_url != _DEFAULT_BASE_URL:
-            return path + "?" + _urlencode_params(params)
 
-        raise ValueError("No API key specified. "
-                         "Visit https://go.openrouteservice.org/dev-dashboard/ "
-                         "to create one.")
-
-
-def _urlencode_params(params):
-    """URL encodes the parameters.
-
-    :param params: The parameters
-    :type params: list of key/value tuples.
-
-    :rtype: string
-    """
-    # urlencode does not handle unicode strings in Python 2.
-    # Firstly, normalize the values so they get encoded correctly.
-    params = [(key, _normalize_for_urlencode(val)) for key, val in params]
-    # Secondly, unquote unreserved chars which are incorrectly quoted
-    # by urllib.urlencode, causing invalid auth signatures. See GH #72
-    # for more info.
-    return requests.utils.unquote_unreserved(urlencode(params))
-
-
-try:
-    unicode
-    # NOTE(cbro): `unicode` was removed in Python 3. In Python 3, NameError is
-    # raised here, and caught below.
-
-    def _normalize_for_urlencode(value):
-        """(Python 2) Converts the value to a `str` (raw bytes)."""
-        if isinstance(value, unicode):
-            return value.encode('utf8')
-
-        if isinstance(value, str):
-            return value
-
-        return _normalize_for_urlencode(str(value))
-
-except NameError:
-    def _normalize_for_urlencode(value):
-        """(Python 3) No-op."""
-        # urlencode in Python 3 handles all the types we are passing it.
-        return value
+        return path + "?" + requests.utils.unquote_unreserved(urlencode(params))

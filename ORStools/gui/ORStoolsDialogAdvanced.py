@@ -27,17 +27,21 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtWidgets import QDialog, QGridLayout
+from PyQt5.QtWidgets import QDialog
 
 from .ORStoolsDialogAdvancedUI import Ui_ORStoolsDialogAdvancedBase
 
 
 class ORStoolsDialogAdvancedMain(QDialog, Ui_ORStoolsDialogAdvancedBase):
+    """Builds advanced parameter dialog."""
 
     def __init__(self, parent=None):
+        """
+        :param parent: Parent window for modality.
+        :type parent: QDialog
+        """
         QDialog.__init__(self, parent)
 
         self.setupUi(self)
-        # for box in self.routing_avoid_group.children():
-        #     if not isinstance(box, QGridLayout):
-        #         box.setChecked(False)
+        # for box in self.findChildren(QgsCollapsibleGroupBox):
+        #     box.setCollapsed(True)

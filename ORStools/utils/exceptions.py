@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -45,6 +45,19 @@ class ApiError(Exception):
             return "{} ({})".format(self.status, self.message)
 
 
+class InvalidKey(Exception):
+    """only called for 403"""
+    def __init__(self, status, message):
+        self.status = status
+        self.message = message
+
+    def __str__(self):
+        if self.message is None:
+            return self.status
+        else:
+            return "{} ({})".format(self.status, self.message)
+
+
 class OverQueryLimit(Exception):
     """Signifies that the request failed because the client exceeded its query rate limit."""
 
@@ -62,3 +75,17 @@ class OverQueryLimit(Exception):
 class Timeout(Exception):
     """The request timed out."""
     pass
+
+
+class GenericServerError(Exception):
+    """Anything else"""
+
+    def __init__(self, status, message=None):
+        self.status = status
+        self.message = message
+
+    def __str__(self):
+        if self.message is None:
+            return self.status
+        else:
+            return "{} ({})".format(self.status, self.message)

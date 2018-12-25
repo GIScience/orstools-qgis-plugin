@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -26,33 +26,44 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os.path
 import yaml
+import os
 
-from ORStools import BASE_DIR, CONFIG_PATH
+from ORStools import CONFIG_PATH
 
 
 def read_config():
-    with open(os.path.join(BASE_DIR, CONFIG_PATH)) as f:
+    """
+    Reads config.yml from file and returns the parsed dict.
+
+    :returns: Parsed settings dictionary.
+    :rtype: dict
+    """
+    with open(CONFIG_PATH) as f:
         doc = yaml.safe_load(f)
 
     return doc
 
 
-def write_config(key, value):
+def write_config(new_config):
+    """
+    Dumps new config
 
-    doc = read_config()
-    doc[key] = value
-    with open(os.path.join(BASE_DIR, CONFIG_PATH), 'w') as f:
-        yaml.safe_dump(doc, f)
-
-
-def write_config_all(new_config):
-    """Dumps new config"""
-    with open(os.path.join(BASE_DIR, CONFIG_PATH), 'w') as f:
+    :param new_config: new provider settings after altering in dialog.
+    :type new_config: dict
+    """
+    with open(CONFIG_PATH, 'w') as f:
         yaml.safe_dump(new_config, f)
 
 
 def write_env_var(key, value):
-    """update quota env variables"""
+    """
+    Update quota env variables
+
+    :param key: environment variable to update.
+    :type key: str
+
+    :param value: value for env variable.
+    :type value: str
+    """
     os.environ[key] = value

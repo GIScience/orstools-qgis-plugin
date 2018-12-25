@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -27,15 +27,14 @@
  ***************************************************************************/
 """
 
-import os.path
-
 from PyQt5.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
 
-from ORStools import ICON_DIR, PLUGIN_NAME, __version__
+from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
 from .isochrones_proc import ORSisochronesAlgo
 from .matrix_proc import ORSmatrixAlgo
-from .directions_proc import ORSdirectionsAlgo
+from .directions_points_proc import ORSdirectionsPointsAlgo
+from .directions_lines_proc import ORSdirectionsLinesAlgo
 
 
 class ORStoolsProvider(QgsProcessingProvider):
@@ -44,7 +43,7 @@ class ORStoolsProvider(QgsProcessingProvider):
         QgsProcessingProvider.__init__(self)
 
         # Load algorithms
-        self.alglist = [ORSdirectionsAlgo(), ORSisochronesAlgo(), ORSmatrixAlgo()]
+        self.alglist = [ORSdirectionsPointsAlgo(), ORSdirectionsLinesAlgo(), ORSisochronesAlgo(), ORSmatrixAlgo()]
 
     def unload(self):
         """
@@ -61,7 +60,7 @@ class ORStoolsProvider(QgsProcessingProvider):
             self.addAlgorithm(alg)
 
     def icon(self):
-        return QIcon(os.path.join(ICON_DIR, 'icon.png'))
+        return QIcon(RESOURCE_PREFIX + 'icon_orstools.png')
 
     def id(self):
         """

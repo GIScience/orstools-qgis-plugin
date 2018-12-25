@@ -3,7 +3,7 @@
 /***************************************************************************
  ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -26,75 +26,37 @@
  *                                                                         *
  ***************************************************************************/
 """
-"""
-Contains isochrones class to perform requests to ORS isochrone API.
-"""
 
-from PyQt5.QtWidgets import (QComboBox,
-                             QLabel,
-                             QCheckBox)
-from PyQt5.QtCore import QVariant
+import json
 
-from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsCoordinateReferenceSystem, QgsVectorLayer
+from PyQt5.QtWidgets import QCheckBox
 
-from ORStools.core import directions_core
-from ORStools.utils import convert, transform
+from ORStools.utils import convert
 
 
-class Directions():
-
+class Directions:
+    """Extended functionality for directions endpoint for GUI."""
     def __init__(self, dlg, advanced):
+        """
+        :param dlg: Main GUI dialog.
+        :type dlg: QDialog
+
+        :param advanced: Advanced parameters dialog.
+        :type advanced: QDialog
+        """
         self.dlg = dlg
         self.advanced = advanced
 
-        self.radio_buttons = {
-            'start': self.dlg.routing_start_fromlayer_radio,
-            'end': self.dlg.routing_end_fromlayer_radio
-        }
-        self.crs = QgsCoordinateReferenceSystem(4326)
-        self.fieldtype_to = None
-        self.fieldtype_from = None
-
         self.avoid = None
 
-    def get_id_field_types(self):
-        field_types = dict()
-        for name in self.radio_buttons:
-            # Check if routing_*_fromlayer_button is checked
-            radio_button = self.radio_buttons[name]
-            if radio_button.isChecked():
-                # Find layer combo box
-                combo_layer_all = radio_button.parent().findChildren(QComboBox)
-                combo_layer_field = [combo for combo in combo_layer_all if combo.objectName().endswith('field_combo')][0]
-                # Get selected layer
-                layer = combo_layer_field.layer()
-
-                field_name = combo_layer_field.currentField()
-
-                # Retrieve field type to define the output field type
-                field_id = layer.fields().lookupField(field_name)
-                field_type = layer.fields().field(field_id).type()
-                field_types[name] = field_type
-            else:
-                field_type = QVariant.Int
-
-                field_types[name] = field_type
-
-        return field_types
-
-    def get_route_count(self):
-        route_dict = self._selectInput()
-
-        # If row-by-row in two-layer mode, then only zip the locations
-        if all([button.isChecked() for button in self.radio_buttons.values()]) and self.dlg.routing_twolayer_rowbyrow.isChecked():
-            return min([len(route_dict['start']['geometries']), len(route_dict['end']['geometries'])])
-        else:
-            return len(route_dict['start']['geometries']) * len(route_dict['end']['geometries'])
-
-
     def get_basic_paramters(self):
+        """
+        Builds basic common parameters across directions functionalities.
 
-        avoid_boxes = self.advanced.routing_avoid_group.findChildren(QCheckBox)
+        :returns: All parameter mappings except for coordinates.
+        :rtype: dict
+        """
+        avoid_boxes = self.advanced.routing_avoid_tags_group.findChildren(QCheckBox)
 
         # API parameters
         route_mode = self.dlg.routing_travel_combo.currentText()
@@ -116,30 +78,33 @@ class Directions():
 
         return params
 
-    def get_request_features(self):
+    def get_request_line_feature(self):
+        """
+        Extracts all coordinates for the list in GUI.
 
-        route_dict = self._selectInput()
-        row_by_row = False
+        :returns: coordinate list of line
+        :rtype: list
+        """
+        coordinates = []
+        layers_list = self.dlg.routing_fromline_list
+        for idx in range(layers_list.count()):
+            item = layers_list.item(idx).text()
+            param, coords = item.split(":")
 
-        # If row-by-row in two-layer mode, then only zip the locations
-        if all([button.isChecked() for button in self.radio_buttons.values()]) and self.dlg.routing_twolayer_rowbyrow.isChecked():
-            row_by_row = True
+            coordinates.append([float(coord) for coord in coords.split(', ')])
 
-        return directions_core.get_request_features(route_dict, row_by_row)
-
-    def get_linestring_layer(self):
-        field_types = self.get_id_field_types()
-        # Create memory routing layer with fields
-        layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
-        layer_out.dataProvider().addAttributes(directions_core.get_fields(
-            field_types['start'],
-            field_types['end'],
-        ))
-        layer_out.updateFields()
-
-        return layer_out
+        return coordinates
 
     def _get_advanced_parameters(self, avoid_boxes):
+        """
+        Extracts checked boxes in Advanced parameters.
+
+        :param avoid_boxes: all checkboxes in advanced paramter dialog.
+        :type avoid_boxes: list of QCheckBox
+
+        :returns: avoid_features parameter
+        :rtype: JSON dump, i.e. str
+        """
 
         # from Advanced dialog
         avoid_dict = dict()
@@ -152,66 +117,4 @@ class Directions():
 
             avoid_dict['avoid_features'] = avoid_features
 
-            return str(avoid_dict)
-
-    def _selectInput(self):
-        """
-        Selects start and end features and returns them as a dict.
-
-        :rtype: dict, {'radio_button_name': {'geometries': list of coords,
-            'values': list of values}, 'other_radio_button':...}
-        """
-        route_dict = dict()
-        # select input for both, start and end features
-        for name in self.radio_buttons:
-            # Check if routing_*_fromlayer_button is checked
-            radio_button = self.radio_buttons[name]
-            if radio_button.isChecked():
-                # Find layer combo box
-                combo_layer_all = radio_button.parent().findChildren(QComboBox)
-                combo_layer_field = [combo for combo in combo_layer_all if combo.objectName().endswith('field_combo')][0]
-
-                # Get selected layer
-                layer = combo_layer_field.layer()
-
-                # If features are selected, calculate with those, else the whole layer
-                # Convert to list, bcs it's a QgsFeatureIterator
-                if layer.selectedFeatureCount() == 0:
-                    feats = list(layer.getFeatures())
-                else:
-                    feats = list(layer.selectedFeatures())
-
-                # Transform and get feature geometries
-                xformer = transform.transformToWGS(layer.crs())
-                point_geom = [xformer.transform(feat.geometry().asPoint()) for feat in feats]
-
-                field_name = combo_layer_field.currentField()
-                field_values = [feat.attribute(field_name) for feat in feats]
-
-                # Retrieve field type to define the output field type
-                field_id = layer.fields().lookupField(field_name)
-                field_type = layer.fields().field(field_id).type()
-
-            else:
-                # Take the coords displayed in the routing_*_frommap_label field
-                parent_group_widget = radio_button.parentWidget()
-                parent_widget_name = parent_group_widget.objectName()
-                grandparent_widget = parent_group_widget.parentWidget()
-                parent_widget_label = \
-                [child for child in grandparent_widget.children() if child.objectName() != parent_widget_name][1]
-
-                point_label = parent_widget_label.findChild(QLabel)
-                # TODO: warning message when no coordiates have been specified: QMessage.warning() or so
-                point_coords = [float(x) for x in point_label.text().split(",")]
-
-                point_geom = [QgsPointXY(*point_coords)]
-
-                field_values = point_label.text()
-                field_type = QVariant.String
-
-            # Get all id attributes from field
-            route_dict[name] = {'geometries': point_geom,
-                                 'values': field_values,
-                                'type': field_type}
-
-        return route_dict
+            return json.dumps(avoid_dict)

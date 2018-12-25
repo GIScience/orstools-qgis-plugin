@@ -1,3 +1,15 @@
-base_url: https://api.openrouteservice.org
-api_key: 5b3ce3597851110001cf6248d6395a4eb976474fade1638b2fc1752c
-req_per_min: 40
+---
+providers:
+- name: openrouteservice
+  base_url: https://api.openrouteservice.org
+  key: "5b3ce3597851110001cf6248d6395a4eb976474fade1638b2fc1752c"
+  limit: 40
+  unit: minute
+  endpoints:
+    directions: "/directions"
+    isochrones: "/isochrones"
+    matrix: "/matrix"
+    geocoding: "/geocoding"
+  ENV_VARS:
+    ORS_REMAINING: "X-Ratelimit-Remaining"
+    ORS_QUOTA: "X-Ratelimit-Limit"

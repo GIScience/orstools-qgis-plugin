@@ -3,7 +3,7 @@
 /***************************************************************************
  ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -28,7 +28,6 @@
 """
 
 import os.path
-import webbrowser
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QVariant
@@ -46,9 +45,9 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterFeatureSink,
                        )
 from . import HELP_DIR
-from ORStools import ENDPOINTS, ICON_DIR, __help__
+from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.core import client, PROFILES
-from ORStools.utils import transform, exceptions
+from ORStools.utils import transform, exceptions, logger, configmanager
 
 
 class ORSmatrixAlgo(QgsProcessingAlgorithm):
@@ -56,23 +55,24 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
 
     ALGO_NAME = 'matrix'
 
+    IN_PROVIDER = "INPUT_PROVIDER"
     IN_START = "INPUT_START_LAYER"
     IN_START_FIELD = "INPUT_START_FIELD"
     IN_END = "INPUT_END_LAYER"
     IN_END_FIELD = "INPUT_END_FIELD"
     IN_PROFILE = "INPUT_PROFILE"
     OUT = 'OUTPUT'
-    # Save reference to output layer
-    # isochrones = isochrones_core.Isochrones()
-    # dest_id = None
+
+    providers = configmanager.read_config()['providers']
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
+        providers = [provider['name'] for provider in self.providers]
         self.addParameter(
             QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES
+                self.IN_PROVIDER,
+                "Provider",
+                providers
             )
         )
 
@@ -109,6 +109,14 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_PROFILE,
+                "Travel mode",
+                PROFILES
+            )
+        )
+
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
                 description="Matrix",
@@ -138,7 +146,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         return 'Generate ' + self.ALGO_NAME.capitalize()
 
     def icon(self):
-        return QIcon(os.path.join(ICON_DIR, 'icon_matrix.png'))
+        return QIcon(RESOURCE_PREFIX + 'icon_matrix.png')
 
     def createInstance(self):
         return ORSmatrixAlgo()
@@ -146,7 +154,9 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
 
         # Init ORS client
-        clnt = client.Client()
+        provider = self.providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
+        clnt = client.Client(provider)
+        clnt.overQueryLimit.connect(lambda sleep_for: feedback.reportError("OverQueryLimit: Wait for {} seconds".format(sleep_for)))
 
         params = dict()
         get_params = dict()
@@ -203,9 +213,9 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         else:
             features = sources_features + destination_features
 
-        # Abort when too many features
-        if len(features) > 100:
-            raise QgsProcessingException("The cumulative feature count is > 100!")
+        # # Abort when too many features
+        # if len(features) > 50:
+        #     raise QgsProcessingException("The cumulative feature count is > 50!")
 
         # Get feature points after transformation
         xformer = transform.transformToWGS(source.sourceCrs())
@@ -228,13 +238,16 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = clnt.request(ENDPOINTS[self.ALGO_NAME], get_params, post_json=params)
-        except exceptions.ApiError as e:
-            feedback.reportError("{}:\n{}".format(
+            response = clnt.request(provider['endpoints'][self.ALGO_NAME], get_params, post_json=params)
+
+        except (exceptions.ApiError,
+                exceptions.InvalidKey,
+                exceptions.GenericServerError) as e:
+            msg = "{}: {}".format(
                 e.__class__.__name__,
                 str(e))
-            )
-            raise
+            feedback.reportError(msg)
+            logger.log(msg)
 
         (sink, dest_id) = self.parameterAsSink(
             parameters,

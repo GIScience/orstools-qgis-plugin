@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="/plugins/ORStools">
+    <file>img/logo_gisops_300.png</file>
+    <file>img/icon_orstools.png</file>
+    <file>img/icon_settings.png</file>
+    <file>img/icon_locate.png</file>
+    <file>img/icon_isochrones.png</file>
+    <file>img/icon_directions.png</file>
+    <file>img/icon_matrix.png</file>
+    <file>img/icon_help.png</file>
+    <file>img/icon_about.png</file>
+  </qresource>
+</RCC>

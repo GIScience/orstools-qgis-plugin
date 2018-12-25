@@ -3,7 +3,7 @@
 /***************************************************************************
  ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -28,7 +28,7 @@
 """
 
 import os.path
-import webbrowser
+from copy import deepcopy
 
 from PyQt5.QtGui import QIcon
 
@@ -43,11 +43,12 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
+                       QgsProcessingParameterPoint,
                        )
 from . import HELP_DIR
-from ORStools import ENDPOINTS, ICON_DIR, __help__
+from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.core import client, isochrones_core, PROFILES, DIMENSIONS
-from ORStools.utils import convert, transform, exceptions
+from ORStools.utils import convert, transform, exceptions, configmanager, logger
 
 
 class ORSisochronesAlgo(QgsProcessingAlgorithm):
@@ -55,6 +56,8 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
 
     ALGO_NAME = 'isochrones'
 
+    IN_PROVIDER = "INPUT_PROVIDER"
+    IN_POINT = "INPUT_POINT"
     IN_POINTS = "INPUT_POINT_LAYER"
     IN_FIELD = "INPUT_FIELD"
     IN_PROFILE = "INPUT_PROFILE"
@@ -64,18 +67,38 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
     IN_DIFFERENCE = 'INPUT_DIFFERENCE'
     OUT = 'OUTPUT'
 
-    # Save reference to output layer
+    # Save some important references
     isochrones = isochrones_core.Isochrones()
     dest_id = None
+    crs_out = QgsCoordinateReferenceSystem(4326)
+    providers = configmanager.read_config()['providers']
     # difference = None
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
+        providers = [provider['name'] for provider in self.providers]
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_PROVIDER,
+                "Provider",
+                providers
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterPoint(
+                name=self.IN_POINT,
+                description="Input Point from map canvas (mutually exclusive with layer option)",
+                optional=True,
+            )
+        )
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
-                description="Input Point layer",
+                description="Input Point layer (mutually exclusive with Point option)",
                 types=[QgsProcessing.TypeVectorPoint],
+                defaultValue=None,
+                optional=True
             )
         )
 
@@ -89,8 +112,9 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
-                description="ID Field (can be used for joining)",
+                description="Input layer ID Field (mutually exclusive with Point option)",
                 parentLayerParameterName=self.IN_POINTS,
+                optional=True
             )
         )
 
@@ -121,6 +145,7 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
                 description="Isochrones",
+                createByDefault=False
             )
         )
 
@@ -147,7 +172,7 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
         return 'Generate ' + self.ALGO_NAME.capitalize()
 
     def icon(self):
-        return QIcon(os.path.join(ICON_DIR, 'icon_isochrones.png'))
+        return QIcon(RESOURCE_PREFIX + 'icon_isochrones.png')
 
     def createInstance(self):
         return ORSisochronesAlgo()
@@ -157,7 +182,9 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, feedback):
         # Init ORS client
-        clnt = client.Client()
+        provider = self.providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
+        clnt = client.Client(provider)
+        clnt.overQueryLimit.connect(lambda sleep_for: feedback.reportError("OverQueryLimit: Wait for {} seconds".format(sleep_for)))
 
         params = dict()
         params['attributes'] = 'total_pop'
@@ -171,62 +198,85 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
         params['range'] = convert.comma_list(ranges_proc)
 
         # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
+        point = self.parameterAsPoint(parameters, self.IN_POINT, context, self.crs_out)
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
-        if source.wkbType() == 4:
-            raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
 
-        # Get ID field properties
-        id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
-        id_field_id = source.fields().lookupField(id_field_name)
-        id_field = source.fields().field(id_field_id)
+        # Make the actual requests
+        # If layer source is set
+        requests = []
+        if source:
+            if source.wkbType() == 4:
+                raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
 
-        # Populate iso_layer instance with parameters
-        self.isochrones.set_parameters(source.sourceName(), profile, dimension, id_field.type(), id_field_name, factor)
+            # Get ID field properties
+            id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
+            id_field_id = source.fields().lookupField(id_field_name)
+            id_field = source.fields().field(id_field_id)
+
+            # Populate iso_layer instance with parameters
+            self.isochrones.set_parameters(profile, dimension, factor, id_field.type(), id_field_name)
+
+            for num, properties in enumerate(self.get_sorted_feature_parameters(source)):
+                # Stop the algorithm if cancel button has been clicked
+                if feedback.isCanceled():
+                    break
+
+                # Get transformed coordinates and feature
+                params['locations'], feat = properties
+                params['id'] = feat[id_field_name]
+                requests.append(deepcopy(params))
+
+                feedback.setProgress(int(100.0 / source.featureCount() * num))
+        # elif point source is set
+        else:
+            self.isochrones.set_parameters(profile, dimension, factor)
+            params['locations'] = convert.build_coords([point.x(), point.y()])
+            params['id'] = None
+            requests.append(params)
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                     self.isochrones.get_fields(),
                                                     QgsWkbTypes.Polygon,  # Needs Multipolygon if difference parameter will ever be reactivated
-                                                    QgsCoordinateReferenceSystem(4326))
-        # Make the actual requests
-        for num, properties in enumerate(self.get_sorted_feature_parameters(source)):
-            # Stop the algorithm if cancel button has been clicked
-            if feedback.isCanceled():
-                break
+                                                    self.crs_out)
 
-            # Get transformed coordinates and feature
-            params['locations'], feat = properties
-            params['id'] = feat[id_field_name]
-
-            feedback.setProgress(int(100.0 / source.featureCount() * num))
-
+        for params in requests:
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                response = clnt.request(ENDPOINTS[self.ALGO_NAME], params)
-            except exceptions.ApiError as e:
-                feedback.reportError("Feature ID {} caused a {}:\n{}".format(
-                    feat[id_field_name],
+                response = clnt.request(provider['endpoints'][self.ALGO_NAME], params)
+
+                for isochrone in self.isochrones.get_features(response, params['id']):
+                    sink.addFeature(isochrone)
+
+            except (exceptions.ApiError,
+                    exceptions.InvalidKey,
+                    exceptions.GenericServerError) as e:
+                msg = "Feature ID {} caused a {}:\n{}".format(
+                    params['id'],
                     e.__class__.__name__,
                     str(e))
-                )
+                feedback.reportError(msg)
+                logger.log(msg)
                 continue
-
-            for isochrone in self.isochrones.get_features(response, feat[id_field_name]):
-                sink.addFeature(isochrone)
 
         return {self.OUT: self.dest_id}
 
     def postProcessAlgorithm(self, context, feedback):
+        """Style polygon layer in post-processing step."""
 
         processed_layer = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
         self.isochrones.stylePoly(processed_layer)
 
         return {self.OUT: self.dest_id}
 
-
     def get_sorted_feature_parameters(self, layer):
-        """generator to yield geometry and id of features sorted by feature ID. Careful: feat.id() is not necessarily
-        permanent"""
+        """
+        Generator to yield geometry and id of features sorted by feature ID. Careful: feat.id() is not necessarily
+        permanent
+
+        :param layer: source input layer.
+        :type layer: QgsProcessingParameterFeatureSource
+        """
         # First get coordinate transformer
         xformer = transform.transformToWGS(layer.sourceCrs())
 

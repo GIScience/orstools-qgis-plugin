@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- OSMtools
+ ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
         copyright            : (C) 2017 by Nils Nolde
         email                : nils.nolde@gmail.com
  ***************************************************************************/
- 
- This plugin provides access to the various APIs from OpenRouteService 
+
+ This plugin provides access to the various APIs from OpenRouteService
  (https://openrouteservice.org), developed and
- maintained by GIScience team at University of Heidelberg, Germany. By using 
+ maintained by GIScience team at University of Heidelberg, Germany. By using
  this plugin you agree to the ORS terms of service
  (https://openrouteservice.org/terms-of-service/).
- 
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -56,6 +56,5 @@ class ORStools():
         
     def unload(self):
         """remove menu entry and toolbar icons"""
-        if self.provider:
-            QgsApplication.processingRegistry().removeProvider(self.provider)
+        QgsApplication.processingRegistry().removeProvider(self.provider)
         self.dialog.unload()

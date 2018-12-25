@@ -3,7 +3,7 @@
 /***************************************************************************
  ORStools
                                  A QGIS plugin
- falk
+ QGIS client to query openrouteservice
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
@@ -28,15 +28,12 @@
 """
 
 import os.path
-import webbrowser
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QUrl
 
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsProcessing,
-                       QgsProcessingException,
                        QgsProcessingAlgorithm,
                        QgsProcessingParameterField,
                        QgsProcessingParameterFeatureSource,
@@ -44,17 +41,19 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterFeatureSink,
                        )
 from . import HELP_DIR
-from ORStools import ENDPOINTS, ICON_DIR, __help__
+from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.core import client, directions_core, PROFILES, PREFERENCES
-from ORStools.utils import convert, transform, exceptions
+from ORStools.utils import configmanager, transform, exceptions,logger
 
 
-class ORSdirectionsAlgo(QgsProcessingAlgorithm):
+class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
     # TODO: create base algorithm class common to all modules
 
-    ALGO_NAME = 'directions'
+    ALGO_NAME = 'directions_points'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
     MODE_SELECTION = ['Row-by-Row', 'All-by-All']
 
+    IN_PROVIDER = "INPUT_PROVIDER"
     IN_START = "INPUT_START_LAYER"
     IN_START_FIELD = "INPUT_START_FIELD"
     IN_END = "INPUT_END_LAYER"
@@ -64,29 +63,16 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
     IN_MODE = "INPUT_MODE"
     OUT = 'OUTPUT'
 
+    providers = configmanager.read_config()['providers']
+
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
+        providers = [provider['name'] for provider in self.providers]
         self.addParameter(
             QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_PREFERENCE,
-                "Travel preference",
-                PREFERENCES
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_MODE,
-                "Layer mode",
-                self.MODE_SELECTION
+                self.IN_PROVIDER,
+                "Provider",
+                providers
             )
         )
 
@@ -123,11 +109,36 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_PROFILE,
+                "Travel mode",
+                PROFILES
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_PREFERENCE,
+                "Travel preference",
+                PREFERENCES
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_MODE,
+                "Layer mode",
+                self.MODE_SELECTION
+            )
+        )
+
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
                 description="Directions",
             )
         )
+
     def name(self):
         return self.ALGO_NAME
 
@@ -136,7 +147,7 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
 
         file = os.path.join(
             HELP_DIR,
-            'algorithm_directions.help'
+            'algorithm_directions_point.help'
         )
         with open(file) as helpf:
             msg = helpf.read()
@@ -148,20 +159,22 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
         return __help__
 
     def displayName(self):
-        return 'Generate ' + self.ALGO_NAME.capitalize()
+        return 'Generate ' + " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
 
     def icon(self):
-        return QIcon(os.path.join(ICON_DIR, 'icon_directions.png'))
+        return QIcon(RESOURCE_PREFIX + 'icon_directions.png')
 
     def createInstance(self):
-        return ORSdirectionsAlgo()
+        return ORSdirectionsPointsAlgo()
 
     # TODO: preprocess parameters to avoid the range clenaup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
 
     def processAlgorithm(self, parameters, context, feedback):
         # Init ORS client
-        clnt = client.Client()
+        provider = self.providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
+        clnt = client.Client(provider)
+        clnt.overQueryLimit.connect(lambda sleep_for: feedback.reportError("OverQueryLimit: Wait for {} seconds".format(sleep_for)))
 
         profile = PROFILES[self.parameterAsEnum(
             parameters,
@@ -236,43 +249,61 @@ class ORSdirectionsAlgo(QgsProcessingAlgorithm):
                                                QgsWkbTypes.LineString,
                                                QgsCoordinateReferenceSystem(4326))
 
-        print(route_dict)
-
         counter = 0
-        for coordinates, values in directions_core.get_request_features(route_dict, mode):
+        for coordinates, values in directions_core.get_request_point_features(route_dict, mode):
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
 
             params['coordinates'] = coordinates
 
-            counter += 1
-            feedback.setProgress(int(100.0 / route_count * counter))
-
             try:
-                response = clnt.request(ENDPOINTS[self.ALGO_NAME], params)
-            except exceptions.ApiError as e:
-                feedback.reportError("Route from {} to {} caused a {}:\n{}".format(
+                response = clnt.request(provider['endpoints'][self.ALGO_NAME_LIST[0]], params)
+            except (exceptions.ApiError,
+                    exceptions.InvalidKey,
+                    exceptions.GenericServerError) as e:
+                msg = "Route from {} to {} caused a {}:\n{}".format(
                     values[0],
                     values[1],
                     e.__class__.__name__,
                     str(e))
-                )
+                feedback.reportError(msg)
+                logger.log(msg)
                 continue
 
-            sink.addFeature(directions_core.get_feature(
+            sink.addFeature(directions_core.get_output_feature(
                 response,
                 profile,
                 preference,
-                None,
-                values[0],
-                values[1]
+                from_value=values[0],
+                to_value=values[1],
+                line=False
             ))
+
+            counter += 1
+            feedback.setProgress(int(100.0 / route_count * counter))
 
         return {self.OUT: dest_id}
 
     def _get_route_dict(self, source, source_field, destination, destination_field):
+        """
+        Compute route_dict from input layer.
 
+        :param source: Input from layer
+        :type source: QgsProcessingParameterFeatureSource
+
+        :param source_field: ID field from layer.
+        :type source_field: QgsField
+
+        :param destination: Input to layer.
+        :type destination: QgsProcessingParameterFeatureSource
+
+        :param destination_field: ID field to layer.
+        :type destination_field: QgsField
+
+        :returns: route_dict with coordinates and ID values
+        :rtype: dict
+        """
         route_dict = dict()
 
         source_feats = list(source.getFeatures())

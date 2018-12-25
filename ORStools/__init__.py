@@ -3,13 +3,19 @@
 /***************************************************************************
  ORStools
                                  A QGIS plugin
- falk
-                             -------------------
+ QGIS client to query openrouteservice
+                              -------------------
         begin                : 2017-02-01
-        copyright            : (C) 2017 by nils
-        email                : nils
         git sha              : $Format:%H$
+        copyright            : (C) 2017 by Nils Nolde
+        email                : nils.nolde@gmail.com
  ***************************************************************************/
+
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
 
 /***************************************************************************
  *                                                                         *
@@ -42,14 +48,11 @@ def classFactory(iface):  # pylint: disable=invalid-name
 PLUGIN_NAME = 'ORS Tools'
 DEFAULT_COLOR = '#a8b1f5'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ICON_DIR = os.path.join(BASE_DIR, 'static', 'img')
+
+RESOURCE_PREFIX = ":plugins/ORStools/img/"
 CONFIG_PATH = os.path.join(BASE_DIR, 'config.yml')
 ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
             'ORS_QUOTA': 'X-Ratelimit-Limit'}
-ENDPOINTS = {'isochrones': '/isochrones',
-             'directions': '/directions',
-             'matrix': '/matrix',
-             'geocoding': 'geocoding'}
 
 # Read metadata.txt
 METADATA = configparser.ConfigParser()
