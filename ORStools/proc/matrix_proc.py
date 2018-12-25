@@ -210,22 +210,19 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         source_equals_destination = parameters['INPUT_START_LAYER'] == parameters['INPUT_END_LAYER']
         if source_equals_destination:
             features = sources_features
+            xformer = transform.transformToWGS(source.sourceCrs())
+            features_points = [xformer.transform(feat.geometry().asPoint()) for feat in features]
         else:
-            features = sources_features + destination_features
+            xformer = transform.transformToWGS(source.sourceCrs())
+            sources_features_xformed = [xformer.transform(feat.geometry().asPoint()) for feat in sources_features]
 
-        # # Abort when too many features
-        # if len(features) > 50:
-        #     raise QgsProcessingException("The cumulative feature count is > 50!")
-
-        # Get feature points after transformation
-        xformer = transform.transformToWGS(source.sourceCrs())
-        features_points = [xformer.transform(feat.geometry().asPoint()) for feat in features]
+            xformer = transform.transformToWGS(destination.sourceCrs())
+            destination_features_xformed = [xformer.transform(feat.geometry().asPoint()) for feat in destination_features]
+            features_points = sources_features_xformed + destination_features_xformed
 
         # Get IDs
         sources_ids = list(range(sources_amount)) if source_equals_destination else list(range(sources_amount))
         destination_ids = list(range(sources_amount)) if source_equals_destination else list(range(sources_amount, sources_amount + destinations_amount))
-
-        feedback.pushInfo("Amount of features: {}".format(len(features_points)))
 
         # Populate parameters further
         params.update({
@@ -286,6 +283,6 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         fields.append(QgsField("FROM_ID", source_type))
         fields.append(QgsField("TO_ID", destination_type))
         fields.append(QgsField("DURATION_H", QVariant.Double))
-        fields.append(QgsField("DIST_Km", QVariant.Double))
+        fields.append(QgsField("DIST_KM", QVariant.Double))
 
         return fields
