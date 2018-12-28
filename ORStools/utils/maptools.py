@@ -49,6 +49,7 @@ class PointTool(QgsMapToolEmitPoint):
         :param button: name of 'Map!' button pressed.
         :type button: str
         """
+
         QgsMapToolEmitPoint.__init__(self, canvas)
         self.canvas = canvas
         self.button = button
@@ -98,6 +99,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     def reset(self):
         """reset rubberband and captured points."""
+
         self.points = []
         # self.isEmittingPoint = False
         self.rubberBand.reset(QgsWkbTypes.LineGeometry)
@@ -109,6 +111,7 @@ class LineTool(QgsMapToolEmitPoint):
         :param point: point clicked by the user.
         :type point: QgsPointXY
         """
+
         new_marker = QgsVertexMarker(self.canvas)
         new_marker.setCenter(point)
         new_marker.setIconType(QgsVertexMarker.ICON_CROSS)

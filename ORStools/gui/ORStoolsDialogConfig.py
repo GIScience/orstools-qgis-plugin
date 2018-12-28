@@ -142,6 +142,9 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         :param unit: unit of API key limit.
         :type unit: str
+
+        :param new: Specifies whether user wants to insert provider or the GUI is being built.
+        :type new: boolean
         """
         if new:
             self.temp_config['providers'].append(
