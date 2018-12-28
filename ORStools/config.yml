@@ -2,7 +2,7 @@
 providers:
 - name: openrouteservice
   base_url: https://api.openrouteservice.org
-  key: "5b3ce3597851110001cf6248d6395a4eb976474fade1638b2fc1752c"
+  key:
   limit: 40
   unit: minute
   endpoints:

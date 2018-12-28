@@ -7,7 +7,7 @@ version=0.99-dev
 author=Nils Nolde
 email=nils@gis-ops.com
 
-about=OSM Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files. Extensive attributes are set for output files, incl. duration, length and start/end locations.
+about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
 changelog=2018/12/3 v0.99 First working version of ORS Tools, after replacing OSM Tools plugin
 
@@ -22,4 +22,4 @@ experimental=True
 
 deprecated=False
 
-tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility, route, isochrones, matrix, ORS
+tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility, route, isochrones, matrix, ORS, processing

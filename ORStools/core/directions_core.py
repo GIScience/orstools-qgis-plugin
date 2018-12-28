@@ -165,5 +165,6 @@ def get_output_feature(response, profile, preference, avoid=None, from_value=Non
                             from_value,
                             to_value
                             ])
+        feat.setAttribute()
 
     return feat

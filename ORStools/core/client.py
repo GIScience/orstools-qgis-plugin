@@ -35,7 +35,7 @@ from urllib.parse import urlencode
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from ORStools import __version__, ENV_VARS
+from ORStools import __version__
 from ORStools.utils import exceptions, configmanager, logger
 
 _USER_AGENT = "ORSQGISClient.v{}".format(__version__)
@@ -64,6 +64,7 @@ class Client(QObject):
         self.base_url = provider['base_url']
         self.limit = provider['limit']
         self.limit_unit = provider['unit']
+        self.ENV_VARS = provider['ENV_VARS']
         
         self.session = requests.Session()
 
@@ -174,8 +175,8 @@ class Client(QObject):
             raise
 
         # Write env variables if successful
-        for env_var in ENV_VARS:
-            configmanager.write_env_var(env_var, response.headers[ENV_VARS[env_var]])
+        for env_var in self.ENV_VARS:
+            configmanager.write_env_var(env_var, response.headers[self.ENV_VARS[env_var]])
 
         return result
 

@@ -41,16 +41,16 @@ from PyQt5.QtGui import QIcon
 from qgis.core import (QgsProject,
                        QgsVectorLayer)
 from qgis.gui import QgsFilterLineEdit
+import processing
 
 from . import resources_rc
 
-from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, ENV_VARS, DEFAULT_COLOR, __version__, __email__, __web__, __help__
+from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
 from ORStools.utils import exceptions, maptools, logger, configmanager, convert
 from ORStools.core import (client,
                            directions_core,
                            PROFILES,
-                           PREFERENCES,
-                           DIMENSIONS)
+                           PREFERENCES,)
 from ORStools.gui import directions_gui
 
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
@@ -184,7 +184,7 @@ class ORStoolsDialogMain:
         self.advanced.exec_()
 
     @staticmethod
-    def get_quota():
+    def get_quota(provider):
         """
         Update remaining quota from env variables.
 
@@ -194,7 +194,7 @@ class ORStoolsDialogMain:
 
         # Dirty hack out of laziness.. Prone to errors
         text = []
-        for var in sorted(ENV_VARS.keys(), reverse=True):
+        for var in sorted(provider['ENV_VARS'].keys(), reverse=True):
             text.append(os.environ[var])
         return '/'.join(text)
 
@@ -266,8 +266,8 @@ class ORStoolsDialogMain:
             self.project.addMapLayer(layer_out)
 
             # Update quota; handled in client module after successful request
-            self.dlg.quota_text.setText(self.get_quota() + ' calls')
-        except exceptions.Timeout as e:
+            self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
+        except exceptions.Timeout:
             msg = "The connection has timed out!"
             logger.log(msg, 2)
             self.dlg.debug_text.setText(msg)
@@ -278,12 +278,21 @@ class ORStoolsDialogMain:
             msg = (e.__class__.__name__,
                    str(e))
 
-            logger.log("{}: ({})".format(*msg, 2))
+            logger.log("{}: {}".format(*msg), 2)
             clnt_msg += "<b>{}</b>: ({})<br>".format(*msg)
+
+        except Exception as e:
+            msg = [e.__class__.__name__ ,
+                   str(e)]
+            logger.log("{}: {}".format(*msg), 2)
+            clnt_msg += "<b>{}</b>: {}<br>".format(*msg)
+            raise
+
         finally:
             # Set URL in debug window
             clnt_msg += '<a href="{0}">{0}</a><br>'.format(clnt.url)
             self.dlg.debug_text.setHtml(clnt_msg)
+
 
 class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     """Define the custom behaviour of Dialog"""
@@ -314,9 +323,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         # Populate combo boxes
         self.routing_travel_combo.addItems(PROFILES)
-        self.iso_travel_combo.addItems(PROFILES)
         self.routing_preference_combo.addItems(PREFERENCES)
-        self.iso_unit_combo.addItems(DIMENSIONS)
 
         # Change OK and Cancel button names
         self.global_buttons.button(QDialogButtonBox.Ok).setText('Apply')
@@ -329,10 +336,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.help_button.clicked.connect(on_help_click)
         self.provider_refresh.clicked.connect(self._on_prov_refresh_click)
 
-        # # Isochrone tab
-        # self.iso_location_button.clicked.connect(self._initMapTool)
-        # self.iso_unit_combo.currentIndexChanged.connect(self._unitChanged)
-
         # Routing tab
         self.routing_frompoint_start_map.clicked.connect(self._on_point_click)
         self.routing_frompoint_end_map.clicked.connect(self._on_point_click)
@@ -341,6 +344,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_clear.clicked.connect(lambda: self.routing_fromline_list.clear())
         for button in self.clear_buttons:
             button.clicked.connect(self._on_clear_click)
+
+        # Batch
+        self.batch_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_points'.format(PLUGIN_NAME)))
+        self.batch_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_lines'.format(PLUGIN_NAME)))
+        self.batch_iso.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones'.format(PLUGIN_NAME)))
+        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog('{}:matrix'.format(PLUGIN_NAME)))
 
     def _on_clear_click(self):
         """Clear the QgsFilterLineEdit widgets associated with the clear buttons"""
@@ -358,14 +367,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.provider_combo.clear()
         for provider in providers:
             self.provider_combo.addItem(provider['name'], provider)
-
-    def _unitChanged(self):
-        """Connector to change unit label text when changing unit"""
-
-        if self.iso_unit_combo.currentText() == 'time':
-            self.iso_range_unit_label.setText('mins')
-        else:
-            self.iso_range_unit_label.setText('m')
 
     def _on_remove_click(self):
         """remove items from line list box"""

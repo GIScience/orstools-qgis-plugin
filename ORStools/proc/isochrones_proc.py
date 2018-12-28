@@ -216,7 +216,7 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
             # Populate iso_layer instance with parameters
             self.isochrones.set_parameters(profile, dimension, factor, id_field.type(), id_field_name)
 
-            for num, properties in enumerate(self.get_sorted_feature_parameters(source)):
+            for properties in self.get_sorted_feature_parameters(source):
                 # Stop the algorithm if cancel button has been clicked
                 if feedback.isCanceled():
                     break
@@ -225,8 +225,6 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
                 params['locations'], feat = properties
                 params['id'] = feat[id_field_name]
                 requests.append(deepcopy(params))
-
-                feedback.setProgress(int(100.0 / source.featureCount() * num))
         # elif point source is set
         else:
             self.isochrones.set_parameters(profile, dimension, factor)
@@ -239,7 +237,7 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
                                                     QgsWkbTypes.Polygon,  # Needs Multipolygon if difference parameter will ever be reactivated
                                                     self.crs_out)
 
-        for params in requests:
+        for num, params in enumerate(requests):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
@@ -256,8 +254,10 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
                     e.__class__.__name__,
                     str(e))
                 feedback.reportError(msg)
-                logger.log(msg)
+                logger.log(msg, 2)
                 continue
+
+            feedback.setProgress(int(100.0 / source.featureCount() * num))
 
         return {self.OUT: self.dest_id}
 
