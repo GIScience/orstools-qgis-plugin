@@ -63,8 +63,6 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
     IN_PROFILE = "INPUT_PROFILE"
     OUT = 'OUTPUT'
 
-    providers = configmanager.read_config()['providers']
-
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
         providers = [provider['name'] for provider in self.providers]
@@ -154,7 +152,8 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
 
         # Init ORS client
-        provider = self.providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
+        providers = configmanager.read_config()['providers']
+        provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
         clnt = client.Client(provider)
         clnt.overQueryLimit.connect(lambda sleep_for: feedback.reportError("OverQueryLimit: Wait for {} seconds".format(sleep_for)))
 
