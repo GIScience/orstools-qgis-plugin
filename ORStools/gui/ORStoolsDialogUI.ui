@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>420</width>
-    <height>694</height>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,23 +120,35 @@
       </item>
       <item>
        <widget class="QPushButton" name="provider_refresh">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
-         <iconset theme="reload">
-          <normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/plugins/ORStools/img/icon_refresh.png</normaloff>:/plugins/ORStools/img/icon_refresh.png</iconset>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="provider_config">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
-         <iconset theme="emblem-system">
-          <normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/plugins/ORStools/img/icon_settings.png</normaloff>:/plugins/ORStools/img/icon_settings.png</iconset>
         </property>
        </widget>
       </item>
@@ -270,7 +282,7 @@
               <item row="1" column="0">
                <widget class="QPushButton" name="routing_frompoint_start_clear">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -279,8 +291,8 @@
                  <string> Clear</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="process-stop">
-                  <normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</iconset>
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/plugins/ORStools/img/icon_clear.png</normaloff>:/plugins/ORStools/img/icon_clear.png</iconset>
                 </property>
                </widget>
               </item>
@@ -360,7 +372,7 @@
               <item row="1" column="0">
                <widget class="QPushButton" name="routing_frompoint_end_clear">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -369,8 +381,8 @@
                  <string> Clear</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="process-stop">
-                  <normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</iconset>
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/plugins/ORStools/img/icon_clear.png</normaloff>:/plugins/ORStools/img/icon_clear.png</iconset>
                 </property>
                </widget>
               </item>
@@ -470,10 +482,16 @@
            <item row="0" column="2" rowspan="3">
             <widget class="QListWidget" name="routing_fromline_list">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>210</height>
+              </size>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::MultiSelection</enum>
@@ -483,7 +501,7 @@
            <item row="1" column="0">
             <widget class="QPushButton" name="routing_fromline_clear">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -492,8 +510,8 @@
               <string> Clear</string>
              </property>
              <property name="icon">
-              <iconset theme="process-stop">
-               <normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</normaloff>../../../pelias-qgis-plugin/PeliasTools/gui</iconset>
+              <iconset>
+               <normaloff>img/icon_clear.png</normaloff>img/icon_clear.png</iconset>
              </property>
             </widget>
            </item>
@@ -595,14 +613,14 @@
    <item>
     <widget class="QTextBrowser" name="debug_text">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="maximumSize">
+     <property name="minimumSize">
       <size>
-       <width>16777215</width>
+       <width>0</width>
        <height>80</height>
       </size>
      </property>
@@ -632,8 +650,8 @@
          <string>  Help</string>
         </property>
         <property name="icon">
-         <iconset theme="help">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/plugins/ORStools/img/icon_help.png</normaloff>:/plugins/ORStools/img/icon_help.png</iconset>
         </property>
        </widget>
       </item>

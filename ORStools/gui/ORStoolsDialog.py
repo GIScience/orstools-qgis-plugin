@@ -141,16 +141,17 @@ class ORStoolsDialogMain:
         self.menu.setIcon(icon_plugin)
         self.menu.addActions(self.actions)
 
-        # Add menu to Web menu and icon to toolbar
+        # Add menu to Web menu and make sure it exsists and add icon to toolbar
+        self.iface.addPluginToWebMenu("_tmp", self.actions[2])
         self.iface.webMenu().addMenu(self.menu)
+        self.iface.removePluginWebMenu("_tmp", self.actions[2])
         self.iface.addWebToolBarIcon(self.actions[0])
 
         # Connect slots to events
         self.actions[0].triggered.connect(self._init_gui_control)
         self.actions[1].triggered.connect(lambda: on_config_click(parent=self.iface.mainWindow()))
-        self.actions[3].triggered.connect(on_help_click)
-        # Connect other dialogs
-        self.actions[2].triggered.connect(self._on_about_click)
+        self.actions[2].triggered.connect(on_help_click)
+        self.actions[3].triggered.connect(self._on_about_click)
 
     def unload(self):
         """Called when QGIS closes or plugin is deactivated in Plugin Manager"""
