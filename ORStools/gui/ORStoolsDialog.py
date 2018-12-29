@@ -229,7 +229,8 @@ class ORStoolsDialogMain:
         layer_out.dataProvider().addAttributes(directions_core.get_fields())
         layer_out.updateFields()
 
-        provider = self.dlg.provider_combo.currentData()
+        provider_id = self.dlg.provider_combo.currentIndex()
+        provider = configmanager.read_config()['providers'][provider_id]
         clnt = client.Client(provider)
         clnt_msg = ''
 

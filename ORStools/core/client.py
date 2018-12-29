@@ -38,7 +38,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from ORStools import __version__
 from ORStools.utils import exceptions, configmanager, logger
 
-_USER_AGENT = "ORSQGISClient.v{}".format(__version__)
+_USER_AGENT = "ORSQGISClient@v{}".format(__version__)
 
 
 class Client(QObject):
