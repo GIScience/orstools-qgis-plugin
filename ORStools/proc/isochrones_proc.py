@@ -71,6 +71,7 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
     isochrones = isochrones_core.Isochrones()
     dest_id = None
     crs_out = QgsCoordinateReferenceSystem(4326)
+    providers = configmanager.read_config()['providers']
     # difference = None
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
@@ -256,8 +257,8 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
-
-            feedback.setProgress(int(100.0 / source.featureCount() * num))
+            if source:
+                feedback.setProgress(int(100.0 / source.featureCount() * num))
 
         return {self.OUT: self.dest_id}
 

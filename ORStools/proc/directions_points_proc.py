@@ -63,6 +63,8 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
     IN_MODE = "INPUT_MODE"
     OUT = 'OUTPUT'
 
+    providers = configmanager.read_config()['providers']
+
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
         providers = [provider['name'] for provider in self.providers]
