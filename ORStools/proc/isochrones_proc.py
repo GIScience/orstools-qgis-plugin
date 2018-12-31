@@ -264,8 +264,8 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
 
     def postProcessAlgorithm(self, context, feedback):
         """Style polygon layer in post-processing step."""
-
-        processed_layer = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
+        # processed_layer = self.isochrones.calculate_difference(self.dest_id, context)
+        processed_layer= QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
         self.isochrones.stylePoly(processed_layer)
 
         return {self.OUT: self.dest_id}

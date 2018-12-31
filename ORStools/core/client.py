@@ -64,7 +64,7 @@ class Client(QObject):
         self.base_url = provider['base_url']
         self.limit = provider['limit']
         self.limit_unit = provider['unit']
-        self.ENV_VARS = provider['ENV_VARS']
+        self.ENV_VARS = provider.get('ENV_VARS')
         
         self.session = requests.Session()
 
@@ -142,7 +142,7 @@ class Client(QObject):
                 self.url,
                 final_requests_kwargs
             ),
-            'info'
+            0
         )
 
         try:
@@ -175,8 +175,9 @@ class Client(QObject):
             raise
 
         # Write env variables if successful
-        for env_var in self.ENV_VARS:
-            configmanager.write_env_var(env_var, response.headers[self.ENV_VARS[env_var]])
+        if self.ENV_VARS:
+            for env_var in self.ENV_VARS:
+                configmanager.write_env_var(env_var, response.headers[self.ENV_VARS[env_var]])
 
         return result
 

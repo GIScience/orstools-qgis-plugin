@@ -268,7 +268,8 @@ class ORStoolsDialogMain:
             self.project.addMapLayer(layer_out)
 
             # Update quota; handled in client module after successful request
-            self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
+            if provider.get('ENV_VARS'):
+                self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
         except exceptions.Timeout:
             msg = "The connection has timed out!"
             logger.log(msg, 2)

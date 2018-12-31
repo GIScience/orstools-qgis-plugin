@@ -39,7 +39,9 @@ from qgis.core import (QgsPointXY,
                        QgsSymbol,
                        QgsSimpleFillSymbolLayer,
                        QgsRendererCategory,
-                       QgsCategorizedSymbolRenderer)
+                       QgsCategorizedSymbolRenderer,
+                       QgsProcessingUtils)
+import processing
 
 class Isochrones():
     """convenience class to build isochrones"""
@@ -136,7 +138,7 @@ class Isochrones():
     #
     #     dissolve_params = {
     #         'INPUT': layer,
-    #         'FIELD': self.field_dimension_name,
+    #         'FIELD': "AA_MINS",
     #         'OUTPUT': 'memory:'
     #     }
     #     dissolved = processing.run('qgis:dissolve', dissolve_params, context=context)['OUTPUT']
