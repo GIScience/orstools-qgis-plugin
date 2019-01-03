@@ -3,7 +3,7 @@
 <!-- https://ask.openrouteservice.org/c/sdks-->
 
 #### Here's what I did
-<!-- if applicable, best copy the coordinates of failing queries, so we can reproduce. we also :heart_eyes: -->
+<!-- if applicable, best copy the coordinates of failing queries or descriptive screenshots, so we can reproduce-->
 
 ---
 #### Here's what I got
