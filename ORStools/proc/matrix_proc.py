@@ -247,6 +247,13 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
             feedback.reportError(msg)
             logger.log(msg)
 
+        except exceptions.Timeout as e:
+            msg = "Server timeout"
+            feedback.reportError(msg)
+            logger.log(msg)
+            raise exceptions.Timeout(msg)
+
+
         (sink, dest_id) = self.parameterAsSink(
             parameters,
             self.OUT,

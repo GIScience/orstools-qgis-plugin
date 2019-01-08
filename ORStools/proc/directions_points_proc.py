@@ -273,6 +273,12 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue
+            except exceptions.Timeout as e:
+                msg = "Server timeout"
+                feedback.reportError(msg)
+                logger.log(msg)
+
+                return {self.OUT: dest_id}
 
             sink.addFeature(directions_core.get_output_feature(
                 response,

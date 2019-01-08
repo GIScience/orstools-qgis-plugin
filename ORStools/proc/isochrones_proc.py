@@ -257,6 +257,12 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
+            except exceptions.Timeout as e:
+                msg = "Server timeout"
+                feedback.reportError(msg)
+                logger.log(msg)
+
+                return {self.OUT: self.dest_id}
             if source:
                 feedback.setProgress(int(100.0 / source.featureCount() * num))
 
