@@ -33,6 +33,7 @@ import random
 import time
 import collections
 from urllib.parse import urlencode
+from PyQt5.QtCore import QSettings
 
 import OSMtools
 from OSMtools.utils import exceptions, configmanager
@@ -114,6 +115,20 @@ class Client(object):
         :rtype: dict from JSON response.
         """
 
+        # procedure to set proxy if needed
+        s = QSettings()
+        proxy_enabled = s.value("proxy/proxyEnabled","")
+        if proxy_enabled:
+            verify=False
+            proxy_host = s.value("proxy/proxyHost","")
+            proxy_port = s.value("proxy/proxyPort","")
+            proxy_user = s.value("proxy/proxyUser","")
+            proxy_password = s.value("proxy/proxyPassword","")
+
+            proxy_host_port = '%s:%s' %(proxy_host,proxy_port)
+            proxy = 'http://%s:%s@%s/'%(proxy_user,proxy_password,proxy_host_port)
+            proxies = {'http': proxy, 'https': proxy}
+
         if not first_request_time:
             first_request_time = datetime.now()
 
@@ -158,11 +173,11 @@ class Client(object):
             requests_method = self.session.post
             final_requests_kwargs["json"] = post_json
 
-        print("url:\n{}\nParameters:\n{}".format(self.base_url+authed_url,
-                                                 final_requests_kwargs))
+        print("url:\n{}\nParameters:\n{}\nproxy:\n{}".format(self.base_url+authed_url,
+                                                 final_requests_kwargs, proxy_host_port))
 
         try:
-            response = requests_method(self.base_url + authed_url,
+            response = requests_method(self.base_url + authed_url, proxies=proxies, verify=verify,
                                        **final_requests_kwargs)
         except requests.exceptions.Timeout:
             raise exceptions.Timeout()
