@@ -1,0 +1,16 @@
+---
+providers:
+- name: openrouteservice
+  base_url: https://api.openrouteservice.org
+  key:
+  limit: 40
+  unit: minute
+  endpoints:
+    directions: "/directions"
+    isochrones: "/isochrones"
+    matrix: "/matrix"
+    geocoding: "/geocoding"
+  # Use Env Vars to update quota label in GUI (if applicable for provider)
+  ENV_VARS:
+    ORS_REMAINING: "X-Ratelimit-Remaining"
+    ORS_QUOTA: "X-Ratelimit-Limit"

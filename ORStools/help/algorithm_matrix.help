@@ -1,0 +1,13 @@
+The Matrix algorithm returns a duration and distance matrix for multiple source and destination points.
+
+You need to have a valid API key ('Web' menu > 'Configuration') or sign up at https://openrouteservice.org/sign-up/.
+
+The Travel Mode determines the profile used.
+
+For Start and End layers, only Point layers are allowed, NOT MultiPoint.
+
+The Start and End ID fields can be used to join the input layers afterwards.
+
+The output layer is a geometryless table with ID, duration and distance attributes.
+
+For current restrictions, please see https://openrouteservice.org/restrictions/.

@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/OSMtools" >
-        <file>static/img/icon.png</file>
-    </qresource>
-</RCC>

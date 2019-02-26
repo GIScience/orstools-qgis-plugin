@@ -1,8 +1,8 @@
+docs/wiki/OSMtools.wiki/
 .idea/
 ./LICENSE.md
 ./apikey.txt
 *.pyc
-help/
 i18n/
 test/
 .spyproject/
