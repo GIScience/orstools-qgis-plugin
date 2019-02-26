@@ -1,0 +1,15 @@
+The Line Directions algorithm calulcates optimal routes for multiple waypoints along a LineString.
+
+You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at https://openrouteservice.org/sign-up/.
+
+Both, LineString and MultiLineString layers are allowed.
+
+The Travel Mode determines the profile used.
+
+The Preference dictates the cost. For longer routes don't use Shortest.
+
+The layer ID field can be used to join the input layer afterwards.
+
+The output layer is a Polygon layer with multiple route attributes set.
+
+For current restrictions, please see https://openrouteservice.org/restrictions/.
