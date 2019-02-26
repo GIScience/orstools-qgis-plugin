@@ -72,8 +72,8 @@ class Client(QObject):
         self.requests_kwargs = dict()
         self.requests_kwargs.update({
             "headers": {"User-Agent": _USER_AGENT,
-                        'Content-type': 'application/json',
-                        'timeout': 60}
+                        'Content-type': 'application/json'},
+            'timeout': 60
         })
 
         self.sent_times = collections.deque("", self.limit)
