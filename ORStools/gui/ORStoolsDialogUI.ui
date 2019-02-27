@@ -656,6 +656,22 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="label_16">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;By &lt;a href=&quot;https://gis-ops.com&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_gisops_300.png&quot; width=100/&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QDialogButtonBox" name="global_buttons">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

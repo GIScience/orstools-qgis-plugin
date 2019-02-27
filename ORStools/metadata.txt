@@ -3,14 +3,17 @@ name=ORS Tools
 qgisMinimumVersion=3.0
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
+<<<<<<< HEAD
 version=1.0.1
+=======
+version=1.0.0
+>>>>>>> 3d815332817c6c41aaf8397c991f9a95e32d2dbb
 author=Nils Nolde
 email=nils@gis-ops.com
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2019/02/27 v1.0.1 change homepage to wiki
-  2018/12/3 v1.0.0 First working version of ORS Tools, after replacing OSM Tools plugin
+changelog=2018/12/3 v1.0.0 First working version of ORS Tools, after replacing OSM Tools plugin
 
 tracker=https://github.com/nilsnolde/orstools-qgis-plugin/issues
 repository=https://github.com/nilsnolde/orstools-qgis-plugin.git
