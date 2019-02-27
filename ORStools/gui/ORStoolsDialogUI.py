@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ORStoolsDialogBase(object):
     def setupUi(self, ORStoolsDialogBase):
         ORStoolsDialogBase.setObjectName("ORStoolsDialogBase")
-        ORStoolsDialogBase.resize(420, 626)
+        ORStoolsDialogBase.resize(420, 708)
         ORStoolsDialogBase.setSizeGripEnabled(True)
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(ORStoolsDialogBase)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
@@ -377,15 +377,6 @@ class Ui_ORStoolsDialogBase(object):
         self.help_button.setIcon(icon4)
         self.help_button.setObjectName("help_button")
         self.horizontalLayout_8.addWidget(self.help_button)
-        self.label_16 = QtWidgets.QLabel(self.widget_2)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Maximum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_16.sizePolicy().hasHeightForWidth())
-        self.label_16.setSizePolicy(sizePolicy)
-        self.label_16.setOpenExternalLinks(True)
-        self.label_16.setObjectName("label_16")
-        self.horizontalLayout_8.addWidget(self.label_16)
         self.global_buttons = QtWidgets.QDialogButtonBox(self.widget_2)
         self.global_buttons.setOrientation(QtCore.Qt.Horizontal)
         self.global_buttons.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
@@ -445,7 +436,6 @@ class Ui_ORStoolsDialogBase(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.batch_tab), _translate("ORStoolsDialogBase", "Batch Jobs"))
         self.debug_text.setPlaceholderText(_translate("ORStoolsDialogBase", "Queries and errors will be printed here."))
         self.help_button.setText(_translate("ORStoolsDialogBase", "  Help"))
-        self.label_16.setText(_translate("ORStoolsDialogBase", "<html><head/><body><p>By <a href=\"https://gis-ops.com\"><img src=\":/plugins/ORStools/img/logo_gisops_300.png\" width=100/></a></p></body></html>"))
 
 from qgsfilterlineedit import QgsFilterLineEdit
 from . import resources_rc
