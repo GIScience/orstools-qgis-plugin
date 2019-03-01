@@ -210,8 +210,12 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
                 raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
 
             # Get ID field properties
+            # TODO: id_field should have a default (#90)
             id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
             id_field_id = source.fields().lookupField(id_field_name)
+            if id_field_name == '':
+                id_field_id = 0
+                id_field_name = source.fields().field(id_field_id).name()
             id_field = source.fields().field(id_field_id)
 
             # Populate iso_layer instance with parameters
