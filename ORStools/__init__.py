@@ -56,7 +56,7 @@ ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
 
 # Read metadata.txt
 METADATA = configparser.ConfigParser()
-METADATA.read(os.path.join(BASE_DIR, 'metadata.txt'))
+METADATA.read(os.path.join(BASE_DIR, 'metadata.txt'), encoding='utf-8')
 today = datetime.today()
 
 __version__ = METADATA['general']['version']
