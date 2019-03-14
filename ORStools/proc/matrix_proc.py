@@ -193,8 +193,8 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         source_field_id = source.fields().lookupField(source_field_name)
         source_field = source.fields().field(source_field_id)
 
-        destination_field_id = source.fields().lookupField(destination_field_name)
-        destination_field = source.fields().field(destination_field_id)
+        destination_field_id = destination.fields().lookupField(destination_field_name)
+        destination_field = destination.fields().field(destination_field_id)
 
         # Abort when MultiPoint type
         if (source.wkbType() or destination.wkbType()) == 4:
