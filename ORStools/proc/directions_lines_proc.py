@@ -147,7 +147,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         providers = configmanager.read_config()['providers']
         provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
         clnt = client.Client(provider)
-        clnt.overQueryLimit.connect(lambda sleep_for: feedback.reportError("OverQueryLimit: Wait for {} seconds".format(sleep_for)))
+        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
 
         profile = PROFILES[self.parameterAsEnum(
             parameters,

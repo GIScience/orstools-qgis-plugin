@@ -30,12 +30,14 @@
 from datetime import datetime, timedelta
 import requests
 import time
-import collections
 from urllib.parse import urlencode
+import random
+import json
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from ORStools import __version__
+from ORStools.core import networkaccessmanager
 from ORStools.utils import exceptions, configmanager, logger
 
 _USER_AGENT = "ORSQGISClient@v{}".format(__version__)
@@ -62,31 +64,38 @@ class Client(QObject):
 
         self.key = provider['key']
         self.base_url = provider['base_url']
-        self.limit = provider['limit']
-        self.limit_unit = provider['unit']
+        # self.limit = provider['limit']
+        # self.limit_unit = provider['unit']
         self.ENV_VARS = provider.get('ENV_VARS')
         
-        self.session = requests.Session()
+        # self.session = requests.Session()
+        self.nam = networkaccessmanager.NetworkAccessManager(debug=False)
 
         self.retry_timeout = timedelta(seconds=retry_timeout)
-        self.requests_kwargs = dict()
-        self.requests_kwargs.update({
-            "headers": {"User-Agent": _USER_AGENT,
-                        'Content-type': 'application/json'},
-            'timeout': 60
-        })
-
-        self.sent_times = collections.deque("", self.limit)
+        self.headers = {
+                "User-Agent": _USER_AGENT,
+                'Content-type': 'application/json',
+                'Authorization': provider['key']
+            }
+        # self.requests_kwargs = dict()
+        # self.requests_kwargs.update({
+        #     "headers": {
+        #         "User-Agent": _USER_AGENT,
+        #         'Content-type': 'application/json',
+        #         'Authorization': provider['key']
+        #     },
+        #     # 'timeout': 60
+        # })
 
         # Save some references to retrieve in client instances
         self.url = None
         self.warnings = None
 
-    overQueryLimit = pyqtSignal('int')
+    overQueryLimit = pyqtSignal()
     def request(self, 
                 url, params,
                 first_request_time=None,
-                requests_kwargs=None,
+                retry_counter=0,
                 post_json=None):
         """Performs HTTP GET/POST with credentials, returning the body as
         JSON.
@@ -100,11 +109,6 @@ class Client(QObject):
         :param first_request_time: The time of the first request (None if no
             retries have occurred).
         :type first_request_time: datetime.datetime
-
-        :param requests_kwargs: Same extra keywords arg for requests as per
-            __init__, but provided here to allow overriding internally on a
-            per-request basis.
-        :type requests_kwargs: dict
 
         :param post_json: Parameters for POST endpoints
         :type post_json: dict
@@ -122,6 +126,15 @@ class Client(QObject):
         if elapsed > self.retry_timeout:
             raise exceptions.Timeout()
 
+        if retry_counter > 0:
+            # 0.5 * (1.5 ^ i) is an increased sleep time of 1.5x per iteration,
+            # starting at 0.5s when retry_counter=1. The first retry will occur
+            # at 1, so subtract that first.
+            delay_seconds = 1.5**(retry_counter - 1)
+
+            # Jitter this value by 50% and pause.
+            time.sleep(delay_seconds * (random.random() + 0.5))
+
         authed_url = self._generate_auth_url(url,
                                              params,
                                              )
@@ -129,50 +142,59 @@ class Client(QObject):
 
         # Default to the client-level self.requests_kwargs, with method-level
         # requests_kwargs arg overriding.
-        requests_kwargs = requests_kwargs or {}
-        final_requests_kwargs = dict(self.requests_kwargs, **requests_kwargs)
+        # final_requests_kwargs = self.requests_kwargs
         
         # Determine GET/POST
-        requests_method = self.session.get
+        # requests_method = self.session.get
+        requests_method = 'GET'
+        body = None
         if post_json is not None:
-            requests_method = self.session.post
-            final_requests_kwargs["json"] = post_json
+            # requests_method = self.session.post
+            # final_requests_kwargs["json"] = post_json
+            body = post_json
+            requests_method = 'POST'
 
         logger.log(
             "url: {}\nParameters: {}".format(
                 self.url,
-                final_requests_kwargs
+                # final_requests_kwargs
+                body
             ),
             0
         )
 
         try:
-            response = requests_method(
-                self.base_url + authed_url,
-                **final_requests_kwargs
-            )
-        except requests.exceptions.Timeout:
-            raise exceptions.Timeout()
+            # response = requests_method(
+            #     self.base_url + authed_url,
+            #     **final_requests_kwargs
+            # )
+            response, content = self.nam.request(self.url,
+                                           method=requests_method,
+                                           body=body,
+                                           headers=self.headers,
+                                           blocking=True)
+        # except requests.exceptions.Timeout:
+        #     raise exceptions.Timeout()
+        except networkaccessmanager.RequestsExceptionTimeout:
+            raise exceptions.Timeout
 
-        try:
-            result = self._get_body(response)
-            self.sent_times.append(time.time())
+        except networkaccessmanager.RequestsException:
+            try:
+                # result = self._get_body(response)
+                self._check_status()
 
-        except exceptions.OverQueryLimit as e:
-            elapsed_since_earliest = time.time() - self.sent_times[0]
-            interval = 60 if self.limit_unit == 'minute' else 1
-            sleep_for = interval - elapsed_since_earliest + 1  # Add 1 second to avoid too quick requests after error
+            except exceptions.OverQueryLimit as e:
 
-            # Let the instances know smth happened
-            self.overQueryLimit.emit(sleep_for)
-            logger.log("{}: {}".format(e.__class__.__name__, str(e)), 1)
+                # Let the instances know smth happened
+                self.overQueryLimit.emit()
+                logger.log("{}: {}".format(e.__class__.__name__, str(e)), 1)
 
-            time.sleep(sleep_for)
+                return self.request(url, params, first_request_time, retry_counter + 1, post_json)
 
-            return self.request(url, params, first_request_time, requests_kwargs, post_json)
+            except exceptions.ApiError as e:
+                logger.log("Feature ID {} caused a {}: {}".format(params['id'], e.__class__.__name__, str(e)), 2)
+                raise
 
-        except exceptions.ApiError as e:
-            logger.log("Feature ID {} caused a {}: {}".format(params['id'], e.__class__.__name__, str(e)), 2)
             raise
 
         # Write env variables if successful
@@ -180,15 +202,11 @@ class Client(QObject):
             for env_var in self.ENV_VARS:
                 configmanager.write_env_var(env_var, response.headers[self.ENV_VARS[env_var]])
 
-        return result
+        return json.loads(content.decode('utf-8'))
 
-    @staticmethod
-    def _get_body(response):
+    def _check_status(self):
         """
         Casts JSON response to dict
-        
-        :param response: The HTTP response of the request.
-        :type response: JSON object
 
         :raises ORStools.utils.exceptions.OverQueryLimitError: when rate limit is exhausted, HTTP 429
         :raises ORStools.utils.exceptions.ApiError: when the backend API throws an error, HTTP 400
@@ -198,35 +216,37 @@ class Client(QObject):
         :returns: response body
         :rtype: dict
         """
-        body = response.json()
-        error = body.get('error')
-        status_code = response.status_code
+
+        status_code = self.nam.http_call_result.status_code
+        message = self.nam.http_call_result.text if self.nam.http_call_result.text != '' else self.nam.http_call_result.reason
 
         if status_code == 403:
             raise exceptions.InvalidKey(
                 str(status_code),
-                error
+                # error,
+                message
             )
 
         if status_code == 429:
             raise exceptions.OverQueryLimit(
                 str(status_code),
-                error
+                # error,
+                message
             )
         # Internal error message for Bad Request
-        if status_code == 400:
+        if 400 < status_code < 500:
             raise exceptions.ApiError(
-                error['code'],
-                error['message']
+                str(status_code),
+                # error,
+                message
             )
         # Other HTTP errors have different formatting
         if status_code != 200:
             raise exceptions.GenericServerError(
                 str(status_code),
-                error
+                # error,
+                message
             )
-
-        return body
 
     def _generate_auth_url(self, path, params):
         """Returns the path and query string portion of the request URL, first
@@ -247,7 +267,7 @@ class Client(QObject):
         
         # Only auto-add API key when using ORS. If own instance, API key must
         # be explicitly added to params
-        if self.key:
-            params.append(("api_key", self.key))
+        # if self.key:
+        #     params.append(("api_key", self.key))
 
         return path + "?" + requests.utils.unquote_unreserved(urlencode(params))

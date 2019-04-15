@@ -157,7 +157,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         providers = configmanager.read_config()['providers']
         provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
         clnt = client.Client(provider)
-        clnt.overQueryLimit.connect(lambda sleep_for: feedback.reportError("OverQueryLimit: Wait for {} seconds".format(sleep_for)))
+        clnt.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying"))
 
         params = dict()
         get_params = dict()
@@ -269,7 +269,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
                 feat.setAttributes([
                     source,
                     destination,
-                    duration / 1000 if duration is not None else None,
+                    duration / 3600 if duration is not None else None,
                     distance / 1000 if distance is not None else None
                 ])
 

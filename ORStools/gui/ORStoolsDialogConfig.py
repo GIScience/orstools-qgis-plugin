@@ -66,8 +66,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             current_provider = self.temp_config['providers'][idx]
             current_provider['key'] = box.findChild(QtWidgets.QLineEdit, box.title() + "_key_text").text()
             current_provider['base_url'] = box.findChild(QtWidgets.QLineEdit, box.title() + "_base_url_text").text()
-            current_provider['limit'] = box.findChild(QtWidgets.QSpinBox, box.title() + "_request_value").value()
-            current_provider['unit'] = box.findChild(QtWidgets.QComboBox, box.title() + "_request_unit").currentText()
 
         configmanager.write_config(self.temp_config)
         self.close()
@@ -77,10 +75,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         for provider_entry in self.temp_config['providers']:
             self._add_box(provider_entry['name'],
-                           provider_entry['base_url'],
-                           provider_entry['key'],
-                           provider_entry['limit'],
-                           provider_entry['unit'],
+                          provider_entry['base_url'],
+                          provider_entry['key'],
                           new=False)
 
         self.gridLayout.addWidget(self.providers, 0, 0, 1, 3)
@@ -97,7 +93,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         # Show quick user input dialog
         provider_name, ok = QInputDialog.getText(self, "New Pelias provider", "Enter a name for the provider")
         if ok:
-            self._add_box(provider_name, 'https://', '', 0, 'minute', new=True)
+            self._add_box(provider_name, 'https://', '', new=True)
 
     def _remove_provider(self):
         """Remove list of providers from list."""
@@ -124,7 +120,11 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
-    def _add_box(self, name, url, key, limit, unit, new=False):
+    def _add_box(self,
+                 name,
+                 url,
+                 key,
+                 new=False):
         """
         Adds a provider box to the QWidget layout and self.temp_config.
 
@@ -136,12 +136,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         :param key: user's API key
         :type key: str
-
-        :param limit: value of API key limit
-        :type limit: int
-
-        :param unit: unit of API key limit.
-        :type unit: str
 
         :param new: Specifies whether user wants to insert provider or the GUI is being built.
         :type new: boolean
@@ -172,11 +166,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         key_label.setObjectName(name + '_key_label')
         key_label.setText('API Key')
         gridLayout_3.addWidget(key_label, 0, 0, 1, 1)
-        label = QtWidgets.QLabel(provider)
-        label.setObjectName(name + "_label")
-        label.setWhatsThis("How many requests you can fire within a second/minute/hour. Depending on your provider")
-        label.setText("Requests per")
-        gridLayout_3.addWidget(label, 4, 1, 1, 1)
         base_url_text = QtWidgets.QLineEdit(provider)
         base_url_text.setObjectName(name + "_base_url_text")
         base_url_text.setText(url)
@@ -185,18 +174,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         key_text.setObjectName(name + "_key_text")
         key_text.setText(key)
         gridLayout_3.addWidget(key_text, 1, 0, 1, 4)
-        request_value = QtWidgets.QSpinBox(provider)
-        request_value.setObjectName(name + "_request_value")
-        request_value.setMaximum(10000)
-        request_value.setValue(limit)
-        gridLayout_3.addWidget(request_value, 4, 0, 1, 1)
-        request_unit = QtWidgets.QComboBox(provider)
-        request_unit.setObjectName(name + "_request_unit")
-        request_unit.addItem("second")
-        request_unit.addItem("minute")
-        current_unit_index = request_unit.findText(unit)
-        request_unit.setCurrentIndex(current_unit_index)
-        gridLayout_3.addWidget(request_unit, 4, 2, 1, 2)
         base_url_label = QtWidgets.QLabel(provider)
         base_url_label.setObjectName("base_url_label")
         base_url_label.setText("Base URL")
