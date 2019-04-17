@@ -219,6 +219,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
 
             xformer = transform.transformToWGS(destination.sourceCrs())
             destination_features_xformed = [xformer.transform(feat.geometry().asPoint()) for feat in destination_features]
+
             features_points = sources_features_xformed + destination_features_xformed
 
         # Get IDs
@@ -287,3 +288,9 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         fields.append(QgsField("DIST_KM", QVariant.Double))
 
         return fields
+
+    @staticmethod
+    def chunks(l, n):
+        """Yield successive n-sized chunks from l."""
+        for i in range(0, len(l), n):
+            yield l[i:i + n]

@@ -217,6 +217,8 @@ class NetworkAccessManager(object):
                 body = body.read()
             if isinstance(body, str):
                 body = body.encode()
+            if isinstance(body, dict):
+                body = str(body).encode(encoding='utf-8')
             self.reply = func(req, body)
         else:
             self.reply = func(req)
