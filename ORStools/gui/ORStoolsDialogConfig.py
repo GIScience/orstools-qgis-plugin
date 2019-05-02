@@ -91,7 +91,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         self._collapse_boxes()
         # Show quick user input dialog
-        provider_name, ok = QInputDialog.getText(self, "New Pelias provider", "Enter a name for the provider")
+        provider_name, ok = QInputDialog.getText(self, "New ORS provider", "Enter a name for the provider")
         if ok:
             self._add_box(provider_name, 'https://', '', new=True)
 
@@ -146,8 +146,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                     name=name,
                     base_url=url,
                     key=key,
-                    limit=limit,
-                    unit=unit,
                     endpoints={
                         "directions": "/directions",
                         "isochrones": "/isochrones",

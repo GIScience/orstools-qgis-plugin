@@ -377,6 +377,12 @@ class Ui_ORStoolsDialogBase(object):
         self.help_button.setIcon(icon4)
         self.help_button.setObjectName("help_button")
         self.horizontalLayout_8.addWidget(self.help_button)
+        self.about_button = QtWidgets.QPushButton(self.widget_2)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/plugins/ORStools/img/icon_about.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.about_button.setIcon(icon5)
+        self.about_button.setObjectName("about_button")
+        self.horizontalLayout_8.addWidget(self.about_button)
         self.global_buttons = QtWidgets.QDialogButtonBox(self.widget_2)
         self.global_buttons.setOrientation(QtCore.Qt.Horizontal)
         self.global_buttons.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
@@ -436,6 +442,7 @@ class Ui_ORStoolsDialogBase(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.batch_tab), _translate("ORStoolsDialogBase", "Batch Jobs"))
         self.debug_text.setPlaceholderText(_translate("ORStoolsDialogBase", "Queries and errors will be printed here."))
         self.help_button.setText(_translate("ORStoolsDialogBase", "  Help"))
+        self.about_button.setText(_translate("ORStoolsDialogBase", "About"))
 
 from qgsfilterlineedit import QgsFilterLineEdit
 from . import resources_rc

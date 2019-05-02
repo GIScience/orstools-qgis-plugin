@@ -73,6 +73,24 @@ def on_help_click():
     webbrowser.open(__help__)
 
 
+def on_about_click(parent):
+    """Slot for click event of About button/menu entry."""
+
+    info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {0}">openrouteservice</a> routing functionalities.<br><br>' \
+           '<center><a href=\"https://gis-ops.com\"><img src=\":/plugins/ORStools/img/logo_gisops_300.png\"/></a> <br><br></center>' \
+           'Author: Nils Nolde<br>' \
+           'Email: <a href="mailto:Nils Nolde <{1}>">{1}</a><br>' \
+           'Web: <a href="{2}">{2}</a><br>' \
+           'Repo: <a href="https://github.com/nilsnolde/ORStools">github.com/nilsnolde/ORStools</a><br>' \
+           'Version: {3}'.format(DEFAULT_COLOR, __email__, __web__, __version__)
+
+    QMessageBox.information(
+        parent,
+        'About {}'.format(PLUGIN_NAME),
+        info
+    )
+
+
 class ORStoolsDialogMain:
     """Defines all mandatory QGIS things about dialog."""
 
@@ -150,8 +168,8 @@ class ORStoolsDialogMain:
         # Connect slots to events
         self.actions[0].triggered.connect(self._init_gui_control)
         self.actions[1].triggered.connect(lambda: on_config_click(parent=self.iface.mainWindow()))
-        self.actions[2].triggered.connect(on_help_click)
-        self.actions[3].triggered.connect(self._on_about_click)
+        self.actions[2].triggered.connect(lambda: on_about_click(parent=self.iface.mainWindow()))
+        self.actions[3].triggered.connect(on_help_click)
 
     def unload(self):
         """Called when QGIS closes or plugin is deactivated in Plugin Manager"""
@@ -161,23 +179,6 @@ class ORStoolsDialogMain:
         QApplication.restoreOverrideCursor()
         del self.dlg
         del self.advanced
-
-    def _on_about_click(self):
-        """Slot for click event of About button/menu entry."""
-
-        info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {0}">openrouteservice</a> routing functionalities.<br><br>' \
-               '<center><a href=\"https://gis-ops.com\"><img src=\":/plugins/ORStools/img/logo_gisops_300.png\"/></a> <br><br></center>' \
-               'Author: Nils Nolde<br>' \
-               'Email: <a href="mailto:Nils Nolde <{1}>">{1}</a><br>' \
-               'Web: <a href="{2}">{2}</a><br>' \
-               'Repo: <a href="https://github.com/nilsnolde/ORStools">github.com/nilsnolde/ORStools</a><br>' \
-               'Version: {3}'.format(DEFAULT_COLOR, __email__, __web__, __version__)
-
-        QMessageBox.information(
-            self.iface.mainWindow(),
-            'About {}'.format(PLUGIN_NAME),
-            info
-        )
 
     def _on_advanced_click(self):
         """Slot for click event of advanced dialog button."""
@@ -232,6 +233,21 @@ class ORStoolsDialogMain:
 
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()['providers'][provider_id]
+
+        # Check if API key was set when using ORS
+        if provider['key'] is None:
+            QMessageBox.critical(
+                self.dlg,
+                "Missing API key",
+                """
+                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+                
+                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br>
+                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the settings symbol in the main ORS Tools GUI, next to the provider dropdown.
+                """
+            )
+            return
+
         clnt = client.Client(provider)
         clnt_msg = ''
 
@@ -274,6 +290,7 @@ class ORStoolsDialogMain:
             msg = "The connection has timed out!"
             logger.log(msg, 2)
             self.dlg.debug_text.setText(msg)
+            return
 
         except (exceptions.ApiError,
                 exceptions.InvalidKey,
@@ -283,6 +300,7 @@ class ORStoolsDialogMain:
 
             logger.log("{}: {}".format(*msg), 2)
             clnt_msg += "<b>{}</b>: ({})<br>".format(*msg)
+            return
 
         except Exception as e:
             msg = [e.__class__.__name__ ,
@@ -295,6 +313,7 @@ class ORStoolsDialogMain:
             # Set URL in debug window
             clnt_msg += '<a href="{0}">{0}</a><br>'.format(clnt.url)
             self.dlg.debug_text.setHtml(clnt_msg)
+            return
 
 
 class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
@@ -337,6 +356,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Config/Help dialogs
         self.provider_config.clicked.connect(lambda: on_config_click(self))
         self.help_button.clicked.connect(on_help_click)
+        self.about_button.clicked.connect(lambda: on_about_click(parent=self._iface.mainWindow()))
         self.provider_refresh.clicked.connect(self._on_prov_refresh_click)
 
         # Routing tab

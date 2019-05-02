@@ -53,44 +53,23 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QCheckBox" name="routing_avoid_tunnels">
-        <property name="text">
-         <string>tunnels</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
        <widget class="QCheckBox" name="routing_avoid_ferries">
         <property name="text">
          <string>ferries</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="1" column="1">
        <widget class="QCheckBox" name="routing_avoid_fords">
         <property name="text">
          <string>fords</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="2" column="0">
        <widget class="QCheckBox" name="routing_avoid_tracks">
         <property name="text">
-         <string>tracks</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="routing_avoid_paved">
-        <property name="text">
-         <string>pavedroads</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QCheckBox" name="routing_avoid_unpaved">
-        <property name="text">
-         <string>unpavedroads</string>
+         <string>steps</string>
         </property>
        </widget>
       </item>
