@@ -64,8 +64,6 @@ class Client(QObject):
 
         self.key = provider['key']
         self.base_url = provider['base_url']
-        # self.limit = provider['limit']
-        # self.limit_unit = provider['unit']
         self.ENV_VARS = provider.get('ENV_VARS')
         
         # self.session = requests.Session()
@@ -77,15 +75,6 @@ class Client(QObject):
                 'Content-type': 'application/json',
                 'Authorization': provider['key']
             }
-        # self.requests_kwargs = dict()
-        # self.requests_kwargs.update({
-        #     "headers": {
-        #         "User-Agent": _USER_AGENT,
-        #         'Content-type': 'application/json',
-        #         'Authorization': provider['key']
-        #     },
-        #     # 'timeout': 60
-        # })
 
         # Save some references to retrieve in client instances
         self.url = None
@@ -200,7 +189,7 @@ class Client(QObject):
         # Write env variables if successful
         if self.ENV_VARS:
             for env_var in self.ENV_VARS:
-                configmanager.write_env_var(env_var, response.headers[self.ENV_VARS[env_var]])
+                configmanager.write_env_var(env_var, response.headers.get(self.ENV_VARS[env_var], 'None'))
 
         return json.loads(content.decode('utf-8'))
 
