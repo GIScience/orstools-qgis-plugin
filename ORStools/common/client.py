@@ -37,7 +37,7 @@ import json
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from ORStools import __version__
-from ORStools.core import networkaccessmanager
+from ORStools.common import networkaccessmanager
 from ORStools.utils import exceptions, configmanager, logger
 
 _USER_AGENT = "ORSQGISClient@v{}".format(__version__)
@@ -50,9 +50,6 @@ class Client(QObject):
                  provider=None,
                  retry_timeout=60):
         """
-        :param iface: A QGIS interface instance.
-        :type iface: QgisInterface
-
         :param provider: A openrouteservice provider from config.yml
         :type provider: dict
 

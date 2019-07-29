@@ -46,7 +46,7 @@ from qgis.core import (QgsWkbTypes,
                        )
 from . import HELP_DIR
 from ORStools import RESOURCE_PREFIX, __help__
-from ORStools.core import client, PROFILES
+from ORStools.common import client, PROFILES
 from ORStools.utils import transform, exceptions, logger, configmanager
 
 

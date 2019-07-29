@@ -34,11 +34,8 @@ from PyQt5.QtGui import QIcon
 
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
-                       QgsProcessing,
                        QgsProcessingUtils,
-                       QgsProcessingException,
                        QgsProcessingAlgorithm,
-                       QgsProcessingParameterField,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum,
@@ -47,19 +44,18 @@ from qgis.core import (QgsWkbTypes,
                        )
 from . import HELP_DIR
 from ORStools import RESOURCE_PREFIX, __help__
-from ORStools.core import client, isochrones_core, PROFILES, DIMENSIONS
+from ORStools.common import client, isochrones_core, PROFILES, DIMENSIONS
 from ORStools.utils import convert, transform, exceptions, configmanager, logger
 
 
-class ORSisochronesAlgo(QgsProcessingAlgorithm):
+class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
     # TODO: create base algorithm class common to all modules
 
-    ALGO_NAME = 'isochrones'
+    ALGO_NAME = 'isochrones_point'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_POINT = "INPUT_POINT"
-    IN_POINTS = "INPUT_POINT_LAYER"
-    IN_FIELD = "INPUT_FIELD"
     IN_PROFILE = "INPUT_PROFILE"
     IN_METRIC = 'INPUT_METRIC'
     IN_RANGES = 'INPUT_RANGES'
@@ -89,32 +85,6 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
                 name=self.IN_POINT,
                 description="Input Point from map canvas (mutually exclusive with layer option)",
                 optional=True,
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterFeatureSource(
-                name=self.IN_POINTS,
-                description="Input Point layer (mutually exclusive with Point option)",
-                types=[QgsProcessing.TypeVectorPoint],
-                defaultValue=None,
-                optional=True
-            )
-        )
-
-        # self.addParameter(
-        #     QgsProcessingParameterBoolean(
-        #         name=self.IN_DIFFERENCE,
-        #         description="Dissolve and calulate isochrone difference",
-        #     )
-        # )
-
-        self.addParameter(
-            QgsProcessingParameterField(
-                name=self.IN_FIELD,
-                description="Input layer ID Field (mutually exclusive with Point option)",
-                parentLayerParameterName=self.IN_POINTS,
-                optional=True
             )
         )
 
@@ -157,7 +127,7 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
 
         file = os.path.join(
             HELP_DIR,
-            'algorithm_isochrone.help'
+            'algorithm_isochrone_point.help'
         )
         with open(file) as helpf:
             msg = helpf.read()
@@ -169,15 +139,15 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
         return __help__
 
     def displayName(self):
-        return 'Generate ' + self.ALGO_NAME.capitalize()
+        return 'Generate ' + " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
 
     def icon(self):
         return QIcon(RESOURCE_PREFIX + 'icon_isochrones.png')
 
     def createInstance(self):
-        return ORSisochronesAlgo()
+        return ORSisochronesPointAlgo()
 
-    # TODO: preprocess parameters to avoid the range clenaup below:
+    # TODO: preprocess parameters to options the range clenaup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -198,77 +168,43 @@ class ORSisochronesAlgo(QgsProcessingAlgorithm):
         ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
         params['range'] = convert.comma_list(ranges_proc)
 
-        # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
         point = self.parameterAsPoint(parameters, self.IN_POINT, context, self.crs_out)
-        source = self.parameterAsSource(parameters, self.IN_POINTS, context)
 
         # Make the actual requests
         # If layer source is set
         requests = []
-        if source:
-            if source.wkbType() == 4:
-                raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
-
-            # Get ID field properties
-            # TODO: id_field should have a default (#90)
-            id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
-            id_field_id = source.fields().lookupField(id_field_name)
-            if id_field_name == '':
-                id_field_id = 0
-                id_field_name = source.fields().field(id_field_id).name()
-            id_field = source.fields().field(id_field_id)
-
-            # Populate iso_layer instance with parameters
-            self.isochrones.set_parameters(profile, dimension, factor, id_field.type(), id_field_name)
-
-            for properties in self.get_sorted_feature_parameters(source):
-                # Stop the algorithm if cancel button has been clicked
-                if feedback.isCanceled():
-                    break
-
-                # Get transformed coordinates and feature
-                params['locations'], feat = properties
-                params['id'] = feat[id_field_name]
-                requests.append(deepcopy(params))
-        # elif point source is set
-        else:
-            self.isochrones.set_parameters(profile, dimension, factor)
-            params['locations'] = convert.build_coords([point.x(), point.y()])
-            params['id'] = None
-            requests.append(params)
+        self.isochrones.set_parameters(profile, dimension, factor)
+        params['locations'] = convert.build_coords([point.x(), point.y()])
+        params['id'] = None
+        requests.append(params)
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                     self.isochrones.get_fields(),
                                                     QgsWkbTypes.Polygon,  # Needs Multipolygon if difference parameter will ever be reactivated
                                                     self.crs_out)
 
-        for num, params in enumerate(requests):
-            # If feature causes error, report and continue with next
-            try:
-                # Populate features from response
-                response = clnt.request(provider['endpoints'][self.ALGO_NAME], params)
+        # If feature causes error, report and continue with next
+        try:
+            # Populate features from response
+            response = clnt.request(provider['endpoints'][self.ALGO_NAME_LIST[0]], params)
 
-                for isochrone in self.isochrones.get_features(response, params['id']):
-                    sink.addFeature(isochrone)
+            for isochrone in self.isochrones.get_features(response, params['id']):
+                sink.addFeature(isochrone)
 
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
-                msg = "Feature ID {} caused a {}:\n{}".format(
-                    params['id'],
-                    e.__class__.__name__,
-                    str(e))
-                feedback.reportError(msg)
-                logger.log(msg, 2)
-                continue
-            if source:
-                feedback.setProgress(int(100.0 / source.featureCount() * num))
+        except (exceptions.ApiError,
+                exceptions.InvalidKey,
+                exceptions.GenericServerError) as e:
+            msg = "Feature ID {} caused a {}:\n{}".format(
+                params['id'],
+                e.__class__.__name__,
+                str(e))
+            feedback.reportError(msg)
+            logger.log(msg, 2)
 
         return {self.OUT: self.dest_id}
 
     def postProcessAlgorithm(self, context, feedback):
         """Style polygon layer in post-processing step."""
-        # processed_layer = self.isochrones.calculate_difference(self.dest_id, context)
         processed_layer= QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
         self.isochrones.stylePoly(processed_layer)
 

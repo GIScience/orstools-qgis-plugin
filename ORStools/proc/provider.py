@@ -31,7 +31,8 @@ from PyQt5.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
 
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
-from .isochrones_proc import ORSisochronesAlgo
+from .isochrones_layer_proc import ORSisochronesLayerAlgo
+from .isochrones_point_proc import ORSisochronesPointAlgo
 from .matrix_proc import ORSmatrixAlgo
 from .directions_points_proc import ORSdirectionsPointsAlgo
 from .directions_lines_proc import ORSdirectionsLinesAlgo
@@ -43,7 +44,13 @@ class ORStoolsProvider(QgsProcessingProvider):
         QgsProcessingProvider.__init__(self)
 
         # Load algorithms
-        self.alglist = [ORSdirectionsPointsAlgo(), ORSdirectionsLinesAlgo(), ORSisochronesAlgo(), ORSmatrixAlgo()]
+        self.alglist = [
+            ORSdirectionsPointsAlgo(),
+            ORSdirectionsLinesAlgo(),
+            ORSisochronesLayerAlgo(),
+            ORSisochronesPointAlgo(),
+            ORSmatrixAlgo()
+        ]
 
     def unload(self):
         """

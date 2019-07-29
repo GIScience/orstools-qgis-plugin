@@ -2,9 +2,7 @@ The Isochrone algorithm returns service/reachability areas for multiple location
 
 You need to have a valid API key ('Web' menu ► 'ORS Tools' ► 'Configuration') or sign up at https://openrouteservice.org/sign-up/.
 
-As Geometry Input, you can choose between Point from map or Point Layer, which are mutually exclusive options (if a layer is specified it'll be used in any case). For Start layers, only Point layers are allowed, NOT MultiPoint.
-
-The ID field can be used to join the input layer afterwards. If not specified, it'll take the first field of the input layer.
+As Geometry Input, choose a Point from the map.
 
 The ranges parameter needs to be a comma-separated list of integer values, no decimal points. Current restriction limits apply, see https://openrouteservice.org/restrictions/.
 

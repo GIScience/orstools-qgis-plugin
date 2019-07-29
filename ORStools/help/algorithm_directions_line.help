@@ -1,4 +1,4 @@
-The Line Directions algorithm calulcates optimal routes for multiple waypoints along a LineString.
+The Line Directions algorithm calulcates least-cost routes for multiple waypoints along a LineString.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at https://openrouteservice.org/sign-up/.
 

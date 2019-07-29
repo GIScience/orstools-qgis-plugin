@@ -43,7 +43,7 @@ from qgis.core import (QgsWkbTypes,
                        )
 from . import HELP_DIR
 from ORStools import RESOURCE_PREFIX, __help__
-from ORStools.core import client, directions_core, PROFILES, PREFERENCES
+from ORStools.common import client, directions_core, PROFILES, PREFERENCES
 from ORStools.utils import configmanager, transform, exceptions,logger, convert
 
 

@@ -105,7 +105,7 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
     fields.append(QgsField("DURATION_H", QVariant.Double))
     fields.append(QgsField("PROFILE", QVariant.String))
     fields.append(QgsField("PREF", QVariant.String))
-    fields.append(QgsField("AVOID_TYPE", QVariant.String))
+    fields.append(QgsField("OPTIONS", QVariant.String))
     fields.append(QgsField(from_name, from_type))
     if not line:
         fields.append(QgsField(to_name, to_type))
@@ -113,7 +113,7 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
     return fields
 
 
-def get_output_feature(response, profile, preference, avoid=None, from_value=None, to_value=None, line=False):
+def get_output_feature(response, profile, preference, options=None, from_value=None, to_value=None, line=False):
     """
     Build output feature based on response attributes.
 
@@ -126,8 +126,8 @@ def get_output_feature(response, profile, preference, avoid=None, from_value=Non
     :param preference: Cost being used, shortest or fastest.
     :type preference: str
 
-    :param avoid: Avoidables being used.
-    :type avoid: str
+    :param options: Avoidables being used.
+    :type options: str
 
     :param from_value: value of 'FROM_ID' field
     :type from_value: any
@@ -153,7 +153,7 @@ def get_output_feature(response, profile, preference, avoid=None, from_value=Non
                             "{0:.3f}".format(duration / 3600),
                             profile,
                             preference,
-                            avoid,
+                            str(options),
                             from_value
                             ])
     else:
@@ -161,7 +161,7 @@ def get_output_feature(response, profile, preference, avoid=None, from_value=Non
                             "{0:.3f}".format(duration / 3600),
                             profile,
                             preference,
-                            avoid,
+                            str(options),
                             from_value,
                             to_value
                             ])

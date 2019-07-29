@@ -36,26 +36,27 @@ from PyQt5.QtWidgets import (QAction,
                              QMenu,
                              QMessageBox,
                              QDialogButtonBox)
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QTextDocument
+from PyQt5.QtCore import QSizeF, QPointF
 
 from qgis.core import (QgsProject,
-                       QgsVectorLayer)
-from qgis.gui import QgsFilterLineEdit
+                       QgsVectorLayer,
+                       QgsTextAnnotation)
+from qgis.gui import QgsFilterLineEdit, QgsMapCanvasAnnotationItem
 import processing
 
 from . import resources_rc
 
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
-from ORStools.utils import exceptions, maptools, logger, configmanager, convert
-from ORStools.core import (client,
-                           directions_core,
-                           PROFILES,
-                           PREFERENCES,)
+from ORStools.utils import exceptions, maptools, logger, configmanager, convert, transform
+from ORStools.common import (client,
+                             directions_core,
+                             PROFILES,
+                             PREFERENCES, )
 from ORStools.gui import directions_gui
 
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
-from .ORStoolsDialogAdvanced import ORStoolsDialogAdvancedMain
 
 
 def on_config_click(parent):
@@ -106,7 +107,6 @@ class ORStoolsDialogMain:
         self.first_start = True
         # Dialogs
         self.dlg = None
-        self.advanced = None
         self.menu = None
         self.actions = None
 
@@ -178,27 +178,21 @@ class ORStoolsDialogMain:
         self.iface.removeWebToolBarIcon(self.actions[0])
         QApplication.restoreOverrideCursor()
         del self.dlg
-        del self.advanced
 
-    def _on_advanced_click(self):
-        """Slot for click event of advanced dialog button."""
-
-        self.advanced.exec_()
-
-    @staticmethod
-    def get_quota(provider):
-        """
-        Update remaining quota from env variables.
-
-        :returns: remaining quota text to be displayed in GUI.
-        :rtype: str
-        """
-
-        # Dirty hack out of laziness.. Prone to errors
-        text = []
-        for var in sorted(provider['ENV_VARS'].keys(), reverse=True):
-            text.append(os.environ[var])
-        return '/'.join(text)
+    # @staticmethod
+    # def get_quota(provider):
+    #     """
+    #     Update remaining quota from env variables.
+    #
+    #     :returns: remaining quota text to be displayed in GUI.
+    #     :rtype: str
+    #     """
+    #
+    #     # Dirty hack out of laziness.. Prone to errors
+    #     text = []
+    #     for var in sorted(provider['ENV_VARS'].keys(), reverse=True):
+    #         text.append(os.environ[var])
+    #     return '/'.join(text)
 
     def _init_gui_control(self):
         """Slot for main plugin button. Initializes the GUI and shows it."""
@@ -208,7 +202,6 @@ class ORStoolsDialogMain:
         if self.first_start:
             self.first_start = False
             self.dlg = ORStoolsDialog(self.iface, self.iface.mainWindow())  # setting parent enables modal view
-            self.dlg.routing_advanced_button.clicked.connect(self._on_advanced_click)
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
@@ -219,9 +212,6 @@ class ORStoolsDialogMain:
         for provider in providers:
             self.dlg.provider_combo.addItem(provider['name'], provider)
 
-        # Populate Advanced dialog; makes sure that dialog is re-populated every time plugin starts,
-        # but stays alive during one session
-        self.advanced = ORStoolsDialogAdvancedMain(parent=self.dlg)
         self.dlg.show()
 
     def run_gui_control(self):
@@ -231,11 +221,16 @@ class ORStoolsDialogMain:
         layer_out.dataProvider().addAttributes(directions_core.get_fields())
         layer_out.updateFields()
 
+        # Associate annotations with map layer, so they get deleted when layer is deleted
+        for annotation in self.dlg.annotations:
+            annotation.setMapLayer(layer_out)
+        self.dlg.annotations = []
+
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()['providers'][provider_id]
 
         # Check if API key was set when using ORS
-        if provider['key'] is None:
+        if not provider['key']:
             QMessageBox.critical(
                 self.dlg,
                 "Missing API key",
@@ -251,41 +246,25 @@ class ORStoolsDialogMain:
         clnt = client.Client(provider)
         clnt_msg = ''
 
-        directions = directions_gui.Directions(self.dlg, self.advanced)
-        params = directions.get_basic_paramters()
-        from_id = None
-        to_id = None
+        directions = directions_gui.Directions(self.dlg)
+        params = directions.get_paramters()
         try:
-            if self.dlg.routing_tab.currentIndex() == 0:
-                x_start = self.dlg.routing_frompoint_start_x.value()
-                y_start = self.dlg.routing_frompoint_start_y.value()
-                x_end = self.dlg.routing_frompoint_end_x.value()
-                y_end = self.dlg.routing_frompoint_end_y.value()
-
-                params['coordinates'] = convert.build_coords([[x_start,y_start],
-                                                              [x_end, y_end]])
-                from_id = convert.comma_list([x_start, y_start])
-                to_id = convert.comma_list([x_end, y_end])
-
-            elif self.dlg.routing_tab.currentIndex() == 1:
-                params['coordinates'] = convert.build_coords(directions.get_request_line_feature())
+            params['coordinates'] = convert.build_coords(directions.get_request_line_feature())
 
             response = clnt.request(provider['endpoints']['directions'], params)
             layer_out.dataProvider().addFeature(directions_core.get_output_feature(
                 response,
                 params['profile'],
                 params['preference'],
-                directions.avoid,
-                from_id,
-                to_id
+                directions.options
             ))
 
             layer_out.updateExtents()
             self.project.addMapLayer(layer_out)
 
             # Update quota; handled in client module after successful request
-            if provider.get('ENV_VARS'):
-                self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
+            # if provider.get('ENV_VARS'):
+            #     self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
         except exceptions.Timeout:
             msg = "The connection has timed out!"
             logger.log(msg, 2)
@@ -330,14 +309,19 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
+        # Collapse all group boxes
+        self.ors_log_group.setCollapsed(True)
+        self.advances_group.setCollapsed(True)
+        self.routing_avoid_tags_group.setCollapsed(True)
+
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
+        self.map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
-        self.point_tool = None
+        # Set things around the custom map tool
         self.line_tool = None
         self.last_maptool = self._iface.mapCanvas().mapTool()
-        self.clear_buttons = [self.routing_frompoint_end_clear,
-                              self.routing_frompoint_start_clear]
+        self.annotations = []
 
         # Set up env variables for remaining quota
         os.environ["ORS_QUOTA"] = "None"
@@ -360,28 +344,15 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.provider_refresh.clicked.connect(self._on_prov_refresh_click)
 
         # Routing tab
-        self.routing_frompoint_start_map.clicked.connect(self._on_point_click)
-        self.routing_frompoint_end_map.clicked.connect(self._on_point_click)
-        self.routing_fromline_map.clicked.connect(self._on_line_click)
-        self.routing_fromline_remove.clicked.connect(self._on_remove_click)
-        self.routing_fromline_clear.clicked.connect(lambda: self.routing_fromline_list.clear())
-        for button in self.clear_buttons:
-            button.clicked.connect(self._on_clear_click)
+        self.routing_fromline_map.clicked.connect(self._on_linetool_init)
+        self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
 
         # Batch
-        self.batch_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_points'.format(PLUGIN_NAME)))
-        self.batch_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_lines'.format(PLUGIN_NAME)))
-        self.batch_iso.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones'.format(PLUGIN_NAME)))
+        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_points'.format(PLUGIN_NAME)))
+        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_lines'.format(PLUGIN_NAME)))
+        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_point'.format(PLUGIN_NAME)))
+        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_layer'.format(PLUGIN_NAME)))
         self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog('{}:matrix'.format(PLUGIN_NAME)))
-
-    def _on_clear_click(self):
-        """Clear the QgsFilterLineEdit widgets associated with the clear buttons"""
-
-        sending_button = self.sender()
-        parent_widget = sending_button.parentWidget()
-        line_edit_widgets = parent_widget.findChildren(QgsFilterLineEdit)
-        for widget in line_edit_widgets:
-            widget.clearValue()
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
@@ -391,70 +362,74 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         for provider in providers:
             self.provider_combo.addItem(provider['name'], provider)
 
-    def _on_remove_click(self):
-        """remove items from line list box"""
-
+    def _on_clear_listwidget_click(self):
+        """Clears the contents of the QgsListWidget and the annotations."""
         items = self.routing_fromline_list.selectedItems()
-        for item in items:
-            row = self.routing_fromline_list.row(item)
-            self.routing_fromline_list.takeItem(row)
+        if items:
+            # if items are selected, only clear those
+            for item in items:
+                row = self.routing_fromline_list.row(item)
+                self.routing_fromline_list.takeItem(row)
+                self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
+        else:
+            # else clear all items and annotations
+            self.routing_fromline_list.clear()
+            self._clear_annotations()
 
-    def _on_line_click(self):
+    def _linetool_annotate_point(self, point, idx):
+        annotation = QgsTextAnnotation()
+
+        c = QTextDocument()
+        html = "<strong>" + str(idx) + "</strong>"
+        c.setHtml(html)
+
+        annotation.setDocument(c)
+
+        annotation.setFrameSize(QSizeF(27, 20))
+        annotation.setFrameOffsetFromReferencePoint(QPointF(5, 5))
+        annotation.setMapPosition(point)
+        annotation.setMapPositionCrs(self.map_crs)
+
+        return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
+
+    def _clear_annotations(self):
+        """Clears annotations"""
+        for annotation in self.annotations:
+            self.project.annotationManager().removeAnnotation(annotation)
+        self.annotations = []
+
+    def _on_linetool_init(self):
         """Hides GUI dialog, inits line maptool and add items to line list box."""
         self.hide()
         self.routing_fromline_list.clear()
+        # Remove all annotations which were added (if any)
+        self._clear_annotations()
+
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
-        self.line_tool.pointDrawn.connect(lambda point, idx: self.routing_fromline_list.addItem("Point {0}: {1:.6f}, {2:.6f}".format(idx, point.x(), point.y())))
-        self.line_tool.doubleClicked.connect(self._restore_map_tool)
+        self.line_tool.pointDrawn.connect(lambda point, idx: self._on_linetool_map_click(point, idx))
+        self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
 
-    def _restore_map_tool(self, points_num):
+    def _on_linetool_map_click(self, point, idx):
+        """Adds an item to QgsListWidget and annotates the point in the map canvas"""
+
+        transformer = transform.transformToWGS(self.map_crs)
+        point_wgs = transformer.transform(point)
+        self.routing_fromline_list.addItem("Point {0}: {1:.6f}, {2:.6f}".format(idx, point_wgs.x(), point_wgs.y()))
+
+        annotation = self._linetool_annotate_point(point, idx)
+        self.annotations.append(annotation)
+
+    def _on_linetool_map_doubleclick(self):
         """
         Populate line list widget with coordinates, end line drawing and show dialog again.
 
         :param points_num: number of points drawn so far.
         :type points_num: int
         """
-        if points_num < 2:
-            self.routing_fromline_list.clear()
+
         self.line_tool.pointDrawn.disconnect()
         self.line_tool.doubleClicked.disconnect()
-        self._iface.mapCanvas().setMapTool(self.last_maptool)
-        self.show()
-
-    def _on_point_click(self):
-        """
-        Initialize the mapTool to select coordinates in map canvas and hide dialog.
-        """
-        self.hide()
-        sending_button = self.sender().objectName()
-        self.point_tool = maptools.PointTool(self._iface.mapCanvas(), sending_button)
-        self._iface.mapCanvas().setMapTool(self.point_tool)
-        self.point_tool.canvasClicked.connect(self._writePointLabel)
-
-    # Write map coordinates to text fields
-    def _writePointLabel(self, point, button):
-        """
-        Writes the selected coordinates from map canvas to its QgsFilterLineEdit widgets.
-        
-        :param point: Point selected with mapTool.
-        :type point: QgsPointXY
-        
-        :param button: Button which intialized mapTool.
-        :param button: QPushButton
-        """
-
-        x, y = point
-
-        if button == self.routing_frompoint_start_map.objectName():
-            self.routing_frompoint_start_x.setText("{0:.6f}".format(x))
-            self.routing_frompoint_start_y.setText("{0:.6f}".format(y))
-
-        if button == self.routing_frompoint_end_map.objectName():
-            self.routing_frompoint_end_x.setText("{0:.6f}".format(x))
-            self.routing_frompoint_end_y.setText("{0:.6f}".format(y))
-
         QApplication.restoreOverrideCursor()
-        self.point_tool.canvasClicked.disconnect()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()

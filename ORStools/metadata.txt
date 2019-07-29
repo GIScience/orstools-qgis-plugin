@@ -3,13 +3,14 @@ name=ORS Tools
 qgisMinimumVersion=3.0
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.0.6
+version=1.0.7
 author=GIS • OPS UG
 email=nils@gis-ops.com
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2019/05/02 v1.0.6 Make quota info optional (#106)
+changelog=2019/05/21 v1.0.7 Improve first user experience with warning messages (#106)
+    2019/05/02 v1.0.6 Make quota info optional (#106)
     2019/05/02 v1.0.5 Custom provider didn't work (#103), better handling when no API key set (#101)
     2019/04/17 v1.0.4 POSTing doesn't want dicts as parameter (#100)
     2019/04/15 v1.0.3 Drop requests module and implement NetworkAccessManager to leverage QGIS Proxy settings (#98); no more user defined rate limits (#97)

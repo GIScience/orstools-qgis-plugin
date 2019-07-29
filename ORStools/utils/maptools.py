@@ -28,51 +28,13 @@
 """
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QCursor, QPixmap, QColor
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QColor
 
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
+from qgis.core import (QgsWkbTypes)
+from qgis.gui import (QgsMapToolEmitPoint,
+                      QgsRubberBand)
 
-from ORStools import RESOURCE_PREFIX, DEFAULT_COLOR
-from ORStools.utils import transform
-
-
-class PointTool(QgsMapToolEmitPoint):
-    """Point Map tool to capture mapped coordinates."""
-
-    def __init__(self, canvas, button):
-        """
-        :param canvas: current map canvas
-        :type: QgsMapCanvas
-
-        :param button: name of 'Map!' button pressed.
-        :type button: str
-        """
-
-        QgsMapToolEmitPoint.__init__(self, canvas)
-        self.canvas = canvas
-        self.button = button
-        self.cursor = QCursor(QPixmap(RESOURCE_PREFIX + 'icon_locate.png').scaledToWidth(48), 24, 24)
-    
-    canvasClicked = pyqtSignal(['QgsPointXY', 'QString'])
-    def canvasReleaseEvent(self, event):
-        #Get the click and emit a transformed point
-        
-        # mapSettings() was only introduced in QGIS 2.4, keep compatibility
-        crsSrc = self.canvas.mapSettings().destinationCrs()
-    
-        point_oldcrs = event.mapPoint()
-        
-        xform = transform.transformToWGS(crsSrc)
-        point_newcrs = xform.transform(point_oldcrs)
-        
-        QApplication.restoreOverrideCursor()
-        
-        self.canvasClicked.emit(point_newcrs, self.button)
-
-    def activate(self):
-        QApplication.setOverrideCursor(self.cursor)
+from ORStools import DEFAULT_COLOR
 
 
 class LineTool(QgsMapToolEmitPoint):
@@ -90,45 +52,24 @@ class LineTool(QgsMapToolEmitPoint):
         self.rubberBand.setStrokeColor(QColor(DEFAULT_COLOR))
         self.rubberBand.setWidth(3)
 
-        crsSrc = self.canvas.mapSettings().destinationCrs()
-        self.transformer = transform.transformToWGS(crsSrc)
+        self.crsSrc = self.canvas.mapSettings().destinationCrs()
         self.previous_point = None
         self.points = []
-        self.markers = []
         self.reset()
 
     def reset(self):
         """reset rubberband and captured points."""
 
         self.points = []
-        # self.isEmittingPoint = False
         self.rubberBand.reset(QgsWkbTypes.LineGeometry)
-
-    def add_marker(self, point):
-        """
-        Adds a clicked marker to the map canvas.
-
-        :param point: point clicked by the user.
-        :type point: QgsPointXY
-        """
-
-        new_marker = QgsVertexMarker(self.canvas)
-        new_marker.setCenter(point)
-        new_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        new_marker.setIconSize(10)
-        new_marker.setFillColor(QColor('#485bea'))
-        new_marker.setColor(QColor('#000000'))
-
-        self.markers.append(new_marker)
 
     pointDrawn = pyqtSignal(["QgsPointXY", "int"])
     def canvasReleaseEvent(self, e):
         """Add marker to canvas and shows line."""
         new_point = self.toMapCoordinates(e.pos())
-        self.add_marker(new_point)
-
         self.points.append(new_point)
-        self.pointDrawn.emit(self.transformer.transform(new_point), self.points.index(new_point))
+
+        self.pointDrawn.emit(new_point, self.points.index(new_point))
         self.showLine()
 
     def showLine(self):
@@ -140,15 +81,48 @@ class LineTool(QgsMapToolEmitPoint):
             self.rubberBand.addPoint(point, False)
         self.rubberBand.show()
 
-    doubleClicked = pyqtSignal(['int'])
+    doubleClicked = pyqtSignal()
     def canvasDoubleClickEvent(self, e):
         """Ends line drawing and deletes rubberband and markers from map canvas."""
-        self.doubleClicked.emit(len(self.points))
+        self.doubleClicked.emit()
         self.canvas.scene().removeItem(self.rubberBand)
-        if self.markers:
-            for marker in self.markers:
-                self.canvas.scene().removeItem(marker)
 
     def deactivate(self):
         super(LineTool, self).deactivate()
         self.deactivated.emit()
+
+
+# class PointTool(QgsMapToolEmitPoint):
+#     """Point Map tool to capture mapped coordinates."""
+#
+#     def __init__(self, canvas, button):
+#         """
+#         :param canvas: current map canvas
+#         :type: QgsMapCanvas
+#
+#         :param button: name of 'Map!' button pressed.
+#         :type button: str
+#         """
+#
+#         QgsMapToolEmitPoint.__init__(self, canvas)
+#         self.canvas = canvas
+#         self.button = button
+#         self.cursor = QCursor(QPixmap(RESOURCE_PREFIX + 'icon_locate.png').scaledToWidth(48), 24, 24)
+#
+#     canvasClicked = pyqtSignal(['QgsPointXY', 'QString'])
+#     def canvasReleaseEvent(self, event):
+#         #Get the click and emit a transformed point
+#
+#         crsSrc = self.canvas.mapSettings().destinationCrs()
+#
+#         point_oldcrs = event.mapPoint()
+#
+#         xform = transform.transformToWGS(crsSrc)
+#         point_newcrs = xform.transform(point_oldcrs)
+#
+#         QApplication.restoreOverrideCursor()
+#
+#         self.canvasClicked.emit(point_newcrs, self.button)
+#
+#     def activate(self):
+#         QApplication.setOverrideCursor(self.cursor)

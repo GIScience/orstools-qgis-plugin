@@ -195,7 +195,8 @@ class NetworkAccessManager(object):
                 pass
             for k, v in list(headers.items()):
                 self.msg_log("Setting header %s to %s" % (k, v))
-                req.setRawHeader(k.encode(), v.encode())
+                if k and v:
+                    req.setRawHeader(k.encode(), v.encode())
         if self.authid:
             self.msg_log("Update request w/ authid: {0}".format(self.authid))
             self.auth_manager().updateNetworkRequest(req, self.authid)

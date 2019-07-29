@@ -42,7 +42,7 @@ from qgis.core import (QgsWkbTypes,
                        )
 from . import HELP_DIR
 from ORStools import RESOURCE_PREFIX, __help__
-from ORStools.core import client, directions_core, PROFILES, PREFERENCES
+from ORStools.common import client, directions_core, PROFILES, PREFERENCES
 from ORStools.utils import configmanager, transform, exceptions,logger
 
 
@@ -167,7 +167,7 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
     def createInstance(self):
         return ORSdirectionsPointsAlgo()
 
-    # TODO: preprocess parameters to avoid the range clenaup below:
+    # TODO: preprocess parameters to options the range clenaup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
 
     def processAlgorithm(self, parameters, context, feedback):

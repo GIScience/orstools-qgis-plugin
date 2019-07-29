@@ -36,27 +36,22 @@ from ORStools.utils import convert
 
 class Directions:
     """Extended functionality for directions endpoint for GUI."""
-    def __init__(self, dlg, advanced):
+    def __init__(self, dlg):
         """
         :param dlg: Main GUI dialog.
         :type dlg: QDialog
-
-        :param advanced: Advanced parameters dialog.
-        :type advanced: QDialog
         """
         self.dlg = dlg
-        self.advanced = advanced
 
-        self.avoid = None
+        self.options = dict()
 
-    def get_basic_paramters(self):
+    def get_paramters(self):
         """
-        Builds basic common parameters across directions functionalities.
+        Builds parameters across directions functionalities.
 
         :returns: All parameter mappings except for coordinates.
         :rtype: dict
         """
-        avoid_boxes = self.advanced.routing_avoid_tags_group.findChildren(QCheckBox)
 
         # API parameters
         route_mode = self.dlg.routing_travel_combo.currentText()
@@ -72,9 +67,14 @@ class Directions:
             'id': None,
         }
 
-        self.avoid = self._get_advanced_parameters(avoid_boxes)
-        if self.avoid is not None:
-            params['options'] = self.avoid
+        # Get Advanced parameters
+        if self.dlg.routing_avoid_tags_group.isChecked():
+            avoid_boxes = self.dlg.routing_avoid_tags_group.findChildren(QCheckBox)
+            if any(box.isChecked() for box in avoid_boxes):
+                self.options['avoid_features'] = self._get_avoid_options(avoid_boxes)
+
+        if self.options:
+            params['options'] = json.dumps(self.options)
 
         return params
 
@@ -95,9 +95,9 @@ class Directions:
 
         return coordinates
 
-    def _get_advanced_parameters(self, avoid_boxes):
+    def _get_avoid_options(self, avoid_boxes):
         """
-        Extracts checked boxes in Advanced parameters.
+        Extracts checked boxes in Advanced avoid parameters.
 
         :param avoid_boxes: all checkboxes in advanced paramter dialog.
         :type avoid_boxes: list of QCheckBox
@@ -105,16 +105,10 @@ class Directions:
         :returns: avoid_features parameter
         :rtype: JSON dump, i.e. str
         """
+        avoid_features = []
+        for box in avoid_boxes:
+            if box.isChecked():
+                avoid_features.append((box.text()))
+        avoid_features = convert.pipe_list(avoid_features)
 
-        # from Advanced dialog
-        avoid_dict = dict()
-        if any(box.isChecked() for box in avoid_boxes):
-            avoid_features = []
-            for box in avoid_boxes:
-                if box.isChecked():
-                    avoid_features.append((box.text()))
-            avoid_features = convert.pipe_list(avoid_features)
-
-            avoid_dict['avoid_features'] = avoid_features
-
-            return json.dumps(avoid_dict)
+        return avoid_features
