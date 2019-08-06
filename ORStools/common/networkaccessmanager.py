@@ -19,6 +19,7 @@
 
 from builtins import str
 from builtins import object
+import json
 
 __author__ = 'Alessandro Pasotti'
 __date__ = 'August 2016'
@@ -219,7 +220,7 @@ class NetworkAccessManager(object):
             if isinstance(body, str):
                 body = body.encode()
             if isinstance(body, dict):
-                body = str(body).encode(encoding='utf-8')
+                body = str(json.dumps(body)).encode(encoding='utf-8')
             self.reply = func(req, body)
         else:
             self.reply = func(req)

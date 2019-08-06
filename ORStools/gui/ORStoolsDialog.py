@@ -28,6 +28,7 @@
 """
 
 import os
+import json
 import webbrowser
 
 from PyQt5.QtWidgets import (QAction,
@@ -78,7 +79,10 @@ def on_about_click(parent):
     """Slot for click event of About button/menu entry."""
 
     info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {0}">openrouteservice</a> routing functionalities.<br><br>' \
-           '<center><a href=\"https://gis-ops.com\"><img src=\":/plugins/ORStools/img/logo_gisops_300.png\"/></a> <br><br></center>' \
+           '<center>' \
+           '<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/></a> <br>' \
+           '<a href=\"https://gis-ops.com\"><img src=\":/plugins/ORStools/img/logo_gisops_300.png\"/></a> <br><br>' \
+           '</center>' \
            'Author: Nils Nolde<br>' \
            'Email: <a href="mailto:Nils Nolde <{1}>">{1}</a><br>' \
            'Web: <a href="{2}">{2}</a><br>' \
@@ -223,14 +227,31 @@ class ORStoolsDialogMain:
 
         # Associate annotations with map layer, so they get deleted when layer is deleted
         for annotation in self.dlg.annotations:
-            annotation.setMapLayer(layer_out)
+            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer, you can change order after optimization
+            # Then in theory, when the layer is remove, the annotation is removed as well
+            # Doesng't work though, the annotations are still there when project is re-opened
+            # annotation.setMapLayer(layer_out)
+            self.project.annotationManager().removeAnnotation(annotation)
         self.dlg.annotations = []
 
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()['providers'][provider_id]
 
-        # Check if API key was set when using ORS
-        if not provider['key']:
+        # if there are no coordinates, throw an error message
+        if not self.dlg.routing_fromline_list.count():
+            QMessageBox.critical(
+                self.dlg,
+                "Missing API key",
+                """
+                Did you forget to set routing waypoints?<br><br>
+                
+                Use the 'Add Waypoint' button to add up to 50 waypoints.
+                """
+            )
+            return
+
+        # if no API key is present, when ORS is selected, throw an error message
+        if not provider['key'] and provider['base_url'].startswith('https://api.openrouteservice.org'):
             QMessageBox.critical(
                 self.dlg,
                 "Missing API key",
@@ -247,17 +268,32 @@ class ORStoolsDialogMain:
         clnt_msg = ''
 
         directions = directions_gui.Directions(self.dlg)
-        params = directions.get_paramters()
+        params = directions.get_parameters()
         try:
-            params['coordinates'] = convert.build_coords(directions.get_request_line_feature())
+            if self.dlg.optimization_group.isChecked():
+                if len(params['jobs']) <= 1:  # Start/end locations don't count as job
+                    QMessageBox.critical(
+                        self.dlg,
+                        "Wrong number of waypoints",
+                        """At least 3 or 4 waypoints are needed to perform routing optimization. 
 
-            response = clnt.request(provider['endpoints']['directions'], params)
-            layer_out.dataProvider().addFeature(directions_core.get_output_feature(
-                response,
-                params['profile'],
-                params['preference'],
-                directions.options
-            ))
+Remember, the first and last location are not part of the optimization.
+                        """
+                    )
+                    return
+                response = clnt.request(provider['endpoints']['optimization'], {}, post_json=params)
+                feat = directions_core.get_output_features_optimization(response, params['vehicles'][0]['profile'])
+            else:
+                params['coordinates'] = convert.build_coords(directions.get_request_line_feature())
+                response = clnt.request(provider['endpoints']['directions'], params)
+                feat = directions_core.get_output_feature_directions(
+                    response,
+                    params['profile'],
+                    params['preference'],
+                    directions.options
+                )
+
+            layer_out.dataProvider().addFeature(feat)
 
             layer_out.updateExtents()
             self.project.addMapLayer(layer_out)
@@ -309,11 +345,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
-        # Collapse all group boxes
-        self.ors_log_group.setCollapsed(True)
-        self.advances_group.setCollapsed(True)
-        self.routing_avoid_tags_group.setCollapsed(True)
-
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
         self.map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
@@ -348,11 +379,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
 
         # Batch
-        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_points'.format(PLUGIN_NAME)))
-        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_lines'.format(PLUGIN_NAME)))
-        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_point'.format(PLUGIN_NAME)))
-        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_layer'.format(PLUGIN_NAME)))
-        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog('{}:matrix'.format(PLUGIN_NAME)))
+        self.batch_routing_points.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_2_layers'.format(PLUGIN_NAME)))
+        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_1_layer'.format(PLUGIN_NAME)))
+        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_polylines_layer'.format(PLUGIN_NAME)))
+        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_point'.format(PLUGIN_NAME)))
+        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_layer'.format(PLUGIN_NAME)))
+        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog('{}:matrix_from_layers'.format(PLUGIN_NAME)))
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
@@ -370,7 +402,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             for item in items:
                 row = self.routing_fromline_list.row(item)
                 self.routing_fromline_list.takeItem(row)
-                self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
+                if self.annotations:
+                    self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
         else:
             # else clear all items and annotations
             self.routing_fromline_list.clear()
@@ -395,7 +428,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     def _clear_annotations(self):
         """Clears annotations"""
         for annotation in self.annotations:
-            self.project.annotationManager().removeAnnotation(annotation)
+            if annotation in self.project.annotationManager().annotations():
+                self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
 
     def _on_linetool_init(self):
@@ -419,6 +453,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         annotation = self._linetool_annotate_point(point, idx)
         self.annotations.append(annotation)
+        self.project.annotationManager().addAnnotation(annotation)
 
     def _on_linetool_map_doubleclick(self):
         """

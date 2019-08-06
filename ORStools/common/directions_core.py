@@ -113,9 +113,9 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
     return fields
 
 
-def get_output_feature(response, profile, preference, options=None, from_value=None, to_value=None, line=False):
+def get_output_feature_directions(response, profile, preference, options=None, from_value=None, to_value=None):
     """
-    Build output feature based on response attributes.
+    Build output feature based on response attributes for directions endpoint.
 
     :param response: API response object
     :type response: dict
@@ -135,9 +135,6 @@ def get_output_feature(response, profile, preference, options=None, from_value=N
     :param to_value: value of 'TO_ID' field
     :type to_value: any
 
-    :param line: Specifies whether output feature is a line or a point
-    :type line: boolean
-
     :returns: Ouput feature with attributes and geometry set.
     :rtype: QgsFeature
     """
@@ -148,22 +145,48 @@ def get_output_feature(response, profile, preference, options=None, from_value=N
     duration = response_mini['properties']['summary'][0]['duration']
     qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
     feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
-    if line:
-        feat.setAttributes(["{0:.3f}".format(distance / 1000),
-                            "{0:.3f}".format(duration / 3600),
-                            profile,
-                            preference,
-                            str(options),
-                            from_value
-                            ])
-    else:
-        feat.setAttributes(["{0:.3f}".format(distance / 1000),
-                            "{0:.3f}".format(duration / 3600),
-                            profile,
-                            preference,
-                            str(options),
-                            from_value,
-                            to_value
-                            ])
+    feat.setAttributes(["{0:.3f}".format(distance / 1000),
+                        "{0:.3f}".format(duration / 3600),
+                        profile,
+                        preference,
+                        str(options),
+                        from_value,
+                        to_value
+                        ])
+
+    return feat
+
+
+def get_output_features_optimization(response, profile, from_value=None):
+    """
+    Build output feature based on response attributes for optimization endpoint.
+
+    :param response: API response object
+    :type response: dict
+
+    :param profile: transportation profile to be used
+    :type profile: str
+
+    :param from_value: value of 'FROM_ID' field
+    :type from_value: any
+
+    :returns: built feature
+    :rtype: QgsFeature
+    """
+
+    response_mini = response['routes'][0]
+    feat = QgsFeature()
+    polyline = response_mini['geometry']
+    distance = response_mini['distance']
+    duration = response_mini['cost']
+    qgis_coords = [QgsPointXY(x, y) for x, y in convert.decode_polyline(polyline)]
+    feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
+    feat.setAttributes(["{0:.3f}".format(distance / 1000),
+                        "{0:.3f}".format(duration / 3600),
+                        profile,
+                        'fastest',
+                        'optimized',
+                        from_value
+                        ])
 
     return feat

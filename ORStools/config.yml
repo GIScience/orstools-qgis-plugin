@@ -8,6 +8,7 @@ providers:
     isochrones: "/isochrones"
     matrix: "/matrix"
     geocoding: "/geocoding"
+    optimization: "/optimization"
   # Use Env Vars to update quota label in GUI (if applicable for provider)
   ENV_VARS:
     # Shitty implementation in boundless networkaccessmanager

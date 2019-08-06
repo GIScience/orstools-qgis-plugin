@@ -53,7 +53,8 @@ from ORStools.utils import transform, exceptions, logger, configmanager
 class ORSmatrixAlgo(QgsProcessingAlgorithm):
     # TODO: create base algorithm class common to all modules
 
-    ALGO_NAME = 'matrix'
+    ALGO_NAME = 'matrix_from_layers'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_START = "INPUT_START_LAYER"
@@ -72,7 +73,8 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROVIDER,
                 "Provider",
-                providers
+                providers,
+                defaultValue=providers[0]
             )
         )
 
@@ -112,7 +114,8 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
                 "Travel mode",
-                PROFILES
+                PROFILES,
+                defaultValue=PROFILES[0]
             )
         )
 
@@ -122,6 +125,12 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
                 description="Matrix",
             )
         )
+
+    def group(self):
+        return "Matrix"
+
+    def groupId(self):
+        return 'matrix'
 
     def name(self):
         return self.ALGO_NAME
@@ -143,7 +152,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         return __help__
 
     def displayName(self):
-        return 'Generate ' + self.ALGO_NAME.capitalize()
+        return " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
 
     def icon(self):
         return QIcon(RESOURCE_PREFIX + 'icon_matrix.png')
@@ -237,7 +246,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = clnt.request(provider['endpoints'][self.ALGO_NAME], get_params, post_json=params)
+            response = clnt.request(provider['endpoints']['matrix'], get_params, post_json=params)
 
         except (exceptions.ApiError,
                 exceptions.InvalidKey,

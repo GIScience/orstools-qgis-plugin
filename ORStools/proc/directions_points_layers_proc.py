@@ -46,10 +46,10 @@ from ORStools.common import client, directions_core, PROFILES, PREFERENCES
 from ORStools.utils import configmanager, transform, exceptions,logger
 
 
-class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
+class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
     # TODO: create base algorithm class common to all modules
 
-    ALGO_NAME = 'directions_points'
+    ALGO_NAME = 'directions_from_points_2_layers'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
     MODE_SELECTION = ['Row-by-Row', 'All-by-All']
 
@@ -72,7 +72,8 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROVIDER,
                 "Provider",
-                providers
+                providers,
+                defaultValue=providers[0]
             )
         )
 
@@ -112,7 +113,8 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
                 "Travel mode",
-                PROFILES
+                PROFILES,
+                defaultValue=PROFILES[0]
             )
         )
 
@@ -120,7 +122,8 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,
                 "Travel preference",
-                PREFERENCES
+                PREFERENCES,
+                defaultValue=PREFERENCES[0]
             )
         )
 
@@ -128,7 +131,8 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_MODE,
                 "Layer mode",
-                self.MODE_SELECTION
+                self.MODE_SELECTION,
+                defaultValue=self.MODE_SELECTION[0]
             )
         )
 
@@ -138,6 +142,12 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
                 description="Directions",
             )
         )
+
+    def group(self):
+        return "Directions"
+
+    def groupId(self):
+        return 'directions'
 
     def name(self):
         return self.ALGO_NAME
@@ -159,13 +169,13 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
         return __help__
 
     def displayName(self):
-        return 'Generate ' + " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
+        return " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
 
     def icon(self):
         return QIcon(RESOURCE_PREFIX + 'icon_directions.png')
 
     def createInstance(self):
-        return ORSdirectionsPointsAlgo()
+        return ORSdirectionsPointsLayersAlgo()
 
     # TODO: preprocess parameters to options the range clenaup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
@@ -274,13 +284,12 @@ class ORSdirectionsPointsAlgo(QgsProcessingAlgorithm):
                 logger.log(msg)
                 continue
 
-            sink.addFeature(directions_core.get_output_feature(
+            sink.addFeature(directions_core.get_output_feature_directions(
                 response,
                 profile,
                 preference,
                 from_value=values[0],
-                to_value=values[1],
-                line=False
+                to_value=values[1]
             ))
 
             counter += 1

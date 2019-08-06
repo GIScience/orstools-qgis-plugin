@@ -53,7 +53,7 @@ from ORStools.utils import convert, transform, exceptions, configmanager, logger
 class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
     # TODO: create base algorithm class common to all modules
 
-    ALGO_NAME = 'isochrones_layer'
+    ALGO_NAME = 'isochrones_from_layer'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     IN_PROVIDER = "INPUT_PROVIDER"
@@ -79,14 +79,15 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROVIDER,
                 "Provider",
-                providers
+                providers,
+                defaultValue=providers[0]
             )
         )
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
-                description="Input Point layer (mutually exclusive with Point option)",
+                description="Input Point layer",
                 types=[QgsProcessing.TypeVectorPoint]
             )
         )
@@ -110,7 +111,8 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
                 "Travel mode",
-                PROFILES
+                PROFILES,
+                defaultValue=PROFILES[0]
             )
         )
 
@@ -119,6 +121,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
                 name=self.IN_METRIC,
                 description="Dimension",
                 options=DIMENSIONS,
+                defaultValue=DIMENSIONS[0]
             )
         )
 
@@ -126,6 +129,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterString(
                 name=self.IN_RANGES,
                 description="Comma-separated ranges [mins or m]",
+                defaultValue="5, 10"
             )
         )
 
@@ -136,6 +140,12 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
                 createByDefault=False
             )
         )
+
+    def group(self):
+        return "Isochrones"
+
+    def groupId(self):
+        return 'isochrones'
 
     def name(self):
         return self.ALGO_NAME
@@ -157,7 +167,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
         return __help__
 
     def displayName(self):
-        return 'Generate ' + " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
+        return " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
 
     def icon(self):
         return QIcon(RESOURCE_PREFIX + 'icon_isochrones.png')
@@ -228,7 +238,6 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                print(self.ALGO_NAME_LIST[0])
                 response = clnt.request(provider['endpoints'][self.ALGO_NAME_LIST[0]], params)
 
                 for isochrone in self.isochrones.get_features(response, params['id']):

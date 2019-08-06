@@ -51,7 +51,7 @@ from ORStools.utils import convert, transform, exceptions, configmanager, logger
 class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
     # TODO: create base algorithm class common to all modules
 
-    ALGO_NAME = 'isochrones_point'
+    ALGO_NAME = 'isochrones_from_point'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     IN_PROVIDER = "INPUT_PROVIDER"
@@ -76,7 +76,8 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROVIDER,
                 "Provider",
-                providers
+                providers,
+                defaultValue=providers[0]
             )
         )
 
@@ -84,7 +85,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,
                 description="Input Point from map canvas (mutually exclusive with layer option)",
-                optional=True,
+                optional=True
             )
         )
 
@@ -92,7 +93,8 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
                 "Travel mode",
-                PROFILES
+                PROFILES,
+                defaultValue=PROFILES[0]
             )
         )
 
@@ -101,6 +103,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
                 name=self.IN_METRIC,
                 description="Dimension",
                 options=DIMENSIONS,
+                defaultValue=DIMENSIONS[0]
             )
         )
 
@@ -108,6 +111,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterString(
                 name=self.IN_RANGES,
                 description="Comma-separated ranges [mins or m]",
+                defaultValue="5, 10"
             )
         )
 
@@ -118,6 +122,12 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
                 createByDefault=False
             )
         )
+
+    def group(self):
+        return "Isochrones"
+
+    def groupId(self):
+        return 'isochrones'
 
     def name(self):
         return self.ALGO_NAME
@@ -139,7 +149,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
         return __help__
 
     def displayName(self):
-        return 'Generate ' + " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
+        return " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
 
     def icon(self):
         return QIcon(RESOURCE_PREFIX + 'icon_isochrones.png')

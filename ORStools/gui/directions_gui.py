@@ -45,13 +45,16 @@ class Directions:
 
         self.options = dict()
 
-    def get_paramters(self):
+    def get_parameters(self):
         """
         Builds parameters across directions functionalities.
 
         :returns: All parameter mappings except for coordinates.
         :rtype: dict
         """
+
+        if self.dlg.optimization_group.isChecked():
+            return self._get_optimize_parameters()
 
         # API parameters
         route_mode = self.dlg.routing_travel_combo.currentText()
@@ -112,3 +115,36 @@ class Directions:
         avoid_features = convert.pipe_list(avoid_features)
 
         return avoid_features
+
+    def _get_optimize_parameters(self):
+        """Return parameters for optimization waypoint"""
+        coordinates = self.get_request_line_feature()
+
+        params = {
+            'jobs': list(),
+            'vehicles': [{
+                "id": 0,
+                "profile": self.dlg.routing_travel_combo.currentText()
+            }],
+            'options': {'g': True}
+        }
+
+        if self.dlg.optimize_end.isChecked():
+            end = coordinates.pop(-1)
+            params['vehicles'][0]['end'] = end
+        elif self.dlg.optimize_start.isChecked():
+            start = coordinates.pop(0)
+            params['vehicles'][0]['start'] = start
+        elif self.dlg.optimize_none.isChecked():
+            start = coordinates.pop(0)
+            end = coordinates.pop(-1)
+            params['vehicles'][0]['start'] = start
+            params['vehicles'][0]['end'] = end
+
+        for coord in coordinates:
+            params['jobs'].append({
+                "location": coord,
+                "id": coordinates.index(coord)
+            })
+
+        return params

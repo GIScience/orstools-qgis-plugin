@@ -48,14 +48,14 @@ from ORStools.common import client, directions_core, PROFILES, PREFERENCES
 from ORStools.utils import configmanager, transform, exceptions,logger, convert
 
 
-class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
+class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
     """Algorithm class for Directions Lines."""
 
-    ALGO_NAME = 'directions_from_polylines_layer'
+    ALGO_NAME = 'directions_from_points_1_layer'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     IN_PROVIDER = "INPUT_PROVIDER"
-    IN_LINES = "INPUT_LINE_LAYER"
+    IN_POINTS = "INPUT_POINT_LAYER"
     IN_FIELD = "INPUT_LAYER_FIELD"
     IN_PROFILE = "INPUT_PROFILE"
     IN_PREFERENCE = "INPUT_PREFERENCE"
@@ -79,9 +79,9 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                name=self.IN_LINES,
-                description="Input Line layer",
-                types=[QgsProcessing.TypeVectorLine],
+                name=self.IN_POINTS,
+                description="Input (Multi)Point layer",
+                types=[QgsProcessing.TypeVectorPoint],
             )
         )
 
@@ -89,7 +89,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
                 description="Layer ID Field",
-                parentLayerParameterName=self.IN_LINES,
+                parentLayerParameterName=self.IN_POINTS,
             )
         )
 
@@ -158,7 +158,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         return QIcon(RESOURCE_PREFIX + 'icon_directions.png')
 
     def createInstance(self):
-        return ORSdirectionsLinesAlgo()
+        return ORSdirectionsPointsLayerAlgo()
 
     def processAlgorithm(self, parameters, context, feedback):
         # Init ORS client
@@ -189,7 +189,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         # Get parameter values
         source = self.parameterAsSource(
             parameters,
-            self.IN_LINES,
+            self.IN_POINTS,
             context
         )
 
@@ -209,40 +209,59 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
                                                directions_core.get_fields(from_type=source.fields().field(source_field_name).type(),
                                                                           from_name=source_field_name,
                                                                           line=True),
-                                               source.wkbType(),
+                                               QgsWkbTypes.LineString,
                                                QgsCoordinateReferenceSystem(4326))
         count = source.featureCount()
 
-        for num, (line, field_value) in enumerate(self._get_sorted_lines(source, source_field_name)):
+        input_points = list()
+        from_values = list()
+        xformer = transform.transformToWGS(source.sourceCrs())
+
+        if source.wkbType() == QgsWkbTypes.Point:
+            points = list()
+            for feat in sorted(source.getFeatures(), key=lambda f: f.id()):
+                points.append(xformer.transform(QgsPointXY(feat.geometry().asPoint())))
+            input_points.append(points)
+            from_values.append('')
+        elif source.wkbType() == QgsWkbTypes.MultiPoint:
+            # loop through multipoint features
+            for feat in sorted(source.getFeatures(), key=lambda f: f.id()):
+                points = list()
+                for point in feat.geometry().asMultiPoint():
+                    points.append(xformer.transform(QgsPointXY(point)))
+                input_points.append(points)
+                from_values.append(feat[source_field_name])
+
+        for num, (points, from_value) in enumerate(zip(input_points, from_values)):
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
 
             try:
                 if optimize:
-                    params = self._get_params_optimize(line, profile)
+                    params = self._get_params_optimize(points, profile)
                     response = clnt.request(provider['endpoints']['optimization'], {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_features_optimization(
                         response,
                         profile,
-                        from_value=field_value
+                        from_value=from_value
                     ))
                 else:
-                    params = self._get_params_directions(line, profile, preference)
+                    params = self._get_params_directions(points, profile, preference)
                     response = clnt.request(provider['endpoints']['directions'], params)
 
                     sink.addFeature(directions_core.get_output_feature_directions(
                         response,
                         profile,
                         preference,
-                        from_value=field_value
+                        from_value=from_value
                     ))
             except (exceptions.ApiError,
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:
                 msg = "Feature ID {} caused a {}:\n{}".format(
-                    line[source_field_name],
+                    points[source_field_name],
                     e.__class__.__name__,
                     str(e))
                 feedback.reportError(msg)
@@ -254,41 +273,12 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_sorted_lines(layer, field_name):
-        """
-        Generator to yield geometry and ID value sorted by feature ID. Careful: feat.id() is not necessarily
-        permanent
-
-        :param layer: source input layer
-        :type layer: QgsProcessingParameterFeatureSource
-
-        :param field_name: name of ID field
-        :type field_name: str
-        """
-        # First get coordinate transformer
-        xformer = transform.transformToWGS(layer.sourceCrs())
-
-        for feat in sorted(layer.getFeatures(), key=lambda f: f.id()):
-            line = None
-            field_value = feat[field_name]
-            # for
-            if layer.wkbType() == QgsWkbTypes.MultiLineString:
-                # TODO: only takes the first polyline geometry from the multiline geometry currently
-                # Loop over all polyline geometries
-                line = [xformer.transform(QgsPointXY(point)) for point in feat.geometry().asMultiPolyline()[0]]
-
-            elif layer.wkbType() == QgsWkbTypes.LineString:
-                line = [xformer.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()]
-
-            yield line, field_value
-
-    @staticmethod
-    def _get_params_directions(line, profile, preference):
+    def _get_params_directions(points, profile, preference):
         """
         Build parameters for optimization endpoint
 
-        :param line: individual polyline points
-        :type line: list of QgsPointXY
+        :param points: individual points
+        :type points: list of QgsPointXY
 
         :param profile: transport profile to be used
         :type profile: str
@@ -301,7 +291,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         """
 
         params = {
-            'coordinates': convert.build_coords([[point.x(), point.y()] for point in line]),
+            'coordinates': convert.build_coords([[point.x(), point.y()] for point in points]),
             'profile': profile,
             'preference': preference,
             'geometry': 'true',
@@ -314,12 +304,12 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         return params
 
     @staticmethod
-    def _get_params_optimize(line, profile):
+    def _get_params_optimize(points, profile):
         """
         Build parameters for optimization endpoint
 
-        :param line: individual polyline points
-        :type line: list of QgsPointXY
+        :param points: individual points list
+        :type points: list of QgsPointXY
 
         :param profile: transport profile to be used
         :type profile: str
@@ -328,8 +318,8 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         :rtype: dict
         """
 
-        start = line.pop(0)
-        end = line.pop(-1)
+        start = points.pop(0)
+        end = points.pop(-1)
 
         params = {
             'jobs': list(),
@@ -341,10 +331,10 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
             }],
             'options': {'g': True}
         }
-        for point in line:
+        for point in points:
             params['jobs'].append({
                 "location": [point.x(), point.y()],
-                "id": line.index(point)
+                "id": points.index(point)
             })
 
         return params

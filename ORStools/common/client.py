@@ -79,7 +79,8 @@ class Client(QObject):
 
     overQueryLimit = pyqtSignal()
     def request(self, 
-                url, params,
+                url,
+                params,
                 first_request_time=None,
                 retry_counter=0,
                 post_json=None):
@@ -144,7 +145,7 @@ class Client(QObject):
             "url: {}\nParameters: {}".format(
                 self.url,
                 # final_requests_kwargs
-                body
+                json.dumps(body, indent=2)
             ),
             0
         )
@@ -220,7 +221,7 @@ class Client(QObject):
                 message
             )
         # Internal error message for Bad Request
-        if 400 < status_code < 500:
+        if 400 <= status_code < 500:
             raise exceptions.ApiError(
                 str(status_code),
                 # error,
