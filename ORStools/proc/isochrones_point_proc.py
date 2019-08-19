@@ -168,15 +168,15 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
         clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
 
         params = dict()
-        params['attributes'] = 'total_pop'
+        params['attributes'] = ['total_pop']
 
-        params['profile'] = profile = PROFILES[self.parameterAsEnum(parameters, self.IN_PROFILE, context)]
+        profile = PROFILES[self.parameterAsEnum(parameters, self.IN_PROFILE, context)]
         params['range_type'] = dimension = DIMENSIONS[self.parameterAsEnum(parameters, self.IN_METRIC, context)]
 
         factor = 60 if params['range_type'] == 'time' else 1
         ranges_raw = self.parameterAsString(parameters, self.IN_RANGES, context)
         ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
-        params['range'] = convert.comma_list(ranges_proc)
+        params['range'] = ranges_proc
 
         point = self.parameterAsPoint(parameters, self.IN_POINT, context, self.crs_out)
 
@@ -184,7 +184,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
         # If layer source is set
         requests = []
         self.isochrones.set_parameters(profile, dimension, factor)
-        params['locations'] = convert.build_coords([point.x(), point.y()])
+        params['locations'] = [[round(point.x(), 6), round(point.y(), 6)]]
         params['id'] = None
         requests.append(params)
 
@@ -196,7 +196,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
         # If feature causes error, report and continue with next
         try:
             # Populate features from response
-            response = clnt.request(provider['endpoints'][self.ALGO_NAME_LIST[0]], params)
+            response = clnt.request('/v2/isochrones/' + profile, {}, post_json=params)
 
             for isochrone in self.isochrones.get_features(response, params['id']):
                 sink.addFeature(isochrone)
@@ -219,20 +219,3 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
         self.isochrones.stylePoly(processed_layer)
 
         return {self.OUT: self.dest_id}
-
-    def get_sorted_feature_parameters(self, layer):
-        """
-        Generator to yield geometry and id of features sorted by feature ID. Careful: feat.id() is not necessarily
-        permanent
-
-        :param layer: source input layer.
-        :type layer: QgsProcessingParameterFeatureSource
-        """
-        # First get coordinate transformer
-        xformer = transform.transformToWGS(layer.sourceCrs())
-
-        for feat in sorted(layer.getFeatures(), key=lambda f: f.id()):
-            x_point = xformer.transform(feat.geometry().asPoint())
-
-            yield (convert.build_coords([x_point.x(), x_point.y()]), feat)
-

@@ -186,15 +186,15 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
         clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
 
         params = dict()
-        params['attributes'] = 'total_pop'
+        params['attributes'] = ['total_pop']
 
-        params['profile'] = profile = PROFILES[self.parameterAsEnum(parameters, self.IN_PROFILE, context)]
+        profile = PROFILES[self.parameterAsEnum(parameters, self.IN_PROFILE, context)]
         params['range_type'] = dimension = DIMENSIONS[self.parameterAsEnum(parameters, self.IN_METRIC, context)]
 
         factor = 60 if params['range_type'] == 'time' else 1
         ranges_raw = self.parameterAsString(parameters, self.IN_RANGES, context)
         ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
-        params['range'] = convert.comma_list(ranges_proc)
+        params['range'] = ranges_proc
 
         # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
@@ -205,7 +205,6 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
 
         # Get ID field properties
-        # TODO: id_field should have a default (#90)
         id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
         id_field_id = source.fields().lookupField(id_field_name)
         if id_field_name == '':
@@ -238,7 +237,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                response = clnt.request(provider['endpoints'][self.ALGO_NAME_LIST[0]], params)
+                response = clnt.request('/v2/isochrones/' + profile, {}, post_json=params)
 
                 for isochrone in self.isochrones.get_features(response, params['id']):
                     sink.addFeature(isochrone)
@@ -279,5 +278,5 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
         for feat in sorted(layer.getFeatures(), key=lambda f: f.id()):
             x_point = xformer.transform(feat.geometry().asPoint())
 
-            yield (convert.build_coords([x_point.x(), x_point.y()]), feat)
+            yield ([[round(x_point.x(), 6), round(x_point.y(), 6)]], feat)
 

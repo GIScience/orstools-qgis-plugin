@@ -179,7 +179,7 @@ class Client(QObject):
                 return self.request(url, params, first_request_time, retry_counter + 1, post_json)
 
             except exceptions.ApiError as e:
-                logger.log("Feature ID {} caused a {}: {}".format(params['id'], e.__class__.__name__, str(e)), 2)
+                logger.log("Feature ID {} caused a {}: {}".format(post_json['id'], e.__class__.__name__, str(e)), 2)
                 raise
 
             raise

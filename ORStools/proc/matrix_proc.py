@@ -169,12 +169,13 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         clnt.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying"))
 
         params = dict()
-        get_params = dict()
-        get_params['profile'] = params['profile'] = PROFILES[self.parameterAsEnum(
-                                                                    parameters,
-                                                                    self.IN_PROFILE,
-                                                                    context
-                                                             )]
+
+        # Get profile value
+        profile = PROFILES[self.parameterAsEnum(
+            parameters,
+            self.IN_PROFILE,
+            context
+        )]
 
         # Get parameter values
         source = self.parameterAsSource(
@@ -240,13 +241,13 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
             'locations': [[point.x(), point.y()] for point in features_points],
             'sources': sources_ids,
             'destinations': destination_ids,
-            'metrics': 'distance|duration',
+            'metrics': ["duration", "distance"],
             'id': 'Matrix'
         })
 
         # Make request and catch ApiError
         try:
-            response = clnt.request(provider['endpoints']['matrix'], get_params, post_json=params)
+            response = clnt.request('/v2/matrix/' + profile, {}, post_json=params)
 
         except (exceptions.ApiError,
                 exceptions.InvalidKey,

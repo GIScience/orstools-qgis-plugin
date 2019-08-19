@@ -236,12 +236,10 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
         destination_field = destination.fields().field(destination_field_id)
 
         params = {
-            'profile': profile,
             'preference': preference,
             'geometry': 'true',
-            'format': 'geojson',
-            'geometry_format': 'geojson',
             'instructions': 'false',
+            'elevation': True,
             'id': None
         }
 
@@ -271,7 +269,7 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
             params['coordinates'] = coordinates
 
             try:
-                response = clnt.request(provider['endpoints'][self.ALGO_NAME_LIST[0]], params)
+                response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
             except (exceptions.ApiError,
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:

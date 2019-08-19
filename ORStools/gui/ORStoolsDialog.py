@@ -281,14 +281,15 @@ Remember, the first and last location are not part of the optimization.
                         """
                     )
                     return
-                response = clnt.request(provider['endpoints']['optimization'], {}, post_json=params)
+                response = clnt.request('/optimization', {}, post_json=params)
                 feat = directions_core.get_output_features_optimization(response, params['vehicles'][0]['profile'])
             else:
-                params['coordinates'] = convert.build_coords(directions.get_request_line_feature())
-                response = clnt.request(provider['endpoints']['directions'], params)
+                params['coordinates'] = directions.get_request_line_feature()
+                profile = self.dlg.routing_travel_combo.currentText()
+                response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
                 feat = directions_core.get_output_feature_directions(
                     response,
-                    params['profile'],
+                    profile,
                     params['preference'],
                     directions.options
                 )
@@ -315,7 +316,7 @@ Remember, the first and last location are not part of the optimization.
 
             logger.log("{}: {}".format(*msg), 2)
             clnt_msg += "<b>{}</b>: ({})<br>".format(*msg)
-            return
+            raise
 
         except Exception as e:
             msg = [e.__class__.__name__ ,
@@ -328,7 +329,6 @@ Remember, the first and last location are not part of the optimization.
             # Set URL in debug window
             clnt_msg += '<a href="{0}">{0}</a><br>'.format(clnt.url)
             self.dlg.debug_text.setHtml(clnt_msg)
-            return
 
 
 class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):

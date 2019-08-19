@@ -30,7 +30,8 @@
 from itertools import product
 from PyQt5.QtCore import QVariant
 
-from qgis.core import (QgsPointXY,
+from qgis.core import (QgsPoint,
+                       QgsPointXY,
                        QgsGeometry,
                        QgsFeature,
                        QgsFields,
@@ -71,7 +72,7 @@ def get_request_point_features(route_dict, row_by_row):
         if properties[0][0] == properties[0][-1]:
             continue
 
-        coordinates = convert.build_coords(properties[0])
+        coordinates = [[round(x, 6), round(y, 6)] for x, y in properties[0]]
         values = properties[1]
 
         yield (coordinates, values)
@@ -141,10 +142,10 @@ def get_output_feature_directions(response, profile, preference, options=None, f
     response_mini = response['features'][0]
     feat = QgsFeature()
     coordinates = response_mini['geometry']['coordinates']
-    distance = response_mini['properties']['summary'][0]['distance']
-    duration = response_mini['properties']['summary'][0]['duration']
-    qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
-    feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
+    distance = response_mini['properties']['summary']['distance']
+    duration = response_mini['properties']['summary']['duration']
+    qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates]
+    feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
     feat.setAttributes(["{0:.3f}".format(distance / 1000),
                         "{0:.3f}".format(duration / 3600),
                         profile,

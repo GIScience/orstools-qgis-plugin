@@ -61,13 +61,11 @@ class Directions:
         route_pref = self.dlg.routing_preference_combo.currentText()
 
         params = {
-            'profile': route_mode,
             'preference': route_pref,
             'geometry': 'true',
-            'format': 'geojson',
-            'geometry_format': 'geojson',
             'instructions': 'false',
-            'id': None,
+            'elevation': True,
+            'id': 1,
         }
 
         # Get Advanced parameters
@@ -75,9 +73,16 @@ class Directions:
             avoid_boxes = self.dlg.routing_avoid_tags_group.findChildren(QCheckBox)
             if any(box.isChecked() for box in avoid_boxes):
                 self.options['avoid_features'] = self._get_avoid_options(avoid_boxes)
+        if self.dlg.routing_avoid_countries_group.isChecked():
+            countries_text = self.dlg.countries_text.value()
+            if countries_text:
+                countries = countries_text.split(',')
+                if all(map(lambda x: x.isdigit(), countries)):
+                    countries = [int(x) for x in countries]
+                self.options['avoid_countries'] = countries
 
         if self.options:
-            params['options'] = json.dumps(self.options)
+            params['options'] = self.options
 
         return params
 
@@ -96,7 +101,7 @@ class Directions:
 
             coordinates.append([float(coord) for coord in coords.split(', ')])
 
-        return coordinates
+        return [[round(x, 6), round(y, 6)] for x, y in coordinates]
 
     def _get_avoid_options(self, avoid_boxes):
         """
@@ -112,7 +117,6 @@ class Directions:
         for box in avoid_boxes:
             if box.isChecked():
                 avoid_features.append((box.text()))
-        avoid_features = convert.pipe_list(avoid_features)
 
         return avoid_features
 

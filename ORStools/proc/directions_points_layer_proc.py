@@ -240,7 +240,7 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
             try:
                 if optimize:
                     params = self._get_params_optimize(points, profile)
-                    response = clnt.request(provider['endpoints']['optimization'], {}, post_json=params)
+                    response = clnt.request('/optimization', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_features_optimization(
                         response,
@@ -249,7 +249,7 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
                     ))
                 else:
                     params = self._get_params_directions(points, profile, preference)
-                    response = clnt.request(provider['endpoints']['directions'], params)
+                    response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_feature_directions(
                         response,
@@ -291,13 +291,11 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
         """
 
         params = {
-            'coordinates': convert.build_coords([[point.x(), point.y()] for point in points]),
-            'profile': profile,
+            'coordinates': [[round(point.x(), 6), round(point.y(), 6)] for point in points],
             'preference': preference,
             'geometry': 'true',
-            'format': 'geojson',
-            'geometry_format': 'geojson',
             'instructions': 'false',
+            'elevation': True,
             'id': None
         }
 
