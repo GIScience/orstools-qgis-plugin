@@ -4,12 +4,13 @@ qgisMinimumVersion=3.0
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
 version=1.1.0
-author=GIS • OPS UG
+author=GIS • OPS UG & HeiGIT gGmbH
 email=nils@gis-ops.com
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2019/08/19 v1.1.0 Implement Traveling Salesman (#109), proper support for > 2 waypoints (batch & interactive), enable elevation (#83), ORS API v2 (#99), add avoid_countries (#78)
+changelog=2019/08/19 v1.1.1 Update metadata, bcs repository moved to GIScience
+    2019/08/19 v1.1.0 Implement Traveling Salesman (#109), proper support for > 2 waypoints (batch & interactive), enable elevation (#83), ORS API v2 (#99), add avoid_countries (#78)
     2019/05/21 v1.0.7 Improve first user experience with warning messages (#106)
     2019/05/02 v1.0.6 Make quota info optional (#106)
     2019/05/02 v1.0.5 Custom provider didn't work (#103), better handling when no API key set (#101)
@@ -19,11 +20,11 @@ changelog=2019/08/19 v1.1.0 Implement Traveling Salesman (#109), proper support 
     2019/03/01 v1.0.1 Provide default for isochrone layer ID field (#90)
     2019/01/27 v1.0.0 First working version of ORS Tools, after replacing OSM Tools plugin
 
-tracker=https://github.com/nilsnolde/orstools-qgis-plugin/issues
-repository=https://github.com/nilsnolde/orstools-qgis-plugin.git
-help=https://github.com/nilsnolde/orstools-qgis-plugin/wiki/
+tracker=https://github.com/GIScience/orstools-qgis-plugin/issues
+repository=https://github.com/GIScience/orstools-qgis-plugin.git
+help=https://github.com/GIScience/orstools-qgis-plugin/wiki/
 
-homepage=https://github.com/nilsnolde/orstools-qgis-plugin/wiki/
+homepage=https://github.com/GIScience/orstools-qgis-plugin/wiki/
 category=Plugins
 icon=gui/img/icon_orstools.png
 experimental=False
