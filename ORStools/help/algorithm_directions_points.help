@@ -1,16 +1,14 @@
-The Point Directions algorithm calulcates optimal routes for MultiPoint features. The waypoint order for the routing will be the same as the internal order of each MultiPoint feature.
+The Points Directions algorithm calulcates optimal routes for multiple start and end points based on input files.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 
-The Start layer has to be a MultiPoint layer.
+For Start and End layers, only Point layers are allowed, <b>not MultiPoint</b>.
 
-The Start ID field can be used to join the input layer afterwards.
+The Start and End ID fields can be used to join the input layers afterwards.
 
 The Travel Mode determines the profile used.
 
 The Preference dictates the cost. For longer routes don't use Shortest Path.
-
-You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Traveling Salesman</a> on the waypoints of each MultiPoint feature.
 
 The output layer is a LineStringZ layer with multiple route attributes and <b>z dimension</b> set.
 

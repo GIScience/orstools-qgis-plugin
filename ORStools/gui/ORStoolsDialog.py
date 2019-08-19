@@ -327,7 +327,7 @@ Remember, the first and last location are not part of the optimization.
 
         finally:
             # Set URL in debug window
-            clnt_msg += '<a href="{0}">{0}</a><br>'.format(clnt.url)
+            clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}'.format(clnt.url, json.dumps(params, indent=2))
             self.dlg.debug_text.setHtml(clnt_msg)
 
 

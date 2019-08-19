@@ -157,7 +157,7 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
 
         file = os.path.join(
             HELP_DIR,
-            'algorithm_directions_point.help'
+            'algorithm_directions_points.help'
         )
         with open(file) as helpf:
             msg = helpf.read()

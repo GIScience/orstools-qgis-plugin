@@ -1,6 +1,6 @@
 The Matrix algorithm returns a duration and distance matrix for multiple source and destination points.
 
-You need to have a valid API key ('Web' menu > 'Configuration') or sign up at https://openrouteservice.org/sign-up/.
+You need to have a valid API key ('Web' menu > 'Configuration') or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 
 The Travel Mode determines the profile used.
 
