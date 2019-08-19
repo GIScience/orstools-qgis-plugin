@@ -101,7 +101,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         providers = [provider['name'] for provider in self.temp_config['providers']]
 
         provider, ok = QInputDialog.getItem(self,
-                                            "Remove Peliasp provider",
+                                            "Remove ORS provider",
                                             "Choose provider to remove",
                                             providers, 0, False)
         if ok:
@@ -146,12 +146,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                     name=name,
                     base_url=url,
                     key=key,
-                    endpoints={
-                        "directions": "/directions",
-                        "isochrones": "/isochrones",
-                        "matrix": "/matrix",
-                        "geocoding": "/geocoding"
-                    }
                 )
             )
 
