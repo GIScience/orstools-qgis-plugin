@@ -31,7 +31,7 @@ import json
 
 from PyQt5.QtWidgets import QCheckBox
 
-from ORStools.utils import convert
+from ORStools.utils import transform
 
 
 class Directions:
@@ -44,6 +44,23 @@ class Directions:
         self.dlg = dlg
 
         self.options = dict()
+
+    def get_request_line_feature(self):
+        """
+        Extracts all coordinates for the list in GUI.
+
+        :returns: coordinate list of line
+        :rtype: list
+        """
+        coordinates = []
+        layers_list = self.dlg.routing_fromline_list
+        for idx in range(layers_list.count()):
+            item = layers_list.item(idx).text()
+            param, coords = item.split(":")
+
+            coordinates.append([float(coord) for coord in coords.split(', ')])
+
+        return [[round(x, 6), round(y, 6)] for x, y in coordinates]
 
     def get_parameters(self):
         """
@@ -73,6 +90,7 @@ class Directions:
             avoid_boxes = self.dlg.routing_avoid_tags_group.findChildren(QCheckBox)
             if any(box.isChecked() for box in avoid_boxes):
                 self.options['avoid_features'] = self._get_avoid_options(avoid_boxes)
+
         if self.dlg.routing_avoid_countries_group.isChecked():
             countries_text = self.dlg.countries_text.value()
             if countries_text:
@@ -81,27 +99,18 @@ class Directions:
                     countries = [int(x) for x in countries]
                 self.options['avoid_countries'] = countries
 
+        if self.dlg.avoidpolygon_group.isChecked():
+            layer = self.dlg.avoidpolygon_dropdown.currentLayer()
+            if layer:
+                transformer = transform.transformToWGS(layer.sourceCrs())
+                geom = layer.getGeometry(0)
+                geom.transform(transformer)
+                self.options['avoid_polygons'] = json.loads(geom.asJson())
+
         if self.options:
             params['options'] = self.options
 
         return params
-
-    def get_request_line_feature(self):
-        """
-        Extracts all coordinates for the list in GUI.
-
-        :returns: coordinate list of line
-        :rtype: list
-        """
-        coordinates = []
-        layers_list = self.dlg.routing_fromline_list
-        for idx in range(layers_list.count()):
-            item = layers_list.item(idx).text()
-            param, coords = item.split(":")
-
-            coordinates.append([float(coord) for coord in coords.split(', ')])
-
-        return [[round(x, 6), round(y, 6)] for x, y in coordinates]
 
     def _get_avoid_options(self, avoid_boxes):
         """
@@ -119,6 +128,18 @@ class Directions:
                 avoid_features.append((box.text()))
 
         return avoid_features
+
+    def _get_avoid_polygons(self, layer):
+        """
+        Extract polygon geometries from the selected polygon layer.
+
+        :param layer: The polygon layer
+        :type layer: QgsMapLayer
+        :returns: GeoJSON object
+        :rtype: dict
+        """
+
+        return json.loads(geom.asJson())
 
     def _get_optimize_parameters(self):
         """Return parameters for optimization waypoint"""

@@ -42,8 +42,9 @@ from PyQt5.QtCore import QSizeF, QPointF
 
 from qgis.core import (QgsProject,
                        QgsVectorLayer,
-                       QgsTextAnnotation)
-from qgis.gui import QgsFilterLineEdit, QgsMapCanvasAnnotationItem
+                       QgsTextAnnotation,
+                       QgsMapLayerProxyModel)
+from qgis.gui import QgsMapCanvasAnnotationItem
 import processing
 
 from . import resources_rc
@@ -86,7 +87,7 @@ def on_about_click(parent):
            'Author: Nils Nolde<br>' \
            'Email: <a href="mailto:Nils Nolde <{1}>">{1}</a><br>' \
            'Web: <a href="{2}">{2}</a><br>' \
-           'Repo: <a href="https://github.com/nilsnolde/ORStools">github.com/nilsnolde/ORStools</a><br>' \
+           'Repo: <a href="https://github.com/GIScience/ORStools">github.com/GIScience/ORStools</a><br>' \
            'Version: {3}'.format(DEFAULT_COLOR, __email__, __web__, __version__)
 
     QMessageBox.information(
@@ -209,6 +210,7 @@ class ORStoolsDialogMain:
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
+            self.dlg.avoidpolygon_dropdown.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
         # Populate provider box on window startup, since can be changed from multiple menus/buttons
         providers = configmanager.read_config()['providers']
