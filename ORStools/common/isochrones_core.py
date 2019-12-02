@@ -120,7 +120,7 @@ class Isochrones():
             feat = QgsFeature()
             coordinates = isochrone['geometry']['coordinates']
             iso_value = isochrone['properties']['value']
-            total_pop = isochrone['properties']['total_pop']
+            total_pop = isochrone['properties'].get('total_pop')
             qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
             feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
             feat.setAttributes([
