@@ -6,9 +6,10 @@ Set of tools to use [openrouteservice](https://openrouteservice.org) (ORS) API's
 
 ORS Tools gives you easy access to the following API's:
 
-- [Directions](https://openrouteservice.org/documentation/#/reference/directions/directions/directions-service)
-- [Isochrones](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service)
+- [Directions](https://openrouteservice.org/dev/#/api-docs/v2/directions/{profile}/geojson/post)
+- [Isochrones](https://openrouteservice.org/dev/#/api-docs/v2/isochrones/{profile}/post)
 - [Matrix](https://openrouteservice.org/documentation/#/reference/matrix/matrix/matrix-service-(post))
+- [Traveling Salesman](https://openrouteservice.org/dev/#/api-docs/v2/matrix/{profile}/post)
 
 The [wiki](https://github.com/nilsnolde/ORStools/wiki/ORS-Tools-Help) offers a tutorial on usage.
 
