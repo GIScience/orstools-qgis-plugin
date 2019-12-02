@@ -222,7 +222,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
 
             # Get transformed coordinates and feature
             params['locations'], feat = properties
-            params['id'] = feat[id_field_name]
+            params['id'] = feat[id_field_name] or None
             requests.append(deepcopy(params))
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
