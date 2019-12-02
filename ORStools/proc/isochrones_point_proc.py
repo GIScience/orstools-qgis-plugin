@@ -67,11 +67,11 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
     isochrones = isochrones_core.Isochrones()
     dest_id = None
     crs_out = QgsCoordinateReferenceSystem(4326)
-    providers = configmanager.read_config()['providers']
     # difference = None
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
-        providers = [provider['name'] for provider in self.providers]
+
+        providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         self.addParameter(
             QgsProcessingParameterEnum(
                 self.IN_PROVIDER,

@@ -63,11 +63,9 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
     IN_MODE = "INPUT_MODE"
     OUT = 'OUTPUT'
 
-    providers = configmanager.read_config()['providers']
-
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
-        providers = [provider['name'] for provider in self.providers]
+        providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         self.addParameter(
             QgsProcessingParameterEnum(
                 self.IN_PROVIDER,
@@ -261,7 +259,7 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:
                 msg = "Feature ID {} caused a {}:\n{}".format(
-                    points[source_field_name],
+                    from_value,
                     e.__class__.__name__,
                     str(e))
                 feedback.reportError(msg)
