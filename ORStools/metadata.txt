@@ -3,13 +3,14 @@ name=ORS Tools
 qgisMinimumVersion=3.0
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.2.0
+version=1.2.1
 author=GIS • OPS UG & HeiGIT gGmbH
 email=nils@gis-ops.com
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2019/08/19 v1.2.0 Implement avoid_polygons parameter (#79)
+changelog=2019/12/02 v1.2.1 fix isochrone layer bug for empty IDs (#113), fix isochrones for local setups (#112)
+    2019/08/19 v1.2.0 Implement avoid_polygons parameter (#79)
     2019/08/19 v1.1.1 Update metadata, bcs repository moved to GIScience
     2019/08/19 v1.1.0 Implement Traveling Salesman (#109), proper support for > 2 waypoints (batch & interactive), enable elevation (#83), ORS API v2 (#99), add avoid_countries (#78)
     2019/05/21 v1.0.7 Improve first user experience with warning messages (#106)
