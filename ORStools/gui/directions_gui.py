@@ -103,7 +103,10 @@ class Directions:
             layer = self.dlg.avoidpolygon_dropdown.currentLayer()
             if layer:
                 transformer = transform.transformToWGS(layer.sourceCrs())
-                geom = layer.getGeometry(0)
+                # FIXME: bug in GPKG driver I think:
+                # https://github.com/GIScience/orstools-qgis-plugin/issues/114
+                # Wrote to dev mailing list
+                geom = layer.getGeometry(0) or layer.getGeometry(1)
                 geom.transform(transformer)
                 self.options['avoid_polygons'] = json.loads(geom.asJson())
 
