@@ -43,6 +43,7 @@ RELEASING:
 - isochrone center lat and lon to isochrone attribute table ([#137](https://github.com/GIScience/orstools-qgis-plugin/issues/137))
 - implement `options`-parameter for routing and isochrones
 - prepare `options`-parameter for matrix
+- custom request timeouts for providers ([#122](https://github.com/GIScience/orstools-qgis-plugin/issues/122))
 
 ## [1.4.0] - 2021-06-15
 
