@@ -142,7 +142,7 @@ class NetworkAccessManager(object):
             'exception' - the exception returned during execution
     """
 
-    def __init__(self, authid=None, disable_ssl_certificate_validation=False, exception_class=None, debug=True):
+    def __init__(self, authid=None, disable_ssl_certificate_validation=False, exception_class=None, debug=True, timeout=60):
         self.disable_ssl_certificate_validation = disable_ssl_certificate_validation
         self.authid = authid
         self.reply = None
@@ -160,6 +160,7 @@ class NetworkAccessManager(object):
             'reason': '',
             'exception': None,
         })
+        self.timeout=timeout
 
     def msg_log(self, msg):
         if self.debug:
@@ -227,8 +228,10 @@ class NetworkAccessManager(object):
         if self.authid:
             self.msg_log(f"Update reply w/ authid: {self.authid}")
             self.auth_manager().updateNetworkReply(self.reply, self.authid)
+        
+        QgsNetworkAccessManager.instance().setTimeout(self.timeout*1000)
 
-        # necessary to trap local timout manage by QgsNetworkAccessManager
+        # necessary to trap local timeout managed by QgsNetworkAccessManager
         # calling QgsNetworkAccessManager::abortRequest
         QgsNetworkAccessManager.instance().requestTimedOut.connect(self.requestTimedOut)
 

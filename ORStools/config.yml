@@ -3,5 +3,6 @@ providers:
     ORS_QUOTA: X-Ratelimit-Limit
     ORS_REMAINING: X-Ratelimit-Remaining
   base_url: https://api.openrouteservice.org
-  key:
+  key: ''
   name: openrouteservice
+  timeout: 60

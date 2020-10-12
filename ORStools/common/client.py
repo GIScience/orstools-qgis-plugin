@@ -46,9 +46,7 @@ _USER_AGENT = f"ORSQGISClient@v{__version__}"
 class Client(QObject):
     """Performs requests to the ORS API services."""
 
-    def __init__(self,
-                 provider=None,
-                 retry_timeout=60):
+    def __init__(self, provider=None):
         """
         :param provider: A openrouteservice provider from config.yml
         :type provider: dict
@@ -64,7 +62,9 @@ class Client(QObject):
         self.ENV_VARS = provider.get('ENV_VARS')
 
         # self.session = requests.Session()
-        self.nam = networkaccessmanager.NetworkAccessManager(debug=False)
+        retry_timeout = provider.get('timeout')
+
+        self.nam = networkaccessmanager.NetworkAccessManager(debug=False, timeout=retry_timeout)
 
         self.retry_timeout = timedelta(seconds=retry_timeout)
         self.headers = {
