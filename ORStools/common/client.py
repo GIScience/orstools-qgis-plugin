@@ -48,7 +48,7 @@ class Client(QObject):
 
     def __init__(self,
                  provider=None,
-                 retry_timeout=60):
+                 retry_timeout=None):
         """
         :param provider: A openrouteservice provider from config.yml
         :type provider: dict
@@ -64,9 +64,15 @@ class Client(QObject):
         self.ENV_VARS = provider.get('ENV_VARS')
         
         # self.session = requests.Session()
-        self.nam = networkaccessmanager.NetworkAccessManager(debug=False)
+        if retry_timeout is None:
+            try:
+                retry_timeout = int(provider['timeout'])
+            except Exception:
+                retry_timeout = 60
+        
+        self.nam = networkaccessmanager.NetworkAccessManager(debug=False, timeout=retry_timeout)
 
-        self.retry_timeout = timedelta(seconds=retry_timeout)
+        self.retry_timeout = timedelta(seconds=int(retry_timeout))
         self.headers = {
                 "User-Agent": _USER_AGENT,
                 'Content-type': 'application/json',

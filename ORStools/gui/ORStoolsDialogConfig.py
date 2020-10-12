@@ -66,6 +66,10 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             current_provider = self.temp_config['providers'][idx]
             current_provider['key'] = box.findChild(QtWidgets.QLineEdit, box.title() + "_key_text").text()
             current_provider['base_url'] = box.findChild(QtWidgets.QLineEdit, box.title() + "_base_url_text").text()
+            try:
+                current_provider['timeout'] = int(box.findChild(QtWidgets.QLineEdit, box.title() + "_timeout_text").text())
+            except Exception:
+                current_provider['timeout'] = 60
 
         configmanager.write_config(self.temp_config)
         self.close()
@@ -74,9 +78,14 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         """Builds the UI on dialog startup."""
 
         for provider_entry in self.temp_config['providers']:
+            try:
+                timeout=provider_entry['timeout']
+            except Exception:
+                timeout="60"
             self._add_box(provider_entry['name'],
                           provider_entry['base_url'],
                           provider_entry['key'],
+                          timeout,
                           new=False)
 
         self.gridLayout.addWidget(self.providers, 0, 0, 1, 3)
@@ -93,7 +102,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         # Show quick user input dialog
         provider_name, ok = QInputDialog.getText(self, "New ORS provider", "Enter a name for the provider")
         if ok:
-            self._add_box(provider_name, 'https://', '', new=True)
+            self._add_box(provider_name, 'https://', '', 60, new=True)
 
     def _remove_provider(self):
         """Remove list of providers from list."""
@@ -124,6 +133,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                  name,
                  url,
                  key,
+                 timeout,
                  new=False):
         """
         Adds a provider box to the QWidget layout and self.temp_config.
@@ -140,15 +150,21 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         :param new: Specifies whether user wants to insert provider or the GUI is being built.
         :type new: boolean
         """
+        try:
+            int(timeout)
+        except Exception:
+            timeout = 60
+        
         if new:
             self.temp_config['providers'].append(
                 dict(
                     name=name,
                     base_url=url,
                     key=key,
+                    timeout=timeout
                 )
             )
-
+            
         provider = QgsCollapsibleGroupBox(self.providers)
         provider.setObjectName(name)
         provider.setTitle(name)
@@ -158,10 +174,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         key_label.setObjectName(name + '_key_label')
         key_label.setText('API Key')
         gridLayout_3.addWidget(key_label, 0, 0, 1, 1)
-        base_url_text = QtWidgets.QLineEdit(provider)
-        base_url_text.setObjectName(name + "_base_url_text")
-        base_url_text.setText(url)
-        gridLayout_3.addWidget(base_url_text, 3, 0, 1, 4)
         key_text = QtWidgets.QLineEdit(provider)
         key_text.setObjectName(name + "_key_text")
         key_text.setText(key)
@@ -170,5 +182,20 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         base_url_label.setObjectName("base_url_label")
         base_url_label.setText("Base URL")
         gridLayout_3.addWidget(base_url_label, 2, 0, 1, 1)
+        base_url_text = QtWidgets.QLineEdit(provider)
+        base_url_text.setObjectName(name + "_base_url_text")
+        base_url_text.setText(url)
+        gridLayout_3.addWidget(base_url_text, 3, 0, 1, 4)
+        
+        #todo: add validator for only int allowed (and remove all corresponding recasts in code...)
+        timeout_label = QtWidgets.QLabel(provider)
+        timeout_label.setObjectName("timeout_label")
+        timeout_label.setText("Custom Timeout (default 60 sec)")
+        gridLayout_3.addWidget(timeout_label, 4, 0, 1, 1)
+        timeout_text = QtWidgets.QLineEdit(provider)
+        timeout_text.setObjectName(name + "_timeout_text")
+        timeout_text.setText(str(timeout))
+        gridLayout_3.addWidget(timeout_text, 5, 0, 1, 4)
+        
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
