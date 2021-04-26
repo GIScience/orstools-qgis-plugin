@@ -101,11 +101,24 @@ class Directions:
 
         if self.dlg.avoidpolygon_group.isChecked():
             layer = self.dlg.avoidpolygon_dropdown.currentLayer()
+            polygons = None
             if layer:
                 transformer = transform.transformToWGS(layer.sourceCrs())
-                geom = next(layer.getFeatures())
-                geom.transform(transformer)
-                self.options['avoid_polygons'] = json.loads(geom.asJson())
+                features = layer.getFeatures()
+
+                # we assume a layer always has at least one feature and a geometry
+                polygons = next(features).geometry()
+                polygons.transform(transformer)
+
+                # iterate over all other features
+                for feature in features:
+                    if feature.hasGeometry():
+                        geom = feature.geometry()
+                        geom.transform(transformer)
+                        polygons = polygons.combine(geom)
+
+
+                self.options['avoid_polygons'] = json.loads(polygons.asJson())
 
         if self.options:
             params['options'] = self.options
