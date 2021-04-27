@@ -243,7 +243,7 @@ class ORStoolsDialogMain:
         if not self.dlg.routing_fromline_list.count():
             QMessageBox.critical(
                 self.dlg,
-                "Missing API key",
+                "Missing Waypoints",
                 """
                 Did you forget to set routing waypoints?<br><br>
                 
