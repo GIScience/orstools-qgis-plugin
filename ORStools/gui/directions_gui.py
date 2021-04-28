@@ -31,11 +31,44 @@ import json
 
 from PyQt5.QtWidgets import QCheckBox
 
-from ORStools.utils import transform
+from ORStools.utils import transform, exceptions
+
+
+def _get_avoid_polygons(layer):
+    """
+    Extract polygon geometries from the selected polygon layer.
+
+    :param layer: The polygon layer
+    :type layer: QgsMapLayer
+    :returns: GeoJSON object
+    :rtype: dict
+    """
+    polygons = None
+    transformer = transform.transformToWGS(layer.sourceCrs())
+    features = layer.getFeatures()
+
+    # iterate over all other features
+    for feature in features:
+        if feature.hasGeometry():
+            geom = feature.geometry()
+            geom.transform(transformer)
+            if polygons is None:
+                polygons = geom
+            else:
+                polygons = polygons.combine(geom)
+
+    if not polygons:
+        raise exceptions.GenericServerError(
+            400,
+            "Bad Request: Not enough features in avoid polygon(s) layer"
+        )
+    else:
+        return json.loads(polygons.asJson())
 
 
 class Directions:
     """Extended functionality for directions endpoint for GUI."""
+
     def __init__(self, dlg):
         """
         :param dlg: Main GUI dialog.
@@ -101,24 +134,9 @@ class Directions:
 
         if self.dlg.avoidpolygon_group.isChecked():
             layer = self.dlg.avoidpolygon_dropdown.currentLayer()
-            polygons = None
             if layer:
-                transformer = transform.transformToWGS(layer.sourceCrs())
-                features = layer.getFeatures()
-
-                # we assume a layer always has at least one feature and a geometry
-                polygons = next(features).geometry()
-                polygons.transform(transformer)
-
-                # iterate over all other features
-                for feature in features:
-                    if feature.hasGeometry():
-                        geom = feature.geometry()
-                        geom.transform(transformer)
-                        polygons = polygons.combine(geom)
-
-
-                self.options['avoid_polygons'] = json.loads(polygons.asJson())
+                polygons = _get_avoid_polygons(layer)
+                self.options['avoid_polygons'] = polygons
 
         if self.options:
             params['options'] = self.options
@@ -141,18 +159,6 @@ class Directions:
                 avoid_features.append((box.text()))
 
         return avoid_features
-
-    def _get_avoid_polygons(self, layer):
-        """
-        Extract polygon geometries from the selected polygon layer.
-
-        :param layer: The polygon layer
-        :type layer: QgsMapLayer
-        :returns: GeoJSON object
-        :rtype: dict
-        """
-
-        return json.loads(geom.asJson())
 
     def _get_optimize_parameters(self):
         """Return parameters for optimization waypoint"""

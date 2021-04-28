@@ -270,8 +270,9 @@ class ORStoolsDialogMain:
         clnt_msg = ''
 
         directions = directions_gui.Directions(self.dlg)
-        params = directions.get_parameters()
+        params = None
         try:
+            params = directions.get_parameters()
             if self.dlg.optimization_group.isChecked():
                 if len(params['jobs']) <= 1:  # Start/end locations don't count as job
                     QMessageBox.critical(
@@ -329,7 +330,8 @@ Remember, the first and last location are not part of the optimization.
 
         finally:
             # Set URL in debug window
-            clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}'.format(clnt.url, json.dumps(params, indent=2))
+            if params:
+                clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}'.format(clnt.url, json.dumps(params, indent=2))
             self.dlg.debug_text.setHtml(clnt_msg)
 
 
