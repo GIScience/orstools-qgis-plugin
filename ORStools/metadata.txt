@@ -29,7 +29,7 @@ repository=https://github.com/GIScience/orstools-qgis-plugin.git
 help=https://github.com/GIScience/orstools-qgis-plugin/wiki/
 
 homepage=https://github.com/GIScience/orstools-qgis-plugin/wiki/
-category=Plugins
+category=Web
 icon=gui/img/icon_orstools.png
 experimental=False
 
