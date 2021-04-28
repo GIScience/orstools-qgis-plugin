@@ -44,15 +44,6 @@ class ORStoolsProvider(QgsProcessingProvider):
     def __init__(self):
         QgsProcessingProvider.__init__(self)
 
-        # Load algorithms
-        self.alglist = [
-            ORSdirectionsPointsLayersAlgo(),
-            ORSdirectionsPointsLayerAlgo(),
-            ORSdirectionsLinesAlgo(),
-            ORSisochronesLayerAlgo(),
-            ORSisochronesPointAlgo(),
-            ORSmatrixAlgo()
-        ]
 
     def unload(self):
         """
@@ -65,8 +56,13 @@ class ORStoolsProvider(QgsProcessingProvider):
         """
         Loads all algorithms belonging to this provider.
         """
-        for alg in self.alglist:
-            self.addAlgorithm(alg)
+        #
+        self.addAlgorithm(ORSdirectionsPointsLayersAlgo())
+        self.addAlgorithm(ORSdirectionsPointsLayerAlgo())
+        self.addAlgorithm(ORSdirectionsLinesAlgo())
+        self.addAlgorithm(ORSisochronesLayerAlgo())
+        self.addAlgorithm(ORSisochronesPointAlgo())
+        self.addAlgorithm(ORSmatrixAlgo())
 
     def icon(self):
         return QIcon(RESOURCE_PREFIX + 'icon_orstools.png')
