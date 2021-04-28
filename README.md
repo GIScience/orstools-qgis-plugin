@@ -15,7 +15,7 @@ The [wiki](https://github.com/nilsnolde/ORStools/wiki/ORS-Tools-Help) offers a t
 
 In case of issues/bugs, please use the [issue tracker](https://github.com/nilsnolde/ORStools/issues).
 
-In case of questions, please ask our [forum](https://ask.openrouteservice.org/c/sdks).
+In case of questions, please ask our [forum](https://ask.openrouteservice.org/c/sdks/qgis).
 
 See also:
 - [Rate limits](https://openrouteservice.org/restrictions/)

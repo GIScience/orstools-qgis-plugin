@@ -453,7 +453,7 @@ class Ui_ORStoolsDialogBase(object):
         self.resources_group.setTitle(_translate("ORStoolsDialogBase", "Resources"))
         self.label_3.setText(_translate("ORStoolsDialogBase", "<html><head/><body><p><a href=\"https://openrouteservice.org/dev/#/signup\"><span style=\"font-weight: bold; text-decoration: underline; color:#a8b1f5;\">Sign Up</span></a></p></body></html>"))
         self.label_2.setText(_translate("ORStoolsDialogBase", "<html><head/><body><p><a href=\"https://openrouteservice.org/dev/#/home\"><span style=\"font-weight: bold; text-decoration: underline; color:#a8b1f5;\">Dashboard</span></a></p></body></html>"))
-        self.label.setText(_translate("ORStoolsDialogBase", "<html><head/><body><p><a href=\"https://ask.openrouteservice.org/c/sdks\"><span style=\"font-weight: bold; text-decoration: underline; color:#a8b1f5;\">Forum</span></a></p></body></html>"))
+        self.label.setText(_translate("ORStoolsDialogBase", "<html><head/><body><p><a href=\"https://ask.openrouteservice.org/c/sdks/qgis\"><span style=\"font-weight: bold; text-decoration: underline; color:#a8b1f5;\">Forum</span></a></p></body></html>"))
         self.label_15.setText(_translate("ORStoolsDialogBase", "Provider"))
         self.provider_refresh.setToolTip(_translate("ORStoolsDialogBase", "Refresh the provider list. Needed after a provider was added or deleted."))
         self.provider_config.setToolTip(_translate("ORStoolsDialogBase", "Shortcut to Web ► ORS Tools ► Provider Settings"))
