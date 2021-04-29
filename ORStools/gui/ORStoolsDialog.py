@@ -291,9 +291,17 @@ Remember, the first and last location are not part of the optimization.
                 profile = self.dlg.routing_travel_combo.currentText()
                 # abort on empty avoid polygons layer
                 if 'options' in params and 'avoid_polygons' in params['options']\
-                        and params['options']['avoid_polygons'] is None:
+                        and params['options']['avoid_polygons'] == {}:
+                    QMessageBox.warning(
+                        self.dlg,
+                        "Empty layer",
+                        """
+The specified avoid polygon(s) layer does not contain any features.
+Please add polygons to the layer or uncheck avoid polygons.
+                        """
+                    )
                     msg = "The request has been aborted!"
-                    logger.log(msg, 2)
+                    logger.log(msg, 0)
                     self.dlg.debug_text.setText(msg)
                     return
                 response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
