@@ -270,8 +270,9 @@ class ORStoolsDialogMain:
         clnt_msg = ''
 
         directions = directions_gui.Directions(self.dlg)
-        params = directions.get_parameters()
+        params = None
         try:
+            params = directions.get_parameters()
             if self.dlg.optimization_group.isChecked():
                 if len(params['jobs']) <= 1:  # Start/end locations don't count as job
                     QMessageBox.critical(
@@ -288,6 +289,21 @@ Remember, the first and last location are not part of the optimization.
             else:
                 params['coordinates'] = directions.get_request_line_feature()
                 profile = self.dlg.routing_travel_combo.currentText()
+                # abort on empty avoid polygons layer
+                if 'options' in params and 'avoid_polygons' in params['options']\
+                        and params['options']['avoid_polygons'] == {}:
+                    QMessageBox.warning(
+                        self.dlg,
+                        "Empty layer",
+                        """
+The specified avoid polygon(s) layer does not contain any features.
+Please add polygons to the layer or uncheck avoid polygons.
+                        """
+                    )
+                    msg = "The request has been aborted!"
+                    logger.log(msg, 0)
+                    self.dlg.debug_text.setText(msg)
+                    return
                 response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
                 feat = directions_core.get_output_feature_directions(
                     response,
@@ -329,7 +345,8 @@ Remember, the first and last location are not part of the optimization.
 
         finally:
             # Set URL in debug window
-            clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}'.format(clnt.url, json.dumps(params, indent=2))
+            if params:
+                clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}'.format(clnt.url, json.dumps(params, indent=2))
             self.dlg.debug_text.setHtml(clnt_msg)
 
 

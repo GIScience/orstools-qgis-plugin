@@ -34,8 +34,56 @@ from PyQt5.QtWidgets import QCheckBox
 from ORStools.utils import transform
 
 
+def _get_avoid_polygons(layer):
+    """
+    Extract polygon geometries from the selected polygon layer.
+
+    :param layer: The polygon layer
+    :type layer: QgsMapLayer
+    :returns: GeoJSON object
+    :rtype: dict
+    """
+    polygons = None
+    transformer = transform.transformToWGS(layer.sourceCrs())
+    features = layer.getFeatures()
+
+    # iterate over all other features
+    for feature in features:
+        if feature.hasGeometry():
+            geom = feature.geometry()
+            geom.transform(transformer)
+            if polygons is None:
+                polygons = geom
+            else:
+                polygons = polygons.combine(geom)
+
+    if not polygons:
+        return json.loads("{}")
+    else:
+        return json.loads(polygons.asJson())
+
+
+def _get_avoid_options(avoid_boxes):
+    """
+    Extracts checked boxes in Advanced avoid parameters.
+
+    :param avoid_boxes: all checkboxes in advanced paramter dialog.
+    :type avoid_boxes: list of QCheckBox
+
+    :returns: avoid_features parameter
+    :rtype: JSON dump, i.e. str
+    """
+    avoid_features = []
+    for box in avoid_boxes:
+        if box.isChecked():
+            avoid_features.append((box.text()))
+
+    return avoid_features
+
+
 class Directions:
     """Extended functionality for directions endpoint for GUI."""
+
     def __init__(self, dlg):
         """
         :param dlg: Main GUI dialog.
@@ -89,7 +137,7 @@ class Directions:
         if self.dlg.routing_avoid_tags_group.isChecked():
             avoid_boxes = self.dlg.routing_avoid_tags_group.findChildren(QCheckBox)
             if any(box.isChecked() for box in avoid_boxes):
-                self.options['avoid_features'] = self._get_avoid_options(avoid_boxes)
+                self.options['avoid_features'] = _get_avoid_options(avoid_boxes)
 
         if self.dlg.routing_avoid_countries_group.isChecked():
             countries_text = self.dlg.countries_text.value()
@@ -102,44 +150,13 @@ class Directions:
         if self.dlg.avoidpolygon_group.isChecked():
             layer = self.dlg.avoidpolygon_dropdown.currentLayer()
             if layer:
-                transformer = transform.transformToWGS(layer.sourceCrs())
-                geom = next(layer.getFeatures())
-                geom.transform(transformer)
-                self.options['avoid_polygons'] = json.loads(geom.asJson())
+                polygons = _get_avoid_polygons(layer)
+                self.options['avoid_polygons'] = polygons
 
         if self.options:
             params['options'] = self.options
 
         return params
-
-    def _get_avoid_options(self, avoid_boxes):
-        """
-        Extracts checked boxes in Advanced avoid parameters.
-
-        :param avoid_boxes: all checkboxes in advanced paramter dialog.
-        :type avoid_boxes: list of QCheckBox
-
-        :returns: avoid_features parameter
-        :rtype: JSON dump, i.e. str
-        """
-        avoid_features = []
-        for box in avoid_boxes:
-            if box.isChecked():
-                avoid_features.append((box.text()))
-
-        return avoid_features
-
-    def _get_avoid_polygons(self, layer):
-        """
-        Extract polygon geometries from the selected polygon layer.
-
-        :param layer: The polygon layer
-        :type layer: QgsMapLayer
-        :returns: GeoJSON object
-        :rtype: dict
-        """
-
-        return json.loads(geom.asJson())
 
     def _get_optimize_parameters(self):
         """Return parameters for optimization waypoint"""
