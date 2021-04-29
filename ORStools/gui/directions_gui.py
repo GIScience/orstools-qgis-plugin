@@ -29,41 +29,9 @@
 
 import json
 
-from PyQt5.QtWidgets import QCheckBox
+from PyQt5.QtWidgets import QCheckBox, QMessageBox
 
 from ORStools.utils import transform, exceptions
-
-
-def _get_avoid_polygons(layer):
-    """
-    Extract polygon geometries from the selected polygon layer.
-
-    :param layer: The polygon layer
-    :type layer: QgsMapLayer
-    :returns: GeoJSON object
-    :rtype: dict
-    """
-    polygons = None
-    transformer = transform.transformToWGS(layer.sourceCrs())
-    features = layer.getFeatures()
-
-    # iterate over all other features
-    for feature in features:
-        if feature.hasGeometry():
-            geom = feature.geometry()
-            geom.transform(transformer)
-            if polygons is None:
-                polygons = geom
-            else:
-                polygons = polygons.combine(geom)
-
-    if not polygons:
-        raise exceptions.GenericServerError(
-            400,
-            "Bad Request: Not enough features in avoid polygon(s) layer"
-        )
-    else:
-        return json.loads(polygons.asJson())
 
 
 class Directions:
@@ -135,13 +103,49 @@ class Directions:
         if self.dlg.avoidpolygon_group.isChecked():
             layer = self.dlg.avoidpolygon_dropdown.currentLayer()
             if layer:
-                polygons = _get_avoid_polygons(layer)
+                polygons = self._get_avoid_polygons(layer)
                 self.options['avoid_polygons'] = polygons
 
         if self.options:
             params['options'] = self.options
 
         return params
+
+    def _get_avoid_polygons(self, layer):
+        """
+        Extract polygon geometries from the selected polygon layer.
+
+        :param layer: The polygon layer
+        :type layer: QgsMapLayer
+        :returns: GeoJSON object
+        :rtype: dict
+        """
+        polygons = None
+        transformer = transform.transformToWGS(layer.sourceCrs())
+        features = layer.getFeatures()
+
+        # iterate over all other features
+        for feature in features:
+            if feature.hasGeometry():
+                geom = feature.geometry()
+                geom.transform(transformer)
+                if polygons is None:
+                    polygons = geom
+                else:
+                    polygons = polygons.combine(geom)
+
+        if not polygons:
+            QMessageBox.warning(
+                self.dlg,
+                "Empty layer",
+                """
+The specified avoid polygon(s) layer does not contain any features.
+Please add polygons to the layer or uncheck avoid polygons.
+                """
+            )
+            return None
+        else:
+            return json.loads(polygons.asJson())
 
     def _get_avoid_options(self, avoid_boxes):
         """

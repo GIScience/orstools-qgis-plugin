@@ -289,6 +289,13 @@ Remember, the first and last location are not part of the optimization.
             else:
                 params['coordinates'] = directions.get_request_line_feature()
                 profile = self.dlg.routing_travel_combo.currentText()
+                # abort on empty avoid polygons layer
+                if 'options' in params and 'avoid_polygons' in params['options']\
+                        and params['options']['avoid_polygons'] is None:
+                    msg = "The request has been aborted!"
+                    logger.log(msg, 2)
+                    self.dlg.debug_text.setText(msg)
+                    return
                 response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
                 feat = directions_core.get_output_feature_directions(
                     response,
