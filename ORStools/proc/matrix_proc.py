@@ -140,7 +140,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
             HELP_DIR,
             'algorithm_matrix.help'
         )
-        with open(file) as helpf:
+        with open(file, encoding='utf-8') as helpf:
             msg = helpf.read()
 
         return msg

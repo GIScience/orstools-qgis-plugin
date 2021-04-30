@@ -157,7 +157,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             HELP_DIR,
             'algorithm_isochrone_layer.help'
         )
-        with open(file) as helpf:
+        with open(file, encoding='utf-8') as helpf:
             msg = helpf.read()
 
         return msg
