@@ -1,4 +1,4 @@
-The Line Directions algorithm calulcates least-cost routes for multiple waypoints along one or multiple LineString(s). Each LineString can have up to 50 waypoints.
+The Line Directions algorithm calculates least-cost routes for multiple waypoints along one or multiple LineString(s). Each LineString can have up to 50 waypoints.
 
 You need to have a <b>valid API key</b> for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 

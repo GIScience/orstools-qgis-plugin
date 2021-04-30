@@ -1,4 +1,4 @@
-The Point Directions algorithm calulcates optimal routes for MultiPoint features. The waypoint order for the routing will be the same as the internal order of each MultiPoint feature.
+The Point Directions algorithm calculates optimal routes for MultiPoint features. The waypoint order for the routing will be the same as the internal order of each MultiPoint feature.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 

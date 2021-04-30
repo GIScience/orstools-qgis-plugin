@@ -1,4 +1,4 @@
-The Points Directions algorithm calulcates optimal routes for multiple start and end points based on input files.
+The Points Directions algorithm calculates optimal routes for multiple start and end points based on input files.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 

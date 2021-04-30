@@ -8,6 +8,6 @@ For Start and End layers, only Point layers are allowed, NOT MultiPoint.
 
 The Start and End ID fields can be used to join the input layers afterwards.
 
-The output layer is a geometryless table with ID, duration and distance attributes.
+The output layer is a geometry-less table with ID, duration and distance attributes.
 
 For current restrictions, please see https://openrouteservice.org/restrictions/.
