@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
 version=1.3.0
-author=HeiGIT gGmbH & GIS • OPS UG
+author=HeiGIT gGmbH
 email=support@openrouteservice.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.

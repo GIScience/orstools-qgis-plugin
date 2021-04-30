@@ -64,3 +64,7 @@ Either from QGIS plugin repository or manually:
 This project is published under the GPLv3 license, see [LICENSE.md](https://github.com/GIScience/orstools-qgis-plugin/blob/master/LICENSE.md) for details.
 
 By using this plugin, you also agree to the terms and conditions of OpenRouteService, as outlined [here](https://openrouteservice.org/terms-of-service/).
+
+## Acknowledgements
+
+This project was first started by [Nils Nolde](https://github.com/nilsnolde), [GIS • OPS UG](https://gis-ops.com).

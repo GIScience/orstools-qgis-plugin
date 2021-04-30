@@ -81,8 +81,7 @@ def on_about_click(parent):
 
     info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {0}">openrouteservice</a> routing functionalities.<br><br>' \
            '<center>' \
-           '<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/></a> <br>' \
-           '<a href=\"https://gis-ops.com\"><img src=\":/plugins/ORStools/img/logo_gisops_300.png\"/></a> <br><br>' \
+           '<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/></a> <br><br>' \
            '</center>' \
            'Author: HeiGIT gGmbH<br>' \
            'Email: <a href="mailto:Openrouteservice <{1}>">{1}</a><br>' \
