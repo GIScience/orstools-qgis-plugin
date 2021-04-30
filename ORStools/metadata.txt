@@ -3,13 +3,23 @@ name=ORS Tools
 qgisMinimumVersion=3.0
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.2.3
-author=GIS • OPS UG & HeiGIT gGmbH
-email=nils@gis-ops.com
+version=1.3.0
+author=HeiGIT gGmbH & GIS • OPS UG
+email=support@openrouteservice.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2020/02/22 v1.2.3 wasn't a bug, implemented Nyall's suggestion: https://github.com/qgis/QGIS/issues/34606#issuecomment-589901410
+changelog=2021/04/30 v1.3.0 Maintainer change & multiple Fixes:
+        - directions from line layer (#123)
+        - help file encodings on mac
+        - typos in help docs
+        - Layer ID types for directions from 1 point layer (#124, #127)
+        - incorrect algorithm ownership (#119)
+        - avoid_polygons (#118)
+        - metadata category
+        - ors ask forum links
+        - warning popup for missing waypoints
+    2020/02/22 v1.2.3 wasn't a bug, implemented Nyall's suggestion: https://github.com/qgis/QGIS/issues/34606#issuecomment-589901410
     2020/02/20 v1.2.2 workaround for possible QGIS geopackage bug (#114): backwards-compatible and future-proof
     2019/12/02 v1.2.1 fix isochrone layer bug for empty IDs (#113), fix isochrones for local setups (#112)
     2019/08/19 v1.2.0 Implement avoid_polygons parameter (#79)
