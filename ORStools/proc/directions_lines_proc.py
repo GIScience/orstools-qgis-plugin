@@ -228,7 +228,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
                     ))
                 else:
                     params = self._get_params_directions(line, profile, preference)
-                    response = clnt.request('/v2/directions/' + profile + '/geojson', params)
+                    response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_feature_directions(
                         response,
@@ -299,12 +299,10 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         """
 
         params = {
-            'coordinates': convert.build_coords([[point.x(), point.y()] for point in line]),
-            'profile': profile,
+            'coordinates': [[round(point.x(), 6), round(point.y(), 6)] for point in line],
             'preference': preference,
             'geometry': 'true',
             'format': 'geojson',
-            'geometry_format': 'geojson',
             'instructions': 'false',
             'elevation': True,
             'id': None
