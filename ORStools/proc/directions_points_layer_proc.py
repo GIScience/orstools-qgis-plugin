@@ -220,7 +220,7 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
             for feat in sorted(source.getFeatures(), key=lambda f: f.id()):
                 points.append(xformer.transform(QgsPointXY(feat.geometry().asPoint())))
             input_points.append(points)
-            from_values.append('')
+            from_values.append(None)
         elif source.wkbType() == QgsWkbTypes.MultiPoint:
             # loop through multipoint features
             for feat in sorted(source.getFeatures(), key=lambda f: f.id()):
