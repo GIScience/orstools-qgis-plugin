@@ -11,18 +11,18 @@ ORS Tools gives you easy access to the following API's:
 - [Matrix](https://openrouteservice.org/documentation/#/reference/matrix/matrix/matrix-service-(post))
 - [Traveling Salesman](https://openrouteservice.org/dev/#/api-docs/v2/matrix/{profile}/post)
 
-The [wiki](https://github.com/nilsnolde/ORStools/wiki/ORS-Tools-Help) offers a tutorial on usage.
+The [wiki](https://github.com/GIScience/orstools-qgis-plugin/wiki/ORS-Tools-Help) offers a tutorial on usage.
 
-In case of issues/bugs, please use the [issue tracker](https://github.com/nilsnolde/ORStools/issues).
+In case of issues/bugs, please use the [issue tracker](https://github.com/GIScience/orstools-qgis-plugin/issues).
 
 In case of questions, please ask our [forum](https://ask.openrouteservice.org/c/sdks/qgis).
 
 See also:
 - [Rate limits](https://openrouteservice.org/restrictions/)
 - Developer [dashboard](https://openrouteservice.org/dev/#/home)
-- [ORS developer documentation](https://openrouteservice.org/documentation/)
+- [ORS developer documentation](https://openrouteservice.org/dev/#/api-docs)
 - ORS openrouteservice-py on [PyPi](https://pypi.python.org/pypi/openrouteservice)
-- ORS Tools plugin in [QGIS repo](https://plugins.qgis.org/plugins/OSMtools/)
+- ORS Tools plugin in [QGIS repo](https://plugins.qgis.org/plugins/ORStools/)
 
 ## Functionalities
 
@@ -53,7 +53,7 @@ API key: https://openrouteservice.org/sign-up/
 ### Installation
 
 Either from QGIS plugin repository or manually:
-  - [Download](https://github.com/nilsnolde/OSMtools/archive/master.zip) ZIP file from Github
+  - [Download](https://github.com/GIScience/orstools-qgis-plugin/archive/master.zip) ZIP file from Github
   - Unzip folder contents and copy `ORStools` folder to:
     - Linux: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins`
     - Windows: `C:\Users\USER\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins`
@@ -61,6 +61,6 @@ Either from QGIS plugin repository or manually:
 
 ## License
 
-This project is published under the GPLv3 license, see [LICENSE.md](https://github.com/nilsnolde/ORStools/blob/master/LICENSE.md) for details.
+This project is published under the GPLv3 license, see [LICENSE.md](https://github.com/GIScience/orstools-qgis-plugin/blob/master/LICENSE.md) for details.
 
 By using this plugin, you also agree to the terms and conditions of OpenRouteService, as outlined [here](https://openrouteservice.org/terms-of-service/).

@@ -84,10 +84,10 @@ def on_about_click(parent):
            '<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/></a> <br>' \
            '<a href=\"https://gis-ops.com\"><img src=\":/plugins/ORStools/img/logo_gisops_300.png\"/></a> <br><br>' \
            '</center>' \
-           'Author: Nils Nolde<br>' \
-           'Email: <a href="mailto:Nils Nolde <{1}>">{1}</a><br>' \
+           'Author: HeiGIT gGmbH<br>' \
+           'Email: <a href="mailto:Openrouteservice <{1}>">{1}</a><br>' \
            'Web: <a href="{2}">{2}</a><br>' \
-           'Repo: <a href="https://github.com/GIScience/ORStools">github.com/GIScience/ORStools</a><br>' \
+           'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">github.com/GIScience/orstools-qgis-plugin</a><br>' \
            'Version: {3}'.format(DEFAULT_COLOR, __email__, __web__, __version__)
 
     QMessageBox.information(
