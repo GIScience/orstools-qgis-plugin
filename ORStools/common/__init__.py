@@ -32,7 +32,6 @@ PROFILES = [
             'driving-hgv',
             'cycling-regular',
             'cycling-road',
-            'cycling-safe',
             'cycling-mountain',
             'cycling-electric',
             'foot-walking',
@@ -42,4 +41,4 @@ PROFILES = [
 
 DIMENSIONS = ['time', 'distance']
 
-PREFERENCES = ['fastest', 'shortest']
+PREFERENCES = ['fastest', 'shortest', 'recommended']
