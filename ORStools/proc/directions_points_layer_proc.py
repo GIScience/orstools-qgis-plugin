@@ -281,7 +281,7 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
         :param profile: transport profile to be used
         :type profile: str
 
-        :param preference: routing preference, shortest/fastest
+        :param preference: routing preference, shortest/fastest/recommended
         :type preference: str
 
         :returns: parameters for optimization endpoint

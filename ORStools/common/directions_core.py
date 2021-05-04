@@ -124,7 +124,7 @@ def get_output_feature_directions(response, profile, preference, options=None, f
     :param profile: Transportation mode being used
     :type profile: str
 
-    :param preference: Cost being used, shortest or fastest.
+    :param preference: Cost being used, shortest, fastest or recommended.
     :type preference: str
 
     :param options: Avoidables being used.
