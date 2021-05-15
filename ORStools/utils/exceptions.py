@@ -42,7 +42,7 @@ class ApiError(Exception):
         if self.message is None:
             return self.status
         else:
-            return "{} ({})".format(self.status, self.message)
+            return f"{self.status} ({self.message})"
 
 
 class InvalidKey(Exception):
@@ -55,7 +55,7 @@ class InvalidKey(Exception):
         if self.message is None:
             return self.status
         else:
-            return "{} ({})".format(self.status, self.message)
+            return f"{self.status} ({self.message})"
 
 
 class OverQueryLimit(Exception):
@@ -69,7 +69,7 @@ class OverQueryLimit(Exception):
         if self.message is None:
             return self.status
         else:
-            return "{} ({})".format(self.status, self.message)
+            return f"{self.status} ({self.message})"
 
 
 class Timeout(Exception):
@@ -88,4 +88,4 @@ class GenericServerError(Exception):
         if self.message is None:
             return self.status
         else:
-            return "{} ({})".format(self.status, self.message)
+            return f"{self.status} ({self.message})"

@@ -146,8 +146,8 @@ def get_output_feature_directions(response, profile, preference, options=None, f
     duration = response_mini['properties']['summary']['duration']
     qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates]
     feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
-    feat.setAttributes(["{0:.3f}".format(distance / 1000),
-                        "{0:.3f}".format(duration / 3600),
+    feat.setAttributes([f"{distance / 1000:.3f}",
+                        f"{duration / 3600:.3f}",
                         profile,
                         preference,
                         str(options),
@@ -182,8 +182,8 @@ def get_output_features_optimization(response, profile, from_value=None):
     duration = response_mini['cost']
     qgis_coords = [QgsPointXY(x, y) for x, y in convert.decode_polyline(polyline)]
     feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
-    feat.setAttributes(["{0:.3f}".format(distance / 1000),
-                        "{0:.3f}".format(duration / 3600),
+    feat.setAttributes([f"{distance / 1000:.3f}",
+                        f"{duration / 3600:.3f}",
                         profile,
                         'fastest',
                         'optimized',

@@ -271,11 +271,7 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
             except (exceptions.ApiError,
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:
-                msg = "Route from {} to {} caused a {}:\n{}".format(
-                    values[0],
-                    values[1],
-                    e.__class__.__name__,
-                    str(e))
+                msg = f"Route from {values[0]} to {values[1]} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue

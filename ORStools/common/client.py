@@ -40,7 +40,7 @@ from ORStools import __version__
 from ORStools.common import networkaccessmanager
 from ORStools.utils import exceptions, configmanager, logger
 
-_USER_AGENT = "ORSQGISClient@v{}".format(__version__)
+_USER_AGENT = f"ORSQGISClient@v{__version__}"
 
 
 class Client(QObject):
@@ -145,11 +145,7 @@ class Client(QObject):
             requests_method = 'POST'
 
         logger.log(
-            "url: {}\nParameters: {}".format(
-                self.url,
-                # final_requests_kwargs
-                json.dumps(body, indent=2)
-            ),
+            f"url: {self.url}\nParameters: {json.dumps(body, indent=2)}",
             0
         )
 
@@ -170,12 +166,12 @@ class Client(QObject):
 
                 # Let the instances know something happened
                 self.overQueryLimit.emit()
-                logger.log("{}: {}".format(e.__class__.__name__, str(e)), 1)
+                logger.log(f"{e.__class__.__name__}: {str(e)}", 1)
 
                 return self.request(url, params, first_request_time, retry_counter + 1, post_json)
 
             except exceptions.ApiError as e:
-                logger.log("Feature ID {} caused a {}: {}".format(post_json['id'], e.__class__.__name__, str(e)), 2)
+                logger.log(f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2)
                 raise
 
             raise
