@@ -91,7 +91,7 @@ class Response(Map):
 
 class NetworkAccessManager(object):
     """
-    This class mimicks httplib2 by using QgsNetworkAccessManager for all
+    This class mimics httplib2 by using QgsNetworkAccessManager for all
     network calls.
 
     The return value is a tuple of (response, content), the first being and
@@ -118,7 +118,7 @@ class NetworkAccessManager(object):
     Usage 2 (Non blocking mode)
     -------------------------
     ::
-        NOTE! if blocking mode returns immediatly
+        NOTE! if blocking mode returns immediately
               it's up to the caller to manage listeners in case
               of non blocking mode
 
@@ -137,9 +137,9 @@ class NetworkAccessManager(object):
             'status_message' - reply message string from reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute)
             'content' - bytearray returned from reply
             'ok' - request success [True, False]
-            'headers' - Dicionary containing the reply header
-            'reason' - fomatted message string with reply.errorString()
-            'exception' - the exception returne dduring execution
+            'headers' - Dictionary containing the reply header
+            'reason' - formatted message string with reply.errorString()
+            'exception' - the exception returned during execution
     """
 
     def __init__(self, authid=None, disable_ssl_certificate_validation=False, exception_class=None, debug=True):
@@ -184,7 +184,7 @@ class NetworkAccessManager(object):
         url = urllib.parse.unquote(url)
         req.setUrl(QUrl(url))
         if headers is not None:
-            # This fixes a wierd error with compressed content not being correctly
+            # This fixes a weird error with compressed content not being correctly
             # inflated.
             # If you set the header on the QNetworkRequest you are basically telling
             # QNetworkAccessManager "I know what I'm doing, please don't do any content
@@ -236,7 +236,7 @@ class NetworkAccessManager(object):
         self.reply.finished.connect(self.replyFinished)
         self.reply.downloadProgress.connect(self.downloadProgress)
 
-        # block if blocking mode otherwise return immediatly
+        # block if blocking mode otherwise return immediately
         # it's up to the caller to manage listeners in case of no blocking mode
         if not self.blocking_mode:
             return (None, None)

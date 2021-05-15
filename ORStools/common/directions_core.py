@@ -136,7 +136,7 @@ def get_output_feature_directions(response, profile, preference, options=None, f
     :param to_value: value of 'TO_ID' field
     :type to_value: any
 
-    :returns: Ouput feature with attributes and geometry set.
+    :returns: Output feature with attributes and geometry set.
     :rtype: QgsFeature
     """
     response_mini = response['features'][0]

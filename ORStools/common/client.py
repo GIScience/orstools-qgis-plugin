@@ -53,7 +53,7 @@ class Client(QObject):
         :param provider: A openrouteservice provider from config.yml
         :type provider: dict
 
-        :param retry_timeout: Timeout across multiple retriable requests, in
+        :param retry_timeout: Timeout across multiple retryable requests, in
             seconds.
         :type retry_timeout: int
         """
@@ -62,7 +62,7 @@ class Client(QObject):
         self.key = provider['key']
         self.base_url = provider['base_url']
         self.ENV_VARS = provider.get('ENV_VARS')
-        
+
         # self.session = requests.Session()
         self.nam = networkaccessmanager.NetworkAccessManager(debug=False)
 
@@ -78,7 +78,7 @@ class Client(QObject):
         self.warnings = None
 
     overQueryLimit = pyqtSignal()
-    def request(self, 
+    def request(self,
                 url,
                 params,
                 first_request_time=None,
@@ -96,6 +96,9 @@ class Client(QObject):
         :param first_request_time: The time of the first request (None if no
             retries have occurred).
         :type first_request_time: datetime.datetime
+
+        :param retry_counter: Amount of retries with increasing timeframe before raising a timeout exception
+        :type retry_counter: int
 
         :param post_json: Parameters for POST endpoints
         :type post_json: dict
@@ -130,7 +133,7 @@ class Client(QObject):
         # Default to the client-level self.requests_kwargs, with method-level
         # requests_kwargs arg overriding.
         # final_requests_kwargs = self.requests_kwargs
-        
+
         # Determine GET/POST
         # requests_method = self.session.get
         requests_method = 'GET'
@@ -172,7 +175,7 @@ class Client(QObject):
 
             except exceptions.OverQueryLimit as e:
 
-                # Let the instances know smth happened
+                # Let the instances know something happened
                 self.overQueryLimit.emit()
                 logger.log("{}: {}".format(e.__class__.__name__, str(e)), 1)
 
@@ -248,10 +251,10 @@ class Client(QObject):
         :returns: encoded URL
         :rtype: string
         """
-        
+
         if type(params) is dict:
             params = sorted(dict(**params).items())
-        
+
         # Only auto-add API key when using ORS. If own instance, API key must
         # be explicitly added to params
         # if self.key:

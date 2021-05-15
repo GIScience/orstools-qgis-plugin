@@ -58,7 +58,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.reset()
 
     def reset(self):
-        """reset rubberband and captured points."""
+        """reset rubber band and captured points."""
 
         self.points = []
         self.rubberBand.reset(QgsWkbTypes.LineGeometry)
@@ -73,7 +73,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.showLine()
 
     def showLine(self):
-        """Builds rubberband from all points and adds it to the map canvas."""
+        """Builds rubber band from all points and adds it to the map canvas."""
         self.rubberBand.reset(QgsWkbTypes.LineGeometry)
         for point in self.points:
             if point == self.points[-1]:
@@ -83,7 +83,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     doubleClicked = pyqtSignal()
     def canvasDoubleClickEvent(self, e):
-        """Ends line drawing and deletes rubberband and markers from map canvas."""
+        """Ends line drawing and deletes rubber band and markers from map canvas."""
         self.doubleClicked.emit()
         self.canvas.scene().removeItem(self.rubberBand)
 

@@ -34,7 +34,7 @@ from datetime import datetime
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
-    """Load OSMtools class from file OS;tools.
+    """Load ORStools class
 
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface

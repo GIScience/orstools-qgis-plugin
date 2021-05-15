@@ -37,7 +37,7 @@ def transformToWGS(old_crs):
     """
     Returns a transformer to WGS84
 
-    :param old_crs: CRS to transfrom from
+    :param old_crs: CRS to transform from
     :type old_crs: QgsCoordinateReferenceSystem
 
     :returns: transformer to use in various modules.
