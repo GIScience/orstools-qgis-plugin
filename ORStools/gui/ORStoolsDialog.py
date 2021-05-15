@@ -79,19 +79,19 @@ def on_help_click():
 def on_about_click(parent):
     """Slot for click event of About button/menu entry."""
 
-    info = '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {0}">openrouteservice</a> routing functionalities.<br><br>' \
-           '<center>' \
-           '<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/></a> <br><br>' \
-           '</center>' \
-           'Author: HeiGIT gGmbH<br>' \
-           'Email: <a href="mailto:Openrouteservice <{1}>">{1}</a><br>' \
-           'Web: <a href="{2}">{2}</a><br>' \
-           'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">github.com/GIScience/orstools-qgis-plugin</a><br>' \
-           'Version: {3}'.format(DEFAULT_COLOR, __email__, __web__, __version__)
+    info = f'<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {DEFAULT_COLOR}">openrouteservice</a> routing functionalities.<br><br>' \
+           f'<center>' \
+           f'<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/></a> <br><br>' \
+           f'</center>' \
+           f'Author: HeiGIT gGmbH<br>' \
+           f'Email: <a href="mailto:Openrouteservice <{__email__}>">{__email__}</a><br>' \
+           f'Web: <a href="{__web__}">{__web__}</a><br>' \
+           f'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">github.com/GIScience/orstools-qgis-plugin</a><br>' \
+           f'Version: {__version__}'
 
     QMessageBox.information(
         parent,
-        'About {}'.format(PLUGIN_NAME),
+        f'About {PLUGIN_NAME}',
         info
     )
 
@@ -329,24 +329,20 @@ Please add polygons to the layer or uncheck avoid polygons.
         except (exceptions.ApiError,
                 exceptions.InvalidKey,
                 exceptions.GenericServerError) as e:
-            msg = (e.__class__.__name__,
-                   str(e))
 
-            logger.log("{}: {}".format(*msg), 2)
-            clnt_msg += "<b>{}</b>: ({})<br>".format(*msg)
+            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
+            clnt_msg += f"<b>{e.__class__.__name__}</b>: ({str(e)})<br>"
             raise
 
         except Exception as e:
-            msg = [e.__class__.__name__ ,
-                   str(e)]
-            logger.log("{}: {}".format(*msg), 2)
-            clnt_msg += "<b>{}</b>: {}<br>".format(*msg)
+            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
+            clnt_msg += f"<b>{e.__class__.__name__}</b>: {str(e)}<br>"
             raise
 
         finally:
             # Set URL in debug window
             if params:
-                clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}'.format(clnt.url, json.dumps(params, indent=2))
+                clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
             self.dlg.debug_text.setHtml(clnt_msg)
 
 
@@ -398,12 +394,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
 
         # Batch
-        self.batch_routing_points.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_2_layers'.format(PLUGIN_NAME)))
-        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_1_layer'.format(PLUGIN_NAME)))
-        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_polylines_layer'.format(PLUGIN_NAME)))
-        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_point'.format(PLUGIN_NAME)))
-        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_layer'.format(PLUGIN_NAME)))
-        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog('{}:matrix_from_layers'.format(PLUGIN_NAME)))
+        self.batch_routing_points.clicked.connect(lambda: processing.execAlgorithmDialog(
+            f'{PLUGIN_NAME}:directions_from_points_2_layers'))
+        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog(
+            f'{PLUGIN_NAME}:directions_from_points_1_layer'))
+        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog(
+            f'{PLUGIN_NAME}:directions_from_polylines_layer'))
+        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog(
+            f'{PLUGIN_NAME}:isochrones_from_point'))
+        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog(
+            f'{PLUGIN_NAME}:isochrones_from_layer'))
+        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog(f'{PLUGIN_NAME}:matrix_from_layers'))
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
@@ -468,7 +469,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         transformer = transform.transformToWGS(self.map_crs)
         point_wgs = transformer.transform(point)
-        self.routing_fromline_list.addItem("Point {0}: {1:.6f}, {2:.6f}".format(idx, point_wgs.x(), point_wgs.y()))
+        self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
         annotation = self._linetool_annotate_point(point, idx)
         self.annotations.append(annotation)

@@ -65,4 +65,4 @@ __email__ = METADATA['general']['email']
 __web__ = METADATA['general']['homepage']
 __help__ = METADATA['general']['help']
 __date__ = today.strftime('%Y-%m-%d')
-__copyright__ = '(C) {} by {}'.format(today.year, __author__)
+__copyright__ = f'(C) {today.year} by {__author__}'

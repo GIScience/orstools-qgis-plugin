@@ -250,9 +250,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         except (exceptions.ApiError,
                 exceptions.InvalidKey,
                 exceptions.GenericServerError) as e:
-            msg = "{}: {}".format(
-                e.__class__.__name__,
-                str(e))
+            msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 

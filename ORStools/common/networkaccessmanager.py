@@ -176,7 +176,7 @@ class NetworkAccessManager(object):
         Make a network request by calling QgsNetworkAccessManager.
         redirections argument is ignored and is here only for httplib2 compatibility.
         """
-        self.msg_log(u'http_call request: {0}'.format(url))
+        self.msg_log(f'http_call request: {url}')
 
         self.blocking_mode = blocking
         req = QNetworkRequest()
@@ -199,7 +199,7 @@ class NetworkAccessManager(object):
                 if k and v:
                     req.setRawHeader(k.encode(), v.encode())
         if self.authid:
-            self.msg_log("Update request w/ authid: {0}".format(self.authid))
+            self.msg_log(f"Update request w/ authid: {self.authid}")
             self.auth_manager().updateNetworkRequest(req, self.authid)
         if self.reply is not None and self.reply.isRunning():
             self.reply.close()
@@ -225,7 +225,7 @@ class NetworkAccessManager(object):
         else:
             self.reply = func(req)
         if self.authid:
-            self.msg_log("Update reply w/ authid: {0}".format(self.authid))
+            self.msg_log(f"Update reply w/ authid: {self.authid}")
             self.auth_manager().updateNetworkReply(self.reply, self.authid)
 
         # necessary to trap local timout manage by QgsNetworkAccessManager
@@ -296,10 +296,9 @@ class NetworkAccessManager(object):
             # check if self.http_call_result.status_code is available (client abort
             # does not produce http.status_code)
             if self.http_call_result.status_code:
-                msg = "Network error #{0}: {1}".format(
-                    self.http_call_result.status_code, errString)
+                msg = f"Network error #{self.http_call_result.status_code}: {errString}"
             else:
-                msg = "Network error: {0}".format(errString)
+                msg = f"Network error: {errString}"
 
             self.http_call_result.reason = msg
             self.http_call_result.text = str(self.reply.readAll().data(), encoding='utf-8')
@@ -333,8 +332,7 @@ class NetworkAccessManager(object):
                 if redirectionUrl.isRelative():
                     redirectionUrl = self.reply.url().resolved(redirectionUrl)
 
-                msg = "Redirected from '{}' to '{}'".format(
-                    self.reply.url().toString(), redirectionUrl.toString())
+                msg = f"Redirected from '{self.reply.url().toString()}' to '{redirectionUrl.toString()}'"
                 self.msg_log(msg)
 
                 self.reply.deleteLater()
@@ -343,7 +341,7 @@ class NetworkAccessManager(object):
 
             # really end request
             else:
-                msg = "Network success #{0}".format(self.reply.error())
+                msg = f"Network success #{self.reply.error()}"
                 self.http_call_result.reason = msg
                 self.msg_log(msg)
 
