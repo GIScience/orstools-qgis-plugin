@@ -175,7 +175,7 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
     def createInstance(self):
         return ORSdirectionsPointsLayersAlgo()
 
-    # TODO: preprocess parameters to options the range clenaup below:
+    # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
 
     def processAlgorithm(self, parameters, context, feedback):

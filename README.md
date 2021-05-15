@@ -46,7 +46,7 @@ Configuration takes place either from the Web menu entry *ORS Tools* ► *Provid
 
 ### Prerequisites
 
-QGIS versin: min. **v3.0**
+QGIS version: min. **v3.0**
 
 API key: https://openrouteservice.org/sign-up/
 

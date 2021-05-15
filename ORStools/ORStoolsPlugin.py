@@ -35,7 +35,7 @@ from .proc import provider
 
 class ORStools():
     """QGIS Plugin Implementation."""
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
+    # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
 
     def __init__(self, iface):
         """Constructor.
@@ -53,7 +53,7 @@ class ORStools():
 
         QgsApplication.processingRegistry().addProvider(self.provider)
         self.dialog.initGui()
-        
+
     def unload(self):
         """remove menu entry and toolbar icons"""
         QgsApplication.processingRegistry().removeProvider(self.provider)

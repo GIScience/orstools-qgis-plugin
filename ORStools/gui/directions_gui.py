@@ -67,7 +67,7 @@ def _get_avoid_options(avoid_boxes):
     """
     Extracts checked boxes in Advanced avoid parameters.
 
-    :param avoid_boxes: all checkboxes in advanced paramter dialog.
+    :param avoid_boxes: all checkboxes in advanced parameter dialog.
     :type avoid_boxes: list of QCheckBox
 
     :returns: avoid_features parameter

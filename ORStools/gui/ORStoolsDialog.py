@@ -163,7 +163,7 @@ class ORStoolsDialogMain:
         self.menu.setIcon(icon_plugin)
         self.menu.addActions(self.actions)
 
-        # Add menu to Web menu and make sure it exsists and add icon to toolbar
+        # Add menu to Web menu and make sure it exists and add icon to toolbar
         self.iface.addPluginToWebMenu("_tmp", self.actions[2])
         self.iface.webMenu().addMenu(self.menu)
         self.iface.removePluginWebMenu("_tmp", self.actions[2])
@@ -228,9 +228,10 @@ class ORStoolsDialogMain:
 
         # Associate annotations with map layer, so they get deleted when layer is deleted
         for annotation in self.dlg.annotations:
-            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer, you can change order after optimization
+            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
+            # , you can change order after optimization
             # Then in theory, when the layer is remove, the annotation is removed as well
-            # Doesng't work though, the annotations are still there when project is re-opened
+            # Doesn't work though, the annotations are still there when project is re-opened
             # annotation.setMapLayer(layer_out)
             self.project.annotationManager().removeAnnotation(annotation)
         self.dlg.annotations = []
