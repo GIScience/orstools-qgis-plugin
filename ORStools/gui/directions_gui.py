@@ -7,13 +7,13 @@
                               -------------------
         begin                : 2017-02-01
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2021 by HeiGIT gGmbH
+        email                : support@openrouteservice.heigit.org
  ***************************************************************************/
 
- This plugin provides access to the various APIs from OpenRouteService
+ This plugin provides access to openrouteservice API functionalities
  (https://openrouteservice.org), developed and
- maintained by GIScience team at University of Heidelberg, Germany. By using
+ maintained by the openrouteservice team of HeiGIT gGmbH, Germany. By using
  this plugin you agree to the ORS terms of service
  (https://openrouteservice.org/terms-of-service/).
 
