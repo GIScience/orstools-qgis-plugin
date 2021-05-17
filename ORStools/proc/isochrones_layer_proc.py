@@ -70,7 +70,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
     # Save some important references
     isochrones = isochrones_core.Isochrones()
     dest_id = None
-    crs_out = QgsCoordinateReferenceSystem(4326)
+    crs_out = QgsCoordinateReferenceSystem.fromEpsgId(4326)
     # difference = None
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):

@@ -208,7 +208,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
                                                                           from_name=source_field_name,
                                                                           line=True),
                                                source.wkbType(),
-                                               QgsCoordinateReferenceSystem(4326))
+                                               QgsCoordinateReferenceSystem.fromEpsgId(4326))
         count = source.featureCount()
 
         for num, (line, field_value) in enumerate(self._get_sorted_lines(source, source_field_name)):

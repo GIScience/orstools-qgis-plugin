@@ -208,7 +208,7 @@ class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):
                                                                           from_name=source_field_name,
                                                                           line=True),
                                                QgsWkbTypes.LineString,
-                                               QgsCoordinateReferenceSystem(4326))
+                                               QgsCoordinateReferenceSystem.fromEpsgId(4326))
         count = source.featureCount()
 
         input_points = list()
