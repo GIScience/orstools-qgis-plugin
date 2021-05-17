@@ -256,7 +256,7 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                directions_core.get_fields(source_field.type(), destination_field.type()),
                                                QgsWkbTypes.LineString,
-                                               QgsCoordinateReferenceSystem(4326))
+                                               QgsCoordinateReferenceSystem.fromEpsgId(4326))
 
         counter = 0
         for coordinates, values in directions_core.get_request_point_features(route_dict, mode):

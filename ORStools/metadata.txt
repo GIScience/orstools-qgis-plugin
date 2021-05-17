@@ -1,6 +1,6 @@
 [general]
 name=ORS Tools
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
 version=1.3.0
