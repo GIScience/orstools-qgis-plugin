@@ -239,7 +239,7 @@ class NetworkAccessManager(object):
         # block if blocking mode otherwise return immediately
         # it's up to the caller to manage listeners in case of no blocking mode
         if not self.blocking_mode:
-            return (None, None)
+            return None, None
 
         # Call and block
         self.el = QEventLoop()
@@ -261,7 +261,7 @@ class NetworkAccessManager(object):
             else:
                 raise self.exception_class(self.http_call_result.reason)
 
-        return (self.http_call_result, self.http_call_result.content)
+        return self.http_call_result, self.http_call_result.content
 
     def downloadProgress(self, bytesReceived, bytesTotal):
         """Keep track of the download progress"""
@@ -391,6 +391,6 @@ class NetworkAccessManager(object):
         """
         Handle request to cancel HTTP call
         """
-        if (self.reply and self.reply.isRunning()):
+        if self.reply and self.reply.isRunning():
             self.on_abort = True
             self.reply.abort()

@@ -27,7 +27,6 @@
  ***************************************************************************/
 """
 
-
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
 
@@ -41,9 +40,12 @@ from qgis.core import (QgsPointXY,
                        QgsRendererCategory,
                        QgsCategorizedSymbolRenderer,
                        QgsProcessingUtils)
-import processing
 
-class Isochrones():
+
+# import processing
+
+
+class Isochrones:
     """convenience class to build isochrones"""
 
     def __init__(self):

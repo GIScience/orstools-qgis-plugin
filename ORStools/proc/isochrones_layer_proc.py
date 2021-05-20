@@ -286,5 +286,5 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
         for feat in sorted(layer.getFeatures(), key=lambda f: f.id()):
             x_point = xformer.transform(feat.geometry().asPoint())
 
-            yield ([[round(x_point.x(), 6), round(x_point.y(), 6)]], feat)
+            yield [[round(x_point.x(), 6), round(x_point.y(), 6)]], feat
 
