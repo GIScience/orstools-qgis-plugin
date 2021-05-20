@@ -75,7 +75,7 @@ def get_request_point_features(route_dict, row_by_row):
         coordinates = [[round(x, 6), round(y, 6)] for x, y in properties[0]]
         values = properties[1]
 
-        yield (coordinates, values)
+        yield coordinates, values
 
 
 def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FROM_ID", to_name="TO_ID", line=False):

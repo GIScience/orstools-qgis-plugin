@@ -33,7 +33,7 @@ from .gui import ORStoolsDialog
 from .proc import provider
 
 
-class ORStools():
+class ORStools:
     """QGIS Plugin Implementation."""
     # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
 
