@@ -69,7 +69,8 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
     crs_out = QgsCoordinateReferenceSystem.fromEpsgId(4326)
     # difference = None
 
-    def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
+    # noinspection PyUnusedLocal
+    def initAlgorithm(self, configuration):
 
         providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         self.addParameter(
@@ -210,6 +211,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
 
         return {self.OUT: self.dest_id}
 
+    # noinspection PyUnusedLocal
     def postProcessAlgorithm(self, context, feedback):
         """Style polygon layer in post-processing step."""
         processed_layer= QgsProcessingUtils.mapLayerFromString(self.dest_id, context)

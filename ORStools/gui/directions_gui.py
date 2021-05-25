@@ -122,7 +122,6 @@ class Directions:
             return self._get_optimize_parameters()
 
         # API parameters
-        route_mode = self.dlg.routing_travel_combo.currentText()
         route_pref = self.dlg.routing_preference_combo.currentText()
 
         params = {

@@ -63,7 +63,8 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
     IN_MODE = "INPUT_MODE"
     OUT = 'OUTPUT'
 
-    def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
+    # noinspection PyUnusedLocal
+    def initAlgorithm(self, configuration):
 
         providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         self.addParameter(
@@ -191,12 +192,6 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
             context
         )
 
-        source_field_idx = self.parameterAsEnum(
-            parameters,
-            self.IN_FIELD,
-            context
-        )
-
         source_field_name = self.parameterAsString(
             parameters,
             self.IN_FIELD,
@@ -227,7 +222,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
                         from_value=field_value
                     ))
                 else:
-                    params = self._get_params_directions(line, profile, preference)
+                    params = self._get_params_directions(line, preference)
                     response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_feature_directions(
@@ -278,15 +273,12 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
             yield line, field_value
 
     @staticmethod
-    def _get_params_directions(line, profile, preference):
+    def _get_params_directions(line, preference):
         """
         Build parameters for optimization endpoint
 
         :param line: individual polyline points
         :type line: list of QgsPointXY
-
-        :param profile: transport profile to be used
-        :type profile: str
 
         :param preference: routing preference, shortest/fastest/recommended
         :type preference: str

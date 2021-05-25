@@ -108,7 +108,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             box_remove = self.providers.findChild(QgsCollapsibleGroupBox, provider)
             self.gridLayout.removeWidget(box_remove)
             box_remove.deleteLater()
-            box_remove = None
 
             # delete from in-memory self.temp_config
             provider_id = providers.index(provider)

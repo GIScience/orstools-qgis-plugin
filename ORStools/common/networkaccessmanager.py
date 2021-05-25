@@ -171,7 +171,7 @@ class NetworkAccessManager(object):
     def auth_manager(self):
         return QgsApplication.authManager()
 
-    def request(self, url, method="GET", body=None, headers=None, redirections=DEFAULT_MAX_REDIRECTS, connection_type=None, blocking=True):
+    def request(self, url, method="GET", body=None, headers=None, blocking=True):
         """
         Make a network request by calling QgsNetworkAccessManager.
         redirections argument is ignored and is here only for httplib2 compatibility.
@@ -268,6 +268,7 @@ class NetworkAccessManager(object):
         #self.msg_log("downloadProgress %s of %s ..." % (bytesReceived, bytesTotal))
         pass
 
+    # noinspection PyUnusedLocal
     def requestTimedOut(self, reply):
         """Trap the timeout. In Async mode requestTimedOut is called after replyFinished"""
         # adapt http_call_result basing on receiving qgs timer timout signal

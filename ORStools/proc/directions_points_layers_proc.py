@@ -63,7 +63,8 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
     IN_MODE = "INPUT_MODE"
     OUT = 'OUTPUT'
 
-    def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
+    # noinspection PyUnusedLocal
+    def initAlgorithm(self, configuration):
 
         providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         self.addParameter(
