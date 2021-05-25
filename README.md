@@ -32,13 +32,13 @@ Use QGIS to generate input for **routing**, **isochrones** and **matrix calculat
 
 It offers either a GUI in the Web menu and toolbar of QGIS to interactively use the API's from the map canvas.
 
-For batch operations you can find a ORS toolbox in the Processing toolbox.
+For batch operations you can find an ORS toolbox in the Processing toolbox.
 
 ### Customization
 
 You'll have to get an API key first: <https://openrouteservice.org/sign-up>.
 
-Additionally you can register your other providers, e.g. if you're hosting a custom ORS backend.
+Additionally, you can register your other providers, e.g. if you're hosting a custom ORS backend.
 
 Configuration takes place either from the Web menu entry *ORS Tools* ► *Provider settings*. Or from *Config* button in the GUI.
 
@@ -53,7 +53,7 @@ API key: https://openrouteservice.org/sign-up/
 ### Installation
 
 Either from QGIS plugin repository or manually:
-  - [Download](https://github.com/GIScience/orstools-qgis-plugin/archive/master.zip) ZIP file from Github
+  - [Download](https://github.com/GIScience/orstools-qgis-plugin/archive/master.zip) ZIP file from GitHub
   - Unzip folder contents and copy `ORStools` folder to:
     - Linux: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins`
     - Windows: `C:\Users\USER\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins`
