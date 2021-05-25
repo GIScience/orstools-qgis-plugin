@@ -82,6 +82,8 @@ class LineTool(QgsMapToolEmitPoint):
         self.rubberBand.show()
 
     doubleClicked = pyqtSignal()
+
+    # noinspection PyUnusedLocal
     def canvasDoubleClickEvent(self, e):
         """Ends line drawing and deletes rubber band and markers from map canvas."""
         self.doubleClicked.emit()

@@ -64,7 +64,8 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
     IN_PROFILE = "INPUT_PROFILE"
     OUT = 'OUTPUT'
 
-    def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
+    # noinspection PyUnusedLocal
+    def initAlgorithm(self, configuration):
 
         providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         self.addParameter(

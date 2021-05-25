@@ -73,7 +73,8 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
     crs_out = QgsCoordinateReferenceSystem.fromEpsgId(4326)
     # difference = None
 
-    def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
+    # noinspection PyUnusedLocal
+    def initAlgorithm(self, configuration):
 
         providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         self.addParameter(
@@ -178,7 +179,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
         return ORSisochronesLayerAlgo()
 
     # TODO: preprocess parameters to options the range cleanup below:
-    # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
+    # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.prepareAlgorithm
 
     def processAlgorithm(self, parameters, context, feedback):
         # Init ORS client
@@ -264,6 +265,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
 
         return {self.OUT: self.dest_id}
 
+    # noinspection PyUnusedLocal
     def postProcessAlgorithm(self, context, feedback):
         """Style polygon layer in post-processing step."""
         # processed_layer = self.isochrones.calculate_difference(self.dest_id, context)
