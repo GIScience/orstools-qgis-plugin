@@ -103,6 +103,10 @@ class Client(QObject):
         :param post_json: Parameters for POST endpoints
         :type post_json: dict
 
+        :param retry_counter: Duration the requests will be retried for before
+            raising a timeout exception.
+        :type retry_counter: int
+
         :raises ORStools.utils.exceptions.ApiError: when the API returns an error.
 
         :returns: openrouteservice response body
