@@ -27,38 +27,35 @@
  ***************************************************************************/
 """
 
-import os
 import json
+import os
+import processing
 import webbrowser
+from qgis.core import (QgsProject,
+                       QgsVectorLayer,
+                       QgsTextAnnotation,
+                       QgsMapLayerProxyModel)
+from qgis.gui import QgsMapCanvasAnnotationItem
 
+from PyQt5.QtCore import QSizeF, QPointF
+from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import (QAction,
                              QDialog,
                              QApplication,
                              QMenu,
                              QMessageBox,
                              QDialogButtonBox)
-from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtCore import QSizeF, QPointF
-
-from qgis.core import (QgsProject,
-                       QgsVectorLayer,
-                       QgsTextAnnotation,
-                       QgsMapLayerProxyModel)
-from qgis.gui import QgsMapCanvasAnnotationItem
-import processing
-
-from . import resources_rc
 
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
-from ORStools.utils import exceptions, maptools, logger, configmanager, convert, transform
 from ORStools.common import (client,
                              directions_core,
                              PROFILES,
                              PREFERENCES, )
 from ORStools.gui import directions_gui
-
-from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
+from ORStools.utils import exceptions, maptools, logger, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
+from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
+from . import resources_rc
 
 
 def on_config_click(parent):
@@ -114,6 +111,7 @@ class ORStoolsDialogMain:
         self.menu = None
         self.actions = None
 
+    # noinspection PyUnresolvedReferences
     def initGui(self):
         """Called when plugin is activated (on QGIS startup or when activated in Plugin Manager)."""
 
@@ -478,9 +476,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     def _on_linetool_map_doubleclick(self):
         """
         Populate line list widget with coordinates, end line drawing and show dialog again.
-
-        :param points_num: number of points drawn so far.
-        :type points_num: int
         """
 
         self.line_tool.pointDrawn.disconnect()

@@ -27,14 +27,14 @@
  ***************************************************************************/
 """
 
+from qgis.gui import QgsCollapsibleGroupBox
+
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QMetaObject
 from PyQt5.QtWidgets import QDialog, QInputDialog
 
-from qgis.gui import QgsCollapsibleGroupBox
-
-from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
 from ORStools.utils import configmanager
+from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
 
 
 class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):

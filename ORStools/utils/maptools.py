@@ -27,12 +27,12 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QColor
-
 from qgis.core import (QgsWkbTypes)
 from qgis.gui import (QgsMapToolEmitPoint,
                       QgsRubberBand)
+
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QColor
 
 from ORStools import DEFAULT_COLOR
 
@@ -69,6 +69,7 @@ class LineTool(QgsMapToolEmitPoint):
         new_point = self.toMapCoordinates(e.pos())
         self.points.append(new_point)
 
+        # noinspection PyUnresolvedReferences
         self.pointDrawn.emit(new_point, self.points.index(new_point))
         self.showLine()
 
@@ -86,6 +87,7 @@ class LineTool(QgsMapToolEmitPoint):
     # noinspection PyUnusedLocal
     def canvasDoubleClickEvent(self, e):
         """Ends line drawing and deletes rubber band and markers from map canvas."""
+        # noinspection PyUnresolvedReferences
         self.doubleClicked.emit()
         self.canvas.scene().removeItem(self.rubberBand)
 

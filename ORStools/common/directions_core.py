@@ -28,14 +28,14 @@
 """
 
 from itertools import product
-from PyQt5.QtCore import QVariant
-
 from qgis.core import (QgsPoint,
                        QgsPointXY,
                        QgsGeometry,
                        QgsFeature,
                        QgsFields,
                        QgsField)
+
+from PyQt5.QtCore import QVariant
 
 from ORStools.utils import convert
 

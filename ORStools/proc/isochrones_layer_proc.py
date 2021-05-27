@@ -29,9 +29,6 @@
 
 import os.path
 from copy import deepcopy
-
-from PyQt5.QtGui import QIcon
-
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsField,
@@ -45,10 +42,13 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink
                        )
-from . import HELP_DIR
+
+from PyQt5.QtGui import QIcon
+
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.common import client, isochrones_core, PROFILES, DIMENSIONS
-from ORStools.utils import convert, transform, exceptions, configmanager, logger
+from ORStools.utils import transform, exceptions, configmanager, logger
+from . import HELP_DIR
 
 
 class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
