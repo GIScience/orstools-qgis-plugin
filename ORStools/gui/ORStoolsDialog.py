@@ -76,14 +76,18 @@ def on_help_click():
 def on_about_click(parent):
     """Slot for click event of About button/menu entry."""
 
-    info = f'<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org" style="color: {DEFAULT_COLOR}">openrouteservice</a> routing functionalities.<br><br>' \
+    info = f'<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org"' \
+           f' style="color: {DEFAULT_COLOR}">openrouteservice</a> routing functionalities.' \
+           f'<br><br>' \
            f'<center>' \
-           f'<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/></a> <br><br>' \
+           f'<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/>' \
+           f'</a><br><br>' \
            f'</center>' \
            f'Author: HeiGIT gGmbH<br>' \
            f'Email: <a href="mailto:Openrouteservice <{__email__}>">{__email__}</a><br>' \
            f'Web: <a href="{__web__}">{__web__}</a><br>' \
-           f'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">github.com/GIScience/orstools-qgis-plugin</a><br>' \
+           f'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">' \
+           f'github.com/GIScience/orstools-qgis-plugin</a><br>' \
            f'Version: {__version__}'
 
     QMessageBox.information(
@@ -258,9 +262,9 @@ class ORStoolsDialogMain:
                 """
                 Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
                 
-                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br>
-                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the settings symbol in the main ORS Tools GUI, next to the provider dropdown.
-                """
+                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""
             )
             return
 
@@ -379,7 +383,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.global_buttons.button(QDialogButtonBox.Ok).setText('Apply')
         self.global_buttons.button(QDialogButtonBox.Cancel).setText('Close')
 
-        #### Set up signals/slots ####
+        # Set up signals/slots
 
         # Config/Help dialogs
         self.provider_config.clicked.connect(lambda: on_config_click(self))
