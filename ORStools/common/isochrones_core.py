@@ -27,9 +27,6 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
-
 from qgis.core import (QgsPointXY,
                        QgsFeature,
                        QgsField,
@@ -38,8 +35,10 @@ from qgis.core import (QgsPointXY,
                        QgsSymbol,
                        QgsSimpleFillSymbolLayer,
                        QgsRendererCategory,
-                       QgsCategorizedSymbolRenderer,
-                       QgsProcessingUtils)
+                       QgsCategorizedSymbolRenderer)
+
+from PyQt5.QtCore import QVariant
+from PyQt5.QtGui import QColor
 
 
 # import processing

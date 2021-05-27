@@ -26,10 +26,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-import yaml
 import os
 
-from PyQt5.QtWidgets import QMessageBox
+import yaml
 
 from ORStools import CONFIG_PATH
 

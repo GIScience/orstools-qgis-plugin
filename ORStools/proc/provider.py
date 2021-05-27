@@ -27,16 +27,17 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
 
+from PyQt5.QtGui import QIcon
+
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
+from .directions_lines_proc import ORSdirectionsLinesAlgo
+from .directions_points_layer_proc import ORSdirectionsPointsLayerAlgo
+from .directions_points_layers_proc import ORSdirectionsPointsLayersAlgo
 from .isochrones_layer_proc import ORSisochronesLayerAlgo
 from .isochrones_point_proc import ORSisochronesPointAlgo
 from .matrix_proc import ORSmatrixAlgo
-from .directions_points_layers_proc import ORSdirectionsPointsLayersAlgo
-from .directions_points_layer_proc import ORSdirectionsPointsLayerAlgo
-from .directions_lines_proc import ORSdirectionsLinesAlgo
 
 
 class ORStoolsProvider(QgsProcessingProvider):

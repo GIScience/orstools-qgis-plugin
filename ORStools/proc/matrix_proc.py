@@ -28,10 +28,6 @@
 """
 
 import os.path
-
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QVariant
-
 from qgis.core import (QgsWkbTypes,
                        QgsFeature,
                        QgsProcessing,
@@ -44,10 +40,14 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
                        )
-from . import HELP_DIR
+
+from PyQt5.QtCore import QVariant
+from PyQt5.QtGui import QIcon
+
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.common import client, PROFILES
 from ORStools.utils import transform, exceptions, logger, configmanager
+from . import HELP_DIR
 
 
 class ORSmatrixAlgo(QgsProcessingAlgorithm):

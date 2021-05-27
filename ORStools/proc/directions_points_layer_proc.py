@@ -28,9 +28,6 @@
 """
 
 import os.path
-
-from PyQt5.QtGui import QIcon
-
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsProcessing,
@@ -42,10 +39,13 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterBoolean,
                        QgsPointXY,
                        )
-from . import HELP_DIR
+
+from PyQt5.QtGui import QIcon
+
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.common import client, directions_core, PROFILES, PREFERENCES
-from ORStools.utils import configmanager, transform, exceptions,logger, convert
+from ORStools.utils import configmanager, transform, exceptions, logger
+from . import HELP_DIR
 
 
 class ORSdirectionsPointsLayerAlgo(QgsProcessingAlgorithm):

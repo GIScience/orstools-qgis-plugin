@@ -27,14 +27,14 @@
  ***************************************************************************/
 """
 
-from datetime import datetime, timedelta
-import requests
-import time
-from urllib.parse import urlencode
-import random
 import json
+import random
+import time
+from datetime import datetime, timedelta
+from urllib.parse import urlencode
 
 from PyQt5.QtCore import QObject, pyqtSignal
+from requests.utils import unquote_unreserved
 
 from ORStools import __version__
 from ORStools.common import networkaccessmanager
@@ -169,6 +169,7 @@ class Client(QObject):
             except exceptions.OverQueryLimit as e:
 
                 # Let the instances know something happened
+                # noinspection PyUnresolvedReferences
                 self.overQueryLimit.emit()
                 logger.log(f"{e.__class__.__name__}: {str(e)}", 1)
 
@@ -249,4 +250,4 @@ class Client(QObject):
         # if self.key:
         #     params.append(("api_key", self.key))
 
-        return path + "?" + requests.utils.unquote_unreserved(urlencode(params))
+        return path + "?" + unquote_unreserved(urlencode(params))

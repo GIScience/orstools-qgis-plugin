@@ -28,24 +28,22 @@
 """
 
 import os.path
-from copy import deepcopy
-
-from PyQt5.QtGui import QIcon
-
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsProcessingUtils,
                        QgsProcessingAlgorithm,
-                       QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterPoint,
                        )
-from . import HELP_DIR
+
+from PyQt5.QtGui import QIcon
+
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.common import client, isochrones_core, PROFILES, DIMENSIONS
-from ORStools.utils import convert, transform, exceptions, configmanager, logger
+from ORStools.utils import exceptions, configmanager, logger
+from . import HELP_DIR
 
 
 class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
