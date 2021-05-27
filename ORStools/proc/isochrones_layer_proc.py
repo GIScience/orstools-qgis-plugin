@@ -213,7 +213,7 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
 
         # LookupField will return -1 if the name cannot be found.
         # Try the first field in this case.
-        if id_field_id == -1: 
+        if id_field_id == -1:
             id_field_id = 0
 
         # Populate iso_layer instance with parameters

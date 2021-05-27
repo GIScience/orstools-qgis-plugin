@@ -60,7 +60,8 @@ class Isochrones:
 
     def set_parameters(self, profile, dimension, factor, id_field_type=QVariant.String, id_field_name='ID'):
         """
-        Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know its parameters yet.
+        Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know
+        its parameters yet.
 
         :param profile: Transportation mode being used
         :type profile: str
@@ -116,8 +117,7 @@ class Isochrones:
 
         # Sort features based on the isochrone value, so that longest isochrone
         # is added first. This will plot the isochrones on top of each other.
-        l = lambda x: x['properties']['value']
-        for isochrone in sorted(response['features'], key=l, reverse=True):
+        for isochrone in sorted(response['features'], key=lambda x: x['properties']['value'], reverse=True):
             feat = QgsFeature()
             coordinates = isochrone['geometry']['coordinates']
             iso_value = isochrone['properties']['value']
