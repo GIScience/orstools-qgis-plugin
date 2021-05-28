@@ -47,6 +47,7 @@ RELEASING:
 ### Fixed
 - author information
 - repository link
+- Correct isochrone computation from layer without fields
 
 ### Removed
 - 'cycling-safe' profile
