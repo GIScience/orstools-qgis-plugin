@@ -34,6 +34,7 @@ from PyQt5.QtGui import QIcon
 
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
+                       QgsField,
                        QgsProcessing,
                        QgsProcessingUtils,
                        QgsProcessingException,
@@ -103,7 +104,8 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
                 description="Input layer ID Field (mutually exclusive with Point option)",
-                parentLayerParameterName=self.IN_POINTS
+                parentLayerParameterName=self.IN_POINTS,
+                optional=True
             )
         )
 
@@ -207,13 +209,19 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
         # Get ID field properties
         id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
         id_field_id = source.fields().lookupField(id_field_name)
-        if id_field_name == '':
+
+        # LookupField will return -1 if the name cannot be found.
+        # Try the first field in this case.
+        if id_field_id == -1: 
             id_field_id = 0
-            id_field_name = source.fields().field(id_field_id).name()
-        id_field = source.fields().field(id_field_id)
 
         # Populate iso_layer instance with parameters
-        self.isochrones.set_parameters(profile, dimension, factor, id_field.type(), id_field_name)
+        try:
+            id_field = source.fields().field(id_field_id)
+            id_field_name = source.fields().field(id_field_id).name()
+            self.isochrones.set_parameters(profile, dimension, factor, id_field.type(), id_field_name)
+        except KeyError: # Scratch layers don't neccessarily have fields
+            self.isochrones.set_parameters(profile, dimension, factor)
 
         for properties in self.get_sorted_feature_parameters(source):
             # Stop the algorithm if cancel button has been clicked
@@ -222,7 +230,10 @@ class ORSisochronesLayerAlgo(QgsProcessingAlgorithm):
 
             # Get transformed coordinates and feature
             params['locations'], feat = properties
-            params['id'] = feat[id_field_name] or None
+            try:
+                params['id'] = feat[id_field_name]
+            except KeyError:
+                params['id'] = None
             requests.append(deepcopy(params))
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
