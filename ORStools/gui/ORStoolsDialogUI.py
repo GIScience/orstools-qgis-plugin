@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ORStools/gui/ORStoolsDialogUI.ui'
+# Form implementation generated from reading ui file 'ORStoolsDialogUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_ORStoolsDialogBase(object):
     def setupUi(self, ORStoolsDialogBase):
@@ -194,7 +196,7 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_fromline_list.setObjectName("routing_fromline_list")
         self.gridLayout.addWidget(self.routing_fromline_list, 0, 2, 3, 1)
         self.verticalLayout_7.addWidget(self.widget)
-        self.advances_group = QgsCollapsibleGroupBox(self.qwidget)
+        self.advances_group = gui.QgsCollapsibleGroupBox(self.qwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -209,7 +211,7 @@ class Ui_ORStoolsDialogBase(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.advances_group)
         self.verticalLayout_3.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.optimization_group = QgsCollapsibleGroupBox(self.advances_group)
+        self.optimization_group = gui.QgsCollapsibleGroupBox(self.advances_group)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -229,26 +231,31 @@ class Ui_ORStoolsDialogBase(object):
         self.label_4.setEnabled(False)
         self.label_4.setObjectName("label_4")
         self.gridLayout_2.addWidget(self.label_4, 0, 0, 1, 4)
-        self.optimize_start = QtWidgets.QRadioButton(self.optimization_group)
-        self.optimize_start.setObjectName("optimize_start")
+        self.fix_start = QtWidgets.QRadioButton(self.optimization_group)
+        self.fix_start.setObjectName("fix_start")
         self.optimize_button_group = QtWidgets.QButtonGroup(ORStoolsDialogBase)
         self.optimize_button_group.setObjectName("optimize_button_group")
-        self.optimize_button_group.addButton(self.optimize_start)
-        self.gridLayout_2.addWidget(self.optimize_start, 2, 1, 1, 1)
-        self.optimize_none = QtWidgets.QRadioButton(self.optimization_group)
-        self.optimize_none.setChecked(True)
-        self.optimize_none.setObjectName("optimize_none")
-        self.optimize_button_group.addButton(self.optimize_none)
-        self.gridLayout_2.addWidget(self.optimize_none, 2, 0, 1, 1)
-        self.optimize_end = QtWidgets.QRadioButton(self.optimization_group)
-        self.optimize_end.setObjectName("optimize_end")
-        self.optimize_button_group.addButton(self.optimize_end)
-        self.gridLayout_2.addWidget(self.optimize_end, 2, 2, 1, 1)
+        self.optimize_button_group.addButton(self.fix_start)
+        self.gridLayout_2.addWidget(self.fix_start, 2, 1, 1, 1)
+        self.fix_end = QtWidgets.QRadioButton(self.optimization_group)
+        self.fix_end.setObjectName("fix_end")
+        self.optimize_button_group.addButton(self.fix_end)
+        self.gridLayout_2.addWidget(self.fix_end, 2, 2, 1, 1)
         self.label_5 = QtWidgets.QLabel(self.optimization_group)
         self.label_5.setObjectName("label_5")
         self.gridLayout_2.addWidget(self.label_5, 1, 0, 1, 3, QtCore.Qt.AlignHCenter)
+        self.fix_both = QtWidgets.QRadioButton(self.optimization_group)
+        self.fix_both.setChecked(False)
+        self.fix_both.setObjectName("fix_both")
+        self.optimize_button_group.addButton(self.fix_both)
+        self.gridLayout_2.addWidget(self.fix_both, 2, 3, 1, 1)
+        self.round_trip = QtWidgets.QRadioButton(self.optimization_group)
+        self.round_trip.setChecked(True)
+        self.round_trip.setObjectName("round_trip")
+        self.optimize_button_group.addButton(self.round_trip)
+        self.gridLayout_2.addWidget(self.round_trip, 2, 0, 1, 1)
         self.verticalLayout_3.addWidget(self.optimization_group)
-        self.routing_avoid_tags_group = QgsCollapsibleGroupBox(self.advances_group)
+        self.routing_avoid_tags_group = gui.QgsCollapsibleGroupBox(self.advances_group)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -278,7 +285,7 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_avoid_tracks_3.setObjectName("routing_avoid_tracks_3")
         self.gridLayout_4.addWidget(self.routing_avoid_tracks_3, 2, 0, 1, 1)
         self.verticalLayout_3.addWidget(self.routing_avoid_tags_group)
-        self.routing_avoid_countries_group = QgsCollapsibleGroupBox(self.advances_group)
+        self.routing_avoid_countries_group = gui.QgsCollapsibleGroupBox(self.advances_group)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -292,12 +299,12 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_avoid_countries_group.setObjectName("routing_avoid_countries_group")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.routing_avoid_countries_group)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.countries_text = QgsFilterLineEdit(self.routing_avoid_countries_group)
+        self.countries_text = gui.QgsFilterLineEdit(self.routing_avoid_countries_group)
         self.countries_text.setProperty("qgisRelation", "")
         self.countries_text.setObjectName("countries_text")
         self.verticalLayout_4.addWidget(self.countries_text)
         self.verticalLayout_3.addWidget(self.routing_avoid_countries_group)
-        self.avoidpolygon_group = QgsCollapsibleGroupBox(self.advances_group)
+        self.avoidpolygon_group = gui.QgsCollapsibleGroupBox(self.advances_group)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -311,7 +318,7 @@ class Ui_ORStoolsDialogBase(object):
         self.avoidpolygon_group.setObjectName("avoidpolygon_group")
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.avoidpolygon_group)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.avoidpolygon_dropdown = QgsMapLayerComboBox(self.avoidpolygon_group)
+        self.avoidpolygon_dropdown = gui.QgsMapLayerComboBox(self.avoidpolygon_group)
         self.avoidpolygon_dropdown.setShowCrs(False)
         self.avoidpolygon_dropdown.setObjectName("avoidpolygon_dropdown")
         self.verticalLayout_6.addWidget(self.avoidpolygon_dropdown)
@@ -374,7 +381,7 @@ class Ui_ORStoolsDialogBase(object):
         self.verticalLayout.addItem(spacerItem)
         self.tabWidget.addTab(self.batch_tab, "")
         self.verticalLayout_5.addWidget(self.tabWidget)
-        self.ors_log_group = QgsCollapsibleGroupBox(ORStoolsDialogBase)
+        self.ors_log_group = gui.QgsCollapsibleGroupBox(ORStoolsDialogBase)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -471,13 +478,15 @@ class Ui_ORStoolsDialogBase(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" padding: 10px; -qt-block-indent:0; text-indent:0px ; background-color:#e7f2fa; color: #999999\"><img stype=\"margin: 10px\" src=\":/plugins/ORStools/img/icon_about.png\" width=16 height=16 />  All other configuration will be omitted</p></body></html>"))
-        self.optimize_start.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>First waypoint will be optimized.</p></body></html>"))
-        self.optimize_start.setText(_translate("ORStoolsDialogBase", "Optimize Start"))
-        self.optimize_none.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>First and last waypoints are not optimized.</p></body></html>"))
-        self.optimize_none.setText(_translate("ORStoolsDialogBase", "None"))
-        self.optimize_end.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Last waypoint will be optimized.</p></body></html>"))
-        self.optimize_end.setText(_translate("ORStoolsDialogBase", "Optimize End"))
+        self.fix_start.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>First waypoint won\'t be optimized.</p></body></html>"))
+        self.fix_start.setText(_translate("ORStoolsDialogBase", "Fix Start"))
+        self.fix_end.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Last waypoint won\'t be optimized.</p></body></html>"))
+        self.fix_end.setText(_translate("ORStoolsDialogBase", "Fix End"))
         self.label_5.setText(_translate("ORStoolsDialogBase", "<html><head/><body><p><span style=\" font-weight:600;\">Other Options</span></p></body></html>"))
+        self.fix_both.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>First and last waypoints are not optimized.</p></body></html>"))
+        self.fix_both.setText(_translate("ORStoolsDialogBase", "Fix Both"))
+        self.round_trip.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Return to first waypoint after last waypoint.</p></body></html>"))
+        self.round_trip.setText(_translate("ORStoolsDialogBase", "Round Trip"))
         self.routing_avoid_tags_group.setToolTip(_translate("ORStoolsDialogBase", "Avoid certain road attributes."))
         self.routing_avoid_tags_group.setTitle(_translate("ORStoolsDialogBase", "Avoid tags"))
         self.routing_avoid_highways_3.setText(_translate("ORStoolsDialogBase", "highways"))
@@ -488,9 +497,9 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_avoid_countries_group.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Avoid countries based on alphnumeric ISO 3166 Alpha-2 or Alpha-3 codes.</p><p>Find a list of codes at https://github.com/GIScience/openrouteservice-docs#country-list.</p></body></html>"))
         self.routing_avoid_countries_group.setTitle(_translate("ORStoolsDialogBase", "Avoid countries"))
         self.countries_text.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Avoid countries based on ISO 3166 Alpha-2 or Alpha-3 codes.</p></body></html>"))
-        self.avoidpolygon_group.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Avoid areas by specifying a (Multi-)Polygon layer. </p><p><br/></p><p><span style=\" font-weight:600;\">Note</span>, only the first feature of the layer will be respected.</p></body></html>"))
+        self.avoidpolygon_group.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Avoid areas by specifying a (Multi-)Polygon layer. </p><p>Does <span style=\" font-weight:600;\">not work</span> for memory (scratch) Polygon layers!</p><p><span style=\" font-weight:600;\">Note</span>, only the first feature of the layer will be respected.</p></body></html>"))
         self.avoidpolygon_group.setTitle(_translate("ORStoolsDialogBase", "Avoid polygon(s)"))
-        self.avoidpolygon_dropdown.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Avoid areas by specifying a (Multi-)Polygon layer. </p><p><br/></p><p><span style=\" font-weight:600;\">Note</span>, only the first feature of the layer will be respected.</p></body></html>"))
+        self.avoidpolygon_dropdown.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Avoid areas by specifying a (Multi-)Polygon layer. </p><p>Does <span style=\" font-weight:600;\">not work</span> for memory (scratch) Polygon layers!</p><p><span style=\" font-weight:600;\">Note</span>, only the first feature of the layer will be respected.</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.qwidget), _translate("ORStoolsDialogBase", "Advanced Directions"))
         self.groupBox.setTitle(_translate("ORStoolsDialogBase", "Directions"))
         self.batch_routing_line.setText(_translate("ORStoolsDialogBase", "Polylines Layer"))
@@ -506,8 +515,5 @@ class Ui_ORStoolsDialogBase(object):
         self.debug_text.setPlaceholderText(_translate("ORStoolsDialogBase", "Queries and errors will be printed here."))
         self.help_button.setText(_translate("ORStoolsDialogBase", "  Help"))
         self.about_button.setText(_translate("ORStoolsDialogBase", "About"))
-
-from qgscollapsiblegroupbox import QgsCollapsibleGroupBox
-from qgsfilterlineedit import QgsFilterLineEdit
-from qgsmaplayercombobox import QgsMapLayerComboBox
+from qgis import gui
 from . import resources_rc
