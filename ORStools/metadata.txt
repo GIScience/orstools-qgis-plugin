@@ -12,9 +12,13 @@ about=ORS Tools provides access to most of the functions of openrouteservice.org
 changelog=YYYY/MM/DD v1.X.X
     Added:
     - 'recommended' preference
+    - round trip parameter to TSP-options for Advanced Directions
+    Changed:
+    - parameter names of TSP-options for Advanced Directions
     Fixed:
     - author information
-    - reo link
+    - repository link
+    - Correct isochrone computation from layer without fields
     Removed:
     - 'cycling-safe' profile
     - gis-ops information

@@ -170,17 +170,21 @@ class Directions:
             'options': {'g': True}
         }
 
-        if self.dlg.optimize_end.isChecked():
+        if self.dlg.fix_end.isChecked():
             end = coordinates.pop(-1)
             params['vehicles'][0]['end'] = end
-        elif self.dlg.optimize_start.isChecked():
+        elif self.dlg.fix_start.isChecked():
             start = coordinates.pop(0)
             params['vehicles'][0]['start'] = start
-        elif self.dlg.optimize_none.isChecked():
+        elif self.dlg.fix_both.isChecked():
             start = coordinates.pop(0)
             end = coordinates.pop(-1)
             params['vehicles'][0]['start'] = start
             params['vehicles'][0]['end'] = end
+        elif self.dlg.round_trip.isChecked():
+            start = coordinates.pop(0)
+            params['vehicles'][0]['start'] = start
+            params['vehicles'][0]['end'] = start
 
         for coord in coordinates:
             params['jobs'].append({
