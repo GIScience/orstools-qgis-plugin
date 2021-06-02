@@ -91,7 +91,7 @@
          </font>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ask.openrouteservice.org/c/sdks&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Forum&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://ask.openrouteservice.org/c/sdks/qgis&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Forum&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="openExternalLinks">
          <bool>true</bool>
@@ -431,28 +431,12 @@ p, li { white-space: pre-wrap; }
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QRadioButton" name="optimize_start">
+              <widget class="QRadioButton" name="fix_start">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First waypoint will be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First waypoint won't be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Optimize Start</string>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">optimize_button_group</string>
-               </attribute>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QRadioButton" name="optimize_none">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First and last waypoints are not optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>None</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
+                <string>Fix Start</string>
                </property>
                <attribute name="buttonGroup">
                 <string notr="true">optimize_button_group</string>
@@ -460,12 +444,12 @@ p, li { white-space: pre-wrap; }
               </widget>
              </item>
              <item row="2" column="2">
-              <widget class="QRadioButton" name="optimize_end">
+              <widget class="QRadioButton" name="fix_end">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last waypoint will be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last waypoint won't be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Optimize End</string>
+                <string>Fix End</string>
                </property>
                <attribute name="buttonGroup">
                 <string notr="true">optimize_button_group</string>
@@ -477,6 +461,38 @@ p, li { white-space: pre-wrap; }
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Other Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QRadioButton" name="fix_both">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First and last waypoints are not optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Fix Both</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">optimize_button_group</string>
+               </attribute>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QRadioButton" name="round_trip">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Return to first waypoint after last waypoint.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Round Trip</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">optimize_button_group</string>
+               </attribute>
               </widget>
              </item>
             </layout>
