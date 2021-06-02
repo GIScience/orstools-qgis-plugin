@@ -43,6 +43,10 @@ RELEASING:
 ### Added
 - CHANGELOG.md including release instructions
 - 'recommended' preference
+- round trip parameter to TSP-options for Advanced Directions ([#125](https://github.com/GIScience/orstools-qgis-plugin/issues/125))
+
+### Changed
+- parameter names of TSP-options for Advanced Directions
 
 ### Fixed
 - author information
