@@ -27,184 +27,85 @@
  ***************************************************************************/
 """
 
-import os.path
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsProcessing,
-                       QgsProcessingAlgorithm,
                        QgsProcessingParameterField,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
-                       QgsProcessingParameterFeatureSink,
                        )
 
-from PyQt5.QtGui import QIcon
-
-from ORStools import RESOURCE_PREFIX, __help__
-from ORStools.common import client, directions_core, PROFILES, PREFERENCES
-from ORStools.utils import configmanager, transform, exceptions, logger
-from . import HELP_DIR
+from ORStools.common import directions_core, PROFILES, PREFERENCES
+from ORStools.utils import transform, exceptions, logger
+from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
-class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
-    # TODO: create base algorithm class common to all modules
+# noinspection PyPep8Naming
+class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
-    ALGO_NAME = 'directions_from_points_2_layers'
-    ALGO_NAME_LIST = ALGO_NAME.split('_')
-    MODE_SELECTION = ['Row-by-Row', 'All-by-All']
-
-    IN_PROVIDER = "INPUT_PROVIDER"
-    IN_START = "INPUT_START_LAYER"
-    IN_START_FIELD = "INPUT_START_FIELD"
-    IN_END = "INPUT_END_LAYER"
-    IN_END_FIELD = "INPUT_END_FIELD"
-    IN_PROFILE = "INPUT_PROFILE"
-    IN_PREFERENCE = "INPUT_PREFERENCE"
-    IN_MODE = "INPUT_MODE"
-    OUT = 'OUTPUT'
-
-    # noinspection PyUnusedLocal
-    def initAlgorithm(self, configuration):
-
-        providers = [provider['name'] for provider in configmanager.read_config()['providers']]
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_PROVIDER,
-                "Provider",
-                providers,
-                defaultValue=providers[0]
-            )
-        )
-
-        self.addParameter(
+    def __init__(self):
+        super().__init__()
+        self.ALGO_NAME = 'directions_from_points_2_layers'
+        self.GROUP = "Directions"
+        self.MODE_SELECTION: list = ['Row-by-Row', 'All-by-All']
+        self.IN_START = "INPUT_START_LAYER"
+        self.IN_START_FIELD = "INPUT_START_FIELD"
+        self.IN_END = "INPUT_END_LAYER"
+        self.IN_END_FIELD = "INPUT_END_FIELD"
+        self.IN_PROFILE = "INPUT_PROFILE"
+        self.IN_PREFERENCE = "INPUT_PREFERENCE"
+        self.IN_MODE = "INPUT_MODE"
+        self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
                 description="Input Start Point layer",
                 types=[QgsProcessing.TypeVectorPoint],
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterField(
                 name=self.IN_START_FIELD,
                 description="Start ID Field (can be used for joining)",
                 parentLayerParameterName=self.IN_START,
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
                 description="Input End Point layer",
                 types=[QgsProcessing.TypeVectorPoint],
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterField(
                 name=self.IN_END_FIELD,
                 description="End ID Field (can be used for joining)",
                 parentLayerParameterName=self.IN_END,
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
                 "Travel mode",
                 PROFILES,
                 defaultValue=PROFILES[0]
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,
                 "Travel preference",
                 PREFERENCES,
                 defaultValue=PREFERENCES[0]
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterEnum(
                 self.IN_MODE,
                 "Layer mode",
                 self.MODE_SELECTION,
                 defaultValue=self.MODE_SELECTION[0]
             )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
-                name=self.OUT,
-                description="Directions",
-            )
-        )
-
-    def group(self):
-        return "Directions"
-
-    def groupId(self):
-        return 'directions'
-
-    def name(self):
-        return self.ALGO_NAME
-
-    def shortHelpString(self):
-        """Displays the sidebar help in the algorithm window"""
-
-        file = os.path.join(
-            HELP_DIR,
-            'algorithm_directions_points.help'
-        )
-        with open(file, encoding='utf-8') as helpf:
-            msg = helpf.read()
-
-        return msg
-
-    def helpUrl(self):
-        """will be connected to the Help button in the Algorithm window"""
-        return __help__
-
-    def displayName(self):
-        return " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
-
-    def icon(self):
-        return QIcon(RESOURCE_PREFIX + 'icon_directions.png')
-
-    def createInstance(self):
-        return ORSdirectionsPointsLayersAlgo()
+        ]
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
-
     def processAlgorithm(self, parameters, context, feedback):
+        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
-        # Init ORS client
+        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
-        providers = configmanager.read_config()['providers']
-        provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
-        clnt = client.Client(provider)
-        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
+        preference = dict(enumerate(PREFERENCES))[parameters[self.IN_PREFERENCE]]
 
-        profile = PROFILES[self.parameterAsEnum(
-            parameters,
-            self.IN_PROFILE,
-            context
-        )]
-
-        preference = PREFERENCES[self.parameterAsEnum(
-            parameters,
-            self.IN_PREFERENCE,
-            context
-        )]
-
-        mode = self.MODE_SELECTION[self.parameterAsEnum(
-            parameters,
-            self.IN_MODE,
-            context
-        )]
+        mode = dict(enumerate(self.MODE_SELECTION))[parameters[self.IN_MODE]]
 
         # Get parameter values
         source = self.parameterAsSource(
@@ -212,35 +113,18 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
             self.IN_START,
             context
         )
-        source_field_name = self.parameterAsString(
-            parameters,
-            self.IN_START_FIELD,
-            context
-        )
+        source_field_name = parameters[self.IN_START_FIELD]
+
         destination = self.parameterAsSource(
             parameters,
             self.IN_END,
             context
         )
-        destination_field_name = self.parameterAsString(
-            parameters,
-            self.IN_END_FIELD,
-            context
-        )
+        destination_field_name = parameters[self.IN_END_FIELD]
 
         # Get fields from field name
-        source_field_id = source.fields().lookupField(source_field_name)
-        source_field = source.fields().field(source_field_id)
-        destination_field_id = destination.fields().lookupField(destination_field_name)
-        destination_field = destination.fields().field(destination_field_id)
-
-        params = {
-            'preference': preference,
-            'geometry': 'true',
-            'instructions': 'false',
-            'elevation': True,
-            'id': None
-        }
+        source_field = source.fields().field(source_field_name)
+        destination_field = destination.fields().field(destination_field_name)
 
         route_dict = self._get_route_dict(
             source,
@@ -255,7 +139,8 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
             route_count = source.featureCount() * destination.featureCount()
 
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
-                                               directions_core.get_fields(source_field.type(), destination_field.type()),
+                                               directions_core.get_fields(source_field.type(),
+                                                                          destination_field.type()),
                                                QgsWkbTypes.LineString,
                                                QgsCoordinateReferenceSystem.fromEpsgId(4326))
 
@@ -265,10 +150,10 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 break
 
-            params['coordinates'] = coordinates
+            params = directions_core.build_default_parameters(preference, coordinates=coordinates)
 
             try:
-                response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
+                response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
             except (exceptions.ApiError,
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:
@@ -290,7 +175,8 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
 
         return {self.OUT: dest_id}
 
-    def _get_route_dict(self, source, source_field, destination, destination_field):
+    @staticmethod
+    def _get_route_dict(source, source_field, destination, destination_field):
         """
         Compute route_dict from input layer.
 
@@ -312,17 +198,17 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
         route_dict = dict()
 
         source_feats = list(source.getFeatures())
-        xformer_source = transform.transformToWGS(source.sourceCrs())
+        x_former_source = transform.transformToWGS(source.sourceCrs())
         route_dict['start'] = dict(
-            geometries=[xformer_source.transform(feat.geometry().asPoint()) for feat in source_feats],
-            values= [feat.attribute(source_field.name()) for feat in source_feats],
+            geometries=[x_former_source.transform(feat.geometry().asPoint()) for feat in source_feats],
+            values=[feat.attribute(source_field.name()) for feat in source_feats],
         )
 
         destination_feats = list(destination.getFeatures())
-        xformer_destination = transform.transformToWGS(destination.sourceCrs())
+        x_former_destination = transform.transformToWGS(destination.sourceCrs())
         route_dict['end'] = dict(
-            geometries=[xformer_destination.transform(feat.geometry().asPoint()) for feat in destination_feats],
-            values= [feat.attribute(destination_field.name()) for feat in destination_feats],
+            geometries=[x_former_destination.transform(feat.geometry().asPoint()) for feat in destination_feats],
+            values=[feat.attribute(destination_field.name()) for feat in destination_feats],
         )
 
         return route_dict

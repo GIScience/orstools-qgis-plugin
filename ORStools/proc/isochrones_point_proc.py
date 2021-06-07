@@ -27,176 +27,99 @@
  ***************************************************************************/
 """
 
-import os.path
 from qgis.core import (QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsProcessingUtils,
-                       QgsProcessingAlgorithm,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum,
-                       QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterPoint,
                        )
 
-from PyQt5.QtGui import QIcon
-
-from ORStools import RESOURCE_PREFIX, __help__
-from ORStools.common import client, isochrones_core, PROFILES, DIMENSIONS
-from ORStools.utils import exceptions, configmanager, logger
-from . import HELP_DIR
+from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
+from ORStools.utils import exceptions, logger
+from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
-class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
-    # TODO: create base algorithm class common to all modules
-
-    ALGO_NAME = 'isochrones_from_point'
-    ALGO_NAME_LIST = ALGO_NAME.split('_')
-
-    IN_PROVIDER = "INPUT_PROVIDER"
-    IN_POINT = "INPUT_POINT"
-    IN_PROFILE = "INPUT_PROFILE"
-    IN_METRIC = 'INPUT_METRIC'
-    IN_RANGES = 'INPUT_RANGES'
-    IN_KEY = 'INPUT_APIKEY'
-    IN_DIFFERENCE = 'INPUT_DIFFERENCE'
-    OUT = 'OUTPUT'
-
-    # Save some important references
-    isochrones = isochrones_core.Isochrones()
-    dest_id = None
-    crs_out = QgsCoordinateReferenceSystem.fromEpsgId(4326)
-    # difference = None
-
-    # noinspection PyUnusedLocal
-    def initAlgorithm(self, configuration):
-
-        providers = [provider['name'] for provider in configmanager.read_config()['providers']]
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_PROVIDER,
-                "Provider",
-                providers,
-                defaultValue=providers[0]
-            )
-        )
-
-        self.addParameter(
+# noinspection PyPep8Naming
+class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
+    def __init__(self):
+        super().__init__()
+        self.ALGO_NAME = 'isochrones_from_point'
+        self.GROUP = "Isochrones"
+        self.IN_POINT = "INPUT_POINT"
+        self.IN_PROFILE = "INPUT_PROFILE"
+        self.IN_METRIC = 'INPUT_METRIC'
+        self.IN_RANGES = 'INPUT_RANGES'
+        self.IN_KEY = 'INPUT_APIKEY'
+        self.IN_DIFFERENCE = 'INPUT_DIFFERENCE'
+        self.PARAMETERS = [
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,
                 description="Input Point from map canvas (mutually exclusive with layer option)",
                 optional=True
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
                 "Travel mode",
                 PROFILES,
                 defaultValue=PROFILES[0]
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterEnum(
                 name=self.IN_METRIC,
                 description="Dimension",
                 options=DIMENSIONS,
                 defaultValue=DIMENSIONS[0]
-            )
-        )
-
-        self.addParameter(
+            ),
             QgsProcessingParameterString(
                 name=self.IN_RANGES,
-                description="Comma-separated ranges [mins or m]",
+                description="Comma-separated ranges [min or m]",
                 defaultValue="5, 10"
             )
-        )
+        ]
 
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
-                name=self.OUT,
-                description="Isochrones",
-                createByDefault=False
-            )
-        )
-
-    def group(self):
-        return "Isochrones"
-
-    def groupId(self):
-        return 'isochrones'
-
-    def name(self):
-        return self.ALGO_NAME
-
-    def shortHelpString(self):
-        """Displays the sidebar help in the algorithm window"""
-
-        file = os.path.join(
-            HELP_DIR,
-            'algorithm_isochrone_point.help'
-        )
-        with open(file, encoding='utf-8') as helpf:
-            msg = helpf.read()
-
-        return msg
-
-    def helpUrl(self):
-        """will be connected to the Help button in the Algorithm window"""
-        return __help__
-
-    def displayName(self):
-        return " ".join(map(lambda x: x.capitalize(), self.ALGO_NAME_LIST))
-
-    def icon(self):
-        return QIcon(RESOURCE_PREFIX + 'icon_isochrones.png')
-
-    def createInstance(self):
-        return ORSisochronesPointAlgo()
+    # Save some important references
+    # TODO bad style, refactor
+    isochrones = isochrones_core.Isochrones()
+    dest_id = None
+    crs_out = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+    # difference = None
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
-
     def processAlgorithm(self, parameters, context, feedback):
-        # Init ORS client
-        providers = configmanager.read_config()['providers']
-        provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
-        clnt = client.Client(provider)
-        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
+        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
-        params = dict()
-        params['attributes'] = ['total_pop']
+        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
 
-        profile = PROFILES[self.parameterAsEnum(parameters, self.IN_PROFILE, context)]
-        params['range_type'] = dimension = DIMENSIONS[self.parameterAsEnum(parameters, self.IN_METRIC, context)]
-
-        factor = 60 if params['range_type'] == 'time' else 1
-        ranges_raw = self.parameterAsString(parameters, self.IN_RANGES, context)
+        factor = 60 if dimension == 'time' else 1
+        ranges_raw = parameters[self.IN_RANGES]
         ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
-        params['range'] = ranges_proc
 
         point = self.parameterAsPoint(parameters, self.IN_POINT, context, self.crs_out)
 
         # Make the actual requests
         # If layer source is set
-        requests = []
         self.isochrones.set_parameters(profile, dimension, factor)
-        params['locations'] = [[round(point.x(), 6), round(point.y(), 6)]]
-        params['id'] = None
-        requests.append(params)
+        params = {
+            "locations": [[round(point.x(), 6), round(point.y(), 6)]],
+            "range_type": dimension,
+            "range": ranges_proc,
+            "attributes": ['total_pop'],
+            "id": None
+        }
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                     self.isochrones.get_fields(),
-                                                    QgsWkbTypes.Polygon,  # Needs Multipolygon if difference parameter will ever be reactivated
+                                                    QgsWkbTypes.Polygon,
+                                                    # Needs Multipolygon if difference parameter will ever be
+                                                    # reactivated
                                                     self.crs_out)
 
-        # If feature causes error, report and continue with next
         try:
-            # Populate features from response
-            response = clnt.request('/v2/isochrones/' + profile, {}, post_json=params)
+            response = ors_client.request('/v2/isochrones/' + profile, {}, post_json=params)
 
+            # Populate features from response
             for isochrone in self.isochrones.get_features(response, params['id']):
                 sink.addFeature(isochrone)
 
@@ -212,7 +135,7 @@ class ORSisochronesPointAlgo(QgsProcessingAlgorithm):
     # noinspection PyUnusedLocal
     def postProcessAlgorithm(self, context, feedback):
         """Style polygon layer in post-processing step."""
-        processed_layer= QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
+        processed_layer = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
         self.isochrones.stylePoly(processed_layer)
 
         return {self.OUT: self.dest_id}

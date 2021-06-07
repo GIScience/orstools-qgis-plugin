@@ -34,6 +34,7 @@ from qgis.core import (QgsPoint,
                        QgsFeature,
                        QgsFields,
                        QgsField)
+from typing import List
 
 from PyQt5.QtCore import QVariant
 
@@ -191,3 +192,34 @@ def get_output_features_optimization(response, profile, from_value=None):
                         ])
 
     return feat
+
+
+def build_default_parameters(preference: str, point_list: List[QgsPointXY] = None, coordinates: list = None) -> dict:
+    """
+    Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates
+    passed in point_list or an existing coordinate list within the coordinates parameter.
+    TODO no optimal solution, maybe let get_request_point_features() return QgsPointXY as well to only use point_list
+
+    :param preference: routing preference, shortest/fastest/recommended
+    :type preference: str
+
+    :param point_list:
+    :type point_list: list of QgsPointXY
+
+    :param coordinates:
+    :type coordinates: list
+
+    :returns: parameters for directions endpoint
+    :rtype: dict
+    """
+    coords = coordinates if coordinates else [[round(point.x(), 6), round(point.y(), 6)] for point in point_list]
+    params = {
+        'coordinates': coords,
+        'preference': preference,
+        'geometry': 'true',
+        'instructions': 'false',
+        'elevation': True,
+        'id': None
+    }
+
+    return params

@@ -155,11 +155,11 @@ class Isochrones:
         """
 
         if self.dimension == 'time':
-            legend_suffix = ' mins'
+            legend_suffix = ' min'
         else:
             legend_suffix = ' m'
 
-        field = layer.fields().lookupField(self.field_dimension_name)
+        field = layer.fields().indexOf(self.field_dimension_name)
         unique_values = sorted(layer.uniqueValues(field))
 
         colors = {0: QColor('#2b83ba'),

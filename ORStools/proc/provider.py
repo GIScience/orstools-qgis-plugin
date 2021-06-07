@@ -32,12 +32,12 @@ from qgis.core import QgsProcessingProvider
 from PyQt5.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
-from .directions_lines_proc import ORSdirectionsLinesAlgo
-from .directions_points_layer_proc import ORSdirectionsPointsLayerAlgo
-from .directions_points_layers_proc import ORSdirectionsPointsLayersAlgo
-from .isochrones_layer_proc import ORSisochronesLayerAlgo
-from .isochrones_point_proc import ORSisochronesPointAlgo
-from .matrix_proc import ORSmatrixAlgo
+from .directions_lines_proc import ORSDirectionsLinesAlgorithm
+from .directions_points_layer_proc import ORSDirectionsPointsLayerAlgo
+from .directions_points_layers_proc import ORSDirectionsPointsLayersAlgo
+from .isochrones_layer_proc import ORSIsochronesLayerAlgo
+from .isochrones_point_proc import ORSIsochronesPointAlgo
+from .matrix_proc import ORSMatrixAlgo
 
 
 class ORStoolsProvider(QgsProcessingProvider):
@@ -53,22 +53,25 @@ class ORStoolsProvider(QgsProcessingProvider):
         """
         pass
 
+    # noinspection PyPep8Naming
     def loadAlgorithms(self):
         """
         Loads all algorithms belonging to this provider.
         """
         #
-        self.addAlgorithm(ORSdirectionsPointsLayersAlgo())
-        self.addAlgorithm(ORSdirectionsPointsLayerAlgo())
-        self.addAlgorithm(ORSdirectionsLinesAlgo())
-        self.addAlgorithm(ORSisochronesLayerAlgo())
-        self.addAlgorithm(ORSisochronesPointAlgo())
-        self.addAlgorithm(ORSmatrixAlgo())
+        self.addAlgorithm(ORSDirectionsPointsLayersAlgo())
+        self.addAlgorithm(ORSDirectionsPointsLayerAlgo())
+        self.addAlgorithm(ORSDirectionsLinesAlgorithm())
+        self.addAlgorithm(ORSIsochronesLayerAlgo())
+        self.addAlgorithm(ORSIsochronesPointAlgo())
+        self.addAlgorithm(ORSMatrixAlgo())
 
-    def icon(self):
+    @staticmethod
+    def icon():
         return QIcon(RESOURCE_PREFIX + 'icon_orstools.png')
 
-    def id(self):
+    @staticmethod
+    def id():
         """
         Returns the unique provider id, used for identifying the provider. This
         string should be a unique, short, character only string, eg "qgis" or
@@ -76,7 +79,8 @@ class ORStoolsProvider(QgsProcessingProvider):
         """
         return PLUGIN_NAME.strip()
 
-    def name(self):
+    @staticmethod
+    def name():
         """
         Returns the provider name, which is used to describe the provider
         within the GUI.
@@ -85,7 +89,9 @@ class ORStoolsProvider(QgsProcessingProvider):
         """
         return PLUGIN_NAME
 
-    def longName(self):
+    # noinspection PyPep8Naming
+    @staticmethod
+    def longName():
         """
         Returns the a longer version of the provider name, which can include
         extra details such as version numbers. E.g. "Lastools LIDAR tools
