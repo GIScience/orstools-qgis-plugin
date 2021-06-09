@@ -1,15 +1,16 @@
 The Points Directions algorithm calculates optimal routes for multiple start and end points based on input files.
+The waypoint order can be specified via <i>Sort Points by</i> and will default to the internal order of each layer.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 
-For Start and End layers, only Point layers are allowed, <b>not MultiPoint</b>.
+For <i>Start and End layers</i>, only Point layers are allowed, <b>not MultiPoint</b>.
 
-The Start and End ID fields can be used to join the input layers afterwards.
+The <i>Start and End ID</i> fields can be used to join the input layers afterwards.
 
-The Travel Mode determines the profile used.
+The <i>Travel Mode</i> determines the profile used.
 
-The Preference dictates the cost. For longer routes don't use Shortest Path.
+The <i>Travel preference</i> dictates the cost. For longer routes don't use Shortest Path.
 
-The output layer is a LineStringZ layer with multiple route attributes and <b>z dimension</b> set.
+The output layer is a LineString layer with multiple route attributes.
 
 For current restrictions, please see <a href="https://openrouteservice.org/restrictions/">https://openrouteservice.org/restrictions/</a>.
