@@ -66,6 +66,8 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
                 name=self.IN_START_FIELD,
                 description="Start ID Field (can be used for joining)",
                 parentLayerParameterName=self.IN_START,
+                defaultValue=None,
+                optional=True,
             ),
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
@@ -76,6 +78,8 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
                 name=self.IN_END_FIELD,
                 description="End ID Field (can be used for joining)",
                 parentLayerParameterName=self.IN_END,
+                defaultValue=None,
+                optional=True,
             ),
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
@@ -97,19 +101,20 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             self.IN_START,
             context
         )
-        source_field_name = parameters[self.IN_START_FIELD]
+        if source_field_name := parameters[self.IN_START_FIELD]:
+            source_field = source.fields().field(source_field_name)
+        else:
+            source_field = None
 
         destination = self.parameterAsSource(
             parameters,
             self.IN_END,
             context
         )
-        destination_field_name = parameters[self.IN_END_FIELD]
-
-        # Get fields from field name
-        source_field = source.fields().field(source_field_name)
-
-        destination_field = destination.fields().field(destination_field_name)
+        if destination_field_name := parameters[self.IN_END_FIELD]:
+            destination_field = destination.fields().field(destination_field_name)
+        else:
+            destination_field = None
 
         # Abort when MultiPoint type
         if (source.wkbType() or destination.wkbType()) == 4:
@@ -152,6 +157,14 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             'id': 'Matrix'
         }
 
+        if source_field and destination_field:
+            sink_fields = self.get_fields(
+                    source_field.type(),
+                    destination_field.type()
+                    )
+        else:
+            sink_fields = self.get_fields()
+
         # Make request and catch ApiError
         try:
             response = ors_client.request('/v2/matrix/' + profile, {}, post_json=params)
@@ -167,15 +180,12 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             parameters,
             self.OUT,
             context,
-            self.get_fields(
-                source_field.type(),
-                destination_field.type()
-            ),
+            sink_fields,
             QgsWkbTypes.NoGeometry
         )
 
-        sources_attributes = [feat.attribute(source_field_name) for feat in sources_features]
-        destinations_attributes = [feat.attribute(destination_field_name) for feat in destination_features]
+        sources_attributes = [feat.attribute(source_field_name) if source_field_name else feat.id() for feat in sources_features]
+        destinations_attributes = [feat.attribute(destination_field_name) if source_field_name else feat.id() for feat in destination_features]
 
         for s, source in enumerate(sources_attributes):
             for d, destination in enumerate(destinations_attributes):
@@ -194,7 +204,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def get_fields(source_type, destination_type):
+    def get_fields(source_type = QVariant.Int, destination_type = QVariant.Int):
 
         fields = QgsFields()
         fields.append(QgsField("FROM_ID", source_type))

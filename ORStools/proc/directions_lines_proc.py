@@ -66,6 +66,8 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
                 name=self.IN_FIELD,
                 description="Layer ID Field",
                 parentLayerParameterName=self.IN_LINES,
+                defaultValue=None,
+                optional=True,
             ),
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
@@ -102,13 +104,18 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             context
         )
 
-        source_field_name = parameters[self.IN_FIELD]
+        # qgis overwrites PyQt5.QtCore.QVariant's __bool__ in
+        # https://github.com/qgis/QGIS/blob/master/python/PyQt/PyQt5/QtCore.py:
+        # def __bool__(self):
+        #     return not self.isNull()
+        if source_field_name := parameters[self.IN_FIELD]:
+            sink_fields = directions_core.get_fields(
+                    from_type=source.fields().field(source_field_name).type(),
+                    from_name=source_field_name, line=True)
+        else:
+            sink_fields = directions_core.get_fields(line=True)
 
-        (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
-                                               directions_core.get_fields(
-                                                   from_type=source.fields().field(source_field_name).type(),
-                                                   from_name=source_field_name,
-                                                   line=True),
+        (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context, sink_fields,
                                                source.wkbType(),
                                                QgsCoordinateReferenceSystem.fromEpsgId(4326))
         count = source.featureCount()
@@ -141,7 +148,7 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             except (exceptions.ApiError,
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:
-                msg = f"Feature ID {line[source_field_name]} caused a {e.__class__.__name__}:\n{str(e)}"
+                msg = f"Feature ID {num} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue
@@ -167,7 +174,10 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
 
         for feat in sorted(layer.getFeatures(), key=lambda f: f.id()):
             line = None
-            field_value = feat[field_name]
+            try:
+                field_value = feat[field_name]
+            except TypeError:
+                field_value = None
             # for
             if layer.wkbType() == QgsWkbTypes.MultiLineString:
                 # TODO: only takes the first polyline geometry from the multiline geometry currently

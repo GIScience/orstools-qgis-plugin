@@ -66,6 +66,8 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 name=self.IN_FIELD,
                 description="Layer ID Field",
                 parentLayerParameterName=self.IN_POINTS,
+                defaultValue=None,
+                optional=True
             ),
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
@@ -102,13 +104,18 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             context
         )
 
-        source_field_name = parameters[self.IN_FIELD]
+        if source_field_name := parameters[self.IN_FIELD]:
+           sink_fields = directions_core.get_fields(
+                    from_type=source.fields().field(source_field_name).type(),
+                    from_name=source_field_name,
+                    line=True
+                )
+        else:
+            sink_fields = directions_core.get_fields(line=True)
+
 
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
-                                               directions_core.get_fields(
-                                                   from_type=source.fields().field(source_field_name).type(),
-                                                   from_name=source_field_name,
-                                                   line=True),
+                                               sink_fields,
                                                QgsWkbTypes.LineString,
                                                QgsCoordinateReferenceSystem.fromEpsgId(4326))
         count = source.featureCount()
@@ -130,7 +137,10 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 for point in feat.geometry().asMultiPoint():
                     points.append(x_former.transform(QgsPointXY(point)))
                 input_points.append(points)
-                from_values.append(feat[source_field_name])
+                try:
+                    from_values.append(feat[source_field_name])
+                except KeyError:
+                    from_values.append(None)
 
         for num, (points, from_value) in enumerate(zip(input_points, from_values)):
             # Stop the algorithm if cancel button has been clicked
