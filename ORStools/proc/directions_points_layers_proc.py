@@ -127,7 +127,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             context
         )
 
-        destination_field_name = parameters[self.IN_START_FIELD]:
+        destination_field_name = parameters[self.IN_START_FIELD]
         destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
 
         route_dict = self._get_route_dict(

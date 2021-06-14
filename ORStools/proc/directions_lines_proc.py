@@ -112,8 +112,9 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
         #     return not self.isNull()
         # The check below works because of that.
         source_field_name = parameters[self.IN_FIELD]
+        get_fields_options = dict()
         if source_field_name:
-            get_field_options = dict(
+            get_fields_options.update(
                     from_type=source.fields().field(source_field_name).type(),
                     from_name=source_field_name
                     )
@@ -179,11 +180,8 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
 
         for feat in sorted(layer.getFeatures(), key=lambda f: f.id()):
             line = None
-            try:
-                field_value = feat[field_name]
-            except TypeError:
-                field_value = None
-            # for
+            field_value = feat[field_name] if field_name else None
+
             if layer.wkbType() == QgsWkbTypes.MultiLineString:
                 # TODO: only takes the first polyline geometry from the multiline geometry currently
                 # Loop over all polyline geometries

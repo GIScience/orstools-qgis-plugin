@@ -105,12 +105,12 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         )
 
         source_field_name = parameters[self.IN_FIELD]
+        get_fields_options = dict()
         if source_field_name:
-           get_fields_options = dict(
+            get_fields_options.update(
                     from_type=source.fields().field(source_field_name).type(),
                     from_name=source_field_name
-                )
-        else:
+                    )
 
         sink_fields = directions_core.get_fields(**get_fields_options, line=True)
 

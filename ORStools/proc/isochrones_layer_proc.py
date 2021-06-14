@@ -122,6 +122,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         # Get ID field properties
         id_field_name = parameters[self.IN_FIELD]
+        parameter_options = list()
         if id_field_name:
             id_field = source.fields().field(id_field_name)
             parameter_options = [id_field.type(), id_field_name]
