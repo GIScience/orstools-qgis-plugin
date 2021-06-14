@@ -104,11 +104,15 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             context
         )
 
-        # qgis overwrites PyQt5.QtCore.QVariant's __bool__ in
+        # parameters[self.IN_FIELD] returns a PyQt5.QtCore.QVariant with "NULL" as content
+        # in case of absence of self.IN_FIELD.
+        # qgis overwrites this type's __bool__ in
         # https://github.com/qgis/QGIS/blob/master/python/PyQt/PyQt5/QtCore.py:
         # def __bool__(self):
         #     return not self.isNull()
-        if source_field_name := parameters[self.IN_FIELD]:
+        # The check below works because of that.
+        source_field_name = parameters[self.IN_FIELD]
+        if source_field_name:
             sink_fields = directions_core.get_fields(
                     from_type=source.fields().field(source_field_name).type(),
                     from_name=source_field_name, line=True)

@@ -118,11 +118,8 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             context
         )
 
-        if source_field_name := parameters[self.IN_START_FIELD]:
-            source_field = source.fields().field(source_field_name)
-        else:
-            source_field = None
-
+        source_field_name = parameters[self.IN_START_FIELD]
+        source_field = source.fields().field(source_field_name) if source_field_name else None
 
         destination = self.parameterAsSource(
             parameters,
@@ -130,10 +127,8 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             context
         )
 
-        if destination_field_name := parameters[self.IN_START_FIELD]:
-            destination_field = destination.fields().field(destination_field_name)
-        else:
-            destination_field = None
+        destination_field_name = parameters[self.IN_START_FIELD]:
+        destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
 
         route_dict = self._get_route_dict(
             source,

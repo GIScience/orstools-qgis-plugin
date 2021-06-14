@@ -104,7 +104,8 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             context
         )
 
-        if source_field_name := parameters[self.IN_FIELD]:
+        source_field_name = parameters[self.IN_FIELD]
+        if source_field_name:
            sink_fields = directions_core.get_fields(
                     from_type=source.fields().field(source_field_name).type(),
                     from_name=source_field_name,
