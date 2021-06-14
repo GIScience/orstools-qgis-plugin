@@ -113,11 +113,12 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
         # The check below works because of that.
         source_field_name = parameters[self.IN_FIELD]
         if source_field_name:
-            sink_fields = directions_core.get_fields(
+            get_field_options = dict(
                     from_type=source.fields().field(source_field_name).type(),
-                    from_name=source_field_name, line=True)
-        else:
-            sink_fields = directions_core.get_fields(line=True)
+                    from_name=source_field_name
+                    )
+
+        sink_fields = directions_core.get_fields(**get_fields_options, line=True)
 
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context, sink_fields,
                                                source.wkbType(),

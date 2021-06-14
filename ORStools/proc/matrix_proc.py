@@ -155,10 +155,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         }
 
         if source_field and destination_field:
-            sink_fields = self.get_fields(
-                    source_field.type(),
-                    destination_field.type()
-                    )
+            sink_fields = self.get_fields(source_field.type(), destination_field.type())
         else:
             sink_fields = self.get_fields()
 

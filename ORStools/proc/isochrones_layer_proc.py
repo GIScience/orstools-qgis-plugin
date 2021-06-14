@@ -122,20 +122,11 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         # Get ID field properties
         id_field_name = parameters[self.IN_FIELD]
-        id_field_id = source.fields().indexOf(id_field_name)
+        if id_field_name:
+            id_field = source.fields().field(id_field_name)
+            parameter_options = [id_field.type(), id_field_name]
 
-        # indexOf will return -1 if the name cannot be found.
-        # Try the first field in this case.
-        if id_field_id == -1:
-            id_field_id = 0
-
-        # Populate iso_layer instance with parameters
-        try:
-            id_field = source.fields().field(id_field_id)
-            id_field_name = source.fields().field(id_field_id).name()
-            self.isochrones.set_parameters(profile, dimension, factor, id_field.type(), id_field_name)
-        except KeyError:  # Scratch layers don't necessarily have fields
-            self.isochrones.set_parameters(profile, dimension, factor)
+        self.isochrones.set_parameters(profile, dimension, factor, *parameter_options)
 
         for locations, id_value in self.get_sorted_feature_parameters(source, id_field_name):
             # Stop the algorithm if cancel button has been clicked
@@ -203,9 +194,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         for feat in sorted(layer.getFeatures(), key=lambda f: f.id()):
             x_point = x_former.transform(feat.geometry().asPoint())
-            try:
-                id_value = feat[id_field_name]
-            except KeyError:
-                id_value = None
+            id_value = feat[id_field_name] if id_field_name else None
 
             yield [[round(x_point.x(), 6), round(x_point.y(), 6)]], id_value
