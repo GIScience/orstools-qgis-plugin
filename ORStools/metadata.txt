@@ -19,6 +19,7 @@ changelog=YYYY/MM/DD v1.X.X
     - author information
     - repository link
     - Correct isochrone computation from layer without fields
+    - other errors stemming from layers without fields
     Removed:
     - 'cycling-safe' profile
     - gis-ops information

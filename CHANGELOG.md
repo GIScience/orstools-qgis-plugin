@@ -52,6 +52,7 @@ RELEASING:
 - author information
 - repository link
 - Correct isochrone computation from layer without fields
+- other errors stemming from layers without fields
 
 ### Removed
 - 'cycling-safe' profile
