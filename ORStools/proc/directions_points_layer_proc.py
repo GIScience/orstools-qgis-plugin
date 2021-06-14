@@ -46,6 +46,7 @@ from ..utils.processing import get_params_optimize
 # noinspection PyPep8Naming
 class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
     """Algorithm class for Directions Lines."""
+
     def __init__(self):
         super().__init__()
         self.ALGO_NAME = 'directions_from_points_1_layer'
@@ -108,12 +109,11 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         get_fields_options = dict()
         if source_field_name:
             get_fields_options.update(
-                    from_type=source.fields().field(source_field_name).type(),
-                    from_name=source_field_name
-                    )
+                from_type=source.fields().field(source_field_name).type(),
+                from_name=source_field_name
+            )
 
         sink_fields = directions_core.get_fields(**get_fields_options, line=True)
-
 
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                sink_fields,

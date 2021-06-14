@@ -154,10 +154,14 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             'id': 'Matrix'
         }
 
-        if source_field and destination_field:
-            sink_fields = self.get_fields(source_field.type(), destination_field.type())
-        else:
-            sink_fields = self.get_fields()
+        # get types of set ID fields
+        field_types = dict()
+        if source_field:
+            field_types.update({"source_type": source_field.type()})
+        if destination_field:
+            field_types.update({"destination_type": destination_field.type()})
+
+        sink_fields = self.get_fields(**field_types)
 
         # Make request and catch ApiError
         try:
@@ -178,8 +182,10 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             QgsWkbTypes.NoGeometry
         )
 
-        sources_attributes = [feat.attribute(source_field_name) if source_field_name else feat.id() for feat in sources_features]
-        destinations_attributes = [feat.attribute(destination_field_name) if source_field_name else feat.id() for feat in destination_features]
+        sources_attributes = [feat.attribute(source_field_name) if source_field_name else feat.id() for feat in
+                              sources_features]
+        destinations_attributes = [feat.attribute(destination_field_name) if destination_field_name else feat.id() for
+                                   feat in destination_features]
 
         for s, source in enumerate(sources_attributes):
             for d, destination in enumerate(destinations_attributes):
@@ -197,8 +203,10 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
 
         return {self.OUT: dest_id}
 
+    # TODO working source_type and destination_type differ in both name and type from get_fields in directions_core.
+    #  Change to be consistent
     @staticmethod
-    def get_fields(source_type = QVariant.Int, destination_type = QVariant.Int):
+    def get_fields(source_type=QVariant.Int, destination_type=QVariant.Int):
 
         fields = QgsFields()
         fields.append(QgsField("FROM_ID", source_type))

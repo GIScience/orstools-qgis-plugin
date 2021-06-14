@@ -127,7 +127,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             context
         )
 
-        destination_field_name = parameters[self.IN_START_FIELD]
+        destination_field_name = parameters[self.IN_END_FIELD]
         destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
 
         route_dict = self._get_route_dict(
@@ -142,10 +142,13 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         else:
             route_count = source.featureCount() * destination.featureCount()
 
-        if source_field_name and destination_field_name:
-           sink_fields = directions_core.get_fields(source_field.type(), destination_field.type())
-        else:
-            sink_fields = directions_core.get_fields()
+        # get types of set ID fields
+        field_types = dict()
+        if source_field:
+            field_types.update({"from_type": source_field.type()})
+        if destination_field:
+            field_types.update({"to_type": destination_field.type()})
+        sink_fields = directions_core.get_fields(**field_types)
 
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context, sink_fields,
                                                QgsWkbTypes.LineString,
@@ -215,7 +218,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         x_former_destination = transform.transformToWGS(destination.sourceCrs())
         route_dict['end'] = dict(
             geometries=[x_former_destination.transform(feat.geometry().asPoint()) for feat in destination_feats],
-            values=[feat.attribute(destination_field.name()) if destination_field else feat.id() for feat in destination_feats] ,
+            values=[feat.attribute(destination_field.name()) if destination_field else feat.id() for feat in
+                    destination_feats
+                    ],
         )
 
         return route_dict
