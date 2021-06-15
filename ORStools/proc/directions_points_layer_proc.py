@@ -123,7 +123,6 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
         sink_fields = directions_core.get_fields(**get_fields_options, line=True)
 
-
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                sink_fields,
                                                QgsWkbTypes.LineString,

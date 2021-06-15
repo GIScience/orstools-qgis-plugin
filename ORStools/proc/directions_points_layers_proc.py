@@ -164,7 +164,6 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             destination_field,
             sort_end
         )
-        logger.log('route dict'+ str(route_dict), 1)
 
         if mode == 'Row-by-Row':
             route_count = min([source.featureCount(), destination.featureCount()])
@@ -185,7 +184,6 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
         counter = 0
         for coordinates, values in directions_core.get_request_point_features(route_dict, mode):
-            logger.log('from grpf:'+str(coordinates), 1)
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
@@ -236,19 +234,17 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         :rtype: dict
         """
         route_dict = dict()
-        logger.log(source.sourceName(), 1)
-
-        source_feats = list(source.getFeatures())
+        source_feats = sorted(list(source.getFeatures()), key=sort_start)
         x_former_source = transform.transformToWGS(source.sourceCrs())
         route_dict['start'] = dict(
-            geometries=[x_former_source.transform(feat.geometry().asPoint()) for feat in sorted(source_feats, key=sort_start)],
+            geometries=[x_former_source.transform(feat.geometry().asPoint()) for feat in source_feats],
             values=[feat.attribute(source_field.name()) if source_field else feat.id() for feat in source_feats],
         )
 
-        destination_feats = list(destination.getFeatures())
+        destination_feats = sorted(list(destination.getFeatures()), key=sort_end)
         x_former_destination = transform.transformToWGS(destination.sourceCrs())
         route_dict['end'] = dict(
-            geometries=[x_former_destination.transform(feat.geometry().asPoint()) for feat in sorted(destination_feats, key=sort_end)],
+            geometries=[x_former_destination.transform(feat.geometry().asPoint()) for feat in destination_feats],
             values=[feat.attribute(destination_field.name()) if destination_field else feat.id() for feat in
                     destination_feats
                     ],
