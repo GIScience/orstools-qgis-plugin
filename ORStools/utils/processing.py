@@ -61,13 +61,13 @@ def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: in
     }
 
     if start:
-        vehicle.update({"start": [round(start.x(), 7), round(start.y(), 7)]})
+        vehicle.update({"start": [round(start.x(), 6), round(start.y(), 6)]})
     if end:
-        vehicle.update({"end": [round(end.x(), 7), round(end.y(), 7)]})
+        vehicle.update({"end": [round(end.x(), 6), round(end.y(), 6)]})
 
     params = {
         'jobs': [{
-            "location": [round(point.x(), 7), round(point.y(), 7)],
+            "location": [round(point.x(), 6), round(point.y(), 6)],
             "id": point_list.index(point)
         } for point in point_list],
         'vehicles': [vehicle],
