@@ -3,13 +3,16 @@ The waypoint order for the routing can be specified via <i>Sort Points by</i> an
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 
-The <i>Input layer</i> has to be a (Multi)Point layer.
+<i>Input layer</i>: Point or MultiPoint layer.
 
-The <i>Layer ID field</i> can be used to join the input layer afterwards.
+<i>ID Field (only MultiPoint layers)</i>: values will transfer to the output layer and can be used to join layers or
+group features afterwards.
 
-The <i>Travel mode</i> determines the profile used.
+<i>Sort points by</i>: before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)
 
-The <i>Travel preference</i> dictates the cost. For longer routes don't use Shortest Path.
+<i>Travel Mode</i>: determines the profile used.
+
+<i>Travel preference</i>: dictates the cost. For longer routes don't use Shortest Path.
 
 You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Traveling Salesman Optimization</a> on the waypoints of each (Multi)Point feature.
 

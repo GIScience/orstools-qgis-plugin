@@ -3,13 +3,17 @@ The waypoint order can be specified via <i>Sort Points by</i> and will default t
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 
-For <i>Start and End layers</i>, only Point layers are allowed, <b>not MultiPoint</b>.
+<i>Input layers</i>: only Point layers are allowed, <b>not MultiPoint</b>.
 
-The <i>Start and End ID</i> fields can be used to join the input layers afterwards.
+<i>ID Field</i>: values will transfer to the output layer and can be used to join layers or group features afterwards.
 
-The <i>Travel Mode</i> determines the profile used.
+<i>Sort points by</i>: before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)
 
-The <i>Travel preference</i> dictates the cost. For longer routes don't use Shortest Path.
+<i>Travel Mode</i>: determines the profile used.
+
+<i>Travel preference</i>: dictates the cost. For longer routes don't use Shortest Path.
+
+<i>Layer Mode</i>: either 'row-by-row' until one layers has no more features or 'all-by-all' for every feature combination
 
 The output layer is a LineString layer with multiple route attributes.
 
