@@ -52,7 +52,7 @@ def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: in
     elif mode == OPTIMIZATION_MODES.index("Fix Start and End Point"):
         start = point_list.pop(0)
         end = point_list.pop(-1)
-    elif mode == OPTIMIZATION_MODES.index("Do Round Trip"):
+    elif mode == OPTIMIZATION_MODES.index("Round Trip"):
         start = end = point_list.pop(0)
 
     vehicle = {
