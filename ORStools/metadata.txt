@@ -13,6 +13,7 @@ changelog=YYYY/MM/DD v1.X.X
     Added:
     - 'recommended' preference
     - round trip parameter to TSP-options for Advanced Directions
+    - all TSP-options to 'Directions (Line and 1 Layer)' algorithms
     - sort waypoints by input layer field functionality in 'Directions'-Algorithms
     Changed:
     - parameter names of TSP-options for Advanced Directions

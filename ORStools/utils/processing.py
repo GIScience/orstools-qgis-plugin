@@ -32,9 +32,10 @@ from qgis.core import QgsPointXY
 from typing import List
 
 from ORStools import BASE_DIR
+from ORStools.common import OPTIMIZATION
 
 
-def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str) -> dict:
+def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, optimize: int) -> dict:
     """
     Build parameters for optimization endpoint
 
@@ -42,19 +43,31 @@ def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str) -> dict:
     :param ors_profile: ors transport profile to be used
     """
 
-    start = point_list.pop(0)
-    end = point_list.pop(-1)
-
     params = {
         'jobs': list(),
         'vehicles': [{
             "id": 0,
-            "profile": ors_profile,
-            "start": [start.x(), start.y()],
-            "end": [end.x(), end.y()]
+            "profile": ors_profile
         }],
         'options': {'g': True}
     }
+
+    if optimize == OPTIMIZATION.index("Fix End Point"):
+        end = point_list.pop(-1)
+        params['vehicles'][0]['end'] = [end.x(), end.y()]
+    elif optimize == OPTIMIZATION.index("Fix Start Point"):
+        start = point_list.pop(0)
+        params['vehicles'][0]['start'] = [start.x(), start.y()]
+    elif optimize == OPTIMIZATION.index("Fix Start and End Point"):
+        start = point_list.pop(0)
+        end = point_list.pop(-1)
+        params['vehicles'][0]['start'] = [start.x(), start.y()]
+        params['vehicles'][0]['end'] = [end.x(), end.y()]
+    elif optimize == OPTIMIZATION.index("Do Round Trip"):
+        start = point_list.pop(0)
+        params['vehicles'][0]['start'] = [start.x(), start.y()]
+        params['vehicles'][0]['end'] = [start.x(), start.y()]
+
     for point in point_list:
         params['jobs'].append({
             "location": [point.x(), point.y()],
@@ -62,7 +75,6 @@ def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str) -> dict:
         })
 
     return params
-
 
 def read_help_file(file_name: str):
     """

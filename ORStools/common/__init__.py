@@ -42,3 +42,5 @@ PROFILES = [
 DIMENSIONS = ['time', 'distance']
 
 PREFERENCES = ['fastest', 'shortest', 'recommended']
+
+OPTIMIZATION = ['Do Round Trip', 'Fix Start Point', 'Fix End Point', 'Fix Start and End Point']

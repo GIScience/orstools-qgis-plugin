@@ -37,7 +37,7 @@ from qgis.core import (QgsWkbTypes,
                        QgsPointXY,
                        )
 
-from ORStools.common import directions_core, PROFILES, PREFERENCES
+from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
@@ -90,10 +90,12 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 PREFERENCES,
                 defaultValue=PREFERENCES[0]
             ),
-            QgsProcessingParameterBoolean(
-                name=self.IN_OPTIMIZE,
-                description="Optimize waypoint order (except first and last)",
-                defaultValue=False
+            QgsProcessingParameterEnum(
+                self.IN_OPTIMIZE,
+                "Traveling Salesman",
+                OPTIMIZATION,
+                defaultValue=None,
+                optional=True,
             )
         ]
 
@@ -162,8 +164,8 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 break
 
             try:
-                if optimize:
-                    params = get_params_optimize(points, profile)
+                if optimize is not None:
+                    params = get_params_optimize(points, profile, optimize)
                     response = ors_client.request('/optimization', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_features_optimization(
