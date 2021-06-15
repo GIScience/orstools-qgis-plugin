@@ -17,6 +17,7 @@ changelog=YYYY/MM/DD v1.X.X
     - sort waypoints by input layer field functionality in 'Directions'-Algorithms
     Changed:
     - parameter names of TSP-options for Advanced Directions
+    - help file formatting to highlight parameters and unify format
     Fixed:
     - author information
     - repository link

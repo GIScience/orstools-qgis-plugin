@@ -2,6 +2,7 @@ The Points Directions algorithm calculates optimal routes for multiple start and
 The waypoint order can be specified via <i>Sort Points by</i> and will default to the internal order of each layer.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
+Current <a href="https://openrouteservice.org/restrictions/">restriction limits</a> for the openrouteservice API apply.
 
 <i>Input layers</i>: only Point layers are allowed, <b>not MultiPoint</b>.
 
@@ -15,6 +16,4 @@ You need to have a valid API key for at least one provider (Web ► ORS Tools �
 
 <i>Layer Mode</i>: either 'row-by-row' until one layers has no more features or 'all-by-all' for every feature combination
 
-The output layer is a LineString layer with multiple route attributes.
-
-For current restrictions, please see <a href="https://openrouteservice.org/restrictions/">https://openrouteservice.org/restrictions/</a>.
+<i>Output layer</i>: a LineString layer with multiple route attributes.

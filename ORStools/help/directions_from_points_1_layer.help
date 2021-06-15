@@ -2,6 +2,7 @@ The Point Directions algorithm calculates optimal routes for (Multi)Point layers
 The waypoint order for the routing can be specified via <i>Sort Points by</i> and will default to the internal order of each (Multi)Point layer.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
+Current <a href="https://openrouteservice.org/restrictions/">restriction limits</a> for the openrouteservice API apply.
 
 <i>Input layer</i>: Point or MultiPoint layer.
 
@@ -16,6 +17,4 @@ group features afterwards.
 
 You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Traveling Salesman Optimization</a> on the waypoints of each (Multi)Point feature.
 
-The output layer is a LineString layer with multiple route attributes.
-
-For current restrictions, please see <a href="https://openrouteservice.org/restrictions/">https://openrouteservice.org/restrictions/</a>.
+<i>Output layer</i>: a LineString layer with multiple route attributes.

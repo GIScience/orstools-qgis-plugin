@@ -49,6 +49,7 @@ RELEASING:
 
 ### Changed
 - parameter names of TSP-options for Advanced Directions
+- help file formatting to highlight parameters and unify format
 
 ### Fixed
 - author information

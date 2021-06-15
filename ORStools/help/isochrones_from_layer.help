@@ -1,11 +1,13 @@
 The Isochrone algorithm returns service/reachability areas for multiple locations and time/distance ranges.
 
 You need to have a valid API key ('Web' menu ► 'ORS Tools' ► 'Configuration') or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
+Current <a href="https://openrouteservice.org/restrictions/">restriction limits</a> for the openrouteservice API apply.
 
-As Geometry Input, choose a Point Layer. Only Point layers are allowed, NOT MultiPoint.
+<i>Input layers</i>: only Point layers are allowed, <b>not MultiPoint</b>.
 
-The ID field can be used to join the input layer afterwards. If not specified, it'll take the first field of the input layer.
+<i>ID Field</i>: values will transfer to the output layer and can be used to join layers or group features afterwards.
 
-The ranges parameter needs to be a comma-separated list of integer values, no decimal points. Current restriction limits apply, see https://openrouteservice.org/restrictions/.
+<i>Ranges</i>: parameter needs to be a comma-separated list of integer values, no decimal points.
 
-The output layer is a Polygon layer with ID, range value, travel mode and total population (from GHSL). The CRS is EPSG:4326.
+<i>Output layer</i>: a Polygon layer with ID, range value, travel mode and total population (from <a href="https://ghsl.jrc.ec.europa.eu/about.php">GHSL</a>).
+The CRS is EPSG:4326.
