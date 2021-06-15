@@ -32,7 +32,7 @@ RELEASING:
 6. Replace ORStools/metadata.txt changelog with latest release info
 7. Commit changes with `git commit -m 'Release vX.X.X'`
 8. Tag the commit `git tag -a vX.X.X -m "vX.X.X"`
-9. Push release commit and tag 'git push && git push vX.X.X'
+9. Push release commit and tag 'git push && git push origin vX.X.X'
 10. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*"`
 11. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 12. Create new release in GitHub with tag version and release title of `vX.X.X`
