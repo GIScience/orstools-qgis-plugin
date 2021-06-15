@@ -1,17 +1,21 @@
-The Point Directions algorithm calculates optimal routes for MultiPoint features. The waypoint order for the routing will be the same as the internal order of each MultiPoint feature.
+The Point Directions algorithm calculates optimal routes for (Multi)Point layers.
+The waypoint order for the routing can be specified via <i>Sort Points by</i> and will default to the internal order of each (Multi)Point layer.
 
 You need to have a valid API key for at least one provider (Web ► ORS Tools ► Configuration) or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
 
-The Start layer has to be a MultiPoint layer.
+<i>Input layer</i>: Point or MultiPoint layer.
 
-The Start ID field can be used to join the input layer afterwards.
+<i>ID Field (only MultiPoint layers)</i>: values will transfer to the output layer and can be used to join layers or
+group features afterwards.
 
-The Travel Mode determines the profile used.
+<i>Sort points by</i>: before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)
 
-The Preference dictates the cost. For longer routes don't use Shortest Path.
+<i>Travel Mode</i>: determines the profile used.
 
-You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Traveling Salesman</a> on the waypoints of each MultiPoint feature.
+<i>Travel preference</i>: dictates the cost. For longer routes don't use Shortest Path.
 
-The output layer is a LineStringZ layer with multiple route attributes and <b>z dimension</b> set.
+You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Traveling Salesman Optimization</a> on the waypoints of each (Multi)Point feature.
+
+The output layer is a LineString layer with multiple route attributes.
 
 For current restrictions, please see <a href="https://openrouteservice.org/restrictions/">https://openrouteservice.org/restrictions/</a>.

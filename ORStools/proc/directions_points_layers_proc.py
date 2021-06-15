@@ -50,8 +50,10 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         self.MODE_SELECTION: list = ['Row-by-Row', 'All-by-All']
         self.IN_START = "INPUT_START_LAYER"
         self.IN_START_FIELD = "INPUT_START_FIELD"
+        self.IN_SORT_START_BY = "INPUT_SORT_START_BY"
         self.IN_END = "INPUT_END_LAYER"
         self.IN_END_FIELD = "INPUT_END_FIELD"
+        self.IN_SORT_END_BY = "INPUT_SORT_END_BY"
         self.IN_PROFILE = "INPUT_PROFILE"
         self.IN_PREFERENCE = "INPUT_PREFERENCE"
         self.IN_MODE = "INPUT_MODE"
@@ -68,6 +70,13 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
+            QgsProcessingParameterField(
+                name=self.IN_SORT_START_BY,
+                description="Sort Start Points by",
+                parentLayerParameterName=self.IN_START,
+                defaultValue=None,
+                optional=True
+            ),
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
                 description="Input End Point layer",
@@ -79,6 +88,13 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 parentLayerParameterName=self.IN_END,
                 defaultValue=None,
                 optional=True,
+            ),
+            QgsProcessingParameterField(
+                name=self.IN_SORT_END_BY,
+                description="Sort End Points by",
+                parentLayerParameterName=self.IN_END,
+                defaultValue=None,
+                optional=True
             ),
             QgsProcessingParameterEnum(
                 self.IN_PROFILE,
@@ -120,6 +136,11 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
         source_field_name = parameters[self.IN_START_FIELD]
         source_field = source.fields().field(source_field_name) if source_field_name else None
+        sort_start_by = parameters[self.IN_SORT_START_BY]
+        if sort_start_by:
+            sort_start = lambda f: f.attribute(sort_start_by)
+        else:
+            sort_start = lambda f: f.id()
 
         destination = self.parameterAsSource(
             parameters,
@@ -129,12 +150,19 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
         destination_field_name = parameters[self.IN_END_FIELD]
         destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
+        sort_end_by = parameters[self.IN_SORT_END_BY]
+        if sort_end_by:
+            sort_end = lambda f: f.attribute(sort_end_by)
+        else:
+            sort_end = lambda f: f.id()
 
         route_dict = self._get_route_dict(
             source,
             source_field,
+            sort_start,
             destination,
-            destination_field
+            destination_field,
+            sort_end
         )
 
         if mode == 'Row-by-Row':
@@ -186,7 +214,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_route_dict(source, source_field, destination, destination_field):
+    def _get_route_dict(source, source_field, sort_start, destination, destination_field, sort_end):
         """
         Compute route_dict from input layer.
 
@@ -206,15 +234,14 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         :rtype: dict
         """
         route_dict = dict()
-
-        source_feats = list(source.getFeatures())
+        source_feats = sorted(list(source.getFeatures()), key=sort_start)
         x_former_source = transform.transformToWGS(source.sourceCrs())
         route_dict['start'] = dict(
             geometries=[x_former_source.transform(feat.geometry().asPoint()) for feat in source_feats],
             values=[feat.attribute(source_field.name()) if source_field else feat.id() for feat in source_feats],
         )
 
-        destination_feats = list(destination.getFeatures())
+        destination_feats = sorted(list(destination.getFeatures()), key=sort_end)
         x_former_destination = transform.transformToWGS(destination.sourceCrs())
         route_dict['end'] = dict(
             geometries=[x_former_destination.transform(feat.geometry().asPoint()) for feat in destination_feats],

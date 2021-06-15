@@ -57,6 +57,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.IN_PREFERENCE = "INPUT_PREFERENCE"
         self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
         self.IN_MODE = "INPUT_MODE"
+        self.IN_SORTBY = "INPUT_SORTBY"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
@@ -66,6 +67,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
                 description="Layer ID Field",
+                parentLayerParameterName=self.IN_POINTS,
+                defaultValue=None,
+                optional=True
+            ),
+            QgsProcessingParameterField(
+                name=self.IN_SORTBY,
+                description="Sort Points by",
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
                 optional=True
@@ -119,6 +127,14 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                                                sink_fields,
                                                QgsWkbTypes.LineString,
                                                QgsCoordinateReferenceSystem.fromEpsgId(4326))
+
+        sort_by = parameters[self.IN_SORTBY]
+
+        if sort_by:
+            sort = lambda f: f.attribute(sort_by)
+        else:
+            sort = lambda f: f.id()
+
         count = source.featureCount()
 
         input_points = list()
@@ -127,13 +143,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
         if source.wkbType() == QgsWkbTypes.Point:
             points = list()
-            for feat in sorted(source.getFeatures(), key=lambda f: f.id()):
+            for feat in sorted(source.getFeatures(), key=sort):
                 points.append(x_former.transform(QgsPointXY(feat.geometry().asPoint())))
             input_points.append(points)
             from_values.append(None)
         elif source.wkbType() == QgsWkbTypes.MultiPoint:
             # loop through multipoint features
-            for feat in sorted(source.getFeatures(), key=lambda f: f.id()):
+            for feat in sorted(source.getFeatures(), key=sort):
                 points = list()
                 for point in feat.geometry().asMultiPoint():
                     points.append(x_former.transform(QgsPointXY(point)))
