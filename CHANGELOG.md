@@ -38,7 +38,7 @@ RELEASING:
 12. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## [Unreleased]
+## [1.4.0] - 2021-06-15
 
 ### Added
 - CHANGELOG.md including release instructions
@@ -163,7 +163,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.2.1...v1.2.2
