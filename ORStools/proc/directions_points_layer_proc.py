@@ -37,7 +37,7 @@ from qgis.core import (QgsWkbTypes,
                        QgsPointXY,
                        )
 
-from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION
+from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
@@ -93,7 +93,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 self.IN_OPTIMIZE,
                 "Traveling Salesman",
-                OPTIMIZATION,
+                OPTIMIZATION_MODES,
                 defaultValue=None,
                 optional=True,
             )
@@ -106,7 +106,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
         preference = dict(enumerate(PREFERENCES))[parameters[self.IN_PREFERENCE]]
 
-        optimize = parameters[self.IN_OPTIMIZE]
+        optimization_mode = parameters[self.IN_OPTIMIZE]
 
         # Get parameter values
         source = self.parameterAsSource(
@@ -164,8 +164,8 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 break
 
             try:
-                if optimize is not None:
-                    params = get_params_optimize(points, profile, optimize)
+                if optimization_mode is not None:
+                    params = get_params_optimize(points, profile, optimization_mode)
                     response = ors_client.request('/optimization', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_features_optimization(
