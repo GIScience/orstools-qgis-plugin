@@ -44,6 +44,7 @@ RELEASING:
 - CHANGELOG.md including release instructions
 - 'recommended' preference
 - round trip parameter to TSP-options for Advanced Directions ([#125](https://github.com/GIScience/orstools-qgis-plugin/issues/125))
+- all TSP-options to 'Directions (Line and 1 Layer)' algorithms ([#155](https://github.com/GIScience/orstools-qgis-plugin/issues/155))
 - custom sorting order for waypoints in 'Directions'-Algorithms ([#142](https://github.com/GIScience/orstools-qgis-plugin/issues/142))
 
 ### Changed
