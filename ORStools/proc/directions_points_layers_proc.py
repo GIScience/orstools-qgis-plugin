@@ -138,9 +138,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         source_field = source.fields().field(source_field_name) if source_field_name else None
         sort_start_by = parameters[self.IN_SORT_START_BY]
         if sort_start_by:
-            sort_start = lambda f: f.attribute(sort_start_by)
+            def sort_start(f): return f.attribute(sort_start_by)
         else:
-            sort_start = lambda f: f.id()
+            def sort_start(f): return f.id()
 
         destination = self.parameterAsSource(
             parameters,
@@ -152,9 +152,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
         sort_end_by = parameters[self.IN_SORT_END_BY]
         if sort_end_by:
-            sort_end = lambda f: f.attribute(sort_end_by)
+            def sort_end(f): return f.attribute(sort_end_by)
         else:
-            sort_end = lambda f: f.id()
+            def sort_end(f): return f.id()
 
         route_dict = self._get_route_dict(
             source,

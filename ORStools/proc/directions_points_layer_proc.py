@@ -133,9 +133,9 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         sort_by = parameters[self.IN_SORTBY]
 
         if sort_by:
-            sort = lambda f: f.attribute(sort_by)
+            def sort(f): return f.attribute(sort_by)
         else:
-            sort = lambda f: f.id()
+            def sort(f): return f.id()
 
         count = source.featureCount()
 
