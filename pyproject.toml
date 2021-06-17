@@ -1,0 +1,19 @@
+[tool.black]
+include = '/ORStools'
+extend-exclude = '''
+# .ui-files and corresponding .py-files
+.*UI.py
+|.*/gui/.*.ui
+# static content used for github
+|.*/static/.*
+# plugin metadata and config
+|metadata.txt
+|config.yml
+# help files
+|.*/help/.*
+# gui images 
+|.*/gui/img/.*
+# I don't even know what this does… 
+|resources.qrc
+|resources_rc.py
+'''
