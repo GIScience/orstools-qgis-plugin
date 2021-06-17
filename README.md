@@ -53,7 +53,7 @@ API key: https://openrouteservice.org/sign-up/
 ### Installation
 
 Either from QGIS plugin repository or manually:
-  - [Download](https://github.com/GIScience/orstools-qgis-plugin/archive/master.zip) ZIP file from GitHub
+  - [Download](https://github.com/GIScience/orstools-qgis-plugin/archive/main.zip) ZIP file from GitHub
   - Unzip folder contents and copy `ORStools` folder to:
     - Linux: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins`
     - Windows: `C:\Users\USER\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins`

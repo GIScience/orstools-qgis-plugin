@@ -27,7 +27,7 @@ changelog=2021/06/15 v1.4.0
     - 'cycling-safe' profile
     - gis-ops information
 
-    Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/master/CHANGELOG.md
+    Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki
 
 tracker=https://github.com/GIScience/orstools-qgis-plugin/issues
