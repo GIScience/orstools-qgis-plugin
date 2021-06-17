@@ -33,7 +33,6 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterField,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
-                       QgsProcessingParameterBoolean,
                        QgsPointXY,
                        )
 
