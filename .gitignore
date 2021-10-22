@@ -10,3 +10,5 @@ test/
 dist/
 # QGIS tests
 tests/qgis
+# tag files
+.tags
