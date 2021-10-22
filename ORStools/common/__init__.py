@@ -44,3 +44,9 @@ DIMENSIONS = ['time', 'distance']
 PREFERENCES = ['fastest', 'shortest', 'recommended']
 
 OPTIMIZATION_MODES = ['Round Trip', 'Fix Start Point', 'Fix End Point', 'Fix Start and End Point']
+
+AVOID_FEATURES = ['highways', 'tollways', 'ferries', 'fords', 'steps']
+
+AVOID_BORDERS = ['all', 'controlled', 'none']
+
+ADVANCED_PARAMETERS = ["INPUT_AVOID_FEATURES", "INPUT_AVOID_BORDERS", "INPUT_AVOID_COUNTRIES", "INPUT_AVOID_POLYGONS"]
