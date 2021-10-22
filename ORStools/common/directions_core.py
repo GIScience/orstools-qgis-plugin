@@ -194,7 +194,7 @@ def get_output_features_optimization(response, profile, from_value=None):
     return feat
 
 
-def build_default_parameters(preference: str, point_list: List[QgsPointXY] = None, coordinates: list = None) -> dict:
+def build_default_parameters(preference: str, point_list: List[QgsPointXY] = None, coordinates: list = None, options: dict = None) -> dict:
     """
     Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates
     passed in point_list or an existing coordinate list within the coordinates parameter.
@@ -219,7 +219,8 @@ def build_default_parameters(preference: str, point_list: List[QgsPointXY] = Non
         'geometry': 'true',
         'instructions': 'false',
         'elevation': True,
-        'id': None
+        'id': None,
+        "options": options
     }
 
     return params
