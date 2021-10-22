@@ -120,6 +120,8 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
         mode = dict(enumerate(self.MODE_SELECTION))[parameters[self.IN_MODE]]
 
+        options = self.parseOptions(parameters, context)
+
         # Get parameter values
         source = self.parameterAsSource(
             parameters,
@@ -181,7 +183,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             if feedback.isCanceled():
                 break
 
-            params = directions_core.build_default_parameters(preference, coordinates=coordinates)
+            params = directions_core.build_default_parameters(preference, coordinates=coordinates, options=options)
 
             try:
                 response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)

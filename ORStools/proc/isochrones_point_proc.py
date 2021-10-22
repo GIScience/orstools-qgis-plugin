@@ -89,6 +89,8 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         ranges_raw = parameters[self.IN_RANGES]
         ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
 
+        options = self.parseOptions(parameters, context)
+
         point = self.parameterAsPoint(parameters, self.IN_POINT, context, self.crs_out)
 
         # Make the actual requests
@@ -99,7 +101,8 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             "range_type": dimension,
             "range": ranges_proc,
             "attributes": ['total_pop'],
-            "id": None
+            "id": None,
+            "options": options
         }
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,

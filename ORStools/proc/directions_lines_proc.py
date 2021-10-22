@@ -91,6 +91,8 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
 
         optimization_mode = parameters[self.IN_OPTIMIZE]
 
+        options = self.parseOptions(parameters, context)
+
         # Get parameter values
         source = self.parameterAsSource(
             parameters,
@@ -136,7 +138,7 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
                         from_value=field_value
                     ))
                 else:
-                    params = directions_core.build_default_parameters(preference, point_list=line)
+                    params = directions_core.build_default_parameters(preference, point_list=line, options=options)
                     response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_feature_directions(

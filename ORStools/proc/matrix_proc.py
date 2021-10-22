@@ -88,6 +88,8 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
+        options = self.parseOptions(parameters, context)
+
         # Get parameter values
         source = self.parameterAsSource(
             parameters,
@@ -144,7 +146,8 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             'sources': sources_ids,
             'destinations': destination_ids,
             'metrics': ["duration", "distance"],
-            'id': 'Matrix'
+            'id': 'Matrix',
+            'options': options
         }
 
         # get types of set ID fields
