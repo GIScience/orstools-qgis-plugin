@@ -107,6 +107,8 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
 
+        options = self.parseOptions(parameters, context)
+
         # Make the actual requests
         requests = []
         if source.wkbType() == 4:
@@ -133,6 +135,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 "range": ranges_proc,
                 "attributes": ['total_pop'],
                 "id": id_value,
+                "options": options
             })
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
