@@ -26,9 +26,14 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.core import (QgsProcessingAlgorithm,
+from qgis.core import (QgsProcessing,
+                       QgsProcessingAlgorithm,
+                       QgsProcessingContext,
+                       QgsProcessingParameterDefinition,
                        QgsProcessingParameterEnum,
+                       QgsProcessingParameterString,
                        QgsProcessingParameterFeatureSink,
+                       QgsProcessingParameterFeatureSource,
                        QgsProcessingFeedback
                        )
 from typing import Any
@@ -39,6 +44,7 @@ from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
 from ..common import client, PROFILES, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
 from ..utils.processing import read_help_file
+from ..gui.directions_gui import _get_avoid_polygons
 
 
 # noinspection PyPep8Naming
@@ -140,6 +146,37 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             description=self.GROUP,
         )
 
+    def option_parameters(self) -> [QgsProcessingParameterDefinition]:
+        return [
+            QgsProcessingParameterEnum(
+                self.IN_AVOID_FEATS,
+                "Features to avoid",
+                AVOID_FEATURES,
+                defaultValue=None,
+                optional=True,
+                allowMultiple=True
+            ),
+            QgsProcessingParameterEnum(
+                self.IN_AVOID_BORDERS,
+                "Types of borders to avoid",
+                AVOID_BORDERS,
+                defaultValue=None,
+                optional=True
+            ),
+            QgsProcessingParameterString(
+                self.IN_AVOID_COUNTRIES,
+                "Comma-separated list of ids of countries to avoid",
+                defaultValue=None,
+                optional=True
+            ),
+            QgsProcessingParameterFeatureSource(
+                self.IN_AVOID_POLYGONS,
+                "Polygons to avoid",
+                types=[QgsProcessing.TypeVectorPolygon],
+                optional=True
+            )
+        ]
+
     @staticmethod
     def _get_ors_client_from_provider(provider: str, feedback: QgsProcessingFeedback) -> client.Client:
         """
@@ -151,14 +188,41 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         ors_client.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying..."))
         return ors_client
 
+
+    def parseOptions(self, parameters: dict, context: QgsProcessingContext) -> dict:
+        options = dict()
+
+        features_raw = parameters[self.IN_AVOID_FEATS]
+        if features_raw:
+            options['avoid_features'] = [dict(enumerate(AVOID_FEATURES))[feat] for feat in features_raw]
+
+        borders_raw = parameters[self.IN_AVOID_BORDERS]
+        if borders_raw:
+            options['avoid_borders'] = dict(enumerate(AVOID_BORDERS))[borders_raw]
+
+        countries_raw = parameters[self.IN_AVOID_COUNTRIES]
+        if countries_raw:
+            options['avoid_countries'] = list(map(int, countries_raw.split(',')))
+
+        polygons_layer = self.parameterAsLayer(parameters, self.IN_AVOID_POLYGONS, context)
+        if polygons_layer:
+            options['avoid_polygons'] = _get_avoid_polygons(polygons_layer)
+
+        return options
+
     # noinspection PyUnusedLocal
     def initAlgorithm(self, configuration):
         """
         Combines default and algorithm parameters and adds them in order to the
         algorithm dialog window.
         """
-        parameters = [self.provider_parameter()] + self.PARAMETERS + [self.output_parameter()]
+        parameters = [self.provider_parameter(), self.profile_parameter()] + self.PARAMETERS + self.option_parameters() + [self.output_parameter()]
         for param in parameters:
+            if param.name() in ADVANCED_PARAMETERS:
+                # flags() is a wrapper around an enum of ints for type-safety.
+                # Flags are added by or-ing values, much like the union operator would work
+                param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+
             self.addParameter(
                 param
             )
