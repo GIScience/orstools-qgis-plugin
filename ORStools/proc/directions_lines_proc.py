@@ -51,7 +51,6 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
         self.GROUP = "Directions"
         self.IN_LINES = "INPUT_LINE_LAYER"
         self.IN_FIELD = "INPUT_LAYER_FIELD"
-        self.IN_PROFILE = "INPUT_PROFILE"
         self.IN_PREFERENCE = "INPUT_PREFERENCE"
         self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
         self.IN_MODE = "INPUT_MODE"
@@ -67,12 +66,6 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
                 parentLayerParameterName=self.IN_LINES,
                 defaultValue=None,
                 optional=True,
-            ),
-            QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
             ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,

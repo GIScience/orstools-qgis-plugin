@@ -37,7 +37,7 @@ from PyQt5.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
-from ..common import client
+from ..common import client, PROFILES, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
 from ..utils.processing import read_help_file
 
 
@@ -53,6 +53,11 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.ALGO_NAME = ''
         self.GROUP = ''
         self.IN_PROVIDER = "INPUT_PROVIDER"
+        self.IN_PROFILE = "INPUT_PROFILE"
+        self.IN_AVOID_FEATS = "INPUT_AVOID_FEATURES"
+        self.IN_AVOID_BORDERS = "INPUT_AVOID_BORDERS"
+        self.IN_AVOID_COUNTRIES = "INPUT_AVOID_COUNTRIES"
+        self.IN_AVOID_POLYGONS = "INPUT_AVOID_POLYGONS"
         self.OUT = 'OUTPUT'
         self.PARAMETERS = None
 
@@ -114,6 +119,17 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             providers,
             defaultValue=providers[0]
         )
+
+    def profile_parameter(self) -> QgsProcessingParameterEnum:
+        """
+        Parameter definition for profile, used in all child classes
+        """
+        return QgsProcessingParameterEnum(
+                self.IN_PROFILE,
+                "Travel mode",
+                PROFILES,
+                defaultValue=PROFILES[0]
+            )
 
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:
         """

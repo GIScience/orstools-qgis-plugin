@@ -52,7 +52,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         self.IN_POINTS = "INPUT_POINT_LAYER"
         self.IN_FIELD = "INPUT_FIELD"
-        self.IN_PROFILE = "INPUT_PROFILE"
         self.IN_METRIC = 'INPUT_METRIC'
         self.IN_RANGES = 'INPUT_RANGES'
         self.IN_KEY = 'INPUT_APIKEY'
@@ -72,12 +71,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 description="Input layer ID Field (mutually exclusive with Point option)",
                 parentLayerParameterName=self.IN_POINTS,
                 optional=True
-            ),
-            QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
             ),
             QgsProcessingParameterEnum(
                 name=self.IN_METRIC,
