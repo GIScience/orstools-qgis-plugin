@@ -52,7 +52,6 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.GROUP = "Directions"
         self.IN_POINTS = "INPUT_POINT_LAYER"
         self.IN_FIELD = "INPUT_LAYER_FIELD"
-        self.IN_PROFILE = "INPUT_PROFILE"
         self.IN_PREFERENCE = "INPUT_PREFERENCE"
         self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
         self.IN_MODE = "INPUT_MODE"
@@ -76,12 +75,6 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
                 optional=True
-            ),
-            QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
             ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,

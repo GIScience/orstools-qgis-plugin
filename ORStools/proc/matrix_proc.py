@@ -55,7 +55,6 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         self.IN_START_FIELD = "INPUT_START_FIELD"
         self.IN_END = "INPUT_END_LAYER"
         self.IN_END_FIELD = "INPUT_END_FIELD"
-        self.IN_PROFILE = "INPUT_PROFILE"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
@@ -81,12 +80,6 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
-            QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
-            )
         ]
 
     def processAlgorithm(self, parameters, context, feedback):

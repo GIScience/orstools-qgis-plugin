@@ -47,7 +47,6 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         self.ALGO_NAME = 'isochrones_from_point'
         self.GROUP = "Isochrones"
         self.IN_POINT = "INPUT_POINT"
-        self.IN_PROFILE = "INPUT_PROFILE"
         self.IN_METRIC = 'INPUT_METRIC'
         self.IN_RANGES = 'INPUT_RANGES'
         self.IN_KEY = 'INPUT_APIKEY'
@@ -57,12 +56,6 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
                 name=self.IN_POINT,
                 description="Input Point from map canvas (mutually exclusive with layer option)",
                 optional=True
-            ),
-            QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
             ),
             QgsProcessingParameterEnum(
                 name=self.IN_METRIC,
