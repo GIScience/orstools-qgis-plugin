@@ -17,4 +17,6 @@ group features afterwards.
 
 You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Traveling Salesman Optimization</a> on the waypoints of each (Multi)Point feature.
 
+<i>Advanced Parameters</i>: see <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">the documentation</a> for descriptions.
+
 <i>Output layer</i>: a LineString layer with multiple route attributes.

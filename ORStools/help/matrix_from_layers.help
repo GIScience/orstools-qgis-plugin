@@ -8,6 +8,8 @@ You need to have a valid API key ('Web' menu > 'Configuration') or sign up at <a
 
 <i>ID Field</i>: values will transfer to the output layer and can be used to join layers or group features afterwards.
 
+<i>Advanced Parameters</i>: see <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">the documentation</a> for descriptions.
+
 <i>Output layer</i>: a geometry-less table with ID, duration and distance attributes.
 
 Current <a href="https://openrouteservice.org/restrictions/">restriction limits</a> for the openrouteservice API apply.
