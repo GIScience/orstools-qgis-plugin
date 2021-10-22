@@ -14,4 +14,6 @@ Current <a href="https://openrouteservice.org/restrictions/">restriction limits<
 
 You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Traveling Salesman</a> on the waypoints of each MultiPoint feature.
 
+<i>Advanced Parameters</i>: see <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">the documentation</a> for descriptions.
+
 <i>Output layer</i>: a LineStringZ layer with multiple route attributes and <b>z dimension</b> set.
