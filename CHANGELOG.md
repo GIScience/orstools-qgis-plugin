@@ -40,8 +40,9 @@ RELEASING:
 ## Unreleased
 
 ### Added
-- isochrone center lat and lon to isochrone attribute table([#137](https://github.com/GIScience/orstools-qgis-plugin/issues/137))
-
+- isochrone center lat and lon to isochrone attribute table ([#137](https://github.com/GIScience/orstools-qgis-plugin/issues/137))
+- implement `options`-parameter for routing and isochrones
+- prepare `options`-parameter for matrix
 
 ## [1.4.0] - 2021-06-15
 
