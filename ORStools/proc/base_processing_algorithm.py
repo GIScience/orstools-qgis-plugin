@@ -219,9 +219,12 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         parameters = [self.provider_parameter(), self.profile_parameter()] + self.PARAMETERS + self.option_parameters() + [self.output_parameter()]
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
-                # flags() is a wrapper around an enum of ints for type-safety.
-                # Flags are added by or-ing values, much like the union operator would work
-                param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+                if self.GROUP == "Matrix":
+                    param.setFlags(param.flags()| QgsProcessingParameterDefinition.FlagHidden)
+                else:
+                    # flags() is a wrapper around an enum of ints for type-safety.
+                    # Flags are added by or-ing values, much like the union operator would work
+                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
 
             self.addParameter(
                 param
