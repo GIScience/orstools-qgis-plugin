@@ -95,6 +95,8 @@ class Isochrones:
         """
         fields = QgsFields()
         fields.append(QgsField(self.id_field_name, self.id_field_type))  # ID field
+        fields.append(QgsField("CENTER_LON", QVariant.String))
+        fields.append(QgsField("CENTER_LAT", QVariant.String))
         fields.append(QgsField(self.field_dimension_name, QVariant.Int))  # Dimension field
         fields.append(QgsField("AA_MODE", QVariant.String))
         fields.append(QgsField("TOTAL_POP", QVariant.String))
@@ -121,11 +123,14 @@ class Isochrones:
             feat = QgsFeature()
             coordinates = isochrone['geometry']['coordinates']
             iso_value = isochrone['properties']['value']
+            center = isochrone['properties']['center']
             total_pop = isochrone['properties'].get('total_pop')
             qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
             feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
             feat.setAttributes([
                 id_field_value,
+                center[0],
+                center[1],
                 int(iso_value / self.factor),
                 self.profile,
                 total_pop
