@@ -37,6 +37,11 @@ RELEASING:
 11. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 12. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+## Unreleased
+
+### Added
+- isochrone center lat and lon to isochrone attribute table([#137](https://github.com/GIScience/orstools-qgis-plugin/issues/137))
+
 
 ## [1.4.0] - 2021-06-15
 
