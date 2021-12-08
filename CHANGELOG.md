@@ -30,14 +30,17 @@ RELEASING:
 [new]: https://github.com/GIScience/orstools-qgis-plugin/compare/vlast...vnew
 5. Double check issue links are valid. Format: item ([#issue-nr](full-url))
 6. Replace ORStools/metadata.txt changelog with latest release info
-7. Commit changes with `git commit -m 'Release vX.X.X'`
-8. Tag the commit `git tag -a vX.X.X -m "vX.X.X"`
-9. Push release commit and tag 'git push && git push origin vX.X.X'
-10. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*"`
-11. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
-12. Create new release in GitHub with tag version and release title of `vX.X.X`
+7. Update ORStools/metadata.txt with the new version number
+8. Commit changes with `git commit -m 'Release vX.X.X'`
+9. Tag the commit `git tag -a vX.X.X -m "vX.X.X"`
+10. Push release commit and tag 'git push && git push origin vX.X.X'
+11. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*"`
+12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
+13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 ## Unreleased
+
+## [1.5.0] - 2021-12-08
 
 ### Added
 - isochrone center lat and lon to isochrone attribute table ([#137](https://github.com/GIScience/orstools-qgis-plugin/issues/137))
@@ -174,7 +177,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.4.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.2.2...v1.2.3

@@ -3,29 +3,21 @@ name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.4.0
+version=1.5.0
 author=HeiGIT gGmbH
 email=support@openrouteservice.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2021/06/15 v1.4.0
+changelog=2021/12/08 v1.5.0
     Added:
-    - 'recommended' preference
-    - round trip parameter to TSP-options for Advanced Directions
-    - all TSP-options to 'Directions (Line and 1 Layer)' algorithms
-    - sort waypoints by input layer field functionality in 'Directions'-Algorithms
+    - isochrone center lat and lon to isochrone attribute table
+    - implement `options`-parameter for routing and isochrones
+    - prepare `options`-parameter for matrix
+    - custom request timeouts for providers
+    - exception on network failures due to unresponsive provider
     Changed:
-    - parameter names of TSP-options for Advanced Directions
-    - help file formatting to highlight parameters and unify format
-    Fixed:
-    - author information
-    - repository link
-    - Correct isochrone computation from layer without fields
-    - other errors stemming from layers without fields
-    Removed:
-    - 'cycling-safe' profile
-    - gis-ops information
+    - default url for new provider entry to default ors backend url
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki
