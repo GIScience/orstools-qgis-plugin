@@ -117,7 +117,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         # Show quick user input dialog
         provider_name, ok = QInputDialog.getText(self, "New ORS provider", "Enter a name for the provider")
         if ok:
-            self._add_box(provider_name, 'https://', '', 60, new=True)
+            self._add_box(provider_name, 'http://localhost:8082/ors', '', 60, new=True)
 
     def _remove_provider(self):
         """Remove list of providers from list."""
