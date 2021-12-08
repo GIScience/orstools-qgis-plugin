@@ -44,6 +44,7 @@ RELEASING:
 - implement `options`-parameter for routing and isochrones
 - prepare `options`-parameter for matrix
 - custom request timeouts for providers ([#122](https://github.com/GIScience/orstools-qgis-plugin/issues/122))
+- exception on network failures due to unresponsive provider
 
 ## [1.4.0] - 2021-06-15
 
