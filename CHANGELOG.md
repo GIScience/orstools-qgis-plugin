@@ -46,6 +46,9 @@ RELEASING:
 - custom request timeouts for providers ([#122](https://github.com/GIScience/orstools-qgis-plugin/issues/122))
 - exception on network failures due to unresponsive provider
 
+### Changed
+- default url for new provider entry to default ors backend url
+
 ## [1.4.0] - 2021-06-15
 
 ### Added
