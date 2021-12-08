@@ -204,25 +204,28 @@ class Client(QObject):
         status_code = self.nam.http_call_result.status_code
         message = self.nam.http_call_result.text if self.nam.http_call_result.text != '' else self.nam.http_call_result.reason
 
-        if status_code == 403:
+        if not status_code:
+            raise Exception(f"{message}. Are your provider settings correct and the provider ready?")
+
+        elif status_code == 403:
             raise exceptions.InvalidKey(
                 str(status_code),
                 message
             )
 
-        if status_code == 429:
+        elif status_code == 429:
             raise exceptions.OverQueryLimit(
                 str(status_code),
                 message
             )
         # Internal error message for Bad Request
-        if 400 <= status_code < 500:
+        elif 400 <= status_code < 500:
             raise exceptions.ApiError(
                 str(status_code),
                 message
             )
         # Other HTTP errors have different formatting
-        if status_code != 200:
+        elif status_code != 200:
             raise exceptions.GenericServerError(
                 str(status_code),
                 message
