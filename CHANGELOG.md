@@ -40,6 +40,9 @@ RELEASING:
  -->
 ## Unreleased
 
+### Fixed
+- matrix algorithm parsing hidden options ([#164](https://github.com/GIScience/orstools-qgis-plugin/issues/164))
+
 ## [1.5.0] - 2021-12-08
 
 ### Added

@@ -188,7 +188,6 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         ors_client.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying..."))
         return ors_client
 
-
     def parseOptions(self, parameters: dict, context: QgsProcessingContext) -> dict:
         options = dict()
 
