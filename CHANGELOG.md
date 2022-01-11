@@ -38,7 +38,7 @@ RELEASING:
 12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
-## Unreleased
+## [1.5.1] - 2022-01-11
 
 ### Fixed
 - matrix algorithm parsing hidden options ([#164](https://github.com/GIScience/orstools-qgis-plugin/issues/164))
@@ -180,7 +180,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.2.3...v1.3.0
