@@ -137,13 +137,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         from_values = list()
         x_former = transform.transformToWGS(source.sourceCrs())
 
-        if source.wkbType() == QgsWkbTypes.Point:
+        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Point:
             points = list()
             for feat in sorted(source.getFeatures(), key=sort):
                 points.append(x_former.transform(QgsPointXY(feat.geometry().asPoint())))
             input_points.append(points)
             from_values.append(None)
-        elif source.wkbType() == QgsWkbTypes.MultiPoint:
+        elif QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.MultiPoint:
             # loop through multipoint features
             for feat in sorted(source.getFeatures(), key=sort):
                 points = list()
