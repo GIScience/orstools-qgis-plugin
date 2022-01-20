@@ -178,12 +178,12 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             line = None
             field_value = feat[field_name] if field_name else None
 
-            if layer.wkbType() == QgsWkbTypes.MultiLineString:
+            if QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.MultiLineString:
                 # TODO: only takes the first polyline geometry from the multiline geometry currently
                 # Loop over all polyline geometries
                 line = [x_former.transform(QgsPointXY(point)) for point in feat.geometry().asMultiPolyline()[0]]
 
-            elif layer.wkbType() == QgsWkbTypes.LineString:
+            elif QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.LineString:
                 line = [x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()]
 
             yield line, field_value

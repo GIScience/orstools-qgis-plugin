@@ -111,7 +111,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         # Make the actual requests
         requests = []
-        if source.wkbType() == 4:
+        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.MultiPoint:
             raise QgsProcessingException(
                 "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
 
