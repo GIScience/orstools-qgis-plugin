@@ -35,7 +35,6 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingException,
                        QgsProcessingParameterField,
                        QgsProcessingParameterFeatureSource,
-                       QgsProcessingParameterEnum,
                        )
 
 from PyQt5.QtCore import QVariant
@@ -110,7 +109,8 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
 
         # Abort when MultiPoint type
-        if (source.wkbType() or destination.wkbType()) == 4:
+        if (QgsWkbTypes.flatType(source.wkbType()) or QgsWkbTypes.flatType(destination.wkbType()))\
+                == QgsWkbTypes.MultiPoint:
             raise QgsProcessingException(
                 "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
 

@@ -41,8 +41,7 @@ RELEASING:
 ## [Unreleased]
 
 ## Fixed
-- error on line layers with z/m values ([#166](https://github.com/GIScience/orstools-qgis-plugin/pull/166))
-- error on point layers with z/m values
+- error for layers with z/m values ([#166](https://github.com/GIScience/orstools-qgis-plugin/pull/166))
 
 ## [1.5.1] - 2022-01-11
 
