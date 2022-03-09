@@ -111,8 +111,8 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
-    def processAlgorithm(self, parameters, context, feedback):
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+    def processAlgorithm(self, parameters, context, feedback, **kwargs):
+        super().processAlgorithm(parameters, context, feedback, **kwargs)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
@@ -186,7 +186,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             params = directions_core.build_default_parameters(preference, coordinates=coordinates, options=options)
 
             try:
-                response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
+                response = self.ORS_CLIENT.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
             except (exceptions.ApiError,
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:

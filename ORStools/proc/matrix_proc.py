@@ -81,8 +81,8 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+    def processAlgorithm(self, parameters, context, feedback, **kwargs):
+        super().processAlgorithm(parameters, context, feedback, **kwargs)
 
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -162,7 +162,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request('/v2/matrix/' + profile, {}, post_json=params)
+            response = self.ORS_CLIENT.request('/v2/matrix/' + profile, {}, post_json=params)
 
         except (exceptions.ApiError,
                 exceptions.InvalidKey,

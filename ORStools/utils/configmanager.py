@@ -68,3 +68,33 @@ def write_env_var(key, value):
     :type value: str
     """
     os.environ[key] = value
+
+
+def set_active_provider(new_index: int):
+    """
+    Sets the boolean 'active' flag for the provider to True and for all others to False
+
+    :param new_index: index of the new active provider in the config.yml providers list
+    :type new_index: int
+    """
+    config = read_config()
+    for i, provider in enumerate(config["providers"]):
+        provider["active"] = i == new_index
+    write_config(config)
+
+
+def get_active_provider_index() -> int:
+    """
+    Get the active provider index.
+    In case the active provider was removed the first provider is set to active.
+
+    :return: active provider index
+    :rtype: int
+    """
+    providers = read_config()["providers"]
+    active_list = [p['active'] if 'active' in p.keys() else False for p in providers]
+    if True in active_list:
+        return active_list.index(True)
+    else:
+        set_active_provider(0)
+        return 0

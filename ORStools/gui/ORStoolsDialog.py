@@ -58,6 +58,7 @@ from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 from . import resources_rc
 
 
+
 def on_config_click(parent):
     """Pop up provider config window. Outside of classes because it's accessed by multiple dialogs.
 
@@ -95,6 +96,12 @@ def on_about_click(parent):
         f'About {PLUGIN_NAME}',
         info
     )
+
+
+def on_change_save_provider(index):
+    """Set the provider with the passed index as active provider if it isn't already"""
+    if index != configmanager.get_active_provider_index():
+        configmanager.set_active_provider(index)
 
 
 class ORStoolsDialogMain:
@@ -219,6 +226,9 @@ class ORStoolsDialogMain:
         for provider in providers:
             self.dlg.provider_combo.addItem(provider['name'], provider)
 
+        self.dlg.provider_combo.setCurrentIndex(configmanager.get_active_provider_index())
+        self.dlg.provider_combo.activated.connect(on_change_save_provider)
+
         self.dlg.show()
 
     def run_gui_control(self):
@@ -292,7 +302,7 @@ Remember, the first and last location are not part of the optimization.
                 params['coordinates'] = directions.get_request_line_feature()
                 profile = self.dlg.routing_travel_combo.currentText()
                 # abort on empty avoid polygons layer
-                if 'options' in params and 'avoid_polygons' in params['options']\
+                if 'options' in params and 'avoid_polygons' in params['options'] \
                         and params['options']['avoid_polygons'] == {}:
                     QMessageBox.warning(
                         self.dlg,
