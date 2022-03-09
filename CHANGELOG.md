@@ -42,6 +42,7 @@ RELEASING:
 
 ### Added
 - active provider storage, persisted between QGIS sessions ([#168](https://github.com/GIScience/orstools-qgis-plugin/pull/166)) 
+- provider storage to processing scripts
 
 ## [1.5.2] - 2022-01-20
 

@@ -42,6 +42,7 @@ from PyQt5.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
+from ORStools.gui.ORStoolsDialog import on_change_save_provider
 from ..common import client, PROFILES, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
 from ..utils.processing import read_help_file
 from ..gui.directions_gui import _get_avoid_polygons
@@ -120,11 +121,15 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Parameter definition for provider, used in all child classes
         """
         providers = [provider['name'] for provider in configmanager.read_config()['providers']]
+        active_provider = providers[configmanager.get_active_provider_index()]
+        # reorders enum options so the active provider is shown at the top which
+        # setting the defaultValue of the QgsProcessingParameterEnum here does not work
+        providers.sort(key=lambda x: x != active_provider)
         return QgsProcessingParameterEnum(
             self.IN_PROVIDER,
             "Provider",
             providers,
-            defaultValue=providers[0]
+            defaultValue=active_provider
         )
 
     def profile_parameter(self) -> QgsProcessingParameterEnum:
@@ -178,9 +183,23 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             )
         ]
 
-    @staticmethod
-    def _get_provider_from_id(provider_id: int) -> dict:
-        return configmanager.read_config()['providers'][provider_id]
+    def _get_provider_from_id(self, provider_id: int) -> dict:
+        """
+        Resolve the index from the reordered QgsProcessingParameterEnum options to the actual provider
+        dict from the config storage.
+
+        Also sets the selected provider to active.
+
+        :param provider_id: the provider ID in the dropdown of the processing script
+        :return:
+        """
+        provider_name = self.provider_parameter().options()[provider_id]
+        providers = configmanager.read_config()['providers']
+
+        ors_provider = next((p for p in providers if p['name'] == provider_name), None)
+        on_change_save_provider(providers.index(ors_provider))
+
+        return ors_provider
 
     @staticmethod
     def _get_ors_client_from_provider(provider: dict, feedback: QgsProcessingFeedback) -> client.Client:
