@@ -38,9 +38,14 @@ RELEASING:
 12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+## [Unreleased]
+
+### Added
+- active provider storage, persisted between QGIS sessions ([#168](https://github.com/GIScience/orstools-qgis-plugin/pull/166)) 
+
 ## [1.5.2] - 2022-01-20
 
-## Fixed
+### Fixed
 - error for layers with z/m values ([#166](https://github.com/GIScience/orstools-qgis-plugin/pull/166))
 
 ## [1.5.1] - 2022-01-11
