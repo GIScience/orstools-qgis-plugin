@@ -94,8 +94,8 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.prepareAlgorithm
-    def processAlgorithm(self, parameters, context, feedback):
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+    def processAlgorithm(self, parameters, context, feedback, **kwargs):
+        super().processAlgorithm(parameters, context, feedback, **kwargs)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
@@ -152,7 +152,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                response = ors_client.request('/v2/isochrones/' + profile, {}, post_json=params)
+                response = self.ORS_CLIENT.request('/v2/isochrones/' + profile, {}, post_json=params)
 
                 for isochrone in self.isochrones.get_features(response, params['id']):
                     sink.addFeature(isochrone)

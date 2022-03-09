@@ -82,8 +82,8 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             )
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+    def processAlgorithm(self, parameters, context, feedback, **kwargs):
+        super().processAlgorithm(parameters, context, feedback, **kwargs)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
@@ -130,7 +130,7 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             try:
                 if optimization_mode is not None:
                     params = get_params_optimize(line, profile, optimization_mode)
-                    response = ors_client.request('/optimization', {}, post_json=params)
+                    response = self.ORS_CLIENT.request('/optimization', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_features_optimization(
                         response,
@@ -139,7 +139,7 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
                     ))
                 else:
                     params = directions_core.build_default_parameters(preference, point_list=line, options=options)
-                    response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
+                    response = self.ORS_CLIENT.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
 
                     sink.addFeature(directions_core.get_output_feature_directions(
                         response,

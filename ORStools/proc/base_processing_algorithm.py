@@ -66,6 +66,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.IN_AVOID_POLYGONS = "INPUT_AVOID_POLYGONS"
         self.OUT = 'OUTPUT'
         self.PARAMETERS = None
+        self.ORS_CLIENT = None
 
     def createInstance(self) -> Any:
         """
@@ -131,11 +132,11 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Parameter definition for profile, used in all child classes
         """
         return QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
-            )
+            self.IN_PROFILE,
+            "Travel mode",
+            PROFILES,
+            defaultValue=PROFILES[0]
+        )
 
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:
         """
@@ -178,13 +179,17 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         ]
 
     @staticmethod
-    def _get_ors_client_from_provider(provider: str, feedback: QgsProcessingFeedback) -> client.Client:
+    def _get_provider_from_id(provider_id: int) -> dict:
+        return configmanager.read_config()['providers'][provider_id]
+
+    @staticmethod
+    def _get_ors_client_from_provider(provider: dict, feedback: QgsProcessingFeedback) -> client.Client:
         """
         Connects client to provider and returns a client instance for requests to the ors API
         """
-        providers = configmanager.read_config()['providers']
-        ors_provider = providers[provider]
-        ors_client = client.Client(ors_provider)
+        ors_client = client.Client(provider)
+        if not ors_client:
+            feedback.reportError("Provider not found in provider configuration.", fatalError=True)
         ors_client.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying..."))
         return ors_client
 
@@ -219,7 +224,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
                 if self.GROUP == "Matrix":
-                    param.setFlags(param.flags()| QgsProcessingParameterDefinition.FlagHidden)
+                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagHidden)
                 else:
                     # flags() is a wrapper around an enum of ints for type-safety.
                     # Flags are added by or-ing values, much like the union operator would work
@@ -228,3 +233,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             self.addParameter(
                 param
             )
+
+    def processAlgorithm(self, parameters, context, feedback, **kwargs):
+        ors_provider = self._get_provider_from_id(parameters[self.IN_PROVIDER])
+        self.ORS_CLIENT = self._get_ors_client_from_provider(ors_provider, feedback)
