@@ -48,7 +48,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.canvas = canvas
         QgsMapToolEmitPoint.__init__(self, self.canvas)
 
-        self.rubberBand = QgsRubberBand(self.canvas, False)
+        self.rubberBand = QgsRubberBand(mapCanvas=self.canvas, geometryType=QgsWkbTypes.LineGeometry)
         self.rubberBand.setStrokeColor(QColor(DEFAULT_COLOR))
         self.rubberBand.setWidth(3)
 
@@ -61,7 +61,7 @@ class LineTool(QgsMapToolEmitPoint):
         """reset rubber band and captured points."""
 
         self.points = []
-        self.rubberBand.reset(QgsWkbTypes.LineGeometry)
+        self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
 
     pointDrawn = pyqtSignal(["QgsPointXY", "int"])
     def canvasReleaseEvent(self, e):
@@ -75,7 +75,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     def showLine(self):
         """Builds rubber band from all points and adds it to the map canvas."""
-        self.rubberBand.reset(QgsWkbTypes.LineGeometry)
+        self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
         for point in self.points:
             if point == self.points[-1]:
                 self.rubberBand.addPoint(point, True)
