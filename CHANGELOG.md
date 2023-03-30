@@ -31,16 +31,21 @@ RELEASING:
 5. Double check issue links are valid. Format: item ([#issue-nr](full-url))
 6. Replace ORStools/metadata.txt changelog with latest release info
 7. Update ORStools/metadata.txt with the new version number
-8. Commit changes with `git commit -m 'Release vX.X.X'`
+8. Commit changes with `git commit -m 'chore: release vX.X.X'`
 9. Tag the commit `git tag -a vX.X.X -m "vX.X.X"`
 10. Push release commit and tag 'git push && git push origin vX.X.X'
 11. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*"`
 12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+## [1.5.3] - 2023-03-30
+
+### Fixed
+- error on QGIS 3.30 with QgsWkbType used for QgsRubberBand ([#179](https://github.com/GIScience/orstools-qgis-plugin/pull/179))
+
 ## [1.5.2] - 2022-01-20
 
-## Fixed
+### Fixed
 - error for layers with z/m values ([#166](https://github.com/GIScience/orstools-qgis-plugin/pull/166))
 
 ## [1.5.1] - 2022-01-11
@@ -185,7 +190,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.2...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.3...HEAD
+[1.5.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.4.0...v1.5.0
