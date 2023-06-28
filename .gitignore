@@ -4,7 +4,6 @@ docs/wiki/OSMtools.wiki/
 ./LICENSE.md
 ./apikey.txt
 *.pyc
-i18n/
 test/
 .spyproject/
 dist/
