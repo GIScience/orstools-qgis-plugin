@@ -59,28 +59,28 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
-                description="Input Point layer",
+                description=self.tr("Input Point layer"),
                 types=[QgsProcessing.TypeVectorPoint]
             ),
             # QgsProcessingParameterBoolean(
             #     name=self.IN_DIFFERENCE,
-            #     description="Dissolve and calculate isochrone difference",
+            #     description=self.tr("Dissolve and calculate isochrone difference"),
             # )
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
-                description="Input layer ID Field (mutually exclusive with Point option)",
+                description=self.tr("Input layer ID Field (mutually exclusive with Point option)"),
                 parentLayerParameterName=self.IN_POINTS,
                 optional=True
             ),
             QgsProcessingParameterEnum(
                 name=self.IN_METRIC,
-                description="Dimension",
+                description=self.tr("Dimension"),
                 options=DIMENSIONS,
                 defaultValue=DIMENSIONS[0]
             ),
             QgsProcessingParameterString(
                 name=self.IN_RANGES,
-                description="Comma-separated ranges [min or m]",
+                description=self.tr("Comma-separated ranges [min or m]"),
                 defaultValue="5, 10"
             )
         ]

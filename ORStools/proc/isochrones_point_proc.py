@@ -54,18 +54,18 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         self.PARAMETERS = [
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,
-                description="Input Point from map canvas (mutually exclusive with layer option)",
+                description=self.tr("Input Point from map canvas (mutually exclusive with layer option)"),
                 optional=True
             ),
             QgsProcessingParameterEnum(
                 name=self.IN_METRIC,
-                description="Dimension",
+                description=self.tr("Dimension"),
                 options=DIMENSIONS,
                 defaultValue=DIMENSIONS[0]
             ),
             QgsProcessingParameterString(
                 name=self.IN_RANGES,
-                description="Comma-separated ranges [min or m]",
+                description=self.tr("Comma-separated ranges [min or m]"),
                 defaultValue="5, 10"
             )
         ]

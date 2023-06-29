@@ -59,32 +59,32 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
-                description="Input (Multi)Point layer",
+                description=self.tr("Input (Multi)Point layer"),
                 types=[QgsProcessing.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
-                description="Layer ID Field",
+                description=self.tr("Layer ID Field"),
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
                 optional=True
             ),
             QgsProcessingParameterField(
                 name=self.IN_SORTBY,
-                description="Sort Points by",
+                description=self.tr("Sort Points by"),
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
                 optional=True
             ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,
-                "Travel preference",
+                self.tr("Travel preference"),
                 PREFERENCES,
                 defaultValue=PREFERENCES[0]
             ),
             QgsProcessingParameterEnum(
                 self.IN_OPTIMIZE,
-                "Traveling Salesman",
+                self.tr("Traveling Salesman"),
                 OPTIMIZATION_MODES,
                 defaultValue=None,
                 optional=True,

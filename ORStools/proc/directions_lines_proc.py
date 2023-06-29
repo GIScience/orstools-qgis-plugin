@@ -57,25 +57,25 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
-                description="Input Line layer",
+                description=self.tr("Input Line layer"),
                 types=[QgsProcessing.TypeVectorLine],
             ),
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
-                description="Layer ID Field",
+                description=self.tr("Layer ID Field"),
                 parentLayerParameterName=self.IN_LINES,
                 defaultValue=None,
                 optional=True,
             ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,
-                "Travel preference",
+                self.tr("Travel preference"),
                 PREFERENCES,
                 defaultValue=PREFERENCES[0]
             ),
             QgsProcessingParameterEnum(
                 self.IN_OPTIMIZE,
-                "Traveling Salesman",
+                self.tr("Traveling Salesman"),
                 OPTIMIZATION_MODES,
                 defaultValue=None,
                 optional=True,

@@ -57,24 +57,24 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
-                description="Input Start Point layer",
+                description=self.tr("Input Start Point layer"),
                 types=[QgsProcessing.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_START_FIELD,
-                description="Start ID Field (can be used for joining)",
+                description=self.tr("Start ID Field (can be used for joining)"),
                 parentLayerParameterName=self.IN_START,
                 defaultValue=None,
                 optional=True,
             ),
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
-                description="Input End Point layer",
+                description=self.tr("Input End Point layer"),
                 types=[QgsProcessing.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_END_FIELD,
-                description="End ID Field (can be used for joining)",
+                description=self.tr("End ID Field (can be used for joining)"),
                 parentLayerParameterName=self.IN_END,
                 defaultValue=None,
                 optional=True,
