@@ -26,7 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication, QSettings
 from qgis.core import (QgsProcessing,
                        QgsProcessingAlgorithm,
                        QgsProcessingContext,
@@ -93,7 +93,9 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Displays the sidebar help in the algorithm window
         """
-        return read_help_file(file_name=f'{self.ALGO_NAME}.help')
+        locale = QSettings().value('locale/userLocale')[0:2]
+
+        return read_help_file(algorithm=self.ALGO_NAME, locale=locale)
 
     @staticmethod
     def helpUrl():

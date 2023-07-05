@@ -77,15 +77,23 @@ def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: in
     return params
 
 
-def read_help_file(file_name: str):
+def read_help_file(algorithm: str, locale: str = ""):
     """
     Returns the contents of a file from the help folder
     :rtype: str
     """
-    file = os.path.join(
+    extension = '_' + locale if locale else ''
+
+    i18n_file = os.path.join(
         BASE_DIR,
         'help',
-        file_name
+        f"{algorithm}{extension}.help"
+    )
+
+    file = i18n_file if os.path.isfile(i18n_file) else os.path.join(
+        BASE_DIR,
+        'help',
+        f"{algorithm}.help"
     )
     with open(file, encoding='utf-8') as help_file:
         msg = help_file.read()
