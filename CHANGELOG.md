@@ -38,6 +38,13 @@ RELEASING:
 12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+## [Unreleased]
+
+### Added
+- translation mechanism ([#183](https://github.com/GIScience/orstools-qgis-plugin/pull/183))
+- german translation ([#183](https://github.com/GIScience/orstools-qgis-plugin/pull/183))
+
+
 ## [1.5.3] - 2023-03-30
 
 ### Fixed
