@@ -135,3 +135,10 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         self.isochrones.stylePoly(processed_layer)
 
         return {self.OUT: self.dest_id}
+
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Isochrones from Point")

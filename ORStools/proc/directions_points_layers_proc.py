@@ -246,3 +246,10 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         )
 
         return route_dict
+
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Directions from 2 Point-Layers")

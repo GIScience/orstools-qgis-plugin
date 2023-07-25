@@ -188,3 +188,10 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             feedback.setProgress(int(100.0 / count * num))
 
         return {self.OUT: dest_id}
+
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Directions from 1 Point-Layer")

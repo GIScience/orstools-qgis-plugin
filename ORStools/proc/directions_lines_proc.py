@@ -187,3 +187,10 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
                 line = [x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()]
 
             yield line, field_value
+
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Directions from 1 Polyline-Layer")

@@ -194,3 +194,10 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             id_value = feat[id_field_name] if id_field_name else None
 
             yield [[round(x_point.x(), 6), round(x_point.y(), 6)]], id_value
+
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Isochrones from Point-Layer")

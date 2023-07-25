@@ -102,13 +102,6 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         return __help__
 
-    def displayName(self) -> str:
-        """
-        Algorithm name shown in QGIS toolbox
-        :return:
-        """
-        return self.ALGO_NAME.capitalize().replace('_', ' ')
-
     def icon(self) -> QIcon:
         """
         Icon used for algorithm in QGIS toolbox

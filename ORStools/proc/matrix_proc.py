@@ -212,3 +212,10 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         fields.append(QgsField("DIST_KM", QVariant.Double))
 
         return fields
+
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Matrix from Layers")
