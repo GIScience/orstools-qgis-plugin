@@ -3,15 +3,16 @@ name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.5.3
+version=1.6.0
 author=HeiGIT gGmbH
 email=support@openrouteservice.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2023/03/30 v1.5.3
-    Fixed:
-    - error on QGIS 3.30 with QgsWkbType used for QgsRubberBand
+changelog=2023/07/25 v1.6.0
+### Added
+    - translation mechanism
+    - german translation
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki
