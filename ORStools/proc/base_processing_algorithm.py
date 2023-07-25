@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt5.QtCore import QCoreApplication, QSettings
 from qgis.core import (QgsProcessing,
                        QgsProcessingAlgorithm,
                        QgsProcessingContext,
@@ -92,7 +93,9 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Displays the sidebar help in the algorithm window
         """
-        return read_help_file(file_name=f'{self.ALGO_NAME}.help')
+        locale = QSettings().value('locale/userLocale')[0:2]
+
+        return read_help_file(algorithm=self.ALGO_NAME, locale=locale)
 
     @staticmethod
     def helpUrl():
@@ -100,13 +103,6 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Will be connected to the Help button in the Algorithm window
         """
         return __help__
-
-    def displayName(self) -> str:
-        """
-        Algorithm name shown in QGIS toolbox
-        :return:
-        """
-        return self.ALGO_NAME.capitalize().replace('_', ' ')
 
     def icon(self) -> QIcon:
         """
@@ -121,7 +117,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         providers = [provider['name'] for provider in configmanager.read_config()['providers']]
         return QgsProcessingParameterEnum(
             self.IN_PROVIDER,
-            "Provider",
+            self.tr("Provider", 'ORSBaseProcessingAlgorithm'),
             providers,
             defaultValue=providers[0]
         )
@@ -132,7 +128,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         return QgsProcessingParameterEnum(
                 self.IN_PROFILE,
-                "Travel mode",
+                self.tr("Travel mode", 'ORSBaseProcessingAlgorithm'),
                 PROFILES,
                 defaultValue=PROFILES[0]
             )
@@ -150,7 +146,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         return [
             QgsProcessingParameterEnum(
                 self.IN_AVOID_FEATS,
-                "Features to avoid",
+                self.tr("Features to avoid", 'ORSBaseProcessingAlgorithm'),
                 AVOID_FEATURES,
                 defaultValue=None,
                 optional=True,
@@ -158,20 +154,20 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
             QgsProcessingParameterEnum(
                 self.IN_AVOID_BORDERS,
-                "Types of borders to avoid",
+                self.tr("Types of borders to avoid", 'ORSBaseProcessingAlgorithm'),
                 AVOID_BORDERS,
                 defaultValue=None,
                 optional=True
             ),
             QgsProcessingParameterString(
                 self.IN_AVOID_COUNTRIES,
-                "Comma-separated list of ids of countries to avoid",
+                self.tr("Comma-separated list of ids of countries to avoid", 'ORSBaseProcessingAlgorithm'),
                 defaultValue=None,
                 optional=True
             ),
             QgsProcessingParameterFeatureSource(
                 self.IN_AVOID_POLYGONS,
-                "Polygons to avoid",
+                self.tr("Polygons to avoid", 'ORSBaseProcessingAlgorithm'),
                 types=[QgsProcessing.TypeVectorPolygon],
                 optional=True
             )
@@ -228,3 +224,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             self.addParameter(
                 param
             )
+
+    def tr(self, string, context=None):
+        context = context or self.__class__.__name__
+        return QCoreApplication.translate(context, string)

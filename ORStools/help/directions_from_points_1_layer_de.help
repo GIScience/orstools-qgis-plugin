@@ -1,0 +1,22 @@
+Der Routing-Algorithmus berechnet optimale routen für (Multi)Punkt-Layer.
+Die Wegpunkt-Reihenfolge kann über <i>Punkte sortieren nach</i> angegeben werden. Ohne Einstellung wird die interne Reihenfolge der (Multi)Punkt-Layer verwendet.
+
+Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung unter <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a> wird benötigt.
+
+<i>Verkehrsmittel</i>: bestimmt das genutzte Reise-Profil
+
+<i>Eingabelayer</i>: nur Punkt-Layer zugelassen, <b>keine MultiPoint-Layer</b>.
+
+<i>ID-Attribut (nur MultiPoint-Layer)</i>: Werte werden in das Ausgabelayer übertragen um etwa für Joins oder Gruppierung verwendet zu werden.
+
+<i>Punkte sortieren nach</i>: Reihenfolge der Wegpunkte. (Auf Feld-Typ achten. Textfelder werden wie folgt sortiert: 1, 13, 2, D, a, x)
+
+<i>Routenpräferenz</i>: Setzt das Optimierungskriterium (schnellste/kürzeste Route). Bei langen Routen kann "kürzeste" zu Leistungseinbrüchen führen.
+
+Optional kann eine <a href="https://de.wikipedia.org/wiki/Problem_des_Handlungsreisenden">Rundreise-Optimierung</a> mit den Wegpunkten der (Multi)Punkt-Layer durchgeführt werden.
+
+<i>Zusätzliche Parameter</i>: Beschreibung in der <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">Dokumentation</a>.
+
+<i>Ausgabelayer</i>: ein LineString-Layer mit mehreren Routen-Feldern.
+
+Es gelten die <a href="https://openrouteservice.org/restrictionsi">Restriktionen</a> der openrouteservice-API.

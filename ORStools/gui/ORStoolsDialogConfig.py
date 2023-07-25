@@ -115,7 +115,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         self._collapse_boxes()
         # Show quick user input dialog
-        provider_name, ok = QInputDialog.getText(self, "New ORS provider", "Enter a name for the provider")
+        provider_name, ok = QInputDialog.getText(self, self.tr("New ORS provider"), self.tr("Enter a name for the provider"))
         if ok:
             self._add_box(provider_name, 'http://localhost:8082/ors', '', 60, new=True)
 
@@ -125,8 +125,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         providers = [provider['name'] for provider in self.temp_config['providers']]
 
         provider, ok = QInputDialog.getItem(self,
-                                            "Remove ORS provider",
-                                            "Choose provider to remove",
+                                            self.tr("Remove ORS provider"),
+                                            self.tr("Choose provider to remove"),
                                             providers, 0, False)
         if ok:
             box_remove = self.providers.findChild(QgsCollapsibleGroupBox, provider)
@@ -181,7 +181,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         gridLayout_3.setObjectName(name + '_grid')
         key_label = QtWidgets.QLabel(provider)
         key_label.setObjectName(name + '_key_label')
-        key_label.setText('API Key')
+        key_label.setText(self.tr('API Key'))
         gridLayout_3.addWidget(key_label, 0, 0, 1, 1)
         key_text = QtWidgets.QLineEdit(provider)
         key_text.setObjectName(name + "_key_text")
@@ -189,7 +189,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         gridLayout_3.addWidget(key_text, 1, 0, 1, 4)
         base_url_label = QtWidgets.QLabel(provider)
         base_url_label.setObjectName("base_url_label")
-        base_url_label.setText("Base URL")
+        base_url_label.setText(self.tr("Base URL"))
         gridLayout_3.addWidget(base_url_label, 2, 0, 1, 1)
         base_url_text = QtWidgets.QLineEdit(provider)
         base_url_text.setObjectName(name + "_base_url_text")
@@ -198,7 +198,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         timeout_label = QtWidgets.QLabel(provider)
         timeout_label.setObjectName("timeout_label")
-        timeout_label.setText("Request timeout in seconds (1 - 3600)")
+        timeout_label.setText(self.tr("Request timeout in seconds (1 - 3600)"))
         gridLayout_3.addWidget(timeout_label, 4, 0, 1, 1)
         timeout_text = QtWidgets.QLineEdit(provider)
         timeout_text.setObjectName(name + "_timeout_text")

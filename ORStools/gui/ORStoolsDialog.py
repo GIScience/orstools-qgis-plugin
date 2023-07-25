@@ -37,7 +37,7 @@ from qgis.core import (QgsProject,
                        QgsMapLayerProxyModel)
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import (QAction,
                              QDialog,
@@ -76,23 +76,23 @@ def on_help_click():
 def on_about_click(parent):
     """Slot for click event of About button/menu entry."""
 
-    info = f'<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org"' \
-           f' style="color: {DEFAULT_COLOR}">openrouteservice</a> routing functionalities.' \
-           f'<br><br>' \
-           f'<center>' \
-           f'<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/>' \
-           f'</a><br><br>' \
-           f'</center>' \
-           f'Author: HeiGIT gGmbH<br>' \
-           f'Email: <a href="mailto:Openrouteservice <{__email__}>">{__email__}</a><br>' \
-           f'Web: <a href="{__web__}">{__web__}</a><br>' \
-           f'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">' \
-           f'github.com/GIScience/orstools-qgis-plugin</a><br>' \
-           f'Version: {__version__}'
+    info = QCoreApplication.translate('@default', '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org"' \
+           ' style="color: {0}">openrouteservice</a> routing functionalities.' \
+           '<br><br>' \
+           '<center>' \
+           '<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/>' \
+           '</a><br><br>' \
+           '</center>' \
+           'Author: HeiGIT gGmbH<br>' \
+           'Email: <a href="mailto:Openrouteservice <{1}>">{1}</a><br>' \
+           'Web: <a href="{2}">{2}</a><br>' \
+           'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">' \
+           'github.com/GIScience/orstools-qgis-plugin</a><br>' \
+           'Version: {3}').format(DEFAULT_COLOR, __email__, __web__, __version__)
 
     QMessageBox.information(
         parent,
-        f'About {PLUGIN_NAME}',
+        QCoreApplication.translate('@default', 'About {}').format(PLUGIN_NAME),
         info
     )
 
@@ -142,19 +142,19 @@ class ORStoolsDialogMain:
             # Config dialog
             QAction(
                 create_icon('icon_settings.png'),
-                'Provider Settings',
+                self.tr('Provider Settings'),
                 self.iface.mainWindow()
             ),
             # About dialog
             QAction(
                 create_icon('icon_about.png'),
-                'About',
+                self.tr('About'),
                 self.iface.mainWindow()
             ),
             # Help page
             QAction(
                 create_icon('icon_help.png'),
-                'Help',
+                self.tr('Help'),
                 self.iface.mainWindow()
             )
 
@@ -347,6 +347,9 @@ Please add polygons to the layer or uncheck avoid polygons.
                 clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
             self.dlg.debug_text.setHtml(clnt_msg)
 
+    def tr(self, string):
+        return QCoreApplication.translate(str(self.__class__.__name__), string)
+
 
 class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     """Define the custom behaviour of Dialog"""
@@ -380,8 +383,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_preference_combo.addItems(PREFERENCES)
 
         # Change OK and Cancel button names
-        self.global_buttons.button(QDialogButtonBox.Ok).setText('Apply')
-        self.global_buttons.button(QDialogButtonBox.Cancel).setText('Close')
+        self.global_buttons.button(QDialogButtonBox.Ok).setText(self.tr('Apply'))
+        self.global_buttons.button(QDialogButtonBox.Cancel).setText(self.tr('Close'))
 
         # Set up signals/slots
 

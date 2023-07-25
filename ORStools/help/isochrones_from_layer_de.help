@@ -1,0 +1,17 @@
+Der Isochronen-Algorithmus berechnet erreichbare Gebiete für mehrere Standorte und Zeit/Entfernungs-Reichweiten.
+
+Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung unter <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a> wird benötigt.
+
+<i>Eingabelayer</i>: nur Punkt-Layer zugelassen, <b>keine MultiPoint-Layer</b>.
+
+<i>ID-Attribut</i>: Werte werden in das Ausgabelayer übertragen um etwa für Joins oder Gruppierung verwendet zu werden.
+
+<i>Reichweiten</i>: komma-separierte Liste von Ganzzahlen, keine Dezimalpunkte.
+
+<i>Zusätzliche Parameter</i>: Beschreibung in der <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">Dokumentation</a>.
+
+<i>Ausgabelayer</i>: Polygonlayer mit ID, Längen- und Breitengrad des Isochronen-Mittelpunkts, Reichweiten-Wert, Verkehrsmittel und Bevölkerung (aus <a href="https://ghsl.jrc.ec.europa.eu/about.php">GHSL</a>). KBS ist EPSG:4326.
+
+Der Mittelpunkt kann über das <code>Punktlayer aus Tabelle erzeugen</code>-Werkzeug ('Verarbeitungswerkzeuge' ► 'Vektorerzeugung') extrahiert werden.
+
+Es gelten die <a href="https://openrouteservice.org/restrictionsi">Restriktionen</a> der openrouteservice-API.

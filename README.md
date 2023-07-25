@@ -260,6 +260,27 @@ Proceed similar for other `.ui` files:
 1. if you edited or added new widgets you will have to change or include them in `ORStools/gui/directions_gui.py`
    as well
 
+### Translation
+Translation uses the QT Linguist for translating GUI and source code strings. All translation-related content resides in `ORStools/i18n`.
+Translation is controlled by `ORStools/gui/translate.pro`, stating all UI-forms and sourcefiles that include strings to be translated.
+To add a translation, add `orstools_<LANGUAGE_TAG>.ts` to the list of translation in this file.
+
+#### Workflow
+1. Generate the `.ts`-files (Translation Source) from `translate.pro` via
+    ```shell
+   pylupdate5 -noobsolete -verbose translate.pro
+    ```
+   Note that this will drop obsolete strings, skip `-noobsolete` if you want to keep them.
+2. Inspect the changes this has on the existing `*.ts`-files. `pylupdate5` will remove translation comments and might restructure the translation.
+3. Translate the `*.ts`-files using QT Linguist via
+    ```shell
+   linguist orstools_<LANGUAGE_TAG>.ts
+    ```
+4. Compile the `*.ts`-file to a `*.qm` Qt Translation file via
+    ```shell
+    lrelease orstools_<LANGUAGE_tag>.ts
+    ```
+
 ## License
 
 This project is published under the GPLv3 license, see [LICENSE.md](https://github.com/GIScience/orstools-qgis-plugin/blob/main/LICENSE.md) for details.

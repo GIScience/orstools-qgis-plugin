@@ -59,51 +59,51 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
-                description="Input Start Point layer",
+                description=self.tr("Input Start Point layer"),
                 types=[QgsProcessing.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_START_FIELD,
-                description="Start ID Field (can be used for joining)",
+                description=self.tr("Start ID Field (can be used for joining)"),
                 parentLayerParameterName=self.IN_START,
                 defaultValue=None,
                 optional=True,
             ),
             QgsProcessingParameterField(
                 name=self.IN_SORT_START_BY,
-                description="Sort Start Points by",
+                description=self.tr("Sort Start Points by"),
                 parentLayerParameterName=self.IN_START,
                 defaultValue=None,
                 optional=True
             ),
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
-                description="Input End Point layer",
+                description=self.tr("Input End Point layer"),
                 types=[QgsProcessing.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_END_FIELD,
-                description="End ID Field (can be used for joining)",
+                description=self.tr("End ID Field (can be used for joining)"),
                 parentLayerParameterName=self.IN_END,
                 defaultValue=None,
                 optional=True,
             ),
             QgsProcessingParameterField(
                 name=self.IN_SORT_END_BY,
-                description="Sort End Points by",
+                description=self.tr("Sort End Points by"),
                 parentLayerParameterName=self.IN_END,
                 defaultValue=None,
                 optional=True
             ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,
-                "Travel preference",
+                self.tr("Travel preference"),
                 PREFERENCES,
                 defaultValue=PREFERENCES[0]
             ),
             QgsProcessingParameterEnum(
                 self.IN_MODE,
-                "Layer mode",
+                self.tr("Layer mode"),
                 self.MODE_SELECTION,
                 defaultValue=self.MODE_SELECTION[0]
             )
@@ -246,3 +246,10 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         )
 
         return route_dict
+
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Directions from 2 Point-Layers")
