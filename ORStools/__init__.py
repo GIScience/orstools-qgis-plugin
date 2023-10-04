@@ -30,6 +30,7 @@
 import os.path
 import configparser
 from datetime import datetime
+import shutil
 
 
 # noinspection PyPep8Naming
@@ -49,8 +50,13 @@ PLUGIN_NAME = 'ORS Tools'
 DEFAULT_COLOR = '#a8b1f5'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Create config-yaml outside plugin folder to keep settings upon plugin update
+CONFIG_PATH = os.path.join(os.path.dirname(BASE_DIR), 'ORStools_config.yml')
+if not os.path.isfile(CONFIG_PATH):
+    src = os.path.join(BASE_DIR, "config.yml")
+    shutil.copyfile(src, CONFIG_PATH)
+
 RESOURCE_PREFIX = ":plugins/ORStools/img/"
-CONFIG_PATH = os.path.join(BASE_DIR, 'config.yml')
 ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
             'ORS_QUOTA': 'X-Ratelimit-Limit'}
 

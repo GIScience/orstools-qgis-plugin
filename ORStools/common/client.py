@@ -48,7 +48,7 @@ class Client(QObject):
 
     def __init__(self, provider=None):
         """
-        :param provider: A openrouteservice provider from config.yml
+        :param provider: A openrouteservice provider from ORStools_config.yml
         :type provider: dict
 
         :param retry_timeout: Timeout across multiple retryable requests, in

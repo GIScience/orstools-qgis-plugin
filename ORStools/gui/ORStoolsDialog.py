@@ -412,7 +412,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog(f'{PLUGIN_NAME}:matrix_from_layers'))
 
     def _on_prov_refresh_click(self):
-        """Populates provider dropdown with fresh list from config.yml"""
+        """Populates provider dropdown with fresh list from ORStools_config.yml"""
 
         providers = configmanager.read_config()['providers']
         self.provider_combo.clear()

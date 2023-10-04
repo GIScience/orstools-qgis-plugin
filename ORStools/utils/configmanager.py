@@ -35,7 +35,7 @@ from ORStools import CONFIG_PATH
 
 def read_config():
     """
-    Reads config.yml from file and returns the parsed dict.
+    Reads ORStools_config.yml from file and returns the parsed dict.
 
     :returns: Parsed settings dictionary.
     :rtype: dict
