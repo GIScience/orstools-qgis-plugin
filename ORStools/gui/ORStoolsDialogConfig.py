@@ -60,7 +60,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.provider_remove.clicked.connect(self._remove_provider)
 
     def accept(self):
-        """When the OK Button is clicked, in-memory temp_config is updated and written to config.yml"""
+        """When the OK Button is clicked, in-memory temp_config is updated and written to ORStools_config.yml"""
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for idx, box in enumerate(collapsible_boxes):
