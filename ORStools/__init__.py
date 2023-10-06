@@ -50,16 +50,6 @@ PLUGIN_NAME = 'ORS Tools'
 DEFAULT_COLOR = '#a8b1f5'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Create config-yaml outside plugin folder to keep settings upon plugin update
-CONFIG_PATH = os.path.join(os.path.dirname(BASE_DIR), 'ORStools_config.yml')
-if not os.path.isfile(CONFIG_PATH):
-    src = os.path.join(BASE_DIR, "config.yml")
-    shutil.copyfile(src, CONFIG_PATH)
-
-RESOURCE_PREFIX = ":plugins/ORStools/img/"
-ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
-            'ORS_QUOTA': 'X-Ratelimit-Limit'}
-
 # Read metadata.txt
 METADATA = configparser.ConfigParser()
 METADATA.read(os.path.join(BASE_DIR, 'metadata.txt'), encoding='utf-8')
@@ -72,3 +62,13 @@ __web__ = METADATA['general']['homepage']
 __help__ = METADATA['general']['help']
 __date__ = today.strftime('%Y-%m-%d')
 __copyright__ = f'(C) {today.year} by {__author__}'
+
+# Create config-yaml outside plugin folder to keep settings upon plugin update
+CONFIG_PATH = os.path.join(os.path.dirname(BASE_DIR), 'ORStools_config.yml')
+if not os.path.isfile(CONFIG_PATH):
+    src = os.path.join(BASE_DIR, "config.yml")
+    shutil.copyfile(src, CONFIG_PATH)
+
+RESOURCE_PREFIX = ":plugins/ORStools/img/"
+ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
+            'ORS_QUOTA': 'X-Ratelimit-Limit'}
