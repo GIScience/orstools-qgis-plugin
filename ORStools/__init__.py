@@ -31,7 +31,8 @@ import os.path
 import configparser
 from datetime import datetime
 import shutil
-
+from packaging import version
+import yaml
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
@@ -63,11 +64,28 @@ __help__ = METADATA['general']['help']
 __date__ = today.strftime('%Y-%m-%d')
 __copyright__ = f'(C) {today.year} by {__author__}'
 
-# Create config-yaml outside plugin folder to keep settings upon plugin update
 CONFIG_PATH = os.path.join(os.path.dirname(BASE_DIR), 'ORStools_config.yml')
-if not os.path.isfile(CONFIG_PATH):
-    src = os.path.join(BASE_DIR, "config.yml")
-    shutil.copyfile(src, CONFIG_PATH)
+BASE_CONFIG_PATH = os.path.join(BASE_DIR, "config.yml")
+
+# Compare plugin version with config file version and copy providers if config file is old
+try:
+    with open(CONFIG_PATH) as f:
+        old_config = yaml.safe_load(f)
+        config_version = old_config['version']
+    # Check if there's a new version of the plugin
+    if version.parse(config_version) < version.parse(__version__):
+        # Logic for when there's new things in the config.yml
+        with open(BASE_CONFIG_PATH) as f:
+            new_config = yaml.safe_load(f)
+        new_config['providers'] = old_config['providers']
+        new_config['version'] = __version__
+        with open(CONFIG_PATH, 'w') as f:
+            yaml.safe_dump(new_config, f)
+except FileNotFoundError:
+    # Create config-yaml outside plugin folder to keep settings upon plugin update
+    shutil.copyfile(BASE_CONFIG_PATH, CONFIG_PATH)
+    with open(CONFIG_PATH, 'a') as f:
+        yaml.safe_dump({'version': __version__}, f)
 
 RESOURCE_PREFIX = ":plugins/ORStools/img/"
 ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
