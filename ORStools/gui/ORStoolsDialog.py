@@ -230,6 +230,11 @@ class ORStoolsDialogMain:
         layer_out.dataProvider().addAttributes(directions_core.get_fields())
         layer_out.updateFields()
 
+        # style output layer
+        qml_path = os.path.join(os.path.dirname(__file__), 'linestyle.qml')
+        layer_out.loadNamedStyle(qml_path, True)
+        layer_out.triggerRepaint()
+
         # Associate annotations with map layer, so they get deleted when layer is deleted
         for annotation in self.dlg.annotations:
             # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
