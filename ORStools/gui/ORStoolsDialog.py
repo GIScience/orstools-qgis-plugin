@@ -177,12 +177,19 @@ class ORStoolsDialogMain:
         self.actions[2].triggered.connect(lambda: on_about_click(parent=self.iface.mainWindow()))
         self.actions[3].triggered.connect(on_help_click)
 
+        # Add keyboard shortcut
+        self.iface.registerMainWindowAction(self.actions[0], "Ctrl+R")
+
     def unload(self):
         """Called when QGIS closes or plugin is deactivated in Plugin Manager"""
 
         self.iface.webMenu().removeAction(self.menu.menuAction())
         self.iface.removeWebToolBarIcon(self.actions[0])
         QApplication.restoreOverrideCursor()
+
+        # Remove action for keyboard shortcut
+        self.iface.unregisterMainWindowAction(self.actions[0])
+        
         del self.dlg
 
     # @staticmethod
