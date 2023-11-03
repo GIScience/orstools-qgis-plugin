@@ -367,7 +367,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
-        self.map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
         # Set things around the custom map tool
         self.line_tool = None
@@ -435,6 +434,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self._clear_annotations()
 
     def _linetool_annotate_point(self, point, idx):
+        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
         annotation = QgsTextAnnotation()
 
         c = QTextDocument()
@@ -446,7 +446,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation.setFrameSizeMm(QSizeF(7, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
         annotation.setMapPosition(point)
-        annotation.setMapPositionCrs(self.map_crs)
+        annotation.setMapPositionCrs(map_crs)
 
         return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
 
@@ -471,8 +471,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_linetool_map_click(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
+        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
-        transformer = transform.transformToWGS(self.map_crs)
+        transformer = transform.transformToWGS(map_crs)
         point_wgs = transformer.transform(point)
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
