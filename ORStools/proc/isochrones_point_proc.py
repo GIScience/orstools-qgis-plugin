@@ -33,6 +33,7 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterPoint,
+                       QgsProcessingParameterNumber
                        )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
@@ -51,6 +52,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         self.IN_RANGES = 'INPUT_RANGES'
         self.IN_KEY = 'INPUT_APIKEY'
         self.IN_DIFFERENCE = 'INPUT_DIFFERENCE'
+        self.IN_SMOOTHING = 'INPUT_SMOOTHING'
         self.PARAMETERS = [
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,
@@ -67,7 +69,14 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
                 name=self.IN_RANGES,
                 description=self.tr("Comma-separated ranges [min or m]"),
                 defaultValue="5, 10"
-            )
+            ),
+            QgsProcessingParameterNumber(
+                name=self.IN_SMOOTHING,
+                description="Smoothing factor between 0 [fine grained] and 100 [concave hull]",
+                defaultValue=0,
+                minValue=0,
+                maxValue=100
+            ),
         ]
 
     # Save some important references
@@ -88,6 +97,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         factor = 60 if dimension == 'time' else 1
         ranges_raw = parameters[self.IN_RANGES]
         ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
+        smoothing = parameters[self.IN_SMOOTHING]
 
         options = self.parseOptions(parameters, context)
 
@@ -102,7 +112,8 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             "range": ranges_proc,
             "attributes": ['total_pop'],
             "id": None,
-            "options": options
+            "options": options,
+            "smoothing": smoothing
         }
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
