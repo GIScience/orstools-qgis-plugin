@@ -33,7 +33,8 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterPoint,
-                       QgsProcessingParameterNumber
+                       QgsProcessingParameterNumber,
+                       QgsProcessingParameterDefinition
                        )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
@@ -73,11 +74,16 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 name=self.IN_SMOOTHING,
                 description="Smoothing factor between 0 [fine grained] and 100 [concave hull]",
-                defaultValue=0,
+                defaultValue=None,
                 minValue=0,
-                maxValue=100
+                maxValue=100,
+                optional=True
             ),
         ]
+
+        # Set flag of smoothness parameters to advanced
+        smooth_param = next((i for i in self.PARAMETERS if i.name() == self.IN_SMOOTHING), None)
+        smooth_param.setFlags(smooth_param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
 
     # Save some important references
     # TODO bad style, refactor
@@ -113,8 +119,10 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             "attributes": ['total_pop'],
             "id": None,
             "options": options,
-            "smoothing": smoothing
         }
+
+        if smoothing or smoothing == 0:
+            params["smoothing"] = smoothing
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                     self.isochrones.get_fields(),
