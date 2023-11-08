@@ -37,7 +37,7 @@ from qgis.core import (
     QgsProcessingParameterNumber,
 )
 
-from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
+from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
 from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
@@ -54,6 +54,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         self.IN_KEY = "INPUT_APIKEY"
         self.IN_DIFFERENCE = "INPUT_DIFFERENCE"
         self.IN_SMOOTHING = "INPUT_SMOOTHING"
+        self.LOCATION_TYPE = "LOCATION_TYPE"
         self.PARAMETERS = [
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,
@@ -81,6 +82,12 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
                 maxValue=100,
                 optional=True,
             ),
+            QgsProcessingParameterEnum(
+                name=self.LOCATION_TYPE,
+                description=self.tr("Location Type"),
+                options=LOCATION_TYPES,
+                defaultValue=LOCATION_TYPES[0]
+            )
         ]
 
     # Save some important references
@@ -97,6 +104,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
+        location_type = dict(enumerate(LOCATION_TYPES))[parameters[self.LOCATION_TYPE]]
 
         factor = 60 if dimension == "time" else 1
         ranges_raw = parameters[self.IN_RANGES]
@@ -117,6 +125,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             "attributes": ["total_pop"],
             "id": None,
             "options": options,
+            "location_type": location_type
         }
 
         if smoothing or smoothing == 0:
