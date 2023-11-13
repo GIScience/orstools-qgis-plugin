@@ -505,10 +505,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.clear()
             self._clear_annotations()
 
-    def _linetool_annotate_point(self, point, idx, crs=None):
-        if not crs:
-            crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        # Remove blue lines (rubber band)
+        if self.line_tool:
+            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
 
+    def _linetool_annotate_point(self, point, idx):
         annotation = QgsTextAnnotation()
 
         c = QTextDocument()
