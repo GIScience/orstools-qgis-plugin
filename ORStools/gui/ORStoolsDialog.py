@@ -422,6 +422,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:matrix_from_layers")
         )
 
+        # Reset index of list items every time something is moved
+        self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
+
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
 
@@ -494,6 +497,15 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation = self._linetool_annotate_point(point, idx)
         self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
+
+    def _reindex_list_items(self):
+        items = [self.routing_fromline_list.item(x).text() for x in range(self.routing_fromline_list.count())]
+        self.routing_fromline_list.clear()
+        for i, x in enumerate(items):
+            y = x.split(':')[1]
+            item = f'Point {i}:{y}'
+            self.routing_fromline_list.addItem(item)
+
 
     def _on_linetool_map_doubleclick(self):
         """
