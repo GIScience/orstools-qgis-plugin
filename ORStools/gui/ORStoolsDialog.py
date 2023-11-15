@@ -499,6 +499,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.project.annotationManager().addAnnotation(annotation)
 
     def _reindex_list_items(self):
+        """Resets the index when an item in the list is moved"""
         items = [self.routing_fromline_list.item(x).text() for x in range(self.routing_fromline_list.count())]
         self.routing_fromline_list.clear()
         for i, x in enumerate(items):
