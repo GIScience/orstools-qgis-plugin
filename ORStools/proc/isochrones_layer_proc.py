@@ -98,10 +98,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         ]
 
-        # Set flag of smoothness parameters to advanced
-        smooth_param = next((i for i in self.PARAMETERS if i.name() == self.IN_SMOOTHING), None)
-        smooth_param.setFlags(smooth_param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
-
     # Save some important references
     # TODO bad style, refactor
     isochrones = isochrones_core.Isochrones()
