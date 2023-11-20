@@ -157,7 +157,8 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 "options": options,
             }
 
-            if smoothing or smoothing == 0:
+            # only include smoothing if set
+            if smoothing is not None:
                 params["smoothing"] = smoothing
 
             requests.append(params)
