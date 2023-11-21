@@ -1,3 +1,4 @@
+# When new parameters or such are introduced, ORStools/__init.py will need to be adapted.
 providers:
 - ENV_VARS:
     ORS_QUOTA: X-Ratelimit-Limit
