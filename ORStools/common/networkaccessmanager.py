@@ -26,10 +26,13 @@ __date__ = 'August 2016'
 
 import re
 import io
-import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 
-from qgis.PyQt.QtCore import QUrl, QEventLoop
-from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
+from qgis.PyQt.QtCore import (QUrl,
+                              QEventLoop)
+
+from qgis.PyQt.QtNetwork import (QNetworkRequest,
+                                 QNetworkReply)
 
 from qgis.core import (
     QgsApplication,
