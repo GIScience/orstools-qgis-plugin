@@ -245,7 +245,7 @@ class Client(QObject):
         :rtype: string
         """
 
-        if type(params) is dict:
+        if isinstance(params, dict):
             params = sorted(dict(**params).items())
 
         # Only auto-add API key when using ORS. If own instance, API key must

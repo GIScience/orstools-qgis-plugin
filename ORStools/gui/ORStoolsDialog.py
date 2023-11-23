@@ -55,7 +55,6 @@ from ORStools.gui import directions_gui
 from ORStools.utils import exceptions, maptools, logger, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
-from . import resources_rc
 
 
 def on_config_click(parent):
