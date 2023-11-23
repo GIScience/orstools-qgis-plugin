@@ -27,14 +27,15 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsWkbTypes,
-                       QgsCoordinateReferenceSystem,
-                       QgsProcessing,
-                       QgsProcessingParameterField,
-                       QgsProcessingParameterFeatureSource,
-                       QgsProcessingParameterEnum,
-                       QgsPointXY,
-                       )
+from qgis.core import (
+    QgsWkbTypes,
+    QgsCoordinateReferenceSystem,
+    QgsProcessing,
+    QgsProcessingParameterField,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterEnum,
+    QgsPointXY,
+)
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
 from ORStools.utils import transform, exceptions, logger
@@ -48,7 +49,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = 'directions_from_points_1_layer'
+        self.ALGO_NAME = "directions_from_points_1_layer"
         self.GROUP = "Directions"
         self.IN_POINTS = "INPUT_POINT_LAYER"
         self.IN_FIELD = "INPUT_LAYER_FIELD"
@@ -67,20 +68,20 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 description=self.tr("Layer ID Field"),
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
-                optional=True
+                optional=True,
             ),
             QgsProcessingParameterField(
                 name=self.IN_SORTBY,
                 description=self.tr("Sort Points by"),
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
-                optional=True
+                optional=True,
             ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,
                 self.tr("Travel preference"),
                 PREFERENCES,
-                defaultValue=PREFERENCES[0]
+                defaultValue=PREFERENCES[0],
             ),
             QgsProcessingParameterEnum(
                 self.IN_OPTIMIZE,
@@ -88,7 +89,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 OPTIMIZATION_MODES,
                 defaultValue=None,
                 optional=True,
-            )
+            ),
         ]
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -103,33 +104,37 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         options = self.parseOptions(parameters, context)
 
         # Get parameter values
-        source = self.parameterAsSource(
-            parameters,
-            self.IN_POINTS,
-            context
-        )
+        source = self.parameterAsSource(parameters, self.IN_POINTS, context)
 
         source_field_name = parameters[self.IN_FIELD]
         get_fields_options = dict()
         if source_field_name:
             get_fields_options.update(
                 from_type=source.fields().field(source_field_name).type(),
-                from_name=source_field_name
+                from_name=source_field_name,
             )
 
         sink_fields = directions_core.get_fields(**get_fields_options, line=True)
 
-        (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
-                                               sink_fields,
-                                               QgsWkbTypes.LineString,
-                                               QgsCoordinateReferenceSystem.fromEpsgId(4326))
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUT,
+            context,
+            sink_fields,
+            QgsWkbTypes.LineString,
+            QgsCoordinateReferenceSystem.fromEpsgId(4326),
+        )
 
         sort_by = parameters[self.IN_SORTBY]
 
         if sort_by:
-            def sort(f): return f.attribute(sort_by)
+
+            def sort(f):
+                return f.attribute(sort_by)
         else:
-            def sort(f): return f.id()
+
+            def sort(f):
+                return f.id()
 
         count = source.featureCount()
 
@@ -160,26 +165,27 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             try:
                 if optimization_mode is not None:
                     params = get_params_optimize(points, profile, optimization_mode)
-                    response = ors_client.request('/optimization', {}, post_json=params)
+                    response = ors_client.request("/optimization", {}, post_json=params)
 
-                    sink.addFeature(directions_core.get_output_features_optimization(
-                        response,
-                        profile,
-                        from_value=from_value
-                    ))
+                    sink.addFeature(
+                        directions_core.get_output_features_optimization(
+                            response, profile, from_value=from_value
+                        )
+                    )
                 else:
-                    params = directions_core.build_default_parameters(preference, point_list=points, options=options)
-                    response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
+                    params = directions_core.build_default_parameters(
+                        preference, point_list=points, options=options
+                    )
+                    response = ors_client.request(
+                        "/v2/directions/" + profile + "/geojson", {}, post_json=params
+                    )
 
-                    sink.addFeature(directions_core.get_output_feature_directions(
-                        response,
-                        profile,
-                        preference,
-                        from_value=from_value
-                    ))
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
+                    sink.addFeature(
+                        directions_core.get_output_feature_directions(
+                            response, profile, preference, from_value=from_value
+                        )
+                    )
+            except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {from_value} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
                 logger.log(msg)

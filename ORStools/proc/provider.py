@@ -41,10 +41,8 @@ from .matrix_proc import ORSMatrixAlgo
 
 
 class ORStoolsProvider(QgsProcessingProvider):
-
     def __init__(self):
         QgsProcessingProvider.__init__(self)
-
 
     def unload(self):
         """
@@ -68,7 +66,7 @@ class ORStoolsProvider(QgsProcessingProvider):
 
     @staticmethod
     def icon():
-        return QIcon(RESOURCE_PREFIX + 'icon_orstools.png')
+        return QIcon(RESOURCE_PREFIX + "icon_orstools.png")
 
     @staticmethod
     def id():
@@ -98,4 +96,4 @@ class ORStoolsProvider(QgsProcessingProvider):
         (version 2.2.1)". This string should be localised. The default
         implementation returns the same string as name().
         """
-        return PLUGIN_NAME + ' plugin v' + __version__
+        return PLUGIN_NAME + " plugin v" + __version__

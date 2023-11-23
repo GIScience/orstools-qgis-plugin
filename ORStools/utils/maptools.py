@@ -27,9 +27,8 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsWkbTypes)
-from qgis.gui import (QgsMapToolEmitPoint,
-                      QgsRubberBand)
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
@@ -48,7 +47,9 @@ class LineTool(QgsMapToolEmitPoint):
         self.canvas = canvas
         QgsMapToolEmitPoint.__init__(self, self.canvas)
 
-        self.rubberBand = QgsRubberBand(mapCanvas=self.canvas, geometryType=QgsWkbTypes.LineGeometry)
+        self.rubberBand = QgsRubberBand(
+            mapCanvas=self.canvas, geometryType=QgsWkbTypes.LineGeometry
+        )
         self.rubberBand.setStrokeColor(QColor(DEFAULT_COLOR))
         self.rubberBand.setWidth(3)
 

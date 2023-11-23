@@ -27,13 +27,14 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsWkbTypes,
-                       QgsCoordinateReferenceSystem,
-                       QgsProcessing,
-                       QgsProcessingParameterField,
-                       QgsProcessingParameterFeatureSource,
-                       QgsProcessingParameterEnum,
-                       )
+from qgis.core import (
+    QgsWkbTypes,
+    QgsCoordinateReferenceSystem,
+    QgsProcessing,
+    QgsProcessingParameterField,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterEnum,
+)
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES
 from ORStools.utils import transform, exceptions, logger
@@ -42,12 +43,11 @@ from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 # noinspection PyPep8Naming
 class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
-
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = 'directions_from_points_2_layers'
+        self.ALGO_NAME = "directions_from_points_2_layers"
         self.GROUP = "Directions"
-        self.MODE_SELECTION: list = ['Row-by-Row', 'All-by-All']
+        self.MODE_SELECTION: list = ["Row-by-Row", "All-by-All"]
         self.IN_START = "INPUT_START_LAYER"
         self.IN_START_FIELD = "INPUT_START_FIELD"
         self.IN_SORT_START_BY = "INPUT_SORT_START_BY"
@@ -74,7 +74,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 description=self.tr("Sort Start Points by"),
                 parentLayerParameterName=self.IN_START,
                 defaultValue=None,
-                optional=True
+                optional=True,
             ),
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
@@ -93,20 +93,20 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 description=self.tr("Sort End Points by"),
                 parentLayerParameterName=self.IN_END,
                 defaultValue=None,
-                optional=True
+                optional=True,
             ),
             QgsProcessingParameterEnum(
                 self.IN_PREFERENCE,
                 self.tr("Travel preference"),
                 PREFERENCES,
-                defaultValue=PREFERENCES[0]
+                defaultValue=PREFERENCES[0],
             ),
             QgsProcessingParameterEnum(
                 self.IN_MODE,
                 self.tr("Layer mode"),
                 self.MODE_SELECTION,
-                defaultValue=self.MODE_SELECTION[0]
-            )
+                defaultValue=self.MODE_SELECTION[0],
+            ),
         ]
 
     # TODO: preprocess parameters to options the range cleanup below:
@@ -123,44 +123,41 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         options = self.parseOptions(parameters, context)
 
         # Get parameter values
-        source = self.parameterAsSource(
-            parameters,
-            self.IN_START,
-            context
-        )
+        source = self.parameterAsSource(parameters, self.IN_START, context)
 
         source_field_name = parameters[self.IN_START_FIELD]
         source_field = source.fields().field(source_field_name) if source_field_name else None
         sort_start_by = parameters[self.IN_SORT_START_BY]
         if sort_start_by:
-            def sort_start(f): return f.attribute(sort_start_by)
-        else:
-            def sort_start(f): return f.id()
 
-        destination = self.parameterAsSource(
-            parameters,
-            self.IN_END,
-            context
-        )
+            def sort_start(f):
+                return f.attribute(sort_start_by)
+        else:
+
+            def sort_start(f):
+                return f.id()
+
+        destination = self.parameterAsSource(parameters, self.IN_END, context)
 
         destination_field_name = parameters[self.IN_END_FIELD]
-        destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
+        destination_field = (
+            destination.fields().field(destination_field_name) if destination_field_name else None
+        )
         sort_end_by = parameters[self.IN_SORT_END_BY]
         if sort_end_by:
-            def sort_end(f): return f.attribute(sort_end_by)
+
+            def sort_end(f):
+                return f.attribute(sort_end_by)
         else:
-            def sort_end(f): return f.id()
+
+            def sort_end(f):
+                return f.id()
 
         route_dict = self._get_route_dict(
-            source,
-            source_field,
-            sort_start,
-            destination,
-            destination_field,
-            sort_end
+            source, source_field, sort_start, destination, destination_field, sort_end
         )
 
-        if mode == 'Row-by-Row':
+        if mode == "Row-by-Row":
             route_count = min([source.featureCount(), destination.featureCount()])
         else:
             route_count = source.featureCount() * destination.featureCount()
@@ -173,9 +170,14 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             field_types.update({"to_type": destination_field.type()})
         sink_fields = directions_core.get_fields(**field_types)
 
-        (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context, sink_fields,
-                                               QgsWkbTypes.LineString,
-                                               QgsCoordinateReferenceSystem.fromEpsgId(4326))
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUT,
+            context,
+            sink_fields,
+            QgsWkbTypes.LineString,
+            QgsCoordinateReferenceSystem.fromEpsgId(4326),
+        )
 
         counter = 0
         for coordinates, values in directions_core.get_request_point_features(route_dict, mode):
@@ -183,25 +185,25 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             if feedback.isCanceled():
                 break
 
-            params = directions_core.build_default_parameters(preference, coordinates=coordinates, options=options)
+            params = directions_core.build_default_parameters(
+                preference, coordinates=coordinates, options=options
+            )
 
             try:
-                response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
+                response = ors_client.request(
+                    "/v2/directions/" + profile + "/geojson", {}, post_json=params
+                )
+            except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Route from {values[0]} to {values[1]} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue
 
-            sink.addFeature(directions_core.get_output_feature_directions(
-                response,
-                profile,
-                preference,
-                from_value=values[0],
-                to_value=values[1]
-            ))
+            sink.addFeature(
+                directions_core.get_output_feature_directions(
+                    response, profile, preference, from_value=values[0], to_value=values[1]
+                )
+            )
 
             counter += 1
             feedback.setProgress(int(100.0 / route_count * counter))
@@ -231,18 +233,27 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         route_dict = dict()
         source_feats = sorted(list(source.getFeatures()), key=sort_start)
         x_former_source = transform.transformToWGS(source.sourceCrs())
-        route_dict['start'] = dict(
-            geometries=[x_former_source.transform(feat.geometry().asPoint()) for feat in source_feats],
-            values=[feat.attribute(source_field.name()) if source_field else feat.id() for feat in source_feats],
+        route_dict["start"] = dict(
+            geometries=[
+                x_former_source.transform(feat.geometry().asPoint()) for feat in source_feats
+            ],
+            values=[
+                feat.attribute(source_field.name()) if source_field else feat.id()
+                for feat in source_feats
+            ],
         )
 
         destination_feats = sorted(list(destination.getFeatures()), key=sort_end)
         x_former_destination = transform.transformToWGS(destination.sourceCrs())
-        route_dict['end'] = dict(
-            geometries=[x_former_destination.transform(feat.geometry().asPoint()) for feat in destination_feats],
-            values=[feat.attribute(destination_field.name()) if destination_field else feat.id() for feat in
-                    destination_feats
-                    ],
+        route_dict["end"] = dict(
+            geometries=[
+                x_former_destination.transform(feat.geometry().asPoint())
+                for feat in destination_feats
+            ],
+            values=[
+                feat.attribute(destination_field.name()) if destination_field else feat.id()
+                for feat in destination_feats
+            ],
         )
 
         return route_dict

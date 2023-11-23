@@ -27,10 +27,7 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsCoordinateReferenceSystem,
-                       QgsCoordinateTransform,
-                       QgsProject
-                       )
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 
 
 def transformToWGS(old_crs):

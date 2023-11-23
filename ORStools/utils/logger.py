@@ -31,6 +31,7 @@ from qgis.core import QgsMessageLog, Qgis
 
 from ORStools import PLUGIN_NAME
 
+
 def log(message, level_in=0):
     """
     Writes to QGIS inbuilt logger accessible through panel.

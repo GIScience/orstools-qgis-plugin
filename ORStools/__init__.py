@@ -41,28 +41,28 @@ def classFactory(iface):  # pylint: disable=invalid-name
     """
 
     from .ORStoolsPlugin import ORStools
+
     return ORStools(iface)
 
 
 # Define plugin wide constants
-PLUGIN_NAME = 'ORS Tools'
-DEFAULT_COLOR = '#a8b1f5'
+PLUGIN_NAME = "ORS Tools"
+DEFAULT_COLOR = "#a8b1f5"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RESOURCE_PREFIX = ":plugins/ORStools/img/"
-CONFIG_PATH = os.path.join(BASE_DIR, 'config.yml')
-ENV_VARS = {'ORS_REMAINING': 'X-Ratelimit-Remaining',
-            'ORS_QUOTA': 'X-Ratelimit-Limit'}
+CONFIG_PATH = os.path.join(BASE_DIR, "config.yml")
+ENV_VARS = {"ORS_REMAINING": "X-Ratelimit-Remaining", "ORS_QUOTA": "X-Ratelimit-Limit"}
 
 # Read metadata.txt
 METADATA = configparser.ConfigParser()
-METADATA.read(os.path.join(BASE_DIR, 'metadata.txt'), encoding='utf-8')
+METADATA.read(os.path.join(BASE_DIR, "metadata.txt"), encoding="utf-8")
 today = datetime.today()
 
-__version__ = METADATA['general']['version']
-__author__ = METADATA['general']['author']
-__email__ = METADATA['general']['email']
-__web__ = METADATA['general']['homepage']
-__help__ = METADATA['general']['help']
-__date__ = today.strftime('%Y-%m-%d')
-__copyright__ = f'(C) {today.year} by {__author__}'
+__version__ = METADATA["general"]["version"]
+__author__ = METADATA["general"]["author"]
+__email__ = METADATA["general"]["email"]
+__web__ = METADATA["general"]["homepage"]
+__help__ = METADATA["general"]["help"]
+__date__ = today.strftime("%Y-%m-%d")
+__copyright__ = f"(C) {today.year} by {__author__}"

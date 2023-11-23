@@ -53,7 +53,7 @@ def write_config(new_config):
     :param new_config: new provider settings after altering in dialog.
     :type new_config: dict
     """
-    with open(CONFIG_PATH, 'w') as f:
+    with open(CONFIG_PATH, "w") as f:
         yaml.safe_dump(new_config, f)
 
 

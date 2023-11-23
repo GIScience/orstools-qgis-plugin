@@ -27,15 +27,17 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsPointXY,
-                       QgsFeature,
-                       QgsField,
-                       QgsFields,
-                       QgsGeometry,
-                       QgsSymbol,
-                       QgsSimpleFillSymbolLayer,
-                       QgsRendererCategory,
-                       QgsCategorizedSymbolRenderer)
+from qgis.core import (
+    QgsPointXY,
+    QgsFeature,
+    QgsField,
+    QgsFields,
+    QgsGeometry,
+    QgsSymbol,
+    QgsSimpleFillSymbolLayer,
+    QgsRendererCategory,
+    QgsCategorizedSymbolRenderer,
+)
 
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
@@ -48,7 +50,6 @@ class Isochrones:
     """convenience class to build isochrones"""
 
     def __init__(self):
-
         # Will all be set in self.set_parameters(), bcs Processing Algo has to initialize this class before it
         # knows about its own parameters
         self.profile = None
@@ -58,7 +59,9 @@ class Isochrones:
         self.factor = None
         self.field_dimension_name = None
 
-    def set_parameters(self, profile, dimension, factor, id_field_type=QVariant.String, id_field_name='ID'):
+    def set_parameters(
+        self, profile, dimension, factor, id_field_type=QVariant.String, id_field_name="ID"
+    ):
         """
         Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know
         its parameters yet.
@@ -84,7 +87,7 @@ class Isochrones:
         self.id_field_name = id_field_name
         self.factor = factor
 
-        self.field_dimension_name = "AA_MINS" if self.dimension == 'time' else "AA_METERS"
+        self.field_dimension_name = "AA_MINS" if self.dimension == "time" else "AA_METERS"
 
     def get_fields(self):
         """
@@ -119,22 +122,26 @@ class Isochrones:
 
         # Sort features based on the isochrone value, so that longest isochrone
         # is added first. This will plot the isochrones on top of each other.
-        for isochrone in sorted(response['features'], key=lambda x: x['properties']['value'], reverse=True):
+        for isochrone in sorted(
+            response["features"], key=lambda x: x["properties"]["value"], reverse=True
+        ):
             feat = QgsFeature()
-            coordinates = isochrone['geometry']['coordinates']
-            iso_value = isochrone['properties']['value']
-            center = isochrone['properties']['center']
-            total_pop = isochrone['properties'].get('total_pop')
+            coordinates = isochrone["geometry"]["coordinates"]
+            iso_value = isochrone["properties"]["value"]
+            center = isochrone["properties"]["center"]
+            total_pop = isochrone["properties"].get("total_pop")
             qgis_coords = [QgsPointXY(x, y) for x, y in coordinates[0]]
             feat.setGeometry(QgsGeometry.fromPolygonXY([qgis_coords]))
-            feat.setAttributes([
-                id_field_value,
-                center[0],
-                center[1],
-                int(iso_value / self.factor),
-                self.profile,
-                total_pop
-            ])
+            feat.setAttributes(
+                [
+                    id_field_value,
+                    center[0],
+                    center[1],
+                    int(iso_value / self.factor),
+                    self.profile,
+                    total_pop,
+                ]
+            )
 
             yield feat
 
@@ -159,24 +166,26 @@ class Isochrones:
         :type layer: QgsMapLayer
         """
 
-        if self.dimension == 'time':
-            legend_suffix = ' min'
+        if self.dimension == "time":
+            legend_suffix = " min"
         else:
-            legend_suffix = ' m'
+            legend_suffix = " m"
 
         field = layer.fields().indexOf(self.field_dimension_name)
         unique_values = sorted(layer.uniqueValues(field))
 
-        colors = {0: QColor('#2b83ba'),
-                  1: QColor('#64abb0'),
-                  2: QColor('#9dd3a7'),
-                  3: QColor('#c7e9ad'),
-                  4: QColor('#edf8b9'),
-                  5: QColor('#ffedaa'),
-                  6: QColor('#fec980'),
-                  7: QColor('#f99e59'),
-                  8: QColor('#e85b3a'),
-                  9: QColor('#d7191c')}
+        colors = {
+            0: QColor("#2b83ba"),
+            1: QColor("#64abb0"),
+            2: QColor("#9dd3a7"),
+            3: QColor("#c7e9ad"),
+            4: QColor("#edf8b9"),
+            5: QColor("#ffedaa"),
+            6: QColor("#fec980"),
+            7: QColor("#f99e59"),
+            8: QColor("#e85b3a"),
+            9: QColor("#d7191c"),
+        }
 
         categories = []
 
@@ -185,8 +194,9 @@ class Isochrones:
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
 
             # configure a symbol layer
-            symbol_layer = QgsSimpleFillSymbolLayer(color=colors[cid],
-                                                    strokeColor=QColor('#000000'))
+            symbol_layer = QgsSimpleFillSymbolLayer(
+                color=colors[cid], strokeColor=QColor("#000000")
+            )
 
             # replace default symbol layer with the configured one
             if symbol_layer is not None:

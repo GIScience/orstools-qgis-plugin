@@ -34,6 +34,7 @@ Defines exceptions that are thrown by the ORS client.
 
 class ApiError(Exception):
     """Represents an exception returned by the remote API."""
+
     def __init__(self, status, message=None):
         self.status = status
         self.message = message
@@ -47,6 +48,7 @@ class ApiError(Exception):
 
 class InvalidKey(Exception):
     """only called for 403"""
+
     def __init__(self, status, message):
         self.status = status
         self.message = message
@@ -74,6 +76,7 @@ class OverQueryLimit(Exception):
 
 class Timeout(Exception):
     """The request timed out."""
+
     pass
 
 

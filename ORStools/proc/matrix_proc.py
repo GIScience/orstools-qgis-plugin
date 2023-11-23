@@ -27,15 +27,16 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsWkbTypes,
-                       QgsFeature,
-                       QgsProcessing,
-                       QgsFields,
-                       QgsField,
-                       QgsProcessingException,
-                       QgsProcessingParameterField,
-                       QgsProcessingParameterFeatureSource,
-                       )
+from qgis.core import (
+    QgsWkbTypes,
+    QgsFeature,
+    QgsProcessing,
+    QgsFields,
+    QgsField,
+    QgsProcessingException,
+    QgsProcessingParameterField,
+    QgsProcessingParameterFeatureSource,
+)
 
 from PyQt5.QtCore import QVariant
 
@@ -48,7 +49,7 @@ from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = 'matrix_from_layers'
+        self.ALGO_NAME = "matrix_from_layers"
         self.GROUP = "Matrix"
         self.IN_START = "INPUT_START_LAYER"
         self.IN_START_FIELD = "INPUT_START_FIELD"
@@ -91,28 +92,24 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         # options = self.parseOptions(parameters, context)
 
         # Get parameter values
-        source = self.parameterAsSource(
-            parameters,
-            self.IN_START,
-            context
-        )
+        source = self.parameterAsSource(parameters, self.IN_START, context)
 
         source_field_name = parameters[self.IN_START_FIELD]
         source_field = source.fields().field(source_field_name) if source_field_name else None
 
-        destination = self.parameterAsSource(
-            parameters,
-            self.IN_END,
-            context
-        )
+        destination = self.parameterAsSource(parameters, self.IN_END, context)
         destination_field_name = parameters[self.IN_END_FIELD]
-        destination_field = destination.fields().field(destination_field_name) if destination_field_name else None
+        destination_field = (
+            destination.fields().field(destination_field_name) if destination_field_name else None
+        )
 
         # Abort when MultiPoint type
-        if (QgsWkbTypes.flatType(source.wkbType()) or QgsWkbTypes.flatType(destination.wkbType()))\
-                == QgsWkbTypes.MultiPoint:
+        if (
+            QgsWkbTypes.flatType(source.wkbType()) or QgsWkbTypes.flatType(destination.wkbType())
+        ) == QgsWkbTypes.MultiPoint:
             raise QgsProcessingException(
-                "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
+                "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer."
+            )
 
         # Get source and destination features
         sources_features = list(source.getFeatures())
@@ -122,32 +119,42 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         destinations_amount = destination.featureCount()
 
         # Allow for 50 features in source if source == destination
-        source_equals_destination = parameters['INPUT_START_LAYER'] == parameters['INPUT_END_LAYER']
+        source_equals_destination = parameters["INPUT_START_LAYER"] == parameters["INPUT_END_LAYER"]
         if source_equals_destination:
             features = sources_features
             x_former = transform.transformToWGS(source.sourceCrs())
             features_points = [x_former.transform(feat.geometry().asPoint()) for feat in features]
         else:
             x_former = transform.transformToWGS(source.sourceCrs())
-            sources_features_x_formed = [x_former.transform(feat.geometry().asPoint()) for feat in sources_features]
+            sources_features_x_formed = [
+                x_former.transform(feat.geometry().asPoint()) for feat in sources_features
+            ]
 
             x_former = transform.transformToWGS(destination.sourceCrs())
-            destination_features_x_formed = [x_former.transform(feat.geometry().asPoint()) for feat in
-                                             destination_features]
+            destination_features_x_formed = [
+                x_former.transform(feat.geometry().asPoint()) for feat in destination_features
+            ]
 
             features_points = sources_features_x_formed + destination_features_x_formed
 
         # Get IDs
-        sources_ids = list(range(sources_amount)) if source_equals_destination else list(range(sources_amount))
-        destination_ids = list(range(sources_amount)) if source_equals_destination else list(
-            range(sources_amount, sources_amount + destinations_amount))
+        sources_ids = (
+            list(range(sources_amount))
+            if source_equals_destination
+            else list(range(sources_amount))
+        )
+        destination_ids = (
+            list(range(sources_amount))
+            if source_equals_destination
+            else list(range(sources_amount, sources_amount + destinations_amount))
+        )
 
         params = {
-            'locations': [[point.x(), point.y()] for point in features_points],
-            'sources': sources_ids,
-            'destinations': destination_ids,
-            'metrics': ["duration", "distance"],
-            'id': 'Matrix'
+            "locations": [[point.x(), point.y()] for point in features_points],
+            "sources": sources_ids,
+            "destinations": destination_ids,
+            "metrics": ["duration", "distance"],
+            "id": "Matrix",
             # 'options': options
         }
 
@@ -162,39 +169,39 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request('/v2/matrix/' + profile, {}, post_json=params)
+            response = ors_client.request("/v2/matrix/" + profile, {}, post_json=params)
 
-        except (exceptions.ApiError,
-                exceptions.InvalidKey,
-                exceptions.GenericServerError) as e:
+        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters,
-            self.OUT,
-            context,
-            sink_fields,
-            QgsWkbTypes.NoGeometry
+            parameters, self.OUT, context, sink_fields, QgsWkbTypes.NoGeometry
         )
 
-        sources_attributes = [feat.attribute(source_field_name) if source_field_name else feat.id() for feat in
-                              sources_features]
-        destinations_attributes = [feat.attribute(destination_field_name) if destination_field_name else feat.id() for
-                                   feat in destination_features]
+        sources_attributes = [
+            feat.attribute(source_field_name) if source_field_name else feat.id()
+            for feat in sources_features
+        ]
+        destinations_attributes = [
+            feat.attribute(destination_field_name) if destination_field_name else feat.id()
+            for feat in destination_features
+        ]
 
         for s, source in enumerate(sources_attributes):
             for d, destination in enumerate(destinations_attributes):
-                duration = response['durations'][s][d]
-                distance = response['distances'][s][d]
+                duration = response["durations"][s][d]
+                distance = response["distances"][s][d]
                 feat = QgsFeature()
-                feat.setAttributes([
-                    source,
-                    destination,
-                    duration / 3600 if duration is not None else None,
-                    distance / 1000 if distance is not None else None
-                ])
+                feat.setAttributes(
+                    [
+                        source,
+                        destination,
+                        duration / 3600 if duration is not None else None,
+                        distance / 1000 if distance is not None else None,
+                    ]
+                )
 
                 sink.addFeature(feat)
 
@@ -204,7 +211,6 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     #  Change to be consistent
     @staticmethod
     def get_fields(source_type=QVariant.Int, destination_type=QVariant.Int):
-
         fields = QgsFields()
         fields.append(QgsField("FROM_ID", source_type))
         fields.append(QgsField("TO_ID", destination_type))
