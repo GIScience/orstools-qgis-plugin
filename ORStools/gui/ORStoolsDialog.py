@@ -31,26 +31,28 @@ import json
 import os
 import processing
 import webbrowser
-from qgis.core import (QgsProject,
-                       QgsVectorLayer,
-                       QgsTextAnnotation,
-                       QgsMapLayerProxyModel)
+from qgis.core import QgsProject, QgsVectorLayer, QgsTextAnnotation, QgsMapLayerProxyModel
 from qgis.gui import QgsMapCanvasAnnotationItem
 
 from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
 from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtWidgets import (QAction,
-                             QDialog,
-                             QApplication,
-                             QMenu,
-                             QMessageBox,
-                             QDialogButtonBox)
+from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
-from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
-from ORStools.common import (client,
-                             directions_core,
-                             PROFILES,
-                             PREFERENCES, )
+from ORStools import (
+    RESOURCE_PREFIX,
+    PLUGIN_NAME,
+    DEFAULT_COLOR,
+    __version__,
+    __email__,
+    __web__,
+    __help__,
+)
+from ORStools.common import (
+    client,
+    directions_core,
+    PROFILES,
+    PREFERENCES,
+)
 from ORStools.gui import directions_gui
 from ORStools.utils import exceptions, maptools, logger, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
@@ -75,24 +77,25 @@ def on_help_click():
 def on_about_click(parent):
     """Slot for click event of About button/menu entry."""
 
-    info = QCoreApplication.translate('@default', '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org"' \
-           ' style="color: {0}">openrouteservice</a> routing functionalities.' \
-           '<br><br>' \
-           '<center>' \
-           '<a href=\"https://heigit.org/de/willkommen\"><img src=\":/plugins/ORStools/img/logo_heigit_300.png\"/>' \
-           '</a><br><br>' \
-           '</center>' \
-           'Author: HeiGIT gGmbH<br>' \
-           'Email: <a href="mailto:Openrouteservice <{1}>">{1}</a><br>' \
-           'Web: <a href="{2}">{2}</a><br>' \
-           'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">' \
-           'github.com/GIScience/orstools-qgis-plugin</a><br>' \
-           'Version: {3}').format(DEFAULT_COLOR, __email__, __web__, __version__)
+    info = QCoreApplication.translate(
+        "@default",
+        '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org"'
+        ' style="color: {0}">openrouteservice</a> routing functionalities.'
+        "<br><br>"
+        "<center>"
+        '<a href="https://heigit.org/de/willkommen"><img src=":/plugins/ORStools/img/logo_heigit_300.png"/>'
+        "</a><br><br>"
+        "</center>"
+        "Author: HeiGIT gGmbH<br>"
+        'Email: <a href="mailto:Openrouteservice <{1}>">{1}</a><br>'
+        'Web: <a href="{2}">{2}</a><br>'
+        'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">'
+        "github.com/GIScience/orstools-qgis-plugin</a><br>"
+        "Version: {3}",
+    ).format(DEFAULT_COLOR, __email__, __web__, __version__)
 
     QMessageBox.information(
-        parent,
-        QCoreApplication.translate('@default', 'About {}').format(PLUGIN_NAME),
-        info
+        parent, QCoreApplication.translate("@default", "About {}").format(PLUGIN_NAME), info
     )
 
 
@@ -130,33 +133,24 @@ class ORStoolsDialogMain:
             """
             return QIcon(RESOURCE_PREFIX + f)
 
-        icon_plugin = create_icon('icon_orstools.png')
+        icon_plugin = create_icon("icon_orstools.png")
 
         self.actions = [
             QAction(
                 icon_plugin,
                 PLUGIN_NAME,  # tr text
-                self.iface.mainWindow()  # parent
+                self.iface.mainWindow(),  # parent
             ),
             # Config dialog
             QAction(
-                create_icon('icon_settings.png'),
-                self.tr('Provider Settings'),
-                self.iface.mainWindow()
+                create_icon("icon_settings.png"),
+                self.tr("Provider Settings"),
+                self.iface.mainWindow(),
             ),
             # About dialog
-            QAction(
-                create_icon('icon_about.png'),
-                self.tr('About'),
-                self.iface.mainWindow()
-            ),
+            QAction(create_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()),
             # Help page
-            QAction(
-                create_icon('icon_help.png'),
-                self.tr('Help'),
-                self.iface.mainWindow()
-            )
-
+            QAction(create_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()),
         ]
 
         # Create menu
@@ -188,7 +182,7 @@ class ORStoolsDialogMain:
 
         # Remove action for keyboard shortcut
         self.iface.unregisterMainWindowAction(self.actions[0])
-        
+
         del self.dlg
 
     # @staticmethod
@@ -213,17 +207,19 @@ class ORStoolsDialogMain:
         # If not checked, GUI would be rebuilt every time!
         if self.first_start:
             self.first_start = False
-            self.dlg = ORStoolsDialog(self.iface, self.iface.mainWindow())  # setting parent enables modal view
+            self.dlg = ORStoolsDialog(
+                self.iface, self.iface.mainWindow()
+            )  # setting parent enables modal view
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
             self.dlg.avoidpolygon_dropdown.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
         # Populate provider box on window startup, since can be changed from multiple menus/buttons
-        providers = configmanager.read_config()['providers']
+        providers = configmanager.read_config()["providers"]
         self.dlg.provider_combo.clear()
         for provider in providers:
-            self.dlg.provider_combo.addItem(provider['name'], provider)
+            self.dlg.provider_combo.addItem(provider["name"], provider)
 
         self.dlg.show()
 
@@ -245,7 +241,7 @@ class ORStoolsDialogMain:
         self.dlg.annotations = []
 
         provider_id = self.dlg.provider_combo.currentIndex()
-        provider = configmanager.read_config()['providers'][provider_id]
+        provider = configmanager.read_config()["providers"][provider_id]
 
         # if there are no coordinates, throw an error message
         if not self.dlg.routing_fromline_list.count():
@@ -256,12 +252,14 @@ class ORStoolsDialogMain:
                 Did you forget to set routing waypoints?<br><br>
                 
                 Use the 'Add Waypoint' button to add up to 50 waypoints.
-                """
+                """,
             )
             return
 
         # if no API key is present, when ORS is selected, throw an error message
-        if not provider['key'] and provider['base_url'].startswith('https://api.openrouteservice.org'):
+        if not provider["key"] and provider["base_url"].startswith(
+            "https://api.openrouteservice.org"
+        ):
             QMessageBox.critical(
                 self.dlg,
                 "Missing API key",
@@ -270,54 +268,58 @@ class ORStoolsDialogMain:
                 
                 If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
                 Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
             )
             return
 
         clnt = client.Client(provider)
-        clnt_msg = ''
+        clnt_msg = ""
 
         directions = directions_gui.Directions(self.dlg)
         params = None
         try:
             params = directions.get_parameters()
             if self.dlg.optimization_group.isChecked():
-                if len(params['jobs']) <= 1:  # Start/end locations don't count as job
+                if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
                     QMessageBox.critical(
                         self.dlg,
                         "Wrong number of waypoints",
                         """At least 3 or 4 waypoints are needed to perform routing optimization. 
 
 Remember, the first and last location are not part of the optimization.
-                        """
+                        """,
                     )
                     return
-                response = clnt.request('/optimization', {}, post_json=params)
-                feat = directions_core.get_output_features_optimization(response, params['vehicles'][0]['profile'])
+                response = clnt.request("/optimization", {}, post_json=params)
+                feat = directions_core.get_output_features_optimization(
+                    response, params["vehicles"][0]["profile"]
+                )
             else:
-                params['coordinates'] = directions.get_request_line_feature()
+                params["coordinates"] = directions.get_request_line_feature()
                 profile = self.dlg.routing_travel_combo.currentText()
                 # abort on empty avoid polygons layer
-                if 'options' in params and 'avoid_polygons' in params['options']\
-                        and params['options']['avoid_polygons'] == {}:
+                if (
+                    "options" in params
+                    and "avoid_polygons" in params["options"]
+                    and params["options"]["avoid_polygons"] == {}
+                ):
                     QMessageBox.warning(
                         self.dlg,
                         "Empty layer",
                         """
 The specified avoid polygon(s) layer does not contain any features.
 Please add polygons to the layer or uncheck avoid polygons.
-                        """
+                        """,
                     )
                     msg = "The request has been aborted!"
                     logger.log(msg, 0)
                     self.dlg.debug_text.setText(msg)
                     return
-                response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
+                response = clnt.request(
+                    "/v2/directions/" + profile + "/geojson", {}, post_json=params
+                )
                 feat = directions_core.get_output_feature_directions(
-                    response,
-                    profile,
-                    params['preference'],
-                    directions.options
+                    response, profile, params["preference"], directions.options
                 )
 
             layer_out.dataProvider().addFeature(feat)
@@ -334,10 +336,7 @@ Please add polygons to the layer or uncheck avoid polygons.
             self.dlg.debug_text.setText(msg)
             return
 
-        except (exceptions.ApiError,
-                exceptions.InvalidKey,
-                exceptions.GenericServerError) as e:
-
+        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
             clnt_msg += f"<b>{e.__class__.__name__}</b>: ({str(e)})<br>"
             raise
@@ -388,8 +387,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_preference_combo.addItems(PREFERENCES)
 
         # Change OK and Cancel button names
-        self.global_buttons.button(QDialogButtonBox.Ok).setText(self.tr('Apply'))
-        self.global_buttons.button(QDialogButtonBox.Cancel).setText(self.tr('Close'))
+        self.global_buttons.button(QDialogButtonBox.Ok).setText(self.tr("Apply"))
+        self.global_buttons.button(QDialogButtonBox.Cancel).setText(self.tr("Close"))
 
         # Set up signals/slots
 
@@ -404,25 +403,32 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
 
         # Batch
-        self.batch_routing_points.clicked.connect(lambda: processing.execAlgorithmDialog(
-            f'{PLUGIN_NAME}:directions_from_points_2_layers'))
-        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog(
-            f'{PLUGIN_NAME}:directions_from_points_1_layer'))
-        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog(
-            f'{PLUGIN_NAME}:directions_from_polylines_layer'))
-        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog(
-            f'{PLUGIN_NAME}:isochrones_from_point'))
-        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog(
-            f'{PLUGIN_NAME}:isochrones_from_layer'))
-        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog(f'{PLUGIN_NAME}:matrix_from_layers'))
+        self.batch_routing_points.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_points_2_layers")
+        )
+        self.batch_routing_point.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_points_1_layer")
+        )
+        self.batch_routing_line.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_polylines_layer")
+        )
+        self.batch_iso_point.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:isochrones_from_point")
+        )
+        self.batch_iso_layer.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:isochrones_from_layer")
+        )
+        self.batch_matrix.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:matrix_from_layers")
+        )
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
 
-        providers = configmanager.read_config()['providers']
+        providers = configmanager.read_config()["providers"]
         self.provider_combo.clear()
         for provider in providers:
-            self.provider_combo.addItem(provider['name'], provider)
+            self.provider_combo.addItem(provider["name"], provider)
 
     def _on_clear_listwidget_click(self):
         """Clears the contents of the QgsListWidget and the annotations."""
@@ -472,7 +478,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
-        self.line_tool.pointDrawn.connect(lambda point, idx: self._on_linetool_map_click(point, idx))
+        self.line_tool.pointDrawn.connect(
+            lambda point, idx: self._on_linetool_map_click(point, idx)
+        )
         self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
 
     def _on_linetool_map_click(self, point, idx):

@@ -106,7 +106,7 @@ class Directions:
             item = layers_list.item(idx).text()
             param, coords = item.split(":")
 
-            coordinates.append([float(coord) for coord in coords.split(', ')])
+            coordinates.append([float(coord) for coord in coords.split(", ")])
 
         return [[round(x, 6), round(y, 6)] for x, y in coordinates]
 
@@ -125,35 +125,35 @@ class Directions:
         route_pref = self.dlg.routing_preference_combo.currentText()
 
         params = {
-            'preference': route_pref,
-            'geometry': 'true',
-            'instructions': 'false',
-            'elevation': True,
-            'id': 1,
+            "preference": route_pref,
+            "geometry": "true",
+            "instructions": "false",
+            "elevation": True,
+            "id": 1,
         }
 
         # Get Advanced parameters
         if self.dlg.routing_avoid_tags_group.isChecked():
             avoid_boxes = self.dlg.routing_avoid_tags_group.findChildren(QCheckBox)
             if any(box.isChecked() for box in avoid_boxes):
-                self.options['avoid_features'] = _get_avoid_options(avoid_boxes)
+                self.options["avoid_features"] = _get_avoid_options(avoid_boxes)
 
         if self.dlg.routing_avoid_countries_group.isChecked():
             countries_text = self.dlg.countries_text.value()
             if countries_text:
-                countries = countries_text.split(',')
+                countries = countries_text.split(",")
                 if all(map(lambda x: x.isdigit(), countries)):
                     countries = [int(x) for x in countries]
-                self.options['avoid_countries'] = countries
+                self.options["avoid_countries"] = countries
 
         if self.dlg.avoidpolygon_group.isChecked():
             layer = self.dlg.avoidpolygon_dropdown.currentLayer()
             if layer:
                 polygons = _get_avoid_polygons(layer)
-                self.options['avoid_polygons'] = polygons
+                self.options["avoid_polygons"] = polygons
 
         if self.options:
-            params['options'] = self.options
+            params["options"] = self.options
 
         return params
 
@@ -162,34 +162,28 @@ class Directions:
         coordinates = self.get_request_line_feature()
 
         params = {
-            'jobs': list(),
-            'vehicles': [{
-                "id": 0,
-                "profile": self.dlg.routing_travel_combo.currentText()
-            }],
-            'options': {'g': True}
+            "jobs": list(),
+            "vehicles": [{"id": 0, "profile": self.dlg.routing_travel_combo.currentText()}],
+            "options": {"g": True},
         }
 
         if self.dlg.fix_end.isChecked():
             end = coordinates.pop(-1)
-            params['vehicles'][0]['end'] = end
+            params["vehicles"][0]["end"] = end
         elif self.dlg.fix_start.isChecked():
             start = coordinates.pop(0)
-            params['vehicles'][0]['start'] = start
+            params["vehicles"][0]["start"] = start
         elif self.dlg.fix_both.isChecked():
             start = coordinates.pop(0)
             end = coordinates.pop(-1)
-            params['vehicles'][0]['start'] = start
-            params['vehicles'][0]['end'] = end
+            params["vehicles"][0]["start"] = start
+            params["vehicles"][0]["end"] = end
         elif self.dlg.round_trip.isChecked():
             start = coordinates.pop(0)
-            params['vehicles'][0]['start'] = start
-            params['vehicles'][0]['end'] = start
+            params["vehicles"][0]["start"] = start
+            params["vehicles"][0]["end"] = start
 
         for coord in coordinates:
-            params['jobs'].append({
-                "location": coord,
-                "id": coordinates.index(coord)
-            })
+            params["jobs"].append({"location": coord, "id": coordinates.index(coord)})
 
         return params

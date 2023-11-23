@@ -27,14 +27,15 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsWkbTypes,
-                       QgsCoordinateReferenceSystem,
-                       QgsProcessing,
-                       QgsProcessingParameterField,
-                       QgsProcessingParameterFeatureSource,
-                       QgsProcessingParameterEnum,
-                       QgsPointXY,
-                       )
+from qgis.core import (
+    QgsWkbTypes,
+    QgsCoordinateReferenceSystem,
+    QgsProcessing,
+    QgsProcessingParameterField,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterEnum,
+    QgsPointXY,
+)
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
 from ORStools.utils import transform, exceptions, logger
@@ -45,9 +46,10 @@ from ..utils.processing import get_params_optimize
 # noinspection PyPep8Naming
 class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
     """Algorithm class for Directions Lines."""
+
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = 'directions_from_polylines_layer'
+        self.ALGO_NAME = "directions_from_polylines_layer"
         self.GROUP = "Directions"
         self.IN_LINES = "INPUT_LINE_LAYER"
         self.IN_FIELD = "INPUT_LAYER_FIELD"
@@ -71,7 +73,7 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
                 self.IN_PREFERENCE,
                 self.tr("Travel preference"),
                 PREFERENCES,
-                defaultValue=PREFERENCES[0]
+                defaultValue=PREFERENCES[0],
             ),
             QgsProcessingParameterEnum(
                 self.IN_OPTIMIZE,
@@ -79,7 +81,7 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
                 OPTIMIZATION_MODES,
                 defaultValue=None,
                 optional=True,
-            )
+            ),
         ]
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -94,11 +96,7 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
         options = self.parseOptions(parameters, context)
 
         # Get parameter values
-        source = self.parameterAsSource(
-            parameters,
-            self.IN_LINES,
-            context
-        )
+        source = self.parameterAsSource(parameters, self.IN_LINES, context)
 
         # parameters[self.IN_FIELD] returns a PyQt5.QtCore.QVariant with "NULL" as content
         # in case of absence of self.IN_FIELD.
@@ -111,18 +109,25 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
         get_fields_options = dict()
         if source_field_name:
             get_fields_options.update(
-                    from_type=source.fields().field(source_field_name).type(),
-                    from_name=source_field_name
-                    )
+                from_type=source.fields().field(source_field_name).type(),
+                from_name=source_field_name,
+            )
 
         sink_fields = directions_core.get_fields(**get_fields_options, line=True)
 
-        (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context, sink_fields,
-                                               source.wkbType(),
-                                               QgsCoordinateReferenceSystem.fromEpsgId(4326))
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUT,
+            context,
+            sink_fields,
+            source.wkbType(),
+            QgsCoordinateReferenceSystem.fromEpsgId(4326),
+        )
         count = source.featureCount()
 
-        for num, (line, field_value) in enumerate(self._get_sorted_lines(source, source_field_name)):
+        for num, (line, field_value) in enumerate(
+            self._get_sorted_lines(source, source_field_name)
+        ):
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
@@ -130,26 +135,27 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             try:
                 if optimization_mode is not None:
                     params = get_params_optimize(line, profile, optimization_mode)
-                    response = ors_client.request('/optimization', {}, post_json=params)
+                    response = ors_client.request("/optimization", {}, post_json=params)
 
-                    sink.addFeature(directions_core.get_output_features_optimization(
-                        response,
-                        profile,
-                        from_value=field_value
-                    ))
+                    sink.addFeature(
+                        directions_core.get_output_features_optimization(
+                            response, profile, from_value=field_value
+                        )
+                    )
                 else:
-                    params = directions_core.build_default_parameters(preference, point_list=line, options=options)
-                    response = ors_client.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
+                    params = directions_core.build_default_parameters(
+                        preference, point_list=line, options=options
+                    )
+                    response = ors_client.request(
+                        "/v2/directions/" + profile + "/geojson", {}, post_json=params
+                    )
 
-                    sink.addFeature(directions_core.get_output_feature_directions(
-                        response,
-                        profile,
-                        preference,
-                        from_value=field_value
-                    ))
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
+                    sink.addFeature(
+                        directions_core.get_output_feature_directions(
+                            response, profile, preference, from_value=field_value
+                        )
+                    )
+            except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {num} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
                 logger.log(msg)
@@ -181,10 +187,15 @@ class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
             if QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.MultiLineString:
                 # TODO: only takes the first polyline geometry from the multiline geometry currently
                 # Loop over all polyline geometries
-                line = [x_former.transform(QgsPointXY(point)) for point in feat.geometry().asMultiPolyline()[0]]
+                line = [
+                    x_former.transform(QgsPointXY(point))
+                    for point in feat.geometry().asMultiPolyline()[0]
+                ]
 
             elif QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.LineString:
-                line = [x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()]
+                line = [
+                    x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()
+                ]
 
             yield line, field_value
 

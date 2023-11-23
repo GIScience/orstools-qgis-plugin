@@ -28,12 +28,7 @@
 """
 
 from itertools import product
-from qgis.core import (QgsPoint,
-                       QgsPointXY,
-                       QgsGeometry,
-                       QgsFeature,
-                       QgsFields,
-                       QgsField)
+from qgis.core import QgsPoint, QgsPointXY, QgsGeometry, QgsFeature, QgsFields, QgsField
 from typing import List
 
 from PyQt5.QtCore import QVariant
@@ -55,18 +50,18 @@ def get_request_point_features(route_dict, row_by_row):
     :rtype: tuple
     """
 
-    locations_list = list(product(route_dict['start']['geometries'],
-                                  route_dict['end']['geometries']))
-    values_list = list(product(route_dict['start']['values'],
-                               route_dict['end']['values']))
+    locations_list = list(
+        product(route_dict["start"]["geometries"], route_dict["end"]["geometries"])
+    )
+    values_list = list(product(route_dict["start"]["values"], route_dict["end"]["values"]))
 
     # If row-by-row in two-layer mode, then only zip the locations
-    if row_by_row == 'Row-by-Row':
-        locations_list = list(zip(route_dict['start']['geometries'],
-                                  route_dict['end']['geometries']))
+    if row_by_row == "Row-by-Row":
+        locations_list = list(
+            zip(route_dict["start"]["geometries"], route_dict["end"]["geometries"])
+        )
 
-        values_list = list(zip(route_dict['start']['values'],
-                               route_dict['end']['values']))
+        values_list = list(zip(route_dict["start"]["values"], route_dict["end"]["values"]))
 
     for properties in zip(locations_list, values_list):
         # Skip if first and last location are the same
@@ -79,7 +74,13 @@ def get_request_point_features(route_dict, row_by_row):
         yield coordinates, values
 
 
-def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FROM_ID", to_name="TO_ID", line=False):
+def get_fields(
+    from_type=QVariant.String,
+    to_type=QVariant.String,
+    from_name="FROM_ID",
+    to_name="TO_ID",
+    line=False,
+):
     """
     Builds output fields for directions response layer.
 
@@ -115,7 +116,9 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
     return fields
 
 
-def get_output_feature_directions(response, profile, preference, options=None, from_value=None, to_value=None):
+def get_output_feature_directions(
+    response, profile, preference, options=None, from_value=None, to_value=None
+):
     """
     Build output feature based on response attributes for directions endpoint.
 
@@ -140,21 +143,24 @@ def get_output_feature_directions(response, profile, preference, options=None, f
     :returns: Output feature with attributes and geometry set.
     :rtype: QgsFeature
     """
-    response_mini = response['features'][0]
+    response_mini = response["features"][0]
     feat = QgsFeature()
-    coordinates = response_mini['geometry']['coordinates']
-    distance = response_mini['properties']['summary']['distance']
-    duration = response_mini['properties']['summary']['duration']
+    coordinates = response_mini["geometry"]["coordinates"]
+    distance = response_mini["properties"]["summary"]["distance"]
+    duration = response_mini["properties"]["summary"]["duration"]
     qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates]
     feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
-    feat.setAttributes([f"{distance / 1000:.3f}",
-                        f"{duration / 3600:.3f}",
-                        profile,
-                        preference,
-                        str(options),
-                        from_value,
-                        to_value
-                        ])
+    feat.setAttributes(
+        [
+            f"{distance / 1000:.3f}",
+            f"{duration / 3600:.3f}",
+            profile,
+            preference,
+            str(options),
+            from_value,
+            to_value,
+        ]
+    )
 
     return feat
 
@@ -176,25 +182,33 @@ def get_output_features_optimization(response, profile, from_value=None):
     :rtype: QgsFeature
     """
 
-    response_mini = response['routes'][0]
+    response_mini = response["routes"][0]
     feat = QgsFeature()
-    polyline = response_mini['geometry']
-    distance = response_mini['distance']
-    duration = response_mini['cost']
+    polyline = response_mini["geometry"]
+    distance = response_mini["distance"]
+    duration = response_mini["cost"]
     qgis_coords = [QgsPointXY(x, y) for x, y in convert.decode_polyline(polyline)]
     feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
-    feat.setAttributes([f"{distance / 1000:.3f}",
-                        f"{duration / 3600:.3f}",
-                        profile,
-                        'fastest',
-                        'optimized',
-                        from_value
-                        ])
+    feat.setAttributes(
+        [
+            f"{distance / 1000:.3f}",
+            f"{duration / 3600:.3f}",
+            profile,
+            "fastest",
+            "optimized",
+            from_value,
+        ]
+    )
 
     return feat
 
 
-def build_default_parameters(preference: str, point_list: List[QgsPointXY] = None, coordinates: list = None, options: dict = None) -> dict:
+def build_default_parameters(
+    preference: str,
+    point_list: List[QgsPointXY] = None,
+    coordinates: list = None,
+    options: dict = None,
+) -> dict:
     """
     Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates
     passed in point_list or an existing coordinate list within the coordinates parameter.
@@ -212,15 +226,19 @@ def build_default_parameters(preference: str, point_list: List[QgsPointXY] = Non
     :returns: parameters for directions endpoint
     :rtype: dict
     """
-    coords = coordinates if coordinates else [[round(point.x(), 6), round(point.y(), 6)] for point in point_list]
+    coords = (
+        coordinates
+        if coordinates
+        else [[round(point.x(), 6), round(point.y(), 6)] for point in point_list]
+    )
     params = {
-        'coordinates': coords,
-        'preference': preference,
-        'geometry': 'true',
-        'instructions': 'false',
-        'elevation': True,
-        'id': None,
-        "options": options
+        "coordinates": coords,
+        "preference": preference,
+        "geometry": "true",
+        "instructions": "false",
+        "elevation": True,
+        "id": None,
+        "options": options,
     }
 
     return params

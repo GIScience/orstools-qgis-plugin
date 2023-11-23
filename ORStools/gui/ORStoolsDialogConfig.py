@@ -64,14 +64,18 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for idx, box in enumerate(collapsible_boxes):
-            current_provider = self.temp_config['providers'][idx]
-            current_provider['key'] = box.findChild(QtWidgets.QLineEdit, box.title() + "_key_text").text()
-            current_provider['base_url'] = box.findChild(QtWidgets.QLineEdit, box.title() + "_base_url_text").text()
+            current_provider = self.temp_config["providers"][idx]
+            current_provider["key"] = box.findChild(
+                QtWidgets.QLineEdit, box.title() + "_key_text"
+            ).text()
+            current_provider["base_url"] = box.findChild(
+                QtWidgets.QLineEdit, box.title() + "_base_url_text"
+            ).text()
             timeout_input = box.findChild(QtWidgets.QLineEdit, box.title() + "_timeout_text")
             # https://doc.qt.io/qt-5/qvalidator.html#State-enum
             if timeout_input.validator().State() != 2:
                 self._adjust_timeout_input(timeout_input)
-            current_provider['timeout'] = int(timeout_input.text())
+            current_provider["timeout"] = int(timeout_input.text())
 
         configmanager.write_config(self.temp_config)
         self.close()
@@ -87,7 +91,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         val = input_line_edit.validator()
         text = input_line_edit.text()
         if not text:
-            input_line_edit.setText('60')
+            input_line_edit.setText("60")
         elif int(text) < val.bottom():
             input_line_edit.setText(str(val.bottom()))
         elif int(text) > val.top():
@@ -96,12 +100,14 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
     def _build_ui(self):
         """Builds the UI on dialog startup."""
 
-        for provider_entry in self.temp_config['providers']:
-            self._add_box(provider_entry['name'],
-                          provider_entry['base_url'],
-                          provider_entry['key'],
-                          provider_entry['timeout'],
-                          new=False)
+        for provider_entry in self.temp_config["providers"]:
+            self._add_box(
+                provider_entry["name"],
+                provider_entry["base_url"],
+                provider_entry["key"],
+                provider_entry["timeout"],
+                new=False,
+            )
 
         self.gridLayout.addWidget(self.providers, 0, 0, 1, 3)
 
@@ -115,19 +121,25 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         self._collapse_boxes()
         # Show quick user input dialog
-        provider_name, ok = QInputDialog.getText(self, self.tr("New ORS provider"), self.tr("Enter a name for the provider"))
+        provider_name, ok = QInputDialog.getText(
+            self, self.tr("New ORS provider"), self.tr("Enter a name for the provider")
+        )
         if ok:
-            self._add_box(provider_name, 'http://localhost:8082/ors', '', 60, new=True)
+            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, new=True)
 
     def _remove_provider(self):
         """Remove list of providers from list."""
 
-        providers = [provider['name'] for provider in self.temp_config['providers']]
+        providers = [provider["name"] for provider in self.temp_config["providers"]]
 
-        provider, ok = QInputDialog.getItem(self,
-                                            self.tr("Remove ORS provider"),
-                                            self.tr("Choose provider to remove"),
-                                            providers, 0, False)
+        provider, ok = QInputDialog.getItem(
+            self,
+            self.tr("Remove ORS provider"),
+            self.tr("Choose provider to remove"),
+            providers,
+            0,
+            False,
+        )
         if ok:
             box_remove = self.providers.findChild(QgsCollapsibleGroupBox, provider)
             self.gridLayout.removeWidget(box_remove)
@@ -135,7 +147,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
             # delete from in-memory self.temp_config
             provider_id = providers.index(provider)
-            del self.temp_config['providers'][provider_id]
+            del self.temp_config["providers"][provider_id]
 
     def _collapse_boxes(self):
         """Collapse all QgsCollapsibleGroupBoxes."""
@@ -143,12 +155,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
-    def _add_box(self,
-                 name,
-                 url,
-                 key,
-                 timeout,
-                 new=False):
+    def _add_box(self, name, url, key, timeout, new=False):
         """
         Adds a provider box to the QWidget layout and self.temp_config.
 
@@ -165,23 +172,18 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         :type new: boolean
         """
         if new:
-            self.temp_config['providers'].append(
-                dict(
-                    name=name,
-                    base_url=url,
-                    key=key,
-                    timeout=timeout
-                )
+            self.temp_config["providers"].append(
+                dict(name=name, base_url=url, key=key, timeout=timeout)
             )
 
         provider = QgsCollapsibleGroupBox(self.providers)
         provider.setObjectName(name)
         provider.setTitle(name)
         gridLayout_3 = QtWidgets.QGridLayout(provider)
-        gridLayout_3.setObjectName(name + '_grid')
+        gridLayout_3.setObjectName(name + "_grid")
         key_label = QtWidgets.QLabel(provider)
-        key_label.setObjectName(name + '_key_label')
-        key_label.setText(self.tr('API Key'))
+        key_label.setObjectName(name + "_key_label")
+        key_label.setText(self.tr("API Key"))
         gridLayout_3.addWidget(key_label, 0, 0, 1, 1)
         key_text = QtWidgets.QLineEdit(provider)
         key_text.setObjectName(name + "_key_text")

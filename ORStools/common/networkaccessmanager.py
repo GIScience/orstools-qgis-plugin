@@ -21,45 +21,45 @@ from builtins import str
 from builtins import object
 import json
 
-__author__ = 'Alessandro Pasotti'
-__date__ = 'August 2016'
+__author__ = "Alessandro Pasotti"
+__date__ = "August 2016"
 
 import re
 import io
 import urllib.parse
 
-from qgis.PyQt.QtCore import (QUrl,
-                              QEventLoop)
+from qgis.PyQt.QtCore import QUrl, QEventLoop
 
-from qgis.PyQt.QtNetwork import (QNetworkRequest,
-                                 QNetworkReply)
+from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 
-from qgis.core import (
-    QgsApplication,
-    QgsNetworkAccessManager,
-    QgsMessageLog
-)
+from qgis.core import QgsApplication, QgsNetworkAccessManager, QgsMessageLog
 
 # FIXME: ignored
 DEFAULT_MAX_REDIRECTS = 4
 
+
 class RequestsException(Exception):
     pass
+
 
 class RequestsExceptionTimeout(RequestsException):
     pass
 
+
 class RequestsExceptionConnectionError(RequestsException):
     pass
 
+
 class RequestsExceptionUserAbort(RequestsException):
     pass
+
 
 class Map(dict):
     """
     Example:
     m = Map({'first_name': 'Eduardo'}, last_name='Pool', age=24, sports=['Soccer'])
     """
+
     def __init__(self, *args, **kwargs):
         super(Map, self).__init__(*args, **kwargs)
         for arg in args:
@@ -91,6 +91,7 @@ class Map(dict):
 
 class Response(Map):
     pass
+
 
 class NetworkAccessManager(object):
     """
@@ -145,7 +146,14 @@ class NetworkAccessManager(object):
             'exception' - the exception returned during execution
     """
 
-    def __init__(self, authid=None, disable_ssl_certificate_validation=False, exception_class=None, debug=True, timeout=60):
+    def __init__(
+        self,
+        authid=None,
+        disable_ssl_certificate_validation=False,
+        exception_class=None,
+        debug=True,
+        timeout=60,
+    ):
         self.disable_ssl_certificate_validation = disable_ssl_certificate_validation
         self.authid = authid
         self.reply = None
@@ -153,17 +161,19 @@ class NetworkAccessManager(object):
         self.exception_class = exception_class
         self.on_abort = False
         self.blocking_mode = False
-        self.http_call_result = Response({
-            'status': 0,
-            'status_code': 0,
-            'status_message': '',
-            'content' : '',
-            'ok': False,
-            'headers': {},
-            'reason': '',
-            'exception': None,
-        })
-        self.timeout=timeout
+        self.http_call_result = Response(
+            {
+                "status": 0,
+                "status_code": 0,
+                "status_message": "",
+                "content": "",
+                "ok": False,
+                "headers": {},
+                "reason": "",
+                "exception": None,
+            }
+        )
+        self.timeout = timeout
 
     def msg_log(self, msg):
         if self.debug:
@@ -180,7 +190,7 @@ class NetworkAccessManager(object):
         Make a network request by calling QgsNetworkAccessManager.
         redirections argument is ignored and is here only for httplib2 compatibility.
         """
-        self.msg_log(f'http_call request: {url}')
+        self.msg_log(f"http_call request: {url}")
 
         self.blocking_mode = blocking
         req = QNetworkRequest()
@@ -195,7 +205,7 @@ class NetworkAccessManager(object):
             # encoding processing".
             # See: https://bugs.webkit.org/show_bug.cgi?id=63696#c1
             try:
-                del headers['Accept-Encoding']
+                del headers["Accept-Encoding"]
             except KeyError:
                 pass
             for k, v in list(headers.items()):
@@ -207,8 +217,8 @@ class NetworkAccessManager(object):
             self.auth_manager().updateNetworkRequest(req, self.authid)
         if self.reply is not None and self.reply.isRunning():
             self.reply.close()
-        if method.lower() == 'delete':
-            func = getattr(QgsNetworkAccessManager.instance(), 'deleteResource')
+        if method.lower() == "delete":
+            func = getattr(QgsNetworkAccessManager.instance(), "deleteResource")
         else:
             func = getattr(QgsNetworkAccessManager.instance(), method.lower())
         # Calling the server ...
@@ -218,21 +228,21 @@ class NetworkAccessManager(object):
         headers = {str(h): str(req.rawHeader(h)) for h in req.rawHeaderList()}
         for k, v in list(headers.items()):
             self.msg_log("%s: %s" % (k, v))
-        if method.lower() in ['post', 'put']:
+        if method.lower() in ["post", "put"]:
             if isinstance(body, io.IOBase):
                 body = body.read()
             if isinstance(body, str):
                 body = body.encode()
             if isinstance(body, dict):
-                body = str(json.dumps(body)).encode(encoding='utf-8')
+                body = str(json.dumps(body)).encode(encoding="utf-8")
             self.reply = func(req, body)
         else:
             self.reply = func(req)
         if self.authid:
             self.msg_log(f"Update reply w/ authid: {self.authid}")
             self.auth_manager().updateNetworkReply(self.reply, self.authid)
-        
-        QgsNetworkAccessManager.instance().setTimeout(self.timeout*1000)
+
+        QgsNetworkAccessManager.instance().setTimeout(self.timeout * 1000)
 
         # necessary to trap local timeout managed by QgsNetworkAccessManager
         # calling QgsNetworkAccessManager::abortRequest
@@ -271,7 +281,7 @@ class NetworkAccessManager(object):
 
     def downloadProgress(self, bytesReceived, bytesTotal):
         """Keep track of the download progress"""
-        #self.msg_log("downloadProgress %s of %s ..." % (bytesReceived, bytesTotal))
+        # self.msg_log("downloadProgress %s of %s ..." % (bytesReceived, bytesTotal))
         pass
 
     # noinspection PyUnusedLocal
@@ -289,14 +299,18 @@ class NetworkAccessManager(object):
         self.http_call_result.status = httpStatus
         self.http_call_result.status_message = httpStatusMessage
         for k, v in self.reply.rawHeaderPairs():
-            self.http_call_result.headers[str(k.data(), encoding='utf-8')] = str(v.data(), encoding='utf-8')
-            self.http_call_result.headers[str(k.data(), encoding='utf-8').lower()] = str(v.data(), encoding='utf-8')
+            self.http_call_result.headers[str(k.data(), encoding="utf-8")] = str(
+                v.data(), encoding="utf-8"
+            )
+            self.http_call_result.headers[str(k.data(), encoding="utf-8").lower()] = str(
+                v.data(), encoding="utf-8"
+            )
 
         if err != QNetworkReply.NoError:
             # handle error
             # check if errorString is empty, if so, then set err string as
             # reply dump
-            if re.match('(.)*server replied: $', self.reply.errorString()):
+            if re.match("(.)*server replied: $", self.reply.errorString()):
                 errString = self.reply.errorString() + self.http_call_result.content
             else:
                 errString = self.reply.errorString()
@@ -308,7 +322,7 @@ class NetworkAccessManager(object):
                 msg = f"Network error: {errString}"
 
             self.http_call_result.reason = msg
-            self.http_call_result.text = str(self.reply.readAll().data(), encoding='utf-8')
+            self.http_call_result.text = str(self.reply.readAll().data(), encoding="utf-8")
             self.http_call_result.ok = False
             self.msg_log(msg)
             # set return exception
@@ -354,14 +368,18 @@ class NetworkAccessManager(object):
 
                 ba = self.reply.readAll()
                 self.http_call_result.content = bytes(ba)
-                self.http_call_result.text = str(ba.data(), encoding='utf-8')
+                self.http_call_result.text = str(ba.data(), encoding="utf-8")
                 self.http_call_result.ok = True
 
         # Let's log the whole response for debugging purposes:
-        self.msg_log("Got response %s %s from %s" % \
-                    (self.http_call_result.status_code,
-                     self.http_call_result.status_message,
-                     self.reply.url().toString()))
+        self.msg_log(
+            "Got response %s %s from %s"
+            % (
+                self.http_call_result.status_code,
+                self.http_call_result.status_message,
+                self.reply.url().toString(),
+            )
+        )
         for k, v in list(self.http_call_result.headers.items()):
             self.msg_log("%s: %s" % (k, v))
         if len(self.http_call_result.content) < 1024:

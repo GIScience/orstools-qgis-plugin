@@ -51,7 +51,7 @@ def decode_polyline(polyline, is3d=False):
             index += 1
             result += b << shift
             shift += 5
-            if b < 0x1f:
+            if b < 0x1F:
                 break
         lat += (~result >> 1) if (result & 1) != 0 else (result >> 1)
 
@@ -62,7 +62,7 @@ def decode_polyline(polyline, is3d=False):
             index += 1
             result += b << shift
             shift += 5
-            if b < 0x1f:
+            if b < 0x1F:
                 break
         lng += ~(result >> 1) if (result & 1) != 0 else (result >> 1)
 
@@ -74,12 +74,12 @@ def decode_polyline(polyline, is3d=False):
                 index += 1
                 result += b << shift
                 shift += 5
-                if b < 0x1f:
+                if b < 0x1F:
                     break
             if (result & 1) != 0:
                 z += ~(result >> 1)
             else:
-                z += (result >> 1)
+                z += result >> 1
 
             points.append([round(lng * 1e-5, 6), round(lat * 1e-5, 6), round(z * 1e-2, 1)])
 

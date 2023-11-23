@@ -27,16 +27,17 @@
  ***************************************************************************/
 """
 from PyQt5.QtCore import QCoreApplication, QSettings
-from qgis.core import (QgsProcessing,
-                       QgsProcessingAlgorithm,
-                       QgsProcessingContext,
-                       QgsProcessingParameterDefinition,
-                       QgsProcessingParameterEnum,
-                       QgsProcessingParameterString,
-                       QgsProcessingParameterFeatureSink,
-                       QgsProcessingParameterFeatureSource,
-                       QgsProcessingFeedback
-                       )
+from qgis.core import (
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingContext,
+    QgsProcessingParameterDefinition,
+    QgsProcessingParameterEnum,
+    QgsProcessingParameterString,
+    QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingFeedback,
+)
 from typing import Any
 
 from PyQt5.QtGui import QIcon
@@ -57,15 +58,15 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Default attributes used in all child classes
         """
         super().__init__()
-        self.ALGO_NAME = ''
-        self.GROUP = ''
+        self.ALGO_NAME = ""
+        self.GROUP = ""
         self.IN_PROVIDER = "INPUT_PROVIDER"
         self.IN_PROFILE = "INPUT_PROFILE"
         self.IN_AVOID_FEATS = "INPUT_AVOID_FEATURES"
         self.IN_AVOID_BORDERS = "INPUT_AVOID_BORDERS"
         self.IN_AVOID_COUNTRIES = "INPUT_AVOID_COUNTRIES"
         self.IN_AVOID_POLYGONS = "INPUT_AVOID_POLYGONS"
-        self.OUT = 'OUTPUT'
+        self.OUT = "OUTPUT"
         self.PARAMETERS = None
 
     def createInstance(self) -> Any:
@@ -93,7 +94,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Displays the sidebar help in the algorithm window
         """
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value("locale/userLocale")[0:2]
 
         return read_help_file(algorithm=self.ALGO_NAME, locale=locale)
 
@@ -108,18 +109,18 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Icon used for algorithm in QGIS toolbox
         """
-        return QIcon(RESOURCE_PREFIX + f'icon_{self.groupId()}.png')
+        return QIcon(RESOURCE_PREFIX + f"icon_{self.groupId()}.png")
 
     def provider_parameter(self) -> QgsProcessingParameterEnum:
         """
         Parameter definition for provider, used in all child classes
         """
-        providers = [provider['name'] for provider in configmanager.read_config()['providers']]
+        providers = [provider["name"] for provider in configmanager.read_config()["providers"]]
         return QgsProcessingParameterEnum(
             self.IN_PROVIDER,
-            self.tr("Provider", 'ORSBaseProcessingAlgorithm'),
+            self.tr("Provider", "ORSBaseProcessingAlgorithm"),
             providers,
-            defaultValue=providers[0]
+            defaultValue=providers[0],
         )
 
     def profile_parameter(self) -> QgsProcessingParameterEnum:
@@ -127,11 +128,11 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Parameter definition for profile, used in all child classes
         """
         return QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                self.tr("Travel mode", 'ORSBaseProcessingAlgorithm'),
-                PROFILES,
-                defaultValue=PROFILES[0]
-            )
+            self.IN_PROFILE,
+            self.tr("Travel mode", "ORSBaseProcessingAlgorithm"),
+            PROFILES,
+            defaultValue=PROFILES[0],
+        )
 
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:
         """
@@ -146,42 +147,49 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         return [
             QgsProcessingParameterEnum(
                 self.IN_AVOID_FEATS,
-                self.tr("Features to avoid", 'ORSBaseProcessingAlgorithm'),
+                self.tr("Features to avoid", "ORSBaseProcessingAlgorithm"),
                 AVOID_FEATURES,
                 defaultValue=None,
                 optional=True,
-                allowMultiple=True
+                allowMultiple=True,
             ),
             QgsProcessingParameterEnum(
                 self.IN_AVOID_BORDERS,
-                self.tr("Types of borders to avoid", 'ORSBaseProcessingAlgorithm'),
+                self.tr("Types of borders to avoid", "ORSBaseProcessingAlgorithm"),
                 AVOID_BORDERS,
                 defaultValue=None,
-                optional=True
+                optional=True,
             ),
             QgsProcessingParameterString(
                 self.IN_AVOID_COUNTRIES,
-                self.tr("Comma-separated list of ids of countries to avoid", 'ORSBaseProcessingAlgorithm'),
+                self.tr(
+                    "Comma-separated list of ids of countries to avoid",
+                    "ORSBaseProcessingAlgorithm",
+                ),
                 defaultValue=None,
-                optional=True
+                optional=True,
             ),
             QgsProcessingParameterFeatureSource(
                 self.IN_AVOID_POLYGONS,
-                self.tr("Polygons to avoid", 'ORSBaseProcessingAlgorithm'),
+                self.tr("Polygons to avoid", "ORSBaseProcessingAlgorithm"),
                 types=[QgsProcessing.TypeVectorPolygon],
-                optional=True
-            )
+                optional=True,
+            ),
         ]
 
     @staticmethod
-    def _get_ors_client_from_provider(provider: str, feedback: QgsProcessingFeedback) -> client.Client:
+    def _get_ors_client_from_provider(
+        provider: str, feedback: QgsProcessingFeedback
+    ) -> client.Client:
         """
         Connects client to provider and returns a client instance for requests to the ors API
         """
-        providers = configmanager.read_config()['providers']
+        providers = configmanager.read_config()["providers"]
         ors_provider = providers[provider]
         ors_client = client.Client(ors_provider)
-        ors_client.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying..."))
+        ors_client.overQueryLimit.connect(
+            lambda: feedback.reportError("OverQueryLimit: Retrying...")
+        )
         return ors_client
 
     def parseOptions(self, parameters: dict, context: QgsProcessingContext) -> dict:
@@ -189,19 +197,21 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
 
         features_raw = parameters[self.IN_AVOID_FEATS]
         if features_raw:
-            options['avoid_features'] = [dict(enumerate(AVOID_FEATURES))[feat] for feat in features_raw]
+            options["avoid_features"] = [
+                dict(enumerate(AVOID_FEATURES))[feat] for feat in features_raw
+            ]
 
         borders_raw = parameters[self.IN_AVOID_BORDERS]
         if borders_raw:
-            options['avoid_borders'] = dict(enumerate(AVOID_BORDERS))[borders_raw]
+            options["avoid_borders"] = dict(enumerate(AVOID_BORDERS))[borders_raw]
 
         countries_raw = parameters[self.IN_AVOID_COUNTRIES]
         if countries_raw:
-            options['avoid_countries'] = list(map(int, countries_raw.split(',')))
+            options["avoid_countries"] = list(map(int, countries_raw.split(",")))
 
         polygons_layer = self.parameterAsLayer(parameters, self.IN_AVOID_POLYGONS, context)
         if polygons_layer:
-            options['avoid_polygons'] = _get_avoid_polygons(polygons_layer)
+            options["avoid_polygons"] = _get_avoid_polygons(polygons_layer)
 
         return options
 
@@ -211,19 +221,22 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Combines default and algorithm parameters and adds them in order to the
         algorithm dialog window.
         """
-        parameters = [self.provider_parameter(), self.profile_parameter()] + self.PARAMETERS + self.option_parameters() + [self.output_parameter()]
+        parameters = (
+            [self.provider_parameter(), self.profile_parameter()]
+            + self.PARAMETERS
+            + self.option_parameters()
+            + [self.output_parameter()]
+        )
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
                 if self.GROUP == "Matrix":
-                    param.setFlags(param.flags()| QgsProcessingParameterDefinition.FlagHidden)
+                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagHidden)
                 else:
                     # flags() is a wrapper around an enum of ints for type-safety.
                     # Flags are added by or-ing values, much like the union operator would work
                     param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
 
-            self.addParameter(
-                param
-            )
+            self.addParameter(param)
 
     def tr(self, string, context=None):
         context = context or self.__class__.__name__

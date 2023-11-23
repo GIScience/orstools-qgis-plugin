@@ -55,10 +55,7 @@ def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: in
     elif mode == OPTIMIZATION_MODES.index("Round Trip"):
         start = end = point_list.pop(0)
 
-    vehicle = {
-        "id": 0,
-        "profile": ors_profile
-    }
+    vehicle = {"id": 0, "profile": ors_profile}
 
     if start:
         vehicle.update({"start": [round(start.x(), 6), round(start.y(), 6)]})
@@ -66,12 +63,12 @@ def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: in
         vehicle.update({"end": [round(end.x(), 6), round(end.y(), 6)]})
 
     params = {
-        'jobs': [{
-            "location": [round(point.x(), 6), round(point.y(), 6)],
-            "id": point_list.index(point)
-        } for point in point_list],
-        'vehicles': [vehicle],
-        'options': {'g': True}
+        "jobs": [
+            {"location": [round(point.x(), 6), round(point.y(), 6)], "id": point_list.index(point)}
+            for point in point_list
+        ],
+        "vehicles": [vehicle],
+        "options": {"g": True},
     }
 
     return params
@@ -82,19 +79,15 @@ def read_help_file(algorithm: str, locale: str = ""):
     Returns the contents of a file from the help folder
     :rtype: str
     """
-    extension = '_' + locale if locale else ''
+    extension = "_" + locale if locale else ""
 
-    i18n_file = os.path.join(
-        BASE_DIR,
-        'help',
-        f"{algorithm}{extension}.help"
-    )
+    i18n_file = os.path.join(BASE_DIR, "help", f"{algorithm}{extension}.help")
 
-    file = i18n_file if os.path.isfile(i18n_file) else os.path.join(
-        BASE_DIR,
-        'help',
-        f"{algorithm}.help"
+    file = (
+        i18n_file
+        if os.path.isfile(i18n_file)
+        else os.path.join(BASE_DIR, "help", f"{algorithm}.help")
     )
-    with open(file, encoding='utf-8') as help_file:
+    with open(file, encoding="utf-8") as help_file:
         msg = help_file.read()
     return msg

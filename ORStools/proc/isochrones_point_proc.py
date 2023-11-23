@@ -27,15 +27,16 @@
  ***************************************************************************/
 """
 
-from qgis.core import (QgsWkbTypes,
-                       QgsCoordinateReferenceSystem,
-                       QgsProcessingUtils,
-                       QgsProcessingParameterString,
-                       QgsProcessingParameterEnum,
-                       QgsProcessingParameterPoint,
-                       QgsProcessingParameterNumber,
-                       QgsProcessingParameterDefinition
-                       )
+from qgis.core import (
+    QgsWkbTypes,
+    QgsCoordinateReferenceSystem,
+    QgsProcessingUtils,
+    QgsProcessingParameterString,
+    QgsProcessingParameterEnum,
+    QgsProcessingParameterPoint,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterDefinition,
+)
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
 from ORStools.utils import exceptions, logger
@@ -46,30 +47,32 @@ from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = 'isochrones_from_point'
+        self.ALGO_NAME = "isochrones_from_point"
         self.GROUP = "Isochrones"
         self.IN_POINT = "INPUT_POINT"
-        self.IN_METRIC = 'INPUT_METRIC'
-        self.IN_RANGES = 'INPUT_RANGES'
-        self.IN_KEY = 'INPUT_APIKEY'
-        self.IN_DIFFERENCE = 'INPUT_DIFFERENCE'
-        self.IN_SMOOTHING = 'INPUT_SMOOTHING'
+        self.IN_METRIC = "INPUT_METRIC"
+        self.IN_RANGES = "INPUT_RANGES"
+        self.IN_KEY = "INPUT_APIKEY"
+        self.IN_DIFFERENCE = "INPUT_DIFFERENCE"
+        self.IN_SMOOTHING = "INPUT_SMOOTHING"
         self.PARAMETERS = [
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,
-                description=self.tr("Input Point from map canvas (mutually exclusive with layer option)"),
-                optional=True
+                description=self.tr(
+                    "Input Point from map canvas (mutually exclusive with layer option)"
+                ),
+                optional=True,
             ),
             QgsProcessingParameterEnum(
                 name=self.IN_METRIC,
                 description=self.tr("Dimension"),
                 options=DIMENSIONS,
-                defaultValue=DIMENSIONS[0]
+                defaultValue=DIMENSIONS[0],
             ),
             QgsProcessingParameterString(
                 name=self.IN_RANGES,
                 description=self.tr("Comma-separated ranges [min or m]"),
-                defaultValue="5, 10"
+                defaultValue="5, 10",
             ),
             QgsProcessingParameterNumber(
                 name=self.IN_SMOOTHING,
@@ -77,7 +80,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 minValue=0,
                 maxValue=100,
-                optional=True
+                optional=True,
             ),
         ]
 
@@ -100,9 +103,9 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
 
-        factor = 60 if dimension == 'time' else 1
+        factor = 60 if dimension == "time" else 1
         ranges_raw = parameters[self.IN_RANGES]
-        ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
+        ranges_proc = [x * factor for x in map(int, ranges_raw.split(","))]
         smoothing = parameters[self.IN_SMOOTHING]
 
         options = self.parseOptions(parameters, context)
@@ -116,7 +119,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             "locations": [[round(point.x(), 6), round(point.y(), 6)]],
             "range_type": dimension,
             "range": ranges_proc,
-            "attributes": ['total_pop'],
+            "attributes": ["total_pop"],
             "id": None,
             "options": options,
         }
@@ -124,23 +127,25 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         if smoothing or smoothing == 0:
             params["smoothing"] = smoothing
 
-        (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
-                                                    self.isochrones.get_fields(),
-                                                    QgsWkbTypes.Polygon,
-                                                    # Needs Multipolygon if difference parameter will ever be
-                                                    # reactivated
-                                                    self.crs_out)
+        (sink, self.dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUT,
+            context,
+            self.isochrones.get_fields(),
+            QgsWkbTypes.Polygon,
+            # Needs Multipolygon if difference parameter will ever be
+            # reactivated
+            self.crs_out,
+        )
 
         try:
-            response = ors_client.request('/v2/isochrones/' + profile, {}, post_json=params)
+            response = ors_client.request("/v2/isochrones/" + profile, {}, post_json=params)
 
             # Populate features from response
-            for isochrone in self.isochrones.get_features(response, params['id']):
+            for isochrone in self.isochrones.get_features(response, params["id"]):
                 sink.addFeature(isochrone)
 
-        except (exceptions.ApiError,
-                exceptions.InvalidKey,
-                exceptions.GenericServerError) as e:
+        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
             feedback.reportError(msg)
             logger.log(msg, 2)

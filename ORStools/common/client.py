@@ -57,33 +57,29 @@ class Client(QObject):
         """
         QObject.__init__(self)
 
-        self.key = provider['key']
-        self.base_url = provider['base_url']
-        self.ENV_VARS = provider.get('ENV_VARS')
+        self.key = provider["key"]
+        self.base_url = provider["base_url"]
+        self.ENV_VARS = provider.get("ENV_VARS")
 
         # self.session = requests.Session()
-        retry_timeout = provider.get('timeout')
+        retry_timeout = provider.get("timeout")
 
         self.nam = networkaccessmanager.NetworkAccessManager(debug=False, timeout=retry_timeout)
 
         self.retry_timeout = timedelta(seconds=retry_timeout)
         self.headers = {
-                "User-Agent": _USER_AGENT,
-                'Content-type': 'application/json',
-                'Authorization': provider['key']
-            }
+            "User-Agent": _USER_AGENT,
+            "Content-type": "application/json",
+            "Authorization": provider["key"],
+        }
 
         # Save some references to retrieve in client instances
         self.url = None
         self.warnings = None
 
     overQueryLimit = pyqtSignal()
-    def request(self,
-                url,
-                params,
-                first_request_time=None,
-                retry_counter=0,
-                post_json=None):
+
+    def request(self, url, params, first_request_time=None, retry_counter=0, post_json=None):
         """Performs HTTP GET/POST with credentials, returning the body as
         JSON.
 
@@ -124,14 +120,15 @@ class Client(QObject):
             # 0.5 * (1.5 ^ i) is an increased sleep time of 1.5x per iteration,
             # starting at 0.5s when retry_counter=1. The first retry will occur
             # at 1, so subtract that first.
-            delay_seconds = 1.5**(retry_counter - 1)
+            delay_seconds = 1.5 ** (retry_counter - 1)
 
             # Jitter this value by 50% and pause.
             time.sleep(delay_seconds * (random.random() + 0.5))
 
-        authed_url = self._generate_auth_url(url,
-                                             params,
-                                             )
+        authed_url = self._generate_auth_url(
+            url,
+            params,
+        )
         self.url = self.base_url + authed_url
 
         # Default to the client-level self.requests_kwargs, with method-level
@@ -140,25 +137,20 @@ class Client(QObject):
 
         # Determine GET/POST
         # requests_method = self.session.get
-        requests_method = 'GET'
+        requests_method = "GET"
         body = None
         if post_json is not None:
             # requests_method = self.session.post
             # final_requests_kwargs["json"] = post_json
             body = post_json
-            requests_method = 'POST'
+            requests_method = "POST"
 
-        logger.log(
-            f"url: {self.url}\nParameters: {json.dumps(body, indent=2)}",
-            0
-        )
+        logger.log(f"url: {self.url}\nParameters: {json.dumps(body, indent=2)}", 0)
 
         try:
-            response, content = self.nam.request(self.url,
-                                           method=requests_method,
-                                           body=body,
-                                           headers=self.headers,
-                                           blocking=True)
+            response, content = self.nam.request(
+                self.url, method=requests_method, body=body, headers=self.headers, blocking=True
+            )
         except networkaccessmanager.RequestsExceptionTimeout:
             raise exceptions.Timeout
 
@@ -167,7 +159,6 @@ class Client(QObject):
                 self._check_status()
 
             except exceptions.OverQueryLimit as e:
-
                 # Let the instances know something happened
                 # noinspection PyUnresolvedReferences
                 self.overQueryLimit.emit()
@@ -176,7 +167,9 @@ class Client(QObject):
                 return self.request(url, params, first_request_time, retry_counter + 1, post_json)
 
             except exceptions.ApiError as e:
-                logger.log(f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2)
+                logger.log(
+                    f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2
+                )
                 raise
 
             raise
@@ -184,9 +177,11 @@ class Client(QObject):
         # Write env variables if successful
         if self.ENV_VARS:
             for env_var in self.ENV_VARS:
-                configmanager.write_env_var(env_var, response.headers.get(self.ENV_VARS[env_var], 'None'))
+                configmanager.write_env_var(
+                    env_var, response.headers.get(self.ENV_VARS[env_var], "None")
+                )
 
-        return json.loads(content.decode('utf-8'))
+        return json.loads(content.decode("utf-8"))
 
     def _check_status(self):
         """
@@ -202,34 +197,28 @@ class Client(QObject):
         """
 
         status_code = self.nam.http_call_result.status_code
-        message = self.nam.http_call_result.text if self.nam.http_call_result.text != '' else self.nam.http_call_result.reason
+        message = (
+            self.nam.http_call_result.text
+            if self.nam.http_call_result.text != ""
+            else self.nam.http_call_result.reason
+        )
 
         if not status_code:
-            raise Exception(f"{message}. Are your provider settings correct and the provider ready?")
+            raise Exception(
+                f"{message}. Are your provider settings correct and the provider ready?"
+            )
 
         elif status_code == 403:
-            raise exceptions.InvalidKey(
-                str(status_code),
-                message
-            )
+            raise exceptions.InvalidKey(str(status_code), message)
 
         elif status_code == 429:
-            raise exceptions.OverQueryLimit(
-                str(status_code),
-                message
-            )
+            raise exceptions.OverQueryLimit(str(status_code), message)
         # Internal error message for Bad Request
         elif 400 <= status_code < 500:
-            raise exceptions.ApiError(
-                str(status_code),
-                message
-            )
+            raise exceptions.ApiError(str(status_code), message)
         # Other HTTP errors have different formatting
         elif status_code != 200:
-            raise exceptions.GenericServerError(
-                str(status_code),
-                message
-            )
+            raise exceptions.GenericServerError(str(status_code), message)
 
     def _generate_auth_url(self, path, params):
         """Returns the path and query string portion of the request URL, first
