@@ -429,8 +429,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:matrix_from_layers")
         )
 
-        # Reset index of list items every time something is moved
+        # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
+        self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
