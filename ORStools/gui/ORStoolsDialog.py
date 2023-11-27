@@ -31,17 +31,20 @@ import json
 import os
 import processing
 import webbrowser
-from qgis.core import (
-    QgsProject,
-    QgsVectorLayer,
-    QgsTextAnnotation,
-    QgsMapLayerProxyModel,
-    QgsCoordinateReferenceSystem,
-    QgsPointXY,
-)
+from qgis.core import (QgsProject,
+                       QgsVectorLayer,
+                       QgsTextAnnotation,
+                       QgsMapLayerProxyModel,
+                       QgsFeature,
+                       QgsPointXY,
+                       QgsGeometry,
+                       QgsFields,
+                       QgsField,
+                       QgsCoordinateReferenceSystem
+                       )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QVariant
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
@@ -410,6 +413,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+        self.save_centroids.clicked.connect(self._save_centroids_to_layer)
 
         # Batch
         self.batch_routing_points.clicked.connect(
@@ -434,6 +438,29 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+    def _save_centroids_to_layer(self):
+        """Saves the centroid list to a temp layer"""
+        items = [self.routing_fromline_list.item(x).text() for x in range(self.routing_fromline_list.count())]
+
+        if len(items) > 0:
+            crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            fields = QgsFields()
+            fields.append(QgsField('ID', QVariant.Int))
+            point_layer = QgsVectorLayer("Point?crs=4326", 'Centroids', 'memory')
+            point_layer.setCrs(crs)
+            point_layer.dataProvider().addAttributes(fields)
+            point_layer.updateFields()
+            for idx, x in enumerate(items):
+                coords = x.split(':')[1]
+                x, y = (float(i) for i in coords.split(', '))
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                feature.setAttributes([idx])
+
+                point_layer.dataProvider().addFeature(feature)
+            QgsProject.instance().addMapLayer(point_layer)
+            self._iface.mapCanvas().refresh()
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
@@ -540,3 +567,4 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()
+
