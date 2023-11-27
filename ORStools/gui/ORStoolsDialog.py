@@ -520,9 +520,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         for idx, x in enumerate(items):
             coords = x.split(":")[1]
             item = f"Point {idx}:{coords}"
-            print(coords)
             x, y = (float(i) for i in coords.split(", "))
-            print(x, y)
             point = QgsPointXY(x, y)
 
             self.routing_fromline_list.addItem(item)
