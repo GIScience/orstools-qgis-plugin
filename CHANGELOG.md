@@ -38,12 +38,17 @@ RELEASING:
 12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+
+## Unreleased
+
+### Added
+- Additional parameter for the "smoothing factor" to isochrones processing algorithms ([#172](https://github.com/GIScience/orstools-qgis-plugin/issues/172))
+
 ## [1.6.0] - 2023-07-25
 
 ### Added
 - translation mechanism ([#183](https://github.com/GIScience/orstools-qgis-plugin/pull/183))
 - german translation ([#183](https://github.com/GIScience/orstools-qgis-plugin/pull/183))
-
 
 ## [1.5.3] - 2023-03-30
 
