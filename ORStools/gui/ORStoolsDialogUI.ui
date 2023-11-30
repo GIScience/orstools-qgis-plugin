@@ -304,7 +304,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" rowspan="4">
+          <item row="0" column="1" rowspan="4">
            <widget class="QListWidget" name="routing_fromline_list">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -342,7 +342,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QPushButton" name="save_centroids">
+           <widget class="QPushButton" name="save_vertices">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -357,13 +357,7 @@
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/save_centroids.png</normaloff>:/plugins/ORStools/img/save_centroids.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
+              <normaloff>:/plugins/ORStools/img/save_vertices.png</normaloff>:/plugins/ORStools/img/save_vertices.png</iconset>
             </property>
            </widget>
           </item>

@@ -413,7 +413,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
-        self.save_centroids.clicked.connect(self._save_centroids_to_layer)
+        self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
         # Batch
         self.batch_routing_points.clicked.connect(
@@ -439,15 +439,15 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
-    def _save_centroids_to_layer(self):
-        """Saves the centroid list to a temp layer"""
+    def _save_vertices_to_layer(self):
+        """Saves the vertices list to a temp layer"""
         items = [self.routing_fromline_list.item(x).text() for x in range(self.routing_fromline_list.count())]
 
         if len(items) > 0:
             crs = QgsCoordinateReferenceSystem("EPSG:4326")
             fields = QgsFields()
             fields.append(QgsField('ID', QVariant.Int))
-            point_layer = QgsVectorLayer("Point?crs=4326", 'Centroids', 'memory')
+            point_layer = QgsVectorLayer("Point?crs=4326", 'Vertices', 'memory')
             point_layer.setCrs(crs)
             point_layer.dataProvider().addAttributes(fields)
             point_layer.updateFields()
