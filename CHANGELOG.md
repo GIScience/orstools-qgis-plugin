@@ -47,6 +47,7 @@ RELEASING:
 - Mention omission of configuration options when using traveling salesman
 - option to set location type for isochrones ([#191](https://github.com/GIScience/orstools-qgis-plugin/pull/191))
 - make items in centroid list drag and droppable ([#144](https://github.com/GIScience/orstools-qgis-plugin/issues/144))
+- Add save button for vertices ([#144](https://github.com/GIScience/orstools-qgis-plugin/issues/144))
 
 ## [1.6.0] - 2023-07-25
 
