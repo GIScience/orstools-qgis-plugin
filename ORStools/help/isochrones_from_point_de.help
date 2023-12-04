@@ -8,6 +8,8 @@ Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung 
 
 <i>Zusätzliche Parameter</i>: Beschreibung in der <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">Dokumentation</a>.
 
+<i>Ortstyp</i>: Start behandelt den/die Ort(e) als Startpunkt, Ziel als Ziel.
+
 <i>Ausgabelayer</i>: Polygonlayer mit ID, Längen- und Breitengrad des Isochronen-Mittelpunkts, Reichweiten-Wert, Verkehrsmittel und Bevölkerung (aus <a href="https://ghsl.jrc.ec.europa.eu/about.php">GHSL</a>). KBS ist EPSG:4326.
 
 Der Mittelpunkt kann über das <code>Punktlayer aus Tabelle erzeugen</code>-Werkzeug ('Verarbeitungswerkzeuge' ► 'Vektorerzeugung') extrahiert werden.
