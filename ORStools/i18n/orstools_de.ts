@@ -165,62 +165,72 @@
 <context>
     <name>ORSIsochronesLayerAlgo</name>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="64"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="67"/>
         <source>Input Point layer</source>
         <translation>Eingabelayer (Punkte)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="73"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="76"/>
         <source>Input layer ID Field (mutually exclusive with Point option)</source>
         <translation>ID-Attribut (schließt Punkt-Option aus)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="79"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="82"/>
         <source>Dimension</source>
         <translation>Dimension</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="85"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="88"/>
         <source>Comma-separated ranges [min or m]</source>
         <translation>Komma-getrennte Reichweiten [min oder m]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="225"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="236"/>
         <source>Isochrones from Point-Layer</source>
         <translation>Isochronen aus Punkt-Layer</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="90"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="93"/>
         <source>Smoothing factor between 0 [detailed] and 100 [generalized]</source>
         <translation>Glättungsfaktor zwischen 0 [detailliert] und 100 [verallgemeinert]</translation>
+    </message>
+    <message>
+        <location filename="../proc/isochrones_layer_proc.py" line="100"/>
+        <source>Location Type</source>
+        <translation>Ortstyp</translation>
     </message>
 </context>
 <context>
     <name>ORSIsochronesPointAlgo</name>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="58"/>
+        <location filename="../proc/isochrones_point_proc.py" line="62"/>
         <source>Input Point from map canvas (mutually exclusive with layer option)</source>
         <translation>Eingabepunkt aus Kartenansicht (schließt Ebenen-Option aus)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="63"/>
+        <location filename="../proc/isochrones_point_proc.py" line="68"/>
         <source>Dimension</source>
         <translation>Dimension</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="69"/>
+        <location filename="../proc/isochrones_point_proc.py" line="74"/>
         <source>Comma-separated ranges [min or m]</source>
         <translation>Komma-getrennte Reichweiten [min oder m]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="163"/>
+        <location filename="../proc/isochrones_point_proc.py" line="172"/>
         <source>Isochrones from Point</source>
         <translation>Isochronen von einzelnem Punkt</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="74"/>
+        <location filename="../proc/isochrones_point_proc.py" line="79"/>
         <source>Smoothing factor between 0 [detailed] and 100 [generalized]</source>
         <translation>Glättungsfaktor zwischen 0 [detailliert] und 100 [verallgemeinert]</translation>
+    </message>
+    <message>
+        <location filename="../proc/isochrones_point_proc.py" line="86"/>
+        <source>Location Type</source>
+        <translation>Ortstyp</translation>
     </message>
 </context>
 <context>
@@ -254,12 +264,12 @@
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="392"/>
+        <location filename="../gui/ORStoolsDialog.py" line="390"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="393"/>
+        <location filename="../gui/ORStoolsDialog.py" line="391"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
