@@ -38,6 +38,12 @@ RELEASING:
 12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+
+## Unreleased
+
+### Added
+- Mention omission of configuration options when using traveling salesman
+
 ## [1.6.0] - 2023-07-25
 
 ### Added

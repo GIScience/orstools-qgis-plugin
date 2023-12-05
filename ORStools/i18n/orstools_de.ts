@@ -72,8 +72,8 @@
     </message>
     <message>
         <location filename="../proc/directions_lines_proc.py" line="76"/>
-        <source>Traveling Salesman</source>
-        <translation>Wegpunktoptimierung</translation>
+        <source>Traveling Salesman (omits other configurations)</source>
+        <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
         <location filename="../proc/directions_lines_proc.py" line="196"/>
@@ -105,8 +105,8 @@
     </message>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="85"/>
-        <source>Traveling Salesman</source>
-        <translation>Wegpunktoptimierung</translation>
+        <source>Traveling Salesman (omits other configurations)</source>
+        <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="197"/>
@@ -244,12 +244,12 @@
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="386"/>
+        <location filename="../gui/ORStoolsDialog.py" line="385"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="387"/>
+        <location filename="../gui/ORStoolsDialog.py" line="386"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -338,8 +338,8 @@
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="398"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be &lt;span style=&quot; font-weight:600;&quot;&gt;fastest&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wegpunktoptimierung entfernt alle anderen weitrgehenden Einstellungen und nimmt als Präferenz &lt;span style=&quot; font-weight:600;&quot;&gt;schnellste&lt;/span&gt; an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling Traveling Salesman will omit all other advanced configuration and assume the preference to be &lt;span style=&quot; font-weight:600;&quot;&gt;fastest&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wegpunktoptimierung entfernt alle anderen weitergehenden Einstellungen und nutzt als Präferenz &lt;span style=&quot; font-weight:600;&quot;&gt;schnellste&lt;/span&gt; an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="401"/>

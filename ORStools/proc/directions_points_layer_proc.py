@@ -84,7 +84,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
             QgsProcessingParameterEnum(
                 self.IN_OPTIMIZE,
-                self.tr("Traveling Salesman"),
+                self.tr("Traveling Salesman (omits other configurations)"),
                 OPTIMIZATION_MODES,
                 defaultValue=None,
                 optional=True,
