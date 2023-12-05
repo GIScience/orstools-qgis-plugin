@@ -89,7 +89,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
             QgsProcessingParameterNumber(
                 name=self.IN_SMOOTHING,
-                description="Smoothing factor between 0 [detailed] and 100 [generalized]",
+                description=self.tr("Smoothing factor between 0 [detailed] and 100 [generalized]"),
                 defaultValue=None,
                 minValue=0,
                 maxValue=100,
