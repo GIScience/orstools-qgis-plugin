@@ -471,7 +471,7 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_fromline_clear.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.</p></body></html>"))
         self.routing_fromline_list.setToolTip(_translate("ORStoolsDialogBase", "Select waypoints from the map!"))
         self.advances_group.setTitle(_translate("ORStoolsDialogBase", "Advanced Configuration"))
-        self.optimization_group.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be <span style=\" font-weight:600;\">fastest</span>.</p></body></html>"))
+        self.optimization_group.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Enabling Traveling Salesman will omit all other advanced configuration and assume the preference to be <span style=\" font-weight:600;\">fastest</span>.</p></body></html>"))
         self.optimization_group.setTitle(_translate("ORStoolsDialogBase", "Traveling Salesman"))
         self.label_4.setText(_translate("ORStoolsDialogBase", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

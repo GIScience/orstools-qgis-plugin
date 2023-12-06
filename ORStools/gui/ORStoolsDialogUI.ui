@@ -395,7 +395,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be &lt;span style=&quot; font-weight:600;&quot;&gt;fastest&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling Traveling Salesman will omit all other advanced configuration and assume the preference to be &lt;span style=&quot; font-weight:600;&quot;&gt;fastest&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="title">
              <string>Traveling Salesman</string>
