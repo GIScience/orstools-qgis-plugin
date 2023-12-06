@@ -35,7 +35,9 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterField,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterString,
-                       QgsProcessingParameterEnum
+                       QgsProcessingParameterEnum,
+                       QgsProcessingParameterNumber,
+                       QgsProcessingParameterDefinition,
                        )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
@@ -56,6 +58,8 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         self.IN_RANGES = 'INPUT_RANGES'
         self.IN_KEY = 'INPUT_APIKEY'
         self.IN_DIFFERENCE = 'INPUT_DIFFERENCE'
+        self.USE_SMOOTHING = 'USE_SMOOTHING'
+        self.IN_SMOOTHING = 'INPUT_SMOOTHING'
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
@@ -82,7 +86,16 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 name=self.IN_RANGES,
                 description=self.tr("Comma-separated ranges [min or m]"),
                 defaultValue="5, 10"
-            )
+            ),
+            QgsProcessingParameterNumber(
+                name=self.IN_SMOOTHING,
+                description=self.tr("Smoothing factor between 0 [detailed] and 100 [generalized]"),
+                defaultValue=None,
+                minValue=0,
+                maxValue=100,
+                optional=True
+            ),
+
         ]
 
     # Save some important references
@@ -103,10 +116,12 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         factor = 60 if dimension == 'time' else 1
         ranges_raw = parameters[self.IN_RANGES]
         ranges_proc = [x * factor for x in map(int, ranges_raw.split(','))]
-
+        smoothing = parameters[self.IN_SMOOTHING] 
+        
         # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
 
+        # get smoothness parameter value
         options = self.parseOptions(parameters, context)
 
         # Make the actual requests
@@ -129,14 +144,21 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             if feedback.isCanceled():
                 break
 
-            requests.append({
+            params = {
                 "locations": locations,
                 "range_type": dimension,
                 "range": ranges_proc,
                 "attributes": ['total_pop'],
                 "id": id_value,
-                "options": options
-            })
+                "options": options,
+            }
+
+            # only include smoothing if set
+            if smoothing is not None:
+                params["smoothing"] = smoothing
+
+            requests.append(params)
+
 
         (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                     self.isochrones.get_fields(),

@@ -42,6 +42,7 @@ RELEASING:
 ## Unreleased
 
 ### Added
+- Additional parameter for the "smoothing factor" to isochrones processing algorithms ([#172](https://github.com/GIScience/orstools-qgis-plugin/issues/172))
 - Mention omission of configuration options when using traveling salesman
 
 ## [1.6.0] - 2023-07-25
@@ -49,7 +50,6 @@ RELEASING:
 ### Added
 - translation mechanism ([#183](https://github.com/GIScience/orstools-qgis-plugin/pull/183))
 - german translation ([#183](https://github.com/GIScience/orstools-qgis-plugin/pull/183))
-
 
 ## [1.5.3] - 2023-03-30
 
