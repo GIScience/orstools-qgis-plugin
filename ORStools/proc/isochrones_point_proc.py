@@ -35,7 +35,6 @@ from qgis.core import (
     QgsProcessingParameterEnum,
     QgsProcessingParameterPoint,
     QgsProcessingParameterNumber,
-    QgsProcessingParameterDefinition,
 )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
