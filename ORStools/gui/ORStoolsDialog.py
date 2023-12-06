@@ -534,6 +534,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_linetool_init(self):
         """Hides GUI dialog, inits line maptool and add items to line list box."""
+        # Remove blue lines (rubber band)
+        if self.line_tool:
+            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
+
         self.hide()
         self.routing_fromline_list.clear()
         # Remove all annotations which were added (if any)
