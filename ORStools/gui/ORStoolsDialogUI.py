@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ORStoolsDialogBase(object):
     def setupUi(self, ORStoolsDialogBase):
         ORStoolsDialogBase.setObjectName("ORStoolsDialogBase")
-        ORStoolsDialogBase.resize(456, 777)
+        ORStoolsDialogBase.resize(412, 686)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -484,7 +484,7 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_fromline_map.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Add wayoints interactively from the map canvas.</p><p>Double-click will terminate waypoint selection.</p></body></html>"))
         self.routing_fromline_clear.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.</p></body></html>"))
         self.routing_fromline_list.setToolTip(_translate("ORStoolsDialogBase", "Select waypoints from the map!"))
-        self.save_vertices.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.</p></body></html>"))
+        self.save_vertices.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Save points in list to layer.</p></body></html>"))
         self.advances_group.setTitle(_translate("ORStoolsDialogBase", "Advanced Configuration"))
         self.optimization_group.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Enabling Traveling Salesman will omit all other advanced configuration and assume the preference to be <span style=\" font-weight:600;\">fastest</span>.</p></body></html>"))
         self.optimization_group.setTitle(_translate("ORStoolsDialogBase", "Traveling Salesman"))
