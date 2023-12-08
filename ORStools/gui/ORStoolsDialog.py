@@ -231,7 +231,7 @@ class ORStoolsDialogMain:
         layer_out.updateFields()
 
         # style output layer
-        qml_path = os.path.join(os.path.dirname(__file__), 'linestyle.qml')
+        qml_path = os.path.join(os.path.dirname(__file__), "linestyle.qml")
         layer_out.loadNamedStyle(qml_path, True)
         layer_out.triggerRepaint()
 
