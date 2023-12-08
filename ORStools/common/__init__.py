@@ -56,3 +56,5 @@ ADVANCED_PARAMETERS = [
     "INPUT_AVOID_POLYGONS",
     "INPUT_SMOOTHING",
 ]
+
+LOCATION_TYPES = ["start", "destination"]

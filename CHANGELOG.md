@@ -44,6 +44,7 @@ RELEASING:
 ### Added
 - Additional parameter for the "smoothing factor" to isochrones processing algorithms ([#172](https://github.com/GIScience/orstools-qgis-plugin/issues/172))
 - Mention omission of configuration options when using traveling salesman
+- option to set location type for isochrones ([#191](https://github.com/GIScience/orstools-qgis-plugin/pull/191))
 
 ## [1.6.0] - 2023-07-25
 

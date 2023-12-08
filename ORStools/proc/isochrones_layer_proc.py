@@ -40,7 +40,7 @@ from qgis.core import (
     QgsProcessingParameterNumber,
 )
 
-from ORStools.common import isochrones_core, PROFILES, DIMENSIONS
+from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ORStools.utils import transform, exceptions, logger
 
@@ -60,6 +60,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         self.IN_DIFFERENCE = "INPUT_DIFFERENCE"
         self.USE_SMOOTHING = "USE_SMOOTHING"
         self.IN_SMOOTHING = "INPUT_SMOOTHING"
+        self.LOCATION_TYPE = "LOCATION_TYPE"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
@@ -95,6 +96,12 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 maxValue=100,
                 optional=True,
             ),
+            QgsProcessingParameterEnum(
+                name=self.LOCATION_TYPE,
+                description=self.tr("Location Type"),
+                options=LOCATION_TYPES,
+                defaultValue=LOCATION_TYPES[0],
+            ),
         ]
 
     # Save some important references
@@ -111,6 +118,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
+        location_type = dict(enumerate(LOCATION_TYPES))[parameters[self.LOCATION_TYPE]]
 
         factor = 60 if dimension == "time" else 1
         ranges_raw = parameters[self.IN_RANGES]
@@ -151,6 +159,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 "attributes": ["total_pop"],
                 "id": id_value,
                 "options": options,
+                "location_type": location_type,
             }
 
             # only include smoothing if set
