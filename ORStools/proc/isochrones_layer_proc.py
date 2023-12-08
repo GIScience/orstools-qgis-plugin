@@ -95,11 +95,12 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 minValue=0,
                 maxValue=100,
                 optional=True,
+            ),
             QgsProcessingParameterEnum(
                 name=self.LOCATION_TYPE,
                 description=self.tr("Location Type"),
                 options=LOCATION_TYPES,
-                defaultValue=LOCATION_TYPES[0]
+                defaultValue=LOCATION_TYPES[0],
             ),
         ]
 
@@ -158,7 +159,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 "attributes": ["total_pop"],
                 "id": id_value,
                 "options": options,
-                "location_type": location_type
+                "location_type": location_type,
             }
 
             # only include smoothing if set

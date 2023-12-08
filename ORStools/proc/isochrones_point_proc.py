@@ -86,8 +86,8 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
                 name=self.LOCATION_TYPE,
                 description=self.tr("Location Type"),
                 options=LOCATION_TYPES,
-                defaultValue=LOCATION_TYPES[0]
-            )
+                defaultValue=LOCATION_TYPES[0],
+            ),
         ]
 
     # Save some important references
@@ -125,7 +125,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             "attributes": ["total_pop"],
             "id": None,
             "options": options,
-            "location_type": location_type
+            "location_type": location_type,
         }
 
         if smoothing or smoothing == 0:
