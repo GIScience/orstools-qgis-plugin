@@ -65,6 +65,8 @@ from ORStools.utils import exceptions, maptools, logger, configmanager, transfor
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
+from . import resources_rc
+
 
 def on_config_click(parent):
     """Pop up provider config window. Outside of classes because it's accessed by multiple dialogs.
