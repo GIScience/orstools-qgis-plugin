@@ -31,6 +31,9 @@ import json
 import os
 import processing
 import webbrowser
+
+from PyQt5.QtNetwork import QNetworkRequest
+from qgis._core import QgsNetworkAccessManager, QgsBlockingNetworkRequest
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -41,9 +44,9 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, Qt, QUrl
 from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox, QCompleter
 
 from ORStools import (
     RESOURCE_PREFIX,
@@ -182,6 +185,45 @@ class ORStoolsDialogMain:
         # Add keyboard shortcut
         self.iface.registerMainWindowAction(self.actions[0], "Ctrl+R")
 
+    def reload_geocode_completer(self, lineEdit, text):
+        option_chosen = lambda index: completer.activated.disconnect(index)
+
+        provider_id = self.dlg.provider_combo.currentIndex()
+        provider = configmanager.read_config()["providers"][provider_id]
+        api_key = provider["key"]
+        if api_key is not '':
+            url = f'https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={text}'
+            request = QgsBlockingNetworkRequest()
+            error_code = request.get(QNetworkRequest(QUrl(url)))
+
+            if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+                reply = request.reply()
+                suggest = [i['properties']['name'] for i in json.loads(reply.content().data().decode("utf-8"))['features']]
+                print(suggest)
+                completer = QCompleter(suggest)
+                completer.setCaseSensitivity(Qt.CaseInsensitive)
+                completer.setFilterMode(Qt.MatchContains)
+                completer.activated.connect(option_chosen)
+                lineEdit.setCompleter(completer)
+
+            else:
+                print(error_code)
+        else:
+            QMessageBox.critical(
+                self.dlg,
+                "Missing API key",
+                """
+                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+            )
+
+
+    def add_geocoded_items(self):
+        pass
+
     def unload(self):
         """Called when QGIS closes or plugin is deactivated in Plugin Manager"""
 
@@ -219,6 +261,13 @@ class ORStoolsDialogMain:
             self.dlg = ORStoolsDialog(
                 self.iface, self.iface.mainWindow()
             )  # setting parent enables modal view
+
+            # add connection to linedit text change
+            self.dlg.geocode_start.textChanged.connect(lambda: self.reload_geocode_completer(self.dlg.geocode_start, self.dlg.geocode_start.text()))
+            self.dlg.geocode_dest.textChanged.connect(lambda: self.reload_geocode_completer(self.dlg.geocode_dest, self.dlg.geocode_dest.text()))
+            # connect geocode add button
+            # self.dlg.geocode_add.clicked.connect(self.add_geocoded_items)
+
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
