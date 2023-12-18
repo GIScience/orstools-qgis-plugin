@@ -40,13 +40,15 @@ from ORStools import __version__
 from ORStools.common import networkaccessmanager
 from ORStools.utils import exceptions, configmanager, logger
 
+from qgis.core import QgsSettings
+
 _USER_AGENT = f"ORSQGISClient@v{__version__}"
 
 
 class Client(QObject):
     """Performs requests to the ORS API services."""
 
-    def __init__(self, provider=None):
+    def __init__(self, provider=None, agent=None):
         """
         :param provider: A openrouteservice provider from config.yml
         :type provider: dict
@@ -72,6 +74,14 @@ class Client(QObject):
             "Content-type": "application/json",
             "Authorization": provider["key"],
         }
+
+        settings = QgsSettings()
+        # Read the current value
+        user_agent = settings.value("qgis/networkAndProxy/userAgent")
+        # Set a new value
+        settings.setValue("qgis/networkAndProxy/userAgent", agent)
+        # Reset to old value
+        settings.setValue("qgis/networkAndProxy/userAgent", user_agent)
 
         # Save some references to retrieve in client instances
         self.url = None

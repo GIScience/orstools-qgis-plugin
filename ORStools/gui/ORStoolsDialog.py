@@ -299,7 +299,10 @@ class ORStoolsDialogMain:
             )
             return
 
-        clnt = client.Client(provider)
+        filename = os.path.basename(__file__).split(".")[0]
+        agent = f"QGis_{filename}"
+
+        clnt = client.Client(provider, agent)
         clnt_msg = ""
 
         directions = directions_gui.Directions(self.dlg)

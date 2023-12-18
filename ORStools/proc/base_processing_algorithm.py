@@ -26,6 +26,8 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os
+
 from PyQt5.QtCore import QCoreApplication, QSettings
 from qgis.core import (
     QgsProcessing,
@@ -38,6 +40,7 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingFeedback,
 )
+import inspect
 from typing import Any
 
 from PyQt5.QtGui import QIcon
@@ -184,9 +187,14 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Connects client to provider and returns a client instance for requests to the ors API
         """
+        current_frame = inspect.currentframe()
+        calling_frame = inspect.getouterframes(current_frame, 2)[1]
+        filename = os.path.basename(calling_frame.filename).split(".")[0]
+        agent = f"QGis_{filename}"
+
         providers = configmanager.read_config()["providers"]
         ors_provider = providers[provider]
-        ors_client = client.Client(ors_provider)
+        ors_client = client.Client(ors_provider, agent)
         ors_client.overQueryLimit.connect(
             lambda: feedback.reportError("OverQueryLimit: Retrying...")
         )
