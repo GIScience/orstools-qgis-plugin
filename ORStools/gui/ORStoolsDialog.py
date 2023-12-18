@@ -34,7 +34,7 @@ import webbrowser
 from qgis.core import QgsProject, QgsVectorLayer, QgsTextAnnotation, QgsMapLayerProxyModel
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
@@ -230,8 +230,17 @@ class ORStoolsDialogMain:
         layer_out.dataProvider().addAttributes(directions_core.get_fields())
         layer_out.updateFields()
 
+        basepath = os.path.dirname(__file__)
+
+        # add ors svg path
+        my_new_path = os.path.join(basepath, "img/svg")
+        svg_paths = QSettings().value("svg/searchPathsForSVG")
+        if my_new_path not in svg_paths:
+            svg_paths.append(my_new_path)
+            QSettings().setValue("svg/searchPathsForSVG", svg_paths)
+
         # style output layer
-        qml_path = os.path.join(os.path.dirname(__file__), "linestyle.qml")
+        qml_path = os.path.join(basepath, "linestyle.qml")
         layer_out.loadNamedStyle(qml_path, True)
         layer_out.triggerRepaint()
 
