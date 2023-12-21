@@ -75,13 +75,11 @@ class Client(QObject):
             "Authorization": provider["key"],
         }
 
-        settings = QgsSettings()
+        self.settings = QgsSettings()
         # Read the current value
-        user_agent = settings.value("qgis/networkAndProxy/userAgent")
+        self.user_agent = self.settings.value("qgis/networkAndProxy/userAgent")
         # Set a new value
-        settings.setValue("qgis/networkAndProxy/userAgent", agent)
-        # Reset to old value
-        settings.setValue("qgis/networkAndProxy/userAgent", user_agent)
+        self.settings.setValue("qgis/networkAndProxy/userAgent", agent)
 
         # Save some references to retrieve in client instances
         self.url = None
@@ -190,6 +188,9 @@ class Client(QObject):
                 configmanager.write_env_var(
                     env_var, response.headers.get(self.ENV_VARS[env_var], "None")
                 )
+
+        # Reset to old value
+        self.settings.setValue("qgis/networkAndProxy/userAgent", self.user_agent)
 
         return json.loads(content.decode("utf-8"))
 
