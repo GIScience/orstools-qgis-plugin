@@ -451,7 +451,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             crs = QgsCoordinateReferenceSystem("EPSG:4326")
             fields = QgsFields()
             fields.append(QgsField("ID", QVariant.Int))
-            point_layer = QgsVectorLayer("Point?crs=4326", "Vertices", "memory")
+            point_layer = QgsVectorLayer("Point?crs=epsg:4326", "Vertices", "memory")
             point_layer.setCrs(crs)
             point_layer.dataProvider().addAttributes(fields)
             point_layer.updateFields()
