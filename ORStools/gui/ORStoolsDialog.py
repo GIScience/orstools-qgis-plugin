@@ -31,6 +31,8 @@ import json
 import os
 import processing
 import webbrowser
+
+from qgis._core import Qgis
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -462,6 +464,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 point_layer.dataProvider().addFeature(feature)
             QgsProject.instance().addMapLayer(point_layer)
             self._iface.mapCanvas().refresh()
+
+        self._iface.messageBar().pushMessage(
+            "Success", "Vertices saved to layer.", level=Qgis.Success
+        )
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
