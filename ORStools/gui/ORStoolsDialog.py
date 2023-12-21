@@ -299,9 +299,7 @@ class ORStoolsDialogMain:
             )
             return
 
-        filename = os.path.basename(__file__).split(".")[0]
-        agent = f"QGis_{filename}"
-
+        agent = "QGis_ORStoolsDialog"
         clnt = client.Client(provider, agent)
         clnt_msg = ""
 
