@@ -46,6 +46,7 @@ RELEASING:
 - Additional parameter for the "smoothing factor" to isochrones processing algorithms ([#172](https://github.com/GIScience/orstools-qgis-plugin/issues/172))
 - Mention omission of configuration options when using traveling salesman
 - option to set location type for isochrones ([#191](https://github.com/GIScience/orstools-qgis-plugin/pull/191))
+- Add styling of routing output in main plugin ([#149](https://github.com/GIScience/orstools-qgis-plugin/issues/149))
 - make items in centroid list drag and droppable ([#144](https://github.com/GIScience/orstools-qgis-plugin/issues/144))
 - Add save button for vertices ([#144](https://github.com/GIScience/orstools-qgis-plugin/issues/144))
 
