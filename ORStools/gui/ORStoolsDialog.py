@@ -449,11 +449,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         if len(items) > 0:
             crs = QgsCoordinateReferenceSystem("EPSG:4326")
-            fields = QgsFields()
-            fields.append(QgsField("ID", QVariant.Int))
-            point_layer = QgsVectorLayer("Point?crs=epsg:4326", "Vertices", "memory")
+            point_layer = QgsVectorLayer("Point?crs=4326&field=ID:integer", "Vertices", "memory")
             point_layer.setCrs(crs)
-            point_layer.dataProvider().addAttributes(fields)
             point_layer.updateFields()
             for idx, x in enumerate(items):
                 coords = x.split(":")[1]
