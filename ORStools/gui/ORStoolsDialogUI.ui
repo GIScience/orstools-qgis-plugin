@@ -304,7 +304,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" rowspan="3">
+          <item row="0" column="1" rowspan="4">
            <widget class="QListWidget" name="routing_fromline_list">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -338,6 +338,26 @@
             </property>
             <property name="resizeMode">
              <enum>QListView::Fixed</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="save_vertices">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/plugins/ORStools/img/save_vertices.png</normaloff>:/plugins/ORStools/img/save_vertices.png</iconset>
             </property>
            </widget>
           </item>

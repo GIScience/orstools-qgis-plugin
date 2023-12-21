@@ -31,13 +31,17 @@ import json
 import os
 import processing
 import webbrowser
+
+from qgis._core import Qgis
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
     QgsTextAnnotation,
     QgsMapLayerProxyModel,
-    QgsCoordinateReferenceSystem,
+    QgsFeature,
     QgsPointXY,
+    QgsGeometry,
+    QgsCoordinateReferenceSystem,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
@@ -410,6 +414,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+        self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
         # Batch
         self.batch_routing_points.clicked.connect(
@@ -434,6 +439,33 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+    def _save_vertices_to_layer(self):
+        """Saves the vertices list to a temp layer"""
+        items = [
+            self.routing_fromline_list.item(x).text()
+            for x in range(self.routing_fromline_list.count())
+        ]
+
+        if len(items) > 0:
+            point_layer = QgsVectorLayer(
+                "point?crs=epsg:4326&field=ID:integer", "Vertices", "memory"
+            )
+            point_layer.updateFields()
+            for idx, x in enumerate(items):
+                coords = x.split(":")[1]
+                x, y = (float(i) for i in coords.split(", "))
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                feature.setAttributes([idx])
+
+                point_layer.dataProvider().addFeature(feature)
+            QgsProject.instance().addMapLayer(point_layer)
+            self._iface.mapCanvas().refresh()
+
+        self._iface.messageBar().pushMessage(
+            "Success", "Vertices saved to layer.", level=Qgis.Success
+        )
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
