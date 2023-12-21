@@ -31,7 +31,18 @@ import json
 import os
 import processing
 import webbrowser
-from qgis.core import QgsProject, QgsVectorLayer, QgsTextAnnotation, QgsMapLayerProxyModel
+
+from qgis._core import Qgis
+from qgis.core import (
+    QgsProject,
+    QgsVectorLayer,
+    QgsTextAnnotation,
+    QgsMapLayerProxyModel,
+    QgsFeature,
+    QgsPointXY,
+    QgsGeometry,
+    QgsCoordinateReferenceSystem,
+)
 from qgis.gui import QgsMapCanvasAnnotationItem
 
 from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
@@ -57,6 +68,8 @@ from ORStools.gui import directions_gui
 from ORStools.utils import exceptions, maptools, logger, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
+
+from . import resources_rc  # noqa: F401
 
 
 def on_config_click(parent):
@@ -415,6 +428,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+        self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
         # Batch
         self.batch_routing_points.clicked.connect(
@@ -434,6 +448,37 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         )
         self.batch_matrix.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:matrix_from_layers")
+        )
+
+        # Reset index of list items every time something is moved or deleted
+        self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
+        self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+    def _save_vertices_to_layer(self):
+        """Saves the vertices list to a temp layer"""
+        items = [
+            self.routing_fromline_list.item(x).text()
+            for x in range(self.routing_fromline_list.count())
+        ]
+
+        if len(items) > 0:
+            point_layer = QgsVectorLayer(
+                "point?crs=epsg:4326&field=ID:integer", "Vertices", "memory"
+            )
+            point_layer.updateFields()
+            for idx, x in enumerate(items):
+                coords = x.split(":")[1]
+                x, y = (float(i) for i in coords.split(", "))
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                feature.setAttributes([idx])
+
+                point_layer.dataProvider().addFeature(feature)
+            QgsProject.instance().addMapLayer(point_layer)
+            self._iface.mapCanvas().refresh()
+
+        self._iface.messageBar().pushMessage(
+            "Success", "Vertices saved to layer.", level=Qgis.Success
         )
 
     def _on_prov_refresh_click(self):
@@ -459,8 +504,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.clear()
             self._clear_annotations()
 
-    def _linetool_annotate_point(self, point, idx):
-        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+    def _linetool_annotate_point(self, point, idx, crs=None):
+        if not crs:
+            crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+
         annotation = QgsTextAnnotation()
 
         c = QTextDocument()
@@ -472,7 +519,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation.setFrameSizeMm(QSizeF(7, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
         annotation.setMapPosition(point)
-        annotation.setMapPositionCrs(map_crs)
+        annotation.setMapPositionCrs(crs)
 
         return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
 
@@ -508,6 +555,26 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation = self._linetool_annotate_point(point, idx)
         self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
+
+    def _reindex_list_items(self):
+        """Resets the index when an item in the list is moved"""
+        items = [
+            self.routing_fromline_list.item(x).text()
+            for x in range(self.routing_fromline_list.count())
+        ]
+        self.routing_fromline_list.clear()
+        self._clear_annotations()
+        crs = QgsCoordinateReferenceSystem(f"EPSG:{4326}")
+        for idx, x in enumerate(items):
+            coords = x.split(":")[1]
+            item = f"Point {idx}:{coords}"
+            x, y = (float(i) for i in coords.split(", "))
+            point = QgsPointXY(x, y)
+
+            self.routing_fromline_list.addItem(item)
+            annotation = self._linetool_annotate_point(point, idx, crs)
+            self.annotations.append(annotation)
+            self.project.annotationManager().addAnnotation(annotation)
 
     def _on_linetool_map_doubleclick(self):
         """
