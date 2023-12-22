@@ -186,7 +186,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         name = cls.__name__
         name = name.removeprefix("ORS").removesuffix("Algo")
-        agent = f"QGis_{name}"
+        agent = f"QGIS_{name}"
 
         providers = configmanager.read_config()["providers"]
         ors_provider = providers[provider]

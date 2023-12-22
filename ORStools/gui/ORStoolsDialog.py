@@ -299,7 +299,7 @@ class ORStoolsDialogMain:
             )
             return
 
-        agent = "QGis_ORStoolsDialog"
+        agent = "QGIS_ORStoolsDialog"
         clnt = client.Client(provider, agent)
         clnt_msg = ""
 
