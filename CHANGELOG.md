@@ -49,6 +49,7 @@ RELEASING:
 - Add styling of routing output in main plugin ([#149](https://github.com/GIScience/orstools-qgis-plugin/issues/149))
 - make items in centroid list drag and droppable ([#144](https://github.com/GIScience/orstools-qgis-plugin/issues/144))
 - Add save button for vertices ([#144](https://github.com/GIScience/orstools-qgis-plugin/issues/144))
+- remove blue lines every time the red X button is clicked ([#120](https://github.com/GIScience/orstools-qgis-plugin/issues/120))
 
 ## [1.6.0] - 2023-07-25
 
