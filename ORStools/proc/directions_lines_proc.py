@@ -44,7 +44,7 @@ from ..utils.processing import get_params_optimize
 
 
 # noinspection PyPep8Naming
-class ORSDirectionsLinesAlgorithm(ORSBaseProcessingAlgorithm):
+class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
     """Algorithm class for Directions Lines."""
 
     def __init__(self):

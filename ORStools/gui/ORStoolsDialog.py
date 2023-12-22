@@ -299,7 +299,8 @@ class ORStoolsDialogMain:
             )
             return
 
-        clnt = client.Client(provider)
+        agent = "QGIS_ORStoolsDialog"
+        clnt = client.Client(provider, agent)
         clnt_msg = ""
 
         directions = directions_gui.Directions(self.dlg)
