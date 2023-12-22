@@ -39,10 +39,10 @@ RELEASING:
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## Unreleased
+## [1.7.0] - 2023-12-22
 
 ### Added
-- Add keyboard shortcut (Ctrl+R) 
+- Add keyboard shortcut (Ctrl+R)
 - Additional parameter for the "smoothing factor" to isochrones processing algorithms ([#172](https://github.com/GIScience/orstools-qgis-plugin/issues/172))
 - Mention omission of configuration options when using traveling salesman
 - option to set location type for isochrones ([#191](https://github.com/GIScience/orstools-qgis-plugin/pull/191))
@@ -209,7 +209,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.6.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.3...v1.7.0
 [1.6.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.1...v1.5.2
