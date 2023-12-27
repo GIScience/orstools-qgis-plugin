@@ -519,7 +519,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
                     p = f"Point {idx}: {coordinates[0]}, {coordinates[1]}"
                     items = [self.routing_fromline_list.item(x).text() for x in range(self.routing_fromline_list.count())]
-                    if p not in items:
+                    coords = [i.split(':')[1] for i in items]
+                    if p.split(':')[1] not in coords:
                         if i == 0:
                             items.insert(0, p)
                         else:
