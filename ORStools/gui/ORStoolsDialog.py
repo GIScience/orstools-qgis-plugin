@@ -193,47 +193,6 @@ class ORStoolsDialogMain:
         # Add keyboard shortcut
         self.iface.registerMainWindowAction(self.actions[0], "Ctrl+R")
 
-    def reload_geocode_completer(self, lineEdit, text):
-        option_chosen = lambda index: completer.activated.disconnect(index)
-
-        provider_id = self.dlg.provider_combo.currentIndex()
-        provider = configmanager.read_config()["providers"][provider_id]
-        api_key = provider["key"]
-        if api_key is not "":
-            url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={text}"
-            request = QgsBlockingNetworkRequest()
-            error_code = request.get(QNetworkRequest(QUrl(url)))
-
-            if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
-                reply = request.reply()
-                suggest = [
-                    i["properties"]["name"]
-                    for i in json.loads(reply.content().data().decode("utf-8"))["features"]
-                ]
-                print(suggest)
-                completer = QCompleter(suggest)
-                completer.setCaseSensitivity(Qt.CaseInsensitive)
-                completer.setFilterMode(Qt.MatchContains)
-                completer.activated.connect(option_chosen)
-                lineEdit.setCompleter(completer)
-
-            else:
-                print(error_code)
-        else:
-            QMessageBox.critical(
-                self.dlg,
-                "Missing API key",
-                """
-                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
-
-                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
-                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
-            )
-
-    def add_geocoded_items(self):
-        pass
-
     def unload(self):
         """Called when QGIS closes or plugin is deactivated in Plugin Manager"""
 
@@ -271,20 +230,6 @@ class ORStoolsDialogMain:
             self.dlg = ORStoolsDialog(
                 self.iface, self.iface.mainWindow()
             )  # setting parent enables modal view
-
-            # add connection to linedit text change
-            self.dlg.geocode_start.textChanged.connect(
-                lambda: self.reload_geocode_completer(
-                    self.dlg.geocode_start, self.dlg.geocode_start.text()
-                )
-            )
-            self.dlg.geocode_dest.textChanged.connect(
-                lambda: self.reload_geocode_completer(
-                    self.dlg.geocode_dest, self.dlg.geocode_dest.text()
-                )
-            )
-            # connect geocode add button
-            # self.dlg.geocode_add.clicked.connect(self.add_geocoded_items)
 
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
@@ -501,6 +446,108 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+        # add connection to linedit text change
+        self.geocode_start.textChanged.connect(
+            lambda: self.reload_geocode_completer(
+                self.geocode_start, self.geocode_start.text()
+            )
+        )
+        self.geocode_dest.textChanged.connect(
+            lambda: self.reload_geocode_completer(
+                self.geocode_dest, self.geocode_dest.text()
+            )
+        )
+        # connect geocode add button
+        self.geocode_add.clicked.connect(self.add_geocoded_items)
+
+    def reload_geocode_completer(self, lineEdit, text):
+        option_chosen = lambda index: completer.activated.disconnect(index)
+
+        provider_id = self.provider_combo.currentIndex()
+        provider = configmanager.read_config()["providers"][provider_id]
+        api_key = provider["key"]
+        if api_key is not "":
+            url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={text}"
+            request = QgsBlockingNetworkRequest()
+            error_code = request.get(QNetworkRequest(QUrl(url)))
+
+            if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+                reply = request.reply()
+                suggest = [
+                    i["properties"]["name"]
+                    for i in json.loads(reply.content().data().decode("utf-8"))["features"]
+                ]
+                completer = QCompleter(suggest)
+                completer.setCaseSensitivity(Qt.CaseInsensitive)
+                completer.setFilterMode(Qt.MatchContains)
+                completer.activated.connect(option_chosen)
+                lineEdit.setCompleter(completer)
+
+            else:
+                # Still to be improved
+                print(error_code)
+        else:
+            QMessageBox.critical(
+                self,
+                "Missing API key",
+                """
+                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+            )
+
+    def add_geocoded_items(self):
+        for i, text in enumerate([self.geocode_start.text(), self.geocode_dest.text()]):
+            provider_id = self.provider_combo.currentIndex()
+            provider = configmanager.read_config()["providers"][provider_id]
+            api_key = provider["key"]
+            if api_key is not "":
+                url = f"https://api.openrouteservice.org/geocode/search?api_key={api_key}&text={text}"
+                request = QgsBlockingNetworkRequest()
+                error_code = request.get(QNetworkRequest(QUrl(url)))
+                if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+                    reply = request.reply()
+                    json_string = reply.content().data().decode("utf-8")
+                    data = json.loads(json_string)
+                    coordinates = [feature["geometry"]["coordinates"] for feature in data["features"]]
+                    # choose first result
+                    coordinates = coordinates[0]
+                    idx = '0'
+
+                    p = f"Point {idx}: {coordinates[0]}, {coordinates[1]}"
+                    items = [self.routing_fromline_list.item(x).text() for x in range(self.routing_fromline_list.count())]
+                    if p not in items:
+                        if i == 0:
+                            items.insert(0, p)
+                        else:
+                            items.insert(self.routing_fromline_list.count(), p)
+
+                    self.routing_fromline_list.clear()
+                    self.routing_fromline_list.addItems(items)
+
+                    point = QgsPointXY(coordinates[0], coordinates[1])
+                    annotation = self._linetool_annotate_point(point, idx)
+                    self.annotations.append(annotation)
+                    self.project.annotationManager().addAnnotation(annotation)
+                    self._reindex_list_items()
+
+                else:
+                    # Still to be improved
+                    print(error_code)
+            else:
+                QMessageBox.critical(
+                    self,
+                    "Missing API key",
+                    """
+                    Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+                    If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                    Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                    settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+                )
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
