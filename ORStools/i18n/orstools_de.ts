@@ -9,7 +9,7 @@
         <translation>&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="93"/>
+        <location filename="../gui/ORStoolsDialog.py" line="110"/>
         <source>About {}</source>
         <translation>Über {}</translation>
     </message>
@@ -17,37 +17,37 @@
 <context>
     <name>ORSBaseProcessingAlgorithm</name>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="118"/>
+        <location filename="../proc/base_processing_algorithm.py" line="119"/>
         <source>Provider</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Dienst wählen</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="129"/>
+        <location filename="../proc/base_processing_algorithm.py" line="130"/>
         <source>Travel mode</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Verkehrsmittel</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="147"/>
+        <location filename="../proc/base_processing_algorithm.py" line="148"/>
         <source>Features to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Vermeiden</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="155"/>
+        <location filename="../proc/base_processing_algorithm.py" line="156"/>
         <source>Types of borders to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Grenzen vermeiden</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="162"/>
+        <location filename="../proc/base_processing_algorithm.py" line="163"/>
         <source>Comma-separated list of ids of countries to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>zu vermeidende Länder-IDs (komma-separiert)</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="168"/>
+        <location filename="../proc/base_processing_algorithm.py" line="172"/>
         <source>Polygons to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Flächen vermeiden</translation>
@@ -56,27 +56,27 @@
 <context>
     <name>ORSDirectionsLinesAlgorithm</name>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="58"/>
+        <location filename="../proc/directions_lines_proc.py" line="60"/>
         <source>Input Line layer</source>
         <translation>Eingabelayer (Linien)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="63"/>
+        <location filename="../proc/directions_lines_proc.py" line="65"/>
         <source>Layer ID Field</source>
         <translation>ID-Attribut</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="70"/>
+        <location filename="../proc/directions_lines_proc.py" line="72"/>
         <source>Travel preference</source>
         <translation>Routenpräferenz</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="76"/>
+        <location filename="../proc/directions_lines_proc.py" line="78"/>
         <source>Traveling Salesman (omits other configurations)</source>
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="196"/>
+        <location filename="../proc/directions_lines_proc.py" line="207"/>
         <source>Directions from 1 Polyline-Layer</source>
         <translation>Routenberechnung aus einem Polyline-Layer</translation>
     </message>
@@ -84,32 +84,32 @@
 <context>
     <name>ORSDirectionsPointsLayerAlgo</name>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="60"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="61"/>
         <source>Input (Multi)Point layer</source>
         <translation>Eingabelayer ((Multi)Point)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="65"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="66"/>
         <source>Layer ID Field</source>
         <translation>ID-Attribut</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="72"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="73"/>
         <source>Sort Points by</source>
         <translation>Punkte sortieren nach</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="79"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="80"/>
         <source>Travel preference</source>
         <translation>Routenpräferenz</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="85"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="86"/>
         <source>Traveling Salesman (omits other configurations)</source>
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="197"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="203"/>
         <source>Directions from 1 Point-Layer</source>
         <translation>Routenberechnung aus einem Punkt-Layer</translation>
     </message>
@@ -157,7 +157,7 @@
         <translation>Zuordnungs-Verfahren</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="255"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="266"/>
         <source>Directions from 2 Point-Layers</source>
         <translation>Routenberechnung aus zwei Punkt-Layern</translation>
     </message>
@@ -165,37 +165,37 @@
 <context>
     <name>ORSIsochronesLayerAlgo</name>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="67"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="65"/>
         <source>Input Point layer</source>
         <translation>Eingabelayer (Punkte)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="76"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="74"/>
         <source>Input layer ID Field (mutually exclusive with Point option)</source>
         <translation>ID-Attribut (schließt Punkt-Option aus)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="82"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="80"/>
         <source>Dimension</source>
         <translation>Dimension</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="88"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="86"/>
         <source>Comma-separated ranges [min or m]</source>
         <translation>Komma-getrennte Reichweiten [min oder m]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="236"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="237"/>
         <source>Isochrones from Point-Layer</source>
         <translation>Isochronen aus Punkt-Layer</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="93"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="91"/>
         <source>Smoothing factor between 0 [detailed] and 100 [generalized]</source>
         <translation>Glättungsfaktor zwischen 0 [detailliert] und 100 [verallgemeinert]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="100"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="99"/>
         <source>Location Type</source>
         <translation>Ortstyp</translation>
     </message>
@@ -203,17 +203,17 @@
 <context>
     <name>ORSIsochronesPointAlgo</name>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="62"/>
+        <location filename="../proc/isochrones_point_proc.py" line="59"/>
         <source>Input Point from map canvas (mutually exclusive with layer option)</source>
         <translation>Eingabepunkt aus Kartenansicht (schließt Ebenen-Option aus)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="68"/>
+        <location filename="../proc/isochrones_point_proc.py" line="66"/>
         <source>Dimension</source>
         <translation>Dimension</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="74"/>
+        <location filename="../proc/isochrones_point_proc.py" line="72"/>
         <source>Comma-separated ranges [min or m]</source>
         <translation>Komma-getrennte Reichweiten [min oder m]</translation>
     </message>
@@ -223,12 +223,12 @@
         <translation>Isochronen von einzelnem Punkt</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="79"/>
+        <location filename="../proc/isochrones_point_proc.py" line="77"/>
         <source>Smoothing factor between 0 [detailed] and 100 [generalized]</source>
         <translation>Glättungsfaktor zwischen 0 [detailliert] und 100 [verallgemeinert]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="86"/>
+        <location filename="../proc/isochrones_point_proc.py" line="85"/>
         <source>Location Type</source>
         <translation>Ortstyp</translation>
     </message>
@@ -236,27 +236,27 @@
 <context>
     <name>ORSMatrixAlgo</name>
     <message>
-        <location filename="../proc/matrix_proc.py" line="58"/>
+        <location filename="../proc/matrix_proc.py" line="59"/>
         <source>Input Start Point layer</source>
         <translation>Startpunkt-Layer wählen</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="63"/>
+        <location filename="../proc/matrix_proc.py" line="64"/>
         <source>Start ID Field (can be used for joining)</source>
         <translation>ID-Attribut Startpunkte (für joins nutzbar)</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="70"/>
+        <location filename="../proc/matrix_proc.py" line="71"/>
         <source>Input End Point layer</source>
         <translation>Endpunkt-Layer wählen</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="75"/>
+        <location filename="../proc/matrix_proc.py" line="76"/>
         <source>End ID Field (can be used for joining)</source>
         <translation>ID-Attribut Endpunkte (für joins nutzbar)</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="221"/>
+        <location filename="../proc/matrix_proc.py" line="227"/>
         <source>Matrix from Layers</source>
         <translation>Matrix-Berechnung aus Layer</translation>
     </message>
@@ -264,12 +264,12 @@
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="390"/>
+        <location filename="../gui/ORStoolsDialog.py" line="403"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="391"/>
+        <location filename="../gui/ORStoolsDialog.py" line="404"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -352,22 +352,22 @@
         <translation>Wegpunkte aus Kartenansicht auswählen!</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="359"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="382"/>
         <source>Advanced Configuration</source>
         <translation>Erweiterte Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="398"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="421"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling Traveling Salesman will omit all other advanced configuration and assume the preference to be &lt;span style=&quot; font-weight:600;&quot;&gt;fastest&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wegpunktoptimierung entfernt alle anderen weitergehenden Einstellungen und nutzt als Präferenz &lt;span style=&quot; font-weight:600;&quot;&gt;schnellste&lt;/span&gt; an.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="401"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="424"/>
         <source>Traveling Salesman</source>
         <translation>Wegpunktoptimierung</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="425"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="448"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -380,174 +380,179 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; padding: 10px; -qt-block-indent:0; text-indent:0px ; background-color:#e7f2fa; color: #999999&quot;&gt;&lt;img stype=&quot;margin: 10px&quot; src=&quot;:/plugins/ORStools/img/icon_about.png&quot; width=16 height=16 /&gt;  Sämtliche Einstellungen werden überschrieben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="436"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="459"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First waypoint won&apos;t be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Erster Wegpunkt wird nicht optimiert.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="439"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="462"/>
         <source>Fix Start</source>
         <translation>Fester Startpunkt</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="449"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="472"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last waypoint won&apos;t be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Letzter Wegpunkt wird nicht optimiert.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="452"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="475"/>
         <source>Fix End</source>
         <translation>Fester Endpunkt</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="462"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="485"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Other Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Weitere Optionen&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="469"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="492"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First and last waypoints are not optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Erster und letzter Wegpunkt werden nicht optimiert.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="472"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="495"/>
         <source>Fix Both</source>
         <translation>Fester Start- und Endpunkt</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="485"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="508"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Return to first waypoint after last waypoint.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nach letztem Wegpunkt zum Start zurückkehren.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="488"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="511"/>
         <source>Round Trip</source>
         <translation>Rundreise</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="510"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="533"/>
         <source>Avoid certain road attributes.</source>
         <translation>Bestimmte Wegetypen vermeiden.</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="513"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="536"/>
         <source>Avoid tags</source>
         <translation>Vermeiden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="534"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="557"/>
         <source>highways</source>
         <translation>Autobahnen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="541"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="564"/>
         <source>tollways</source>
         <translation>Zoll-Straßen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="548"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="571"/>
         <source>ferries</source>
         <translation>Fähren</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="555"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="578"/>
         <source>fords</source>
         <translation>Furten</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="562"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="585"/>
         <source>steps</source>
         <translation>Treppen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="584"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="607"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid countries based on alphnumeric ISO 3166 Alpha-2 or Alpha-3 codes.&lt;/p&gt;&lt;p&gt;Find a list of codes at https://github.com/GIScience/openrouteservice-docs#country-list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Länder basierend auf alphanumerischen ISO 3166 Alpha-2 oder Alpha-3 Kennungen vermeiden.&lt;/p&gt;&lt;p&gt;Eine Kennungsliste ist auf https://github.com/GIScience/openrouteservice-docs#country-list verfügbar.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="587"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="610"/>
         <source>Avoid countries</source>
         <translation>Länder vermeiden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="605"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="628"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid countries based on ISO 3166 Alpha-2 or Alpha-3 codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Länder basierend auf ISO 3166 Alpha-2 oder Alpha-3 Kennungen vermeiden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="651"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="674"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid areas by specifying a (Multi-)Polygon layer. &lt;/p&gt;&lt;p&gt;Does &lt;span style=&quot; font-weight:600;&quot;&gt;not work&lt;/span&gt; for memory (scratch) Polygon layers!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;, only the first feature of the layer will be respected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gebiete aus (Multi-)Polygon–Layer vermeiden. &lt;/p&gt;&lt;p&gt;Funktioniert &lt;span style=&quot; font-weight:600;&quot;&gt;nicht&lt;/span&gt; mit temporären Polygon–Layern!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Achtung&lt;/span&gt;, nur das erste Objekt des Layers wird berücksichtigt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="633"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="656"/>
         <source>Avoid polygon(s)</source>
         <translation>Flächen vermeiden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="668"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="691"/>
         <source>Batch Jobs</source>
         <translation>Berechnung aus Layer</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="674"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="697"/>
         <source>Directions</source>
         <translation>Routenberechnung aus</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="686"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="709"/>
         <source>Polylines Layer</source>
         <translation>Polyline-Layer</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="699"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="722"/>
         <source>Points (1 Layer)</source>
         <translation>einem Punktlayer</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="712"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="735"/>
         <source>Points (2 Layer)</source>
         <translation>zwei Punktlayern</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="722"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="745"/>
         <source>Isochrones</source>
         <translation>Isochronenberechnung</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="728"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="751"/>
         <source>Isochrones from Point</source>
         <translation>von einzelnem Punkt</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="735"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="758"/>
         <source>Isochrones from Layer</source>
         <translation>aus Layer</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="751"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="774"/>
         <source>Matrix</source>
         <translation>Matrixberechnung</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="796"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="819"/>
         <source>Log</source>
         <translation>Protokoll</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="838"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="861"/>
         <source>Queries and errors will be printed here.</source>
         <translation>Anfragen und Fehler werden hier ausgegeben.</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="866"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="889"/>
         <source>  Help</source>
         <translation>  Hilfe</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogUI.ui" line="877"/>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="900"/>
         <source>About</source>
         <translation>Über</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialogUI.ui" line="353"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Punkte aus Liste in Layer speichern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -571,50 +576,55 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ORStoolsDialogConfigMain</name>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="118"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="124"/>
         <source>Enter a name for the provider</source>
         <translation>Name für Dienst angeben</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="127"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="135"/>
         <source>Remove ORS provider</source>
         <translation>Dienst entfernen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="127"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="135"/>
         <source>Choose provider to remove</source>
         <translation>Zu entfernenden Dienst auswählen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="184"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="186"/>
         <source>API Key</source>
         <translation>API-Key</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="192"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="194"/>
         <source>Base URL</source>
         <translation>Basis-URL</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="201"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="203"/>
         <source>Request timeout in seconds (1 - 3600)</source>
         <translation>Anfragen-Timeout in Sekunden (1 – 3600)</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="124"/>
+        <source>New ORS provider</source>
+        <translation>Neuer ORS-Provider</translation>
     </message>
 </context>
 <context>
     <name>ORStoolsDialogMain</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="155"/>
+        <location filename="../gui/ORStoolsDialog.py" line="166"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="143"/>
+        <location filename="../gui/ORStoolsDialog.py" line="158"/>
         <source>Provider Settings</source>
         <translation>Dienst-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="149"/>
+        <location filename="../gui/ORStoolsDialog.py" line="164"/>
         <source>About</source>
         <translation>Über</translation>
     </message>

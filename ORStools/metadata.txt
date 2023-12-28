@@ -3,16 +3,25 @@ name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.6.0
+version=1.7.0
 author=HeiGIT gGmbH
 email=support@openrouteservice.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2023/07/25 v1.6.0
+changelog=2023/12/25 v1.7.0
 ### Added
-    - translation mechanism
-    - german translation
+	- keyboard shortcut (CTRL-R)
+	- parameters for isochrones (`location_type` and `smoothing`)
+	- option to save points from GUI
+
+### Changed
+	- style of route output when using GUI
+	- drag-and-drop for points in GUI
+
+### Fixed
+	- handling of blue lines when drawing points
+
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki

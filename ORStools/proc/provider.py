@@ -32,7 +32,7 @@ from qgis.core import QgsProcessingProvider
 from PyQt5.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
-from .directions_lines_proc import ORSDirectionsLinesAlgorithm
+from .directions_lines_proc import ORSDirectionsLinesAlgo
 from .directions_points_layer_proc import ORSDirectionsPointsLayerAlgo
 from .directions_points_layers_proc import ORSDirectionsPointsLayersAlgo
 from .isochrones_layer_proc import ORSIsochronesLayerAlgo
@@ -59,7 +59,7 @@ class ORStoolsProvider(QgsProcessingProvider):
         #
         self.addAlgorithm(ORSDirectionsPointsLayersAlgo())
         self.addAlgorithm(ORSDirectionsPointsLayerAlgo())
-        self.addAlgorithm(ORSDirectionsLinesAlgorithm())
+        self.addAlgorithm(ORSDirectionsLinesAlgo())
         self.addAlgorithm(ORSIsochronesLayerAlgo())
         self.addAlgorithm(ORSIsochronesPointAlgo())
         self.addAlgorithm(ORSMatrixAlgo())

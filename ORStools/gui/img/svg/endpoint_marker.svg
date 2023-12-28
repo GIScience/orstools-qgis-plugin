@@ -1,0 +1,9 @@
+<svg viewBox="0 0 22 30" xmlns="http://www.w3.org/2000/svg">
+  <title/>
+  <g data-name="Layer 2" id="Layer_2">
+    <g id="Interface-Solid">
+      <path d="M11,0A11.01245,11.01245,0,0,0,0,11C0,21.36133,9.95166,29.44238,10.37549,29.78125a1.00083,1.00083,0,0,0,1.249,0C12.04834,29.44238,22,21.36133,22,11A11.01245,11.01245,0,0,0,11,0Z" id="interface-solid-pin-2" fill="#FF0000" stroke="#333333" stroke-width=".5"/>
+      <text x="50%" y="50%" font-size="20" text-anchor="middle" dy=".3em" fill="white" font-family="sans-serif">2</text>
+    </g>
+  </g>
+</svg>

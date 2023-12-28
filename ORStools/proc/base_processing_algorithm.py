@@ -177,16 +177,20 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
-    @staticmethod
+    @classmethod
     def _get_ors_client_from_provider(
-        provider: str, feedback: QgsProcessingFeedback
+        cls, provider: str, feedback: QgsProcessingFeedback
     ) -> client.Client:
         """
         Connects client to provider and returns a client instance for requests to the ors API
         """
+        name = cls.__name__
+        name = name.removeprefix("ORS").removesuffix("Algo")
+        agent = f"QGIS_{name}"
+
         providers = configmanager.read_config()["providers"]
         ors_provider = providers[provider]
-        ors_client = client.Client(ors_provider)
+        ors_client = client.Client(ors_provider, agent)
         ors_client.overQueryLimit.connect(
             lambda: feedback.reportError("OverQueryLimit: Retrying...")
         )

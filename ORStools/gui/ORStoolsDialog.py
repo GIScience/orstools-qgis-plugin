@@ -33,18 +33,22 @@ import processing
 import webbrowser
 
 from PyQt5.QtNetwork import QNetworkRequest
-from qgis._core import QgsBlockingNetworkRequest
+from qgis._core import Qgis
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
     QgsTextAnnotation,
     QgsMapLayerProxyModel,
-    QgsCoordinateReferenceSystem,
+    QgsFeature,
     QgsPointXY,
+    QgsGeometry,
+    QgsCoordinateReferenceSystem,
+    QgsBlockingNetworkRequest,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, Qt, QUrl
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt, QUrl
+
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import (
     QAction,
@@ -251,6 +255,20 @@ class ORStoolsDialogMain:
         layer_out.dataProvider().addAttributes(directions_core.get_fields())
         layer_out.updateFields()
 
+        basepath = os.path.dirname(__file__)
+
+        # add ors svg path
+        my_new_path = os.path.join(basepath, "img/svg")
+        svg_paths = QSettings().value("svg/searchPathsForSVG")
+        if my_new_path not in svg_paths:
+            svg_paths.append(my_new_path)
+            QSettings().setValue("svg/searchPathsForSVG", svg_paths)
+
+        # style output layer
+        qml_path = os.path.join(basepath, "linestyle.qml")
+        layer_out.loadNamedStyle(qml_path, True)
+        layer_out.triggerRepaint()
+
         # Associate annotations with map layer, so they get deleted when layer is deleted
         for annotation in self.dlg.annotations:
             # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
@@ -293,7 +311,8 @@ class ORStoolsDialogMain:
             )
             return
 
-        clnt = client.Client(provider)
+        agent = "QGIS_ORStoolsDialog"
+        clnt = client.Client(provider, agent)
         clnt_msg = ""
 
         directions = directions_gui.Directions(self.dlg)
@@ -423,6 +442,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+        self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
         # Batch
         self.batch_routing_points.clicked.connect(
@@ -557,6 +577,33 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                         settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
                     )
 
+    def _save_vertices_to_layer(self):
+        """Saves the vertices list to a temp layer"""
+        items = [
+            self.routing_fromline_list.item(x).text()
+            for x in range(self.routing_fromline_list.count())
+        ]
+
+        if len(items) > 0:
+            point_layer = QgsVectorLayer(
+                "point?crs=epsg:4326&field=ID:integer", "Vertices", "memory"
+            )
+            point_layer.updateFields()
+            for idx, x in enumerate(items):
+                coords = x.split(":")[1]
+                x, y = (float(i) for i in coords.split(", "))
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                feature.setAttributes([idx])
+
+                point_layer.dataProvider().addFeature(feature)
+            QgsProject.instance().addMapLayer(point_layer)
+            self._iface.mapCanvas().refresh()
+
+        self._iface.messageBar().pushMessage(
+            "Success", "Vertices saved to layer.", level=Qgis.Success
+        )
+
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""
 
@@ -580,6 +627,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.clear()
             self._clear_annotations()
             self.geocoded = False
+
+        # Remove blue lines (rubber band)
+        if self.line_tool:
+            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
 
     def _linetool_annotate_point(self, point, idx, crs=None):
         if not crs:
@@ -609,6 +660,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_linetool_init(self):
         """Hides GUI dialog, inits line maptool and add items to line list box."""
+        # Remove blue lines (rubber band)
+        if self.line_tool:
+            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
+
         self.hide()
         if not self.geocoded:
             self.routing_fromline_list.clear()
