@@ -71,7 +71,6 @@ class Elevation:
         if self.dlg.routing_fromline_list.count() in [0, 1]:
             return
 
-
         # if no API key is present, when ORS is selected, throw an error message
         if not provider["key"] and provider["base_url"].startswith(
             "https://api.openrouteservice.org"
@@ -98,10 +97,10 @@ class Elevation:
             params = directions.get_parameters()
             if self.dlg.optimization_group.isChecked():
                 QMessageBox.warning(
-                        self.dlg,
+                    self.dlg,
                     "Not available:",
-                        "Elevation profile not available for optimization",
-                    )
+                    "Elevation profile not available for optimization",
+                )
                 return
             else:
                 params["coordinates"] = directions.get_request_line_feature()
