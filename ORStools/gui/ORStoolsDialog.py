@@ -456,13 +456,23 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
+
+        # Recalculate elevation profile when vertex list changes
+        self.routing_fromline_list.model().rowsMoved.connect(self.update_elevation_profile)
+        self.routing_fromline_list.model().rowsRemoved.connect(self.update_elevation_profile)
+        self.routing_fromline_list.model().rowsInserted.connect(self.update_elevation_profile)
+
+        # show elevation profile when  according checkbox is checked
+        self.label_elevation_profile.setVisible(False)
         self.checkBox_elevation_profile.toggled.connect(self.toggle_elevation_profile)
 
+    def update_elevation_profile(self):
+        Elevation(self).make_image()
+
     def toggle_elevation_profile(self):
-        try:
-            Elevation(self).make_image()
+        if not self.routing_fromline_list.count() in [0, 1]:
             self.label_elevation_profile.setVisible(self.checkBox_elevation_profile.isChecked())
-        except AssertionError:
+        else:
             if self.checkBox_elevation_profile.isChecked():
                 QMessageBox.critical(
                     self,
@@ -528,6 +538,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Remove blue lines (rubber band)
         if self.line_tool:
             self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
+
+        # clear elevation profile
+        self.label_elevation_profile.setVisible(False)
+        self.checkBox_elevation_profile.setChecked(False)
 
     def _linetool_annotate_point(self, point, idx, crs=None):
         if not crs:

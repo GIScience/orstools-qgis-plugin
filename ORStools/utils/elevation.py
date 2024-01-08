@@ -44,6 +44,7 @@ import matplotlib.pyplot as plt
 
 class Elevation:
     def __init__(self, dlg):
+        self.abs_distances = None
         self.total_dist = None
         self.dlg = dlg
         self.pixmap = None
@@ -67,8 +68,9 @@ class Elevation:
         provider = configmanager.read_config()["providers"][provider_id]
 
         # if there are no coordinates, throw an error message
-        if not self.dlg.routing_fromline_list.count():
-            raise AssertionError
+        if self.dlg.routing_fromline_list.count() in [0, 1]:
+            return
+
 
         # if no API key is present, when ORS is selected, throw an error message
         if not provider["key"] and provider["base_url"].startswith(
@@ -95,20 +97,12 @@ class Elevation:
         try:
             params = directions.get_parameters()
             if self.dlg.optimization_group.isChecked():
-                if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
-                    QMessageBox.critical(
+                QMessageBox.warning(
                         self.dlg,
-                        "Wrong number of waypoints",
-                        """At least 3 or 4 waypoints are needed to perform routing optimization. 
-
-Remember, the first and last location are not part of the optimization.
-                        """,
+                    "Not available:",
+                        "Elevation profile not available for optimization",
                     )
-                    return
-                response = clnt.request("/optimization", {}, post_json=params)
-                feat = directions_core.get_output_features_optimization(
-                    response, params["vehicles"][0]["profile"]
-                )
+                return
             else:
                 params["coordinates"] = directions.get_request_line_feature()
                 profile = self.dlg.routing_travel_combo.currentText()
@@ -198,15 +192,16 @@ Please add polygons to the layer or uncheck avoid polygons.
         """
         Make image from get_profile() output.
         """
-        fig, ax = plt.subplots()
-        ax.plot(self.abs_distances, self.elevations, linestyle="-")
+        if self.abs_distances and self.elevations:
+            fig, ax = plt.subplots()
+            ax.plot(self.abs_distances, self.elevations, linestyle="-")
 
-        temp_dir = tempfile.mkdtemp(prefix="ORS_qgis_plugin_")
-        temp_image_path = os.path.join(temp_dir, "elevation_profile.jpg")
-        fig.savefig(temp_image_path, dpi=100)
+            temp_dir = tempfile.mkdtemp(prefix="ORS_qgis_plugin_")
+            temp_image_path = os.path.join(temp_dir, "elevation_profile.jpg")
+            fig.savefig(temp_image_path, dpi=100)
 
-        label = self.dlg.label_elevation_profile
-        pixmap = QPixmap(temp_image_path)
-        label.setPixmap(pixmap)
-        # label.setFixedSize(300, 200)
-        label.setScaledContents(True)
+            label = self.dlg.label_elevation_profile
+            pixmap = QPixmap(temp_image_path)
+            label.setPixmap(pixmap)
+            # label.setFixedSize(300, 200)
+            label.setScaledContents(True)
