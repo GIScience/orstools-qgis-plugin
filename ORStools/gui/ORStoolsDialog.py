@@ -462,6 +462,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsRemoved.connect(self.update_elevation_profile)
         self.routing_fromline_list.model().rowsInserted.connect(self.update_elevation_profile)
 
+        self.routing_travel_combo.currentIndexChanged.connect(self.update_elevation_profile)
+        self.routing_preference_combo.currentIndexChanged.connect(self.update_elevation_profile)
+
         # show elevation profile when  according checkbox is checked
         self.label_elevation_profile.setVisible(False)
         self.checkBox_elevation_profile.toggled.connect(self.toggle_elevation_profile)

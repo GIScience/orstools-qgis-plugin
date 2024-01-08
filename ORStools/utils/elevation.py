@@ -67,7 +67,7 @@ class Elevation:
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()["providers"][provider_id]
 
-        # if there are no coordinates, throw an error message
+        # if there are not enough coordinates, do nothing
         if self.dlg.routing_fromline_list.count() in [0, 1]:
             return
 
