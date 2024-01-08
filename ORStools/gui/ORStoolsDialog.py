@@ -45,8 +45,8 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
-from PyQt5.QtGui import QIcon, QTextDocument
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt
+from PyQt5.QtGui import QIcon, QTextDocument, QPixmap
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
 from ORStools import (
@@ -57,6 +57,9 @@ from ORStools import (
     __email__,
     __web__,
     __help__,
+)
+from ORStools.utils.elevation import (
+    Elevation
 )
 from ORStools.common import (
     client,
@@ -454,6 +457,14 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+        self.routing_fromline_list.model().rowsMoved.connect(self.elevation_profile)
+        self.routing_fromline_list.model().rowsRemoved.connect(self.elevation_profile)
+        self.routing_fromline_list.model().rowsInserted.connect(self.elevation_profile)
+
+    def elevation_profile(self):
+        Elevation(self).make_image()
+
 
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""
