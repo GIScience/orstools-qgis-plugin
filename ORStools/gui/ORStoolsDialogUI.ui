@@ -365,6 +365,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_elevation_profile">
+         <property name="text">
+          <string>Display elevation profile</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_elevation_profile">
          <property name="text">
           <string/>
@@ -382,7 +389,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>20</height>
+           <height>18</height>
           </size>
          </property>
          <property name="title">
@@ -819,7 +826,7 @@ p, li { white-space: pre-wrap; }
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>20</height>
+       <height>18</height>
       </size>
      </property>
      <property name="title">
