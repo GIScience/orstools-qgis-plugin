@@ -164,6 +164,22 @@ def get_output_feature_directions(
 
     return feat
 
+def get_output_coordinate_elevations(response):
+    """
+    Build output feature based on response attributes for directions endpoint.
+
+    :param response: API response object
+    :type response: dict
+
+    :returns: Elevations of coordinates of response.
+    :rtype: List
+    """
+    response_mini = response["features"][0]
+    coordinates = response_mini["geometry"]["coordinates"]
+    elevs = [i[2] for i in coordinates]
+
+    return elevs
+
 
 def get_output_features_optimization(response, profile, from_value=None):
     """

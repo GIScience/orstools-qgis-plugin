@@ -365,6 +365,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_elevation_profile">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QgsCollapsibleGroupBox" name="advances_group">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
