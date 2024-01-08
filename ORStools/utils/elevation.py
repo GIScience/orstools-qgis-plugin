@@ -29,12 +29,10 @@
 import json
 import os
 
-from PyQt5.QtCore import QSettings, Qt
-from PyQt5.QtGui import QPixmap, QImage, QPainter
-from PyQt5.QtWidgets import QMessageBox, QLabel
+from PyQt5.QtCore import QSettings
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QMessageBox
 import tempfile
-
-from qgis._core import QgsProcessingParameterRasterDestination
 
 from ORStools.common import client, directions_core
 from ORStools.gui import directions_gui
@@ -82,7 +80,7 @@ class Elevation:
 
         # if no API key is present, when ORS is selected, throw an error message
         if not provider["key"] and provider["base_url"].startswith(
-                "https://api.openrouteservice.org"
+            "https://api.openrouteservice.org"
         ):
             QMessageBox.critical(
                 self.dlg,
@@ -124,9 +122,9 @@ Remember, the first and last location are not part of the optimization.
                 profile = self.dlg.routing_travel_combo.currentText()
                 # abort on empty avoid polygons layer
                 if (
-                        "options" in params
-                        and "avoid_polygons" in params["options"]
-                        and params["options"]["avoid_polygons"] == {}
+                    "options" in params
+                    and "avoid_polygons" in params["options"]
+                    and params["options"]["avoid_polygons"] == {}
                 ):
                     QMessageBox.warning(
                         self.dlg,
@@ -156,8 +154,10 @@ Please add polygons to the layer or uncheck avoid polygons.
 
             total_length = self.route.length
             coordinates = list(self.route.coords)
-            rel_distances = [Point(coord1).distance(Point(coord2)) / total_length for coord1, coord2 in
-                             zip(coordinates[:-1], coordinates[1:])]
+            rel_distances = [
+                Point(coord1).distance(Point(coord2)) / total_length
+                for coord1, coord2 in zip(coordinates[:-1], coordinates[1:])
+            ]
 
             # Initialize an empty list to store the cumulative sums
             cumulative_sums = []
@@ -207,7 +207,7 @@ Please add polygons to the layer or uncheck avoid polygons.
         Make image from get_profile() output.
         """
         fig, ax = plt.subplots()
-        ax.plot(self.abs_distances, self.elevations, linestyle='-')
+        ax.plot(self.abs_distances, self.elevations, linestyle="-")
 
         temp_dir = tempfile.mkdtemp(prefix="ORS_qgis_plugin_")
         temp_image_path = os.path.join(temp_dir, "elevation_profile.jpg")

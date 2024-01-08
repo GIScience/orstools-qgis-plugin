@@ -45,8 +45,8 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt
-from PyQt5.QtGui import QIcon, QTextDocument, QPixmap
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
+from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
 from ORStools import (
@@ -58,9 +58,7 @@ from ORStools import (
     __web__,
     __help__,
 )
-from ORStools.utils.elevation import (
-    Elevation
-)
+from ORStools.utils.elevation import Elevation
 from ORStools.common import (
     client,
     directions_core,
@@ -464,7 +462,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def elevation_profile(self):
         Elevation(self).make_image()
-
 
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""

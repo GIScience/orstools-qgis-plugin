@@ -164,6 +164,7 @@ def get_output_feature_directions(
 
     return feat
 
+
 def get_output_coordinate_elevations(response):
     """
     Build output feature based on response attributes for directions endpoint.
