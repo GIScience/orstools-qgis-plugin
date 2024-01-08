@@ -51,6 +51,7 @@ class Elevation:
         self.route = None
 
         self.base()
+        self.make_image()
 
     def base(self):
         basepath = os.path.dirname(__file__)
@@ -67,16 +68,7 @@ class Elevation:
 
         # if there are no coordinates, throw an error message
         if not self.dlg.routing_fromline_list.count():
-            QMessageBox.critical(
-                self.dlg,
-                "Missing Waypoints",
-                """
-                Did you forget to set routing waypoints?<br><br>
-
-                Use the 'Add Waypoint' button to add up to 50 waypoints.
-                """,
-            )
-            return
+            raise AssertionError
 
         # if no API key is present, when ORS is selected, throw an error message
         if not provider["key"] and provider["base_url"].startswith(

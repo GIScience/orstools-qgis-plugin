@@ -456,12 +456,24 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
-        self.routing_fromline_list.model().rowsMoved.connect(self.elevation_profile)
-        self.routing_fromline_list.model().rowsRemoved.connect(self.elevation_profile)
-        self.routing_fromline_list.model().rowsInserted.connect(self.elevation_profile)
+        self.checkBox_elevation_profile.toggled.connect(self.toggle_elevation_profile)
 
-    def elevation_profile(self):
-        Elevation(self).make_image()
+    def toggle_elevation_profile(self):
+        try:
+            Elevation(self).make_image()
+            self.label_elevation_profile.setVisible(self.checkBox_elevation_profile.isChecked())
+        except AssertionError:
+            if self.checkBox_elevation_profile.isChecked():
+                QMessageBox.critical(
+                    self,
+                    "Missing Waypoints",
+                    """
+                    Did you forget to set routing waypoints?<br><br>
+    
+                    Use the 'Add Waypoint' button to add up to 50 waypoints.
+                    """,
+                )
+                self.checkBox_elevation_profile.setChecked(False)
 
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""
