@@ -39,6 +39,9 @@ RELEASING:
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## [1.7.1]
+- Replace line style with style from previous QGis version 3.16 to enable correct rendering in that version ([#218](https://github.com/GIScience/orstools-qgis-plugin/issues/218))
+
 ## [1.7.0] - 2023-12-22
 
 ### Added
