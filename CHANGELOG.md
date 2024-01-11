@@ -40,7 +40,7 @@ RELEASING:
  -->
 
 ## [1.7.1]
-- Add hint to use batch jobs for point layers in tooltip in save vertices button ([#216](https://github.com/GIScience/orstools-qgis-plugin/pull/216))
+- replace removesuffix() function with replace() function in base processing algorithm ([#215](https://github.com/GIScience/orstools-qgis-plugin/pull/215))
 
 ## [1.7.0] - 2023-12-22
 
