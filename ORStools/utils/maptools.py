@@ -149,6 +149,4 @@ class ShiftTool(QgsMapToolEmitPoint):
     def canvasPressEvent(self, e):
         # Make tooltip look like marker
         # noinspection PyUnresolvedReferences
-        new_point = self.toMapCoordinates(e.pos())
-        print(new_point)
         self.pointPressed.emit(e.pos())

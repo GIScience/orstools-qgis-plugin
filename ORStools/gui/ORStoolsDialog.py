@@ -587,7 +587,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.moving = True
 
     def _on_movetool_map_release(self, point):
-        print(point)
         if self.moving:
             crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
