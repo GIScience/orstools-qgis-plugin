@@ -29,6 +29,7 @@
 
 import json
 import os
+
 import processing
 import webbrowser
 
@@ -70,6 +71,8 @@ from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
 from . import resources_rc  # noqa: F401
+
+from shapely.geometry import Point
 
 
 def on_config_click(parent):
@@ -431,6 +434,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
+        self.move_vertices.clicked.connect(self._on_move_vertices_tool_init)
+
         # Batch
         self.batch_routing_points.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_points_2_layers")
@@ -454,6 +459,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+        self.moving = None
 
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""
@@ -553,6 +560,60 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         )
         self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
 
+    def _on_move_vertices_tool_init(self):
+        self.hide()
+        self.move_tool = maptools.ShiftTool(self._iface.mapCanvas())
+
+        self._iface.mapCanvas().setMapTool(self.move_tool)
+        self.move_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
+        self.move_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
+        self.move_tool.doubleClicked.connect(self._on_movetool_map_doubleclick)
+
+    def _on_movetool_map_press(self, pos):
+        click = Point(pos.x(), pos.y())
+        dists = {}
+        for i, anno in enumerate(self.annotations):
+            x, y = anno.mapPosition()
+            mapcanvas = self._iface.mapCanvas()
+            point = mapcanvas.getCoordinateTransform().transform(x, y)
+            p = Point(point.x(), point.y())
+            dist = click.distance(p)
+            if dist > 0:
+                dists[dist] = anno
+        if min(dists) < 15:
+            idx = dists[min(dists)]
+            self.move_i = self.annotations.index(idx)
+            self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
+            self.moving = True
+
+    def _on_movetool_map_release(self, point):
+        print(point)
+        if self.moving:
+            crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+
+            annotation = self._linetool_annotate_point(point, self.move_i, crs=crs)
+            self.annotations.insert(self.move_i, annotation)
+            self.project.annotationManager().addAnnotation(annotation)
+
+            transformer = transform.transformToWGS(crs)
+            point_wgs = transformer.transform(point)
+
+            items = [
+                self.routing_fromline_list.item(x).text()
+                for x in range(self.routing_fromline_list.count())
+            ]
+            items[self.move_i] = f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
+
+            self.routing_fromline_list.clear()
+            for idx, x in enumerate(items):
+                coords = x.split(":")[1]
+                item = f"Point {idx}:{coords}"
+                self.routing_fromline_list.addItem(item)
+
+        self.moving = False
+        # QApplication.restoreOverrideCursor()
+        # self._iface.mapCanvas().setMapTool(self.last_maptool)
+
     def _on_linetool_map_click(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
         map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
@@ -592,6 +653,18 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         self.line_tool.pointDrawn.disconnect()
         self.line_tool.doubleClicked.disconnect()
+        QApplication.restoreOverrideCursor()
+        self._iface.mapCanvas().setMapTool(self.last_maptool)
+        self.show()
+
+    def _on_movetool_map_doubleclick(self):
+        """
+        Populate line list widget with coordinates, end point moving and show dialog again.
+        """
+
+        self.move_tool.pointPressed.disconnect()
+        self.move_tool.doubleClicked.disconnect()
+        self.move_tool.pointReleased.disconnect()
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()
