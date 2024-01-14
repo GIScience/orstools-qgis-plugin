@@ -313,7 +313,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Move vertices on map by drag and drop. Double click to exit move mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
@@ -395,7 +395,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>23</height>
+           <height>20</height>
           </size>
          </property>
          <property name="title">
@@ -434,7 +434,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>23</height>
+              <height>20</height>
              </size>
             </property>
             <property name="toolTip">
@@ -620,7 +620,7 @@ p, li { white-space: pre-wrap; }
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>23</height>
+              <height>20</height>
              </size>
             </property>
             <property name="toolTip">
@@ -666,7 +666,7 @@ p, li { white-space: pre-wrap; }
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>23</height>
+              <height>20</height>
              </size>
             </property>
             <property name="toolTip">
@@ -832,7 +832,7 @@ p, li { white-space: pre-wrap; }
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>23</height>
+       <height>20</height>
       </size>
      </property>
      <property name="title">

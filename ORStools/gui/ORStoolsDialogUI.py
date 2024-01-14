@@ -228,7 +228,7 @@ class Ui_ORStoolsDialogBase(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.advances_group.sizePolicy().hasHeightForWidth())
         self.advances_group.setSizePolicy(sizePolicy)
-        self.advances_group.setMaximumSize(QtCore.QSize(16777215, 23))
+        self.advances_group.setMaximumSize(QtCore.QSize(16777215, 20))
         self.advances_group.setCheckable(False)
         self.advances_group.setChecked(False)
         self.advances_group.setCollapsed(True)
@@ -244,7 +244,7 @@ class Ui_ORStoolsDialogBase(object):
         sizePolicy.setHeightForWidth(self.optimization_group.sizePolicy().hasHeightForWidth())
         self.optimization_group.setSizePolicy(sizePolicy)
         self.optimization_group.setMinimumSize(QtCore.QSize(0, 0))
-        self.optimization_group.setMaximumSize(QtCore.QSize(16777215, 23))
+        self.optimization_group.setMaximumSize(QtCore.QSize(16777215, 20))
         self.optimization_group.setCheckable(True)
         self.optimization_group.setChecked(False)
         self.optimization_group.setCollapsed(True)
@@ -317,7 +317,7 @@ class Ui_ORStoolsDialogBase(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.routing_avoid_countries_group.sizePolicy().hasHeightForWidth())
         self.routing_avoid_countries_group.setSizePolicy(sizePolicy)
-        self.routing_avoid_countries_group.setMaximumSize(QtCore.QSize(16777215, 23))
+        self.routing_avoid_countries_group.setMaximumSize(QtCore.QSize(16777215, 20))
         self.routing_avoid_countries_group.setCheckable(True)
         self.routing_avoid_countries_group.setChecked(False)
         self.routing_avoid_countries_group.setCollapsed(True)
@@ -336,7 +336,7 @@ class Ui_ORStoolsDialogBase(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.avoidpolygon_group.sizePolicy().hasHeightForWidth())
         self.avoidpolygon_group.setSizePolicy(sizePolicy)
-        self.avoidpolygon_group.setMaximumSize(QtCore.QSize(16777215, 23))
+        self.avoidpolygon_group.setMaximumSize(QtCore.QSize(16777215, 20))
         self.avoidpolygon_group.setCheckable(True)
         self.avoidpolygon_group.setChecked(False)
         self.avoidpolygon_group.setCollapsed(True)
@@ -414,7 +414,7 @@ class Ui_ORStoolsDialogBase(object):
         sizePolicy.setHeightForWidth(self.ors_log_group.sizePolicy().hasHeightForWidth())
         self.ors_log_group.setSizePolicy(sizePolicy)
         self.ors_log_group.setMinimumSize(QtCore.QSize(0, 0))
-        self.ors_log_group.setMaximumSize(QtCore.QSize(16777215, 23))
+        self.ors_log_group.setMaximumSize(QtCore.QSize(16777215, 20))
         self.ors_log_group.setFlat(True)
         self.ors_log_group.setCollapsed(True)
         self.ors_log_group.setSaveCollapsedState(False)
@@ -495,7 +495,7 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_preference_combo.setToolTip(_translate("ORStoolsDialogBase", "Preference"))
         self.save_vertices.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Save points in list to layer.</p></body></html>"))
         self.routing_fromline_clear.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.</p></body></html>"))
-        self.move_vertices.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Save points in list to layer.</p></body></html>"))
+        self.move_vertices.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Move vertices on map by drag and drop. Double click to exit move mode.</p></body></html>"))
         self.routing_fromline_list.setToolTip(_translate("ORStoolsDialogBase", "Select waypoints from the map!"))
         self.routing_fromline_map.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Add wayoints interactively from the map canvas.</p><p>Double-click will terminate waypoint selection.</p></body></html>"))
         self.advances_group.setTitle(_translate("ORStoolsDialogBase", "Advanced Configuration"))
@@ -546,4 +546,4 @@ class Ui_ORStoolsDialogBase(object):
 from qgscollapsiblegroupbox import QgsCollapsibleGroupBox
 from qgsfilterlineedit import QgsFilterLineEdit
 from qgsmaplayercombobox import QgsMapLayerComboBox
-# import resources_rc
+import resources_rc
