@@ -264,8 +264,8 @@
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
-          <item row="0" column="0">
-           <widget class="QPushButton" name="routing_fromline_map">
+          <item row="3" column="0">
+           <widget class="QPushButton" name="save_vertices">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -273,14 +273,14 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/icon_add.png</normaloff>:/plugins/ORStools/img/icon_add.png</iconset>
+              <normaloff>:/plugins/ORStools/img/save_vertices.png</normaloff>:/plugins/ORStools/img/save_vertices.png</iconset>
             </property>
            </widget>
           </item>
@@ -304,7 +304,27 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1" rowspan="4">
+          <item row="2" column="0">
+           <widget class="QPushButton" name="move_vertices">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/plugins/ORStools/img/icon_locate.png</normaloff>:/plugins/ORStools/img/icon_locate.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" rowspan="5">
            <widget class="QListWidget" name="routing_fromline_list">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -341,8 +361,8 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="save_vertices">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="routing_fromline_map">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -350,14 +370,14 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/save_vertices.png</normaloff>:/plugins/ORStools/img/save_vertices.png</iconset>
+              <normaloff>:/plugins/ORStools/img/icon_add.png</normaloff>:/plugins/ORStools/img/icon_add.png</iconset>
             </property>
            </widget>
           </item>
@@ -375,7 +395,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>20</height>
+           <height>23</height>
           </size>
          </property>
          <property name="title">
@@ -414,7 +434,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>20</height>
+              <height>23</height>
              </size>
             </property>
             <property name="toolTip">
@@ -600,7 +620,7 @@ p, li { white-space: pre-wrap; }
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>20</height>
+              <height>23</height>
              </size>
             </property>
             <property name="toolTip">
@@ -646,7 +666,7 @@ p, li { white-space: pre-wrap; }
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>20</height>
+              <height>23</height>
              </size>
             </property>
             <property name="toolTip">
@@ -812,7 +832,7 @@ p, li { white-space: pre-wrap; }
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>20</height>
+       <height>23</height>
       </size>
      </property>
      <property name="title">
