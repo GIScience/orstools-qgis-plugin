@@ -39,6 +39,7 @@ RELEASING:
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+
 ## Unreleased
 
 ### Added
@@ -46,6 +47,7 @@ RELEASING:
 
 ### Fixed
 - TypeError if no SVGPaths are set ([#212](https://github.com/GIScience/orstools-qgis-plugin/issues/212))
+- replace removesuffix() function with replace() function in base processing algorithm ([#215](https://github.com/GIScience/orstools-qgis-plugin/pull/215))
 
 ## [1.7.0] - 2023-12-22
 
