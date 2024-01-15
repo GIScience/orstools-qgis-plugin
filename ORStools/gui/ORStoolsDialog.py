@@ -561,13 +561,20 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
 
     def _on_move_vertices_tool_init(self):
-        self.hide()
-        self.move_tool = maptools.ShiftTool(self._iface.mapCanvas())
+        if self.routing_fromline_list.count() > 0:
+            self.hide()
+            self.move_tool = maptools.ShiftTool(self._iface.mapCanvas())
 
-        self._iface.mapCanvas().setMapTool(self.move_tool)
-        self.move_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.move_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
-        self.move_tool.doubleClicked.connect(self._on_movetool_map_doubleclick)
+            self._iface.mapCanvas().setMapTool(self.move_tool)
+            self.move_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
+            self.move_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
+            self.move_tool.doubleClicked.connect(self._on_movetool_map_doubleclick)
+        else:
+            QMessageBox.warning(
+                self,
+                "Empty point list",
+                """Please add points to move them.""",
+            )
 
     def _on_movetool_map_press(self, pos):
         click = Point(pos.x(), pos.y())
