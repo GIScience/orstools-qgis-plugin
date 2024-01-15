@@ -546,4 +546,4 @@ class Ui_ORStoolsDialogBase(object):
 from qgscollapsiblegroupbox import QgsCollapsibleGroupBox
 from qgsfilterlineedit import QgsFilterLineEdit
 from qgsmaplayercombobox import QgsMapLayerComboBox
-import resources_rc
+# import resources_rc
