@@ -41,6 +41,9 @@ RELEASING:
 
 ## Unreleased
 
+### Added
+- Add hint to use batch jobs for point layers in tooltip in save vertices button ([#211](https://github.com/GIScience/orstools-qgis-plugin/issues/211))
+
 ### Fixed
 - TypeError if no SVGPaths are set ([#212](https://github.com/GIScience/orstools-qgis-plugin/issues/212))
 
