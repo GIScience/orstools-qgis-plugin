@@ -40,7 +40,7 @@ RELEASING:
  -->
 
 
-## Unreleased
+## [1.7.1] - 2024-01-15
 
 ### Added
 - Add hint to use batch jobs for point layers in tooltip in save vertices button ([#211](https://github.com/GIScience/orstools-qgis-plugin/issues/211))
@@ -220,7 +220,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.2...v1.5.3
