@@ -48,6 +48,7 @@ RELEASING:
 ### Fixed
 - TypeError if no SVGPaths are set ([#212](https://github.com/GIScience/orstools-qgis-plugin/issues/212))
 - replace removesuffix() function with replace() function in base processing algorithm ([#215](https://github.com/GIScience/orstools-qgis-plugin/pull/215))
+- Replace line style with style from QGIS v3.16 to enable correct rendering in older versions ([#218](https://github.com/GIScience/orstools-qgis-plugin/issues/218))
 
 ## [1.7.0] - 2023-12-22
 
