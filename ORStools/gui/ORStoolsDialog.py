@@ -27,13 +27,13 @@
  ***************************************************************************/
 """
 
-import json
 import os
 
 import processing
 import webbrowser
 
-from qgis._core import Qgis
+from qgis._core import Qgis, QgsWkbTypes
+from qgis._gui import QgsRubberBand
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -47,7 +47,7 @@ from qgis.core import (
 from qgis.gui import QgsMapCanvasAnnotationItem
 
 from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
-from PyQt5.QtGui import QIcon, QTextDocument
+from PyQt5.QtGui import QIcon, QTextDocument, QColor
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
 from ORStools import (
@@ -60,13 +60,10 @@ from ORStools import (
     __help__,
 )
 from ORStools.common import (
-    client,
-    directions_core,
     PROFILES,
     PREFERENCES,
 )
-from ORStools.gui import directions_gui
-from ORStools.utils import exceptions, maptools, logger, configmanager, transform
+from ORStools.utils import maptools, configmanager, transform, router
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
@@ -241,10 +238,18 @@ class ORStoolsDialogMain:
 
     def run_gui_control(self):
         """Slot function for OK button of main dialog."""
+        # Associate annotations with map layer, so they get deleted when layer is deleted
+        for annotation in self.dlg.annotations:
+            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
+            # , you can change order after optimization
+            # Then in theory, when the layer is remove, the annotation is removed as well
+            # Doesn't work though, the annotations are still there when project is re-opened
+            # annotation.setMapLayer(layer_out)
+            self.project.annotationManager().removeAnnotation(annotation)
+        self.dlg.annotations = []
 
-        layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
-        layer_out.dataProvider().addAttributes(directions_core.get_fields())
-        layer_out.updateFields()
+        route_layer = router.route_as_layer(self.dlg)
+        self.project.addMapLayer(route_layer)
 
         basepath = os.path.dirname(__file__)
 
@@ -257,131 +262,10 @@ class ORStoolsDialogMain:
 
         # style output layer
         qml_path = os.path.join(basepath, "linestyle.qml")
-        layer_out.loadNamedStyle(qml_path, True)
-        layer_out.triggerRepaint()
+        route_layer.loadNamedStyle(qml_path, True)
+        route_layer.triggerRepaint()
 
-        # Associate annotations with map layer, so they get deleted when layer is deleted
-        for annotation in self.dlg.annotations:
-            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
-            # , you can change order after optimization
-            # Then in theory, when the layer is remove, the annotation is removed as well
-            # Doesn't work though, the annotations are still there when project is re-opened
-            # annotation.setMapLayer(layer_out)
-            self.project.annotationManager().removeAnnotation(annotation)
-        self.dlg.annotations = []
-
-        provider_id = self.dlg.provider_combo.currentIndex()
-        provider = configmanager.read_config()["providers"][provider_id]
-
-        # if there are no coordinates, throw an error message
-        if not self.dlg.routing_fromline_list.count():
-            QMessageBox.critical(
-                self.dlg,
-                "Missing Waypoints",
-                """
-                Did you forget to set routing waypoints?<br><br>
-                
-                Use the 'Add Waypoint' button to add up to 50 waypoints.
-                """,
-            )
-            return
-
-        # if no API key is present, when ORS is selected, throw an error message
-        if not provider["key"] and provider["base_url"].startswith(
-            "https://api.openrouteservice.org"
-        ):
-            QMessageBox.critical(
-                self.dlg,
-                "Missing API key",
-                """
-                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
-                
-                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
-                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
-            )
-            return
-
-        agent = "QGIS_ORStoolsDialog"
-        clnt = client.Client(provider, agent)
-        clnt_msg = ""
-
-        directions = directions_gui.Directions(self.dlg)
-        params = None
-        try:
-            params = directions.get_parameters()
-            if self.dlg.optimization_group.isChecked():
-                if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
-                    QMessageBox.critical(
-                        self.dlg,
-                        "Wrong number of waypoints",
-                        """At least 3 or 4 waypoints are needed to perform routing optimization. 
-
-Remember, the first and last location are not part of the optimization.
-                        """,
-                    )
-                    return
-                response = clnt.request("/optimization", {}, post_json=params)
-                feat = directions_core.get_output_features_optimization(
-                    response, params["vehicles"][0]["profile"]
-                )
-            else:
-                params["coordinates"] = directions.get_request_line_feature()
-                profile = self.dlg.routing_travel_combo.currentText()
-                # abort on empty avoid polygons layer
-                if (
-                    "options" in params
-                    and "avoid_polygons" in params["options"]
-                    and params["options"]["avoid_polygons"] == {}
-                ):
-                    QMessageBox.warning(
-                        self.dlg,
-                        "Empty layer",
-                        """
-The specified avoid polygon(s) layer does not contain any features.
-Please add polygons to the layer or uncheck avoid polygons.
-                        """,
-                    )
-                    msg = "The request has been aborted!"
-                    logger.log(msg, 0)
-                    self.dlg.debug_text.setText(msg)
-                    return
-                response = clnt.request(
-                    "/v2/directions/" + profile + "/geojson", {}, post_json=params
-                )
-                feat = directions_core.get_output_feature_directions(
-                    response, profile, params["preference"], directions.options
-                )
-
-            layer_out.dataProvider().addFeature(feat)
-
-            layer_out.updateExtents()
-            self.project.addMapLayer(layer_out)
-
-            # Update quota; handled in client module after successful request
-            # if provider.get('ENV_VARS'):
-            #     self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
-        except exceptions.Timeout:
-            msg = "The connection has timed out!"
-            logger.log(msg, 2)
-            self.dlg.debug_text.setText(msg)
-            return
-
-        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
-            clnt_msg += f"<b>{e.__class__.__name__}</b>: ({str(e)})<br>"
-            raise
-
-        except Exception as e:
-            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
-            clnt_msg += f"<b>{e.__class__.__name__}</b>: {str(e)}<br>"
-            raise
-
-        finally:
-            # Set URL in debug window
-            if params:
-                clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
-            self.dlg.debug_text.setHtml(clnt_msg)
+        self.dlg.routing_fromline_list.clear()
 
     def tr(self, string):
         return QCoreApplication.translate(str(self.__class__.__name__), string)
@@ -408,6 +292,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool = None
         self.last_maptool = self._iface.mapCanvas().mapTool()
         self.annotations = []
+        self.rubber_band = None
 
         # Set up env variables for remaining quota
         os.environ["ORS_QUOTA"] = "None"
@@ -588,6 +473,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             if dist > 0:
                 dists[dist] = anno
         if min(dists) < 15:
+            if self.rubber_band:
+                self.rubber_band.reset()
             idx = dists[min(dists)]
             self.move_i = self.annotations.index(idx)
             self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
@@ -616,9 +503,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 item = f"Point {idx}:{coords}"
                 self.routing_fromline_list.addItem(item)
 
+        route_layer = router.route_as_layer(self)
+        self.rubber_band = QgsRubberBand(self._iface.mapCanvas(), QgsWkbTypes.LineGeometry)
+        self.rubber_band.setStrokeColor(QColor(DEFAULT_COLOR))
+        self.rubber_band.setWidth(3)
+
+        features = route_layer.getFeatures()
+        for feature in features:
+            self.rubber_band.addGeometry(feature.geometry(), route_layer)
+        self.rubber_band.show()
+
         self.moving = False
-        # QApplication.restoreOverrideCursor()
-        # self._iface.mapCanvas().setMapTool(self.last_maptool)
 
     def _on_linetool_map_click(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
