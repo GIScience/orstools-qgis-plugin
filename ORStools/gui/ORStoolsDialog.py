@@ -29,6 +29,7 @@
 
 import json
 import os
+
 import processing
 import webbrowser
 
@@ -47,7 +48,7 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt, QUrl
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt, QUrl, QTimer
 
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import (
@@ -470,51 +471,56 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         # add connection to linedit text change
         self.geocode_start.textChanged.connect(
-            lambda: self.reload_geocode_completer(self.geocode_start, self.geocode_start.text())
+            lambda: self.wait_connect_geocode(self.geocode_start)
         )
-        self.geocode_dest.textChanged.connect(
-            lambda: self.reload_geocode_completer(self.geocode_dest, self.geocode_dest.text())
-        )
+        self.geocode_dest.textChanged.connect(lambda: self.wait_connect_geocode(self.geocode_dest))
         # connect geocode add button
         self.geocode_add.clicked.connect(self.add_geocoded_items)
+
+    def wait_connect_geocode(self, lineEdit):
+        text = lineEdit.text()
+        QTimer.singleShot(500, lambda: self.reload_geocode_completer(lineEdit, text))
 
     def reload_geocode_completer(self, lineEdit, text):
         def option_chosen(index):
             return completer.activated.disconnect(index)
 
-        provider_id = self.provider_combo.currentIndex()
-        provider = configmanager.read_config()["providers"][provider_id]
-        api_key = provider["key"]
-        if api_key != "":
-            url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={text}"
-            request = QgsBlockingNetworkRequest()
-            error_code = request.get(QNetworkRequest(QUrl(url)))
-            if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
-                reply = request.reply()
-                suggest = [
-                    i["properties"]["name"]
-                    for i in json.loads(reply.content().data().decode("utf-8"))["features"]
-                ]
-                completer = QCompleter(suggest)
-                completer.setCaseSensitivity(Qt.CaseInsensitive)
-                completer.setFilterMode(Qt.MatchContains)
-                completer.activated.connect(option_chosen)
-                lineEdit.setCompleter(completer)
+        if lineEdit.text() == text and lineEdit.text() != "":
+            print("geocoding...")
+            provider_id = self.provider_combo.currentIndex()
+            provider = configmanager.read_config()["providers"][provider_id]
+            api_key = provider["key"]
+            if api_key != "":
+                url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={lineEdit.text()}"
+                request = QgsBlockingNetworkRequest()
+                error_code = request.get(QNetworkRequest(QUrl(url)))
+                if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+                    reply = request.reply()
+                    suggest = [
+                        i["properties"]["name"]
+                        for i in json.loads(reply.content().data().decode("utf-8"))["features"]
+                    ]
+                    completer = QCompleter(suggest)
+                    completer.setCaseSensitivity(Qt.CaseInsensitive)
+                    completer.setFilterMode(Qt.MatchContains)
+                    completer.activated.connect(option_chosen)
+                    lineEdit.setCompleter(completer)
+                    completer.complete()
 
+                else:
+                    # Still to be improved
+                    print(error_code)
             else:
-                # Still to be improved
-                print(error_code)
-        else:
-            QMessageBox.critical(
-                self,
-                "Missing API key",
-                """
-                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
-
-                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
-                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
-            )
+                QMessageBox.critical(
+                    self,
+                    "Missing API key",
+                    """
+                    Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+    
+                    If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                    Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                    settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+                )
 
     def add_geocoded_items(self):
         if self.geocoded:
