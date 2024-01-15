@@ -482,11 +482,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         QTimer.singleShot(500, lambda: self.reload_geocode_completer(lineEdit, text))
 
     def reload_geocode_completer(self, lineEdit, text):
-        def option_chosen(index):
-            return completer.activated.disconnect(index)
+        def option_chosen():
+            return completer.activated.disconnect()
 
         if lineEdit.text() == text and lineEdit.text() != "":
-            print("geocoding...")
             provider_id = self.provider_combo.currentIndex()
             provider = configmanager.read_config()["providers"][provider_id]
             api_key = provider["key"]
