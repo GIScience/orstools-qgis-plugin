@@ -10,9 +10,8 @@ email=support@openrouteservice.heigit.org
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
 changelog=2023/01/15 v1.7.1
-Fixed
-- multiple minor issues regarding compatibility with older QGIS versions
-
+    Fixed
+    - multiple minor issues regarding compatibility with older QGIS versions
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki
