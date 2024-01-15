@@ -34,9 +34,10 @@ RELEASING:
 8. Commit changes with `git commit -m 'chore: release vX.X.X'`
 9. Tag the commit `git tag -a vX.X.X -m "vX.X.X"`
 10. Push release commit and tag 'git push && git push origin vX.X.X'
-11. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*"`
-12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
-13. Create new release in GitHub with tag version and release title of `vX.X.X`
+11. Make sure that your branch is up to date with 'origin/main' and there are no unstaged changes
+12. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*" "*.ruff_cache*"`
+13. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
+14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
 
