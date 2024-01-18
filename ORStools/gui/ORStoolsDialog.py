@@ -442,7 +442,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
 
 
-    def _on_movetool_map_press(self, pos):
+    def _on_movetool_map_press(self, pos, click_dist=15):
         click = Point(pos.x(), pos.y())
         dists = {}
         for i, anno in enumerate(self.annotations):
@@ -453,7 +453,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             dist = click.distance(p)
             if dist > 0:
                 dists[dist] = anno
-        if dists and min(dists) < 15:
+        if dists and min(dists) < click_dist:
             if self.rubber_band:
                 self.rubber_band.reset()
             idx = dists[min(dists)]
