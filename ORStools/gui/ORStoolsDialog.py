@@ -322,8 +322,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
-        # self.move_vertices.clicked.connect(self._on_move_vertices_tool_init)
-
         # Batch
         self.batch_routing_points.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_points_2_layers")
@@ -427,7 +425,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
-        self.rubber_band.reset()
+        if self.rubber_band:
+            self.rubber_band.reset()
 
     def _on_linetool_init(self):
         """Hides GUI dialog, inits line maptool and add items to line list box."""
