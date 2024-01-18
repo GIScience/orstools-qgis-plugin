@@ -435,7 +435,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self._iface.mapCanvas().setMapTool(self.line_tool)
         self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
         self.line_tool.pointReleased.connect(
-                lambda point, idx: self._on_linetool_map_click(point, idx)
+                lambda point, idx: self.create_vertex(point, idx)
         )
         self.line_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
         self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
@@ -501,7 +501,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.rubber_band.addGeometry(feature.geometry(), route_layer)
         self.rubber_band.show()
 
-    def _on_linetool_map_click(self, point, idx):
+    def create_vertex(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
         map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
