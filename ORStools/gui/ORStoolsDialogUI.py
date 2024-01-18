@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ORStoolsDialogBase(object):
     def setupUi(self, ORStoolsDialogBase):
         ORStoolsDialogBase.setObjectName("ORStoolsDialogBase")
-        ORStoolsDialogBase.resize(412, 868)
+        ORStoolsDialogBase.resize(412, 686)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
