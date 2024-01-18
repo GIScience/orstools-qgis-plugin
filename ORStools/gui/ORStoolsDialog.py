@@ -54,6 +54,7 @@ from ORStools import (
     RESOURCE_PREFIX,
     PLUGIN_NAME,
     DEFAULT_COLOR,
+    ROUTE_COLOR,
     __version__,
     __email__,
     __web__,
@@ -247,6 +248,8 @@ class ORStoolsDialogMain:
             # annotation.setMapLayer(layer_out)
             self.project.annotationManager().removeAnnotation(annotation)
         self.dlg.annotations = []
+        if self.dlg.rubber_band:
+            self.dlg.rubber_band.reset()
 
         route_layer = router.route_as_layer(self.dlg)
         self.project.addMapLayer(route_layer)
@@ -319,7 +322,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
-        self.move_vertices.clicked.connect(self._on_move_vertices_tool_init)
+        # self.move_vertices.clicked.connect(self._on_move_vertices_tool_init)
 
         # Batch
         self.batch_routing_points.clicked.connect(
@@ -397,9 +400,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.clear()
             self._clear_annotations()
 
-        # Remove blue lines (rubber band)
-        if self.line_tool:
-            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
+        self.rubber_band.reset()
 
     def _linetool_annotate_point(self, point, idx, crs=None):
         if not crs:
@@ -426,40 +427,20 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
+        self.rubber_band.reset()
 
     def _on_linetool_init(self):
         """Hides GUI dialog, inits line maptool and add items to line list box."""
-        # Remove blue lines (rubber band)
-        if self.line_tool:
-            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
-
         self.hide()
-        self.routing_fromline_list.clear()
-        # Remove all annotations which were added (if any)
-        self._clear_annotations()
-
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
-        self.line_tool.pointDrawn.connect(
-            lambda point, idx: self._on_linetool_map_click(point, idx)
+        self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
+        self.line_tool.pointReleased.connect(
+                lambda point, idx: self._on_linetool_map_click(point, idx)
         )
-        self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
+        self.line_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
+        self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
 
-    def _on_move_vertices_tool_init(self):
-        if self.routing_fromline_list.count() > 0:
-            self.hide()
-            self.move_tool = maptools.ShiftTool(self._iface.mapCanvas())
-
-            self._iface.mapCanvas().setMapTool(self.move_tool)
-            self.move_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-            self.move_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
-            self.move_tool.doubleClicked.connect(self._on_movetool_map_doubleclick)
-        else:
-            QMessageBox.warning(
-                self,
-                "Empty point list",
-                """Please add points to move them.""",
-            )
 
     def _on_movetool_map_press(self, pos):
         click = Point(pos.x(), pos.y())
@@ -472,7 +453,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             dist = click.distance(p)
             if dist > 0:
                 dists[dist] = anno
-        if min(dists) < 15:
+        if dists and min(dists) < 15:
             if self.rubber_band:
                 self.rubber_band.reset()
             idx = dists[min(dists)]
@@ -503,17 +484,23 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 item = f"Point {idx}:{coords}"
                 self.routing_fromline_list.addItem(item)
 
+        if self.routing_fromline_list.count() > 1:
+            self.create_rubber_band()
+
+            self.moving = False
+
+    def create_rubber_band(self):
+        if self.rubber_band:
+            self.rubber_band.reset()
         route_layer = router.route_as_layer(self)
         self.rubber_band = QgsRubberBand(self._iface.mapCanvas(), QgsWkbTypes.LineGeometry)
-        self.rubber_band.setStrokeColor(QColor(DEFAULT_COLOR))
-        self.rubber_band.setWidth(3)
+        self.rubber_band.setStrokeColor(QColor(ROUTE_COLOR))
+        self.rubber_band.setWidth(5)
 
         features = route_layer.getFeatures()
         for feature in features:
             self.rubber_band.addGeometry(feature.geometry(), route_layer)
         self.rubber_band.show()
-
-        self.moving = False
 
     def _on_linetool_map_click(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
@@ -546,26 +533,16 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             annotation = self._linetool_annotate_point(point, idx, crs)
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
+        self.create_rubber_band()
 
-    def _on_linetool_map_doubleclick(self):
-        """
-        Populate line list widget with coordinates, end line drawing and show dialog again.
-        """
-
-        self.line_tool.pointDrawn.disconnect()
-        self.line_tool.doubleClicked.disconnect()
-        QApplication.restoreOverrideCursor()
-        self._iface.mapCanvas().setMapTool(self.last_maptool)
-        self.show()
-
-    def _on_movetool_map_doubleclick(self):
+    def _on_line_tool_map_doubleclick(self):
         """
         Populate line list widget with coordinates, end point moving and show dialog again.
         """
 
-        self.move_tool.pointPressed.disconnect()
-        self.move_tool.doubleClicked.disconnect()
-        self.move_tool.pointReleased.disconnect()
+        self.line_tool.pointPressed.disconnect()
+        self.line_tool.doubleClicked.disconnect()
+        self.line_tool.pointReleased.disconnect()
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()
