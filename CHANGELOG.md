@@ -39,6 +39,9 @@ RELEASING:
 13. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+# Unreleased
+- Make vertex marker on map drag and droppable, add live preview ([#204](https://github.com/GIScience/orstools-qgis-plugin/issues/204))
+
 ## [1.7.0] - 2023-12-22
 
 ### Added
