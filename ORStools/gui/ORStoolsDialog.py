@@ -398,7 +398,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.clear()
             self._clear_annotations()
 
-        self.rubber_band.reset()
+        if self.rubber_band:
+            self.rubber_band.reset()
+            self.line_tool.deactivate()
 
     def _linetool_annotate_point(self, point, idx, crs=None):
         if not crs:
@@ -434,12 +436,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
         self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.line_tool.pointReleased.connect(
-                lambda point, idx: self.create_vertex(point, idx)
-        )
+        self.line_tool.pointReleased.connect(lambda point, idx: self.create_vertex(point, idx))
         self.line_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
         self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
-
 
     def _on_movetool_map_press(self, pos, click_dist=15):
         click = Point(pos.x(), pos.y())

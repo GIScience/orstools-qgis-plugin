@@ -27,13 +27,9 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
+from qgis.gui import QgsMapToolEmitPoint
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QColor
-
-from ORStools import ROUTE_COLOR
 
 
 class LineTool(QgsMapToolEmitPoint):
@@ -83,11 +79,6 @@ class LineTool(QgsMapToolEmitPoint):
 
     pointPressed = pyqtSignal(["QPoint"])
 
-    def deactivate(self):
-        super(LineTool, self).deactivate()
-        self.deactivated.emit()
-
     def canvasPressEvent(self, e):
         # Make tooltip look like marker
-        # noinspection PyUnresolvedReferences
         self.pointPressed.emit(e.pos())
