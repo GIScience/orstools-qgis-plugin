@@ -185,7 +185,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Connects client to provider and returns a client instance for requests to the ors API
         """
         name = cls.__name__
-        name = name.removeprefix("ORS").removesuffix("Algo")
+        name = name.replace("ORS", "").replace("Algo", "")
         agent = f"QGIS_{name}"
 
         providers = configmanager.read_config()["providers"]
