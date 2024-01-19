@@ -282,6 +282,9 @@
              <height>30</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Add start and destination as first and last point.</string>
+           </property>
            <property name="text">
             <string>Add</string>
            </property>

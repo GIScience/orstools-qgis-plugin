@@ -503,6 +503,7 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_preference_combo.setToolTip(_translate("ORStoolsDialogBase", "Preference"))
         self.label_6.setText(_translate("ORStoolsDialogBase", "Start:"))
         self.label_7.setText(_translate("ORStoolsDialogBase", "Destination:"))
+        self.geocode_add.setToolTip(_translate("ORStoolsDialogBase", "Add start and destination as first and last point."))
         self.geocode_add.setText(_translate("ORStoolsDialogBase", "Add"))
         self.routing_fromline_map.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Add wayoints interactively from the map canvas.</p><p>Double-click will terminate waypoint selection.</p></body></html>"))
         self.routing_fromline_clear.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.</p></body></html>"))
