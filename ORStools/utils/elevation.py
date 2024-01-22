@@ -51,10 +51,10 @@ class Elevation:
         self.interval = 100
         self.route = None
 
-        self.base()
+        self.query()
         self.make_image()
 
-    def base(self):
+    def query(self):
         basepath = os.path.dirname(__file__)
 
         # add ors svg path
@@ -192,8 +192,17 @@ Please add polygons to the layer or uncheck avoid polygons.
         Make image from get_profile() output.
         """
         if self.abs_distances and self.elevations:
+            mean_elev = sum(self.elevations) / len(self.elevations)
+            min_elev = min(self.elevations)
+            max_elev = max(self.elevations)
             fig, ax = plt.subplots()
             ax.plot(self.abs_distances, self.elevations, linestyle="-")
+            ax.fill_between(self.abs_distances, self.elevations, 0, alpha=0.1)
+            ax.axhline(y=mean_elev, color='y', linestyle='--', linewidth=1)
+            ax.axhline(y=min_elev, color='g', linestyle='--', linewidth=1)
+            ax.axhline(y=max_elev, color='b', linestyle='--', linewidth=1)
+            ax.grid()
+            ax.legend(fontsize='small')
 
             temp_dir = tempfile.mkdtemp(prefix="ORS_qgis_plugin_")
             temp_image_path = os.path.join(temp_dir, "elevation_profile.jpg")
