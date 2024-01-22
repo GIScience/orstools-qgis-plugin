@@ -248,7 +248,7 @@ class ORStoolsDialogMain:
 
         # add ors svg path
         my_new_path = os.path.join(basepath, "img/svg")
-        svg_paths = QSettings().value("svg/searchPathsForSVG")
+        svg_paths = QSettings().value("svg/searchPathsForSVG") or []
         if my_new_path not in svg_paths:
             svg_paths.append(my_new_path)
             QSettings().setValue("svg/searchPathsForSVG", svg_paths)

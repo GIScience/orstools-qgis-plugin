@@ -34,10 +34,22 @@ RELEASING:
 8. Commit changes with `git commit -m 'chore: release vX.X.X'`
 9. Tag the commit `git tag -a vX.X.X -m "vX.X.X"`
 10. Push release commit and tag 'git push && git push origin vX.X.X'
-11. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*"`
-12. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
-13. Create new release in GitHub with tag version and release title of `vX.X.X`
+11. Make sure that your branch is up to date with 'origin/main' and there are no unstaged changes
+12. In repository root generate the plugin package: `zip -r ORStools-vX.X.X.zip ORStools -x "*__pycache__*" "*.ruff_cache*"`
+13. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
+14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+
+
+## [1.7.1] - 2024-01-15
+
+### Added
+- Add hint to use batch jobs for point layers in tooltip in save vertices button ([#211](https://github.com/GIScience/orstools-qgis-plugin/issues/211))
+
+### Fixed
+- TypeError if no SVGPaths are set ([#212](https://github.com/GIScience/orstools-qgis-plugin/issues/212))
+- replace removesuffix() function with replace() function in base processing algorithm ([#215](https://github.com/GIScience/orstools-qgis-plugin/pull/215))
+- Replace line style with style from QGIS v3.16 to enable correct rendering in older versions ([#218](https://github.com/GIScience/orstools-qgis-plugin/issues/218))
 
 ## [1.7.0] - 2023-12-22
 
@@ -209,7 +221,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.2...v1.5.3
