@@ -261,9 +261,6 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="geocode_dest"/>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_7">
            <property name="text">
@@ -274,21 +271,8 @@
          <item row="0" column="1">
           <widget class="QLineEdit" name="geocode_start"/>
          </item>
-         <item row="2" column="1" alignment="Qt::AlignRight">
-          <widget class="QPushButton" name="geocode_add">
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Add start and destination as first and last point.</string>
-           </property>
-           <property name="text">
-            <string>Add</string>
-           </property>
-          </widget>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="geocode_dest"/>
          </item>
         </layout>
        </item>
@@ -427,7 +411,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>20</height>
+           <height>18</height>
           </size>
          </property>
          <property name="title">
@@ -864,7 +848,7 @@ p, li { white-space: pre-wrap; }
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>20</height>
+       <height>18</height>
       </size>
      </property>
      <property name="title">
