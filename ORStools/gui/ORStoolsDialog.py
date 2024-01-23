@@ -514,8 +514,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     completer.complete()
 
                 else:
-                    # Still to be improved
-                    print(error_code)
+                    raise ConnectionError('Error while trying to request geocoding autocomplete.')
             else:
                 QMessageBox.critical(
                     self,
