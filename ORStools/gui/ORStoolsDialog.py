@@ -34,7 +34,7 @@ import processing
 import webbrowser
 
 from PyQt5.QtNetwork import QNetworkRequest
-from qgis._core import Qgis
+from qgis._core import Qgis, QgsCoordinateTransform
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -498,7 +498,15 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     completer.activated.disconnect()
                     lineEdit.setText("")
 
-                url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={lineEdit.text()}&sources=geonames"
+                e = self._iface.mapCanvas().extent()
+                lat = e.xMinimum() + (e.yMaximum() - e.xMinimum())/2
+                sourceCrs = QgsCoordinateReferenceSystem(3857)
+                destCrs = QgsCoordinateReferenceSystem(4326)
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                middle = tr.transform(QgsPointXY(0,lat))
+
+
+                url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={lineEdit.text()}&sources=geonames&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
                 request = QgsBlockingNetworkRequest()
                 error_code = request.get(QNetworkRequest(QUrl(url)))
                 if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
