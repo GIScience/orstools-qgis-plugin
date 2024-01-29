@@ -47,7 +47,7 @@ from qgis.core import (
 from qgis.gui import QgsMapCanvasAnnotationItem
 
 from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt
-from PyQt5.QtGui import QIcon, QTextDocument, QColor, QGuiApplication
+from PyQt5.QtGui import QIcon, QTextDocument, QColor
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
 from ORStools import (

@@ -83,6 +83,7 @@ class LineTool(QgsMapToolEmitPoint):
         # Make tooltip look like marker
         self.pointPressed.emit(e.pos())
 
-    mouseMoved = pyqtSignal(['QPoint'])
+    mouseMoved = pyqtSignal(["QPoint"])
+
     def canvasMoveEvent(self, e):
         self.mouseMoved.emit(e.pos())
