@@ -46,8 +46,8 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
-from PyQt5.QtGui import QIcon, QTextDocument, QColor
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt
+from PyQt5.QtGui import QIcon, QTextDocument, QColor, QGuiApplication
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
 from ORStools import (
@@ -348,6 +348,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         self.moving = None
         self.moved_idxs = 0
+        self.click_dist = 10
 
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""
@@ -441,8 +442,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             lambda point, idx: self._on_movetool_map_release(point, idx)
         )
         self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
+        self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
-    def _on_movetool_map_press(self, pos, click_dist=15):
+    def change_cursor_on_hover(self, pos):
+        idx = self.check_annotation_hover(pos)
+        if idx:
+            QApplication.setOverrideCursor(Qt.OpenHandCursor)
+        else:
+            if not self.moving:
+                QApplication.restoreOverrideCursor()
+
+    def check_annotation_hover(self, pos):
         click = Point(pos.x(), pos.y())
         dists = {}
         for i, anno in enumerate(self.annotations):
@@ -453,12 +463,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             dist = click.distance(p)
             if dist > 0:
                 dists[dist] = anno
-        if dists and min(dists) < click_dist:
+        if dists and min(dists) < self.click_dist:
+            idx = dists[min(dists)]
+            return idx
+
+    def _on_movetool_map_press(self, pos):
+        idx = self.check_annotation_hover(pos)
+        if idx:
+            QApplication.setOverrideCursor(Qt.ClosedHandCursor)
             if self.rubber_band:
                 self.rubber_band.reset()
-            idx = dists[min(dists)]
             self.move_i = self.annotations.index(idx)
-            # self.routing_fromline_list.takeItem(self.move_i)
             self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
             self.moving = True
 
@@ -485,6 +500,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 item = f"Point {i}:{coords}"
                 self.routing_fromline_list.addItem(item)
             self.moved_idxs += 1
+            QApplication.restoreOverrideCursor()
 
         else:
             idx -= self.moved_idxs
@@ -548,6 +564,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         Populate line list widget with coordinates, end point moving and show dialog again.
         """
         self.moved_idxs = 0
+        self.line_tool.mouseMoved.disconnect()
         self.line_tool.pointPressed.disconnect()
         self.line_tool.doubleClicked.disconnect()
         self.line_tool.pointReleased.disconnect()
