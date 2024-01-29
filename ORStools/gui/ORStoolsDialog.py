@@ -347,6 +347,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
         self.moving = None
+        self.moved_idxs = 0
 
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""
@@ -436,8 +437,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
         self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.line_tool.pointReleased.connect(lambda point, idx: self.create_vertex(point, idx))
-        self.line_tool.pointReleased.connect(lambda point: self._on_movetool_map_release(point))
+        self.line_tool.pointReleased.connect(lambda point, idx: self._on_movetool_map_release(point, idx))
         self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
 
     def _on_movetool_map_press(self, pos, click_dist=15):
@@ -456,10 +456,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 self.rubber_band.reset()
             idx = dists[min(dists)]
             self.move_i = self.annotations.index(idx)
+            # self.routing_fromline_list.takeItem(self.move_i)
             self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
             self.moving = True
 
-    def _on_movetool_map_release(self, point):
+    def _on_movetool_map_release(self, point, idx):
         if self.moving:
             crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
@@ -477,10 +478,15 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             items[self.move_i] = f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
 
             self.routing_fromline_list.clear()
-            for idx, x in enumerate(items):
+            for i, x in enumerate(items):
                 coords = x.split(":")[1]
-                item = f"Point {idx}:{coords}"
+                item = f"Point {i}:{coords}"
                 self.routing_fromline_list.addItem(item)
+            self.moved_idxs += 1
+
+        else:
+            idx -= self.moved_idxs
+            self.create_vertex(point, idx)
 
         if self.routing_fromline_list.count() > 1:
             self.create_rubber_band()
@@ -537,7 +543,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         """
         Populate line list widget with coordinates, end point moving and show dialog again.
         """
-
+        self.moved_idxs = 0
         self.line_tool.pointPressed.disconnect()
         self.line_tool.doubleClicked.disconnect()
         self.line_tool.pointReleased.disconnect()
