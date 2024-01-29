@@ -437,7 +437,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
         self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.line_tool.pointReleased.connect(lambda point, idx: self._on_movetool_map_release(point, idx))
+        self.line_tool.pointReleased.connect(
+            lambda point, idx: self._on_movetool_map_release(point, idx)
+        )
         self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
 
     def _on_movetool_map_press(self, pos, click_dist=15):
