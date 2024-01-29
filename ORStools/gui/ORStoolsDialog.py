@@ -254,6 +254,8 @@ class ORStoolsDialogMain:
         route_layer = router.route_as_layer(self.dlg)
         self.project.addMapLayer(route_layer)
 
+        self.dlg.moved_idxs = 0
+
         basepath = os.path.dirname(__file__)
 
         # add ors svg path
