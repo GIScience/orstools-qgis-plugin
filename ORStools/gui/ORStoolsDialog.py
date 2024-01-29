@@ -498,7 +498,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.rubber_band.reset()
         route_layer = router.route_as_layer(self)
         self.rubber_band = QgsRubberBand(self._iface.mapCanvas(), QgsWkbTypes.LineGeometry)
-        self.rubber_band.setStrokeColor(QColor(ROUTE_COLOR))
+        color = QColor(ROUTE_COLOR)
+        color.setAlpha(100)
+        self.rubber_band.setStrokeColor(color)
         self.rubber_band.setWidth(5)
 
         features = route_layer.getFeatures()
