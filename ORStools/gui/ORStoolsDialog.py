@@ -32,7 +32,7 @@ import os
 import processing
 import webbrowser
 
-from qgis._core import Qgis, QgsWkbTypes
+from qgis._core import Qgis, QgsWkbTypes, QgsCoordinateTransform
 from qgis._gui import QgsRubberBand
 from qgis.core import (
     QgsProject,
@@ -508,25 +508,43 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             idx -= self.moved_idxs
             self.create_vertex(point, idx)
 
-        if self.routing_fromline_list.count() > 1:
-            self.create_rubber_band()
-
+        if self.routing_fromline_list.count() > 1 and self.toggle_preview.isChecked():
+            self.create_rubber_band(True)
+            self.moving = False
+        elif self.routing_fromline_list.count() > 1:
+            self.create_rubber_band(False)
             self.moving = False
 
-    def create_rubber_band(self):
+    def create_rubber_band(self, preview=False):
         if self.rubber_band:
             self.rubber_band.reset()
-        route_layer = router.route_as_layer(self)
         self.rubber_band = QgsRubberBand(self._iface.mapCanvas(), QgsWkbTypes.LineGeometry)
         color = QColor(ROUTE_COLOR)
         color.setAlpha(100)
         self.rubber_band.setStrokeColor(color)
         self.rubber_band.setWidth(5)
-
-        features = route_layer.getFeatures()
-        for feature in features:
+        if preview:
+            route_layer = router.route_as_layer(self)
+            feature = next(route_layer.getFeatures())
             self.rubber_band.addGeometry(feature.geometry(), route_layer)
-        self.rubber_band.show()
+            self.rubber_band.show()
+        else:
+            dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+            original_crs = QgsCoordinateReferenceSystem('EPSG:4326')
+            transform = QgsCoordinateTransform(original_crs, dest_crs, QgsProject.instance())
+            items = [
+                self.routing_fromline_list.item(x).text()
+                for x in range(self.routing_fromline_list.count())
+            ]
+            split = [x.split(":")[1] for x in items]
+            coords = [tuple(map(float, coord.split(', '))) for coord in split]
+            points_xy = [QgsPointXY(x, y) for x, y in coords]
+            reprojected_point = [transform.transform(point) for point in points_xy]
+            for point in reprojected_point:
+                if point == reprojected_point[-1]:
+                    self.rubber_band.addPoint(point, True)
+                self.rubber_band.addPoint(point, False)
+            self.rubber_band.show()
 
     def create_vertex(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""

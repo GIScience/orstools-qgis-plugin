@@ -701,6 +701,16 @@ p, li { white-space: pre-wrap; }
             </layout>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="toggle_preview">
+            <property name="text">
+             <string>Live preview</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
