@@ -26,7 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-
+import json
 import os
 
 import processing
@@ -520,22 +520,30 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 self.create_rubber_band()
                 self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
-            except ApiError:
-                self.error_idxs += 1
-                self.moving = False
-                self.routing_fromline_list.clear()
-                for i, x in enumerate(backup):
-                    coords = x.split(":")[1]
-                    item = f"Point {i}:{coords}"
-                    self.routing_fromline_list.addItem(item)
-                self._reindex_list_items()
-                QMessageBox.warning(
-                    self,
-                    "Please use a different point",
-                    """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
-                )
-                self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-                self.moved_idxs -= 1
+            except ApiError as e:
+                json_start_index = e.message.find("{")
+                json_end_index = e.message.rfind("}") + 1
+                json_str = e.message[json_start_index:json_end_index]
+                error_dict = json.loads(json_str)
+                error_code = error_dict["error"]["code"]
+                if error_code == 2010:
+                    self.error_idxs += 1
+                    self.moving = False
+                    self.routing_fromline_list.clear()
+                    for i, x in enumerate(backup):
+                        coords = x.split(":")[1]
+                        item = f"Point {i}:{coords}"
+                        self.routing_fromline_list.addItem(item)
+                    self._reindex_list_items()
+                    QMessageBox.warning(
+                        self,
+                        "Please use a different point",
+                        """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+                    )
+                    self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
+                    self.moved_idxs -= 1
+                else:
+                    raise e
 
         else:
             try:
@@ -546,23 +554,31 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 if self.routing_fromline_list.count() > 1:
                     self.create_rubber_band()
                     self.moving = False
-            except ApiError:
-                self.error_idxs += 1
-                num = len(self.routing_fromline_list) - 1
+            except ApiError as e:
+                json_start_index = e.message.find("{")
+                json_end_index = e.message.rfind("}") + 1
+                json_str = e.message[json_start_index:json_end_index]
+                error_dict = json.loads(json_str)
+                error_code = error_dict["error"]["code"]
+                if error_code == 2010:
+                    self.error_idxs += 1
+                    num = len(self.routing_fromline_list) - 1
 
-                if num < 2:
-                    self.routing_fromline_list.clear()
-                    for annotation in self.annotations:
-                        self.project.annotationManager().removeAnnotation(annotation)
-                    self.annotations = []
+                    if num < 2:
+                        self.routing_fromline_list.clear()
+                        for annotation in self.annotations:
+                            self.project.annotationManager().removeAnnotation(annotation)
+                        self.annotations = []
+                    else:
+                        self.routing_fromline_list.takeItem(num)
+                        self.create_rubber_band()
+                    QMessageBox.warning(
+                        self,
+                        "Please use a different point",
+                        """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+                    )
                 else:
-                    self.routing_fromline_list.takeItem(num)
-                    self.create_rubber_band()
-                QMessageBox.warning(
-                    self,
-                    "Please use a different point",
-                    """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
-                )
+                    raise e
 
     def create_rubber_band(self):
         if self.rubber_band:
