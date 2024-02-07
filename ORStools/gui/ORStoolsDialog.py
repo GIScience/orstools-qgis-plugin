@@ -72,6 +72,8 @@ from . import resources_rc  # noqa: F401
 
 from shapely.geometry import Point
 
+from ..utils.exceptions import ApiError
+
 
 def on_config_click(parent):
     """Pop up provider config window. Outside of classes because it's accessed by multiple dialogs.
@@ -350,6 +352,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         self.moving = None
         self.moved_idxs = 0
+        self.error_idxs = 0
         self.click_dist = 10
 
     def _save_vertices_to_layer(self):
@@ -407,8 +410,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.line_tool.deactivate()
 
     def _linetool_annotate_point(self, point, idx, crs=None):
-        if not crs:
-            crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+
+        if crs:
+            transform = QgsCoordinateTransform(crs, dest_crs, QgsProject.instance())
+            point = transform.transform(point)
 
         annotation = QgsTextAnnotation()
 
@@ -421,7 +427,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation.setFrameSizeMm(QSizeF(7, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
         annotation.setMapPosition(point)
-        annotation.setMapPositionCrs(crs)
+        annotation.setMapPositionCrs(dest_crs)
 
         return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
 
@@ -460,7 +466,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         for i, anno in enumerate(self.annotations):
             x, y = anno.mapPosition()
             mapcanvas = self._iface.mapCanvas()
-            point = mapcanvas.getCoordinateTransform().transform(x, y)
+            point = mapcanvas.getCoordinateTransform().transform(x, y)  # die ist es
             p = Point(point.x(), point.y())
             dist = click.distance(p)
             if dist > 0:
@@ -472,6 +478,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     def _on_movetool_map_press(self, pos):
         idx = self.check_annotation_hover(pos)
         if idx:
+            self.line_tool.mouseMoved.disconnect()
             QApplication.setOverrideCursor(Qt.ClosedHandCursor)
             if self.rubber_band:
                 self.rubber_band.reset()
@@ -481,41 +488,81 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_movetool_map_release(self, point, idx):
         if self.moving:
-            crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+            try:
+                self.moving = False
+                QApplication.restoreOverrideCursor()
+                crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
-            annotation = self._linetool_annotate_point(point, self.move_i, crs=crs)
-            self.annotations.insert(self.move_i, annotation)
-            self.project.annotationManager().addAnnotation(annotation)
+                annotation = self._linetool_annotate_point(point, self.move_i, crs=crs)
+                self.annotations.insert(self.move_i, annotation)
+                self.project.annotationManager().addAnnotation(annotation)
 
-            transformer = transform.transformToWGS(crs)
-            point_wgs = transformer.transform(point)
+                transformer = transform.transformToWGS(crs)
+                point_wgs = transformer.transform(point)
 
-            items = [
-                self.routing_fromline_list.item(x).text()
-                for x in range(self.routing_fromline_list.count())
-            ]
-            items[self.move_i] = f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
+                items = [
+                    self.routing_fromline_list.item(x).text()
+                    for x in range(self.routing_fromline_list.count())
+                ]
+                backup = items.copy()
+                items[
+                    self.move_i
+                ] = f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
+                self.moved_idxs += 1
 
-            self.routing_fromline_list.clear()
-            for i, x in enumerate(items):
-                coords = x.split(":")[1]
-                item = f"Point {i}:{coords}"
-                self.routing_fromline_list.addItem(item)
-            self.moved_idxs += 1
-            QApplication.restoreOverrideCursor()
+                self.routing_fromline_list.clear()
+                for i, x in enumerate(items):
+                    coords = x.split(":")[1]
+                    item = f"Point {i}:{coords}"
+                    self.routing_fromline_list.addItem(item)
+                self.create_rubber_band()
+                self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
+
+            except ApiError:
+                self.error_idxs += 1
+                self.moving = False
+                self.routing_fromline_list.clear()
+                for i, x in enumerate(backup):
+                    coords = x.split(":")[1]
+                    item = f"Point {i}:{coords}"
+                    self.routing_fromline_list.addItem(item)
+                self._reindex_list_items()
+                QMessageBox.warning(
+                    self,
+                    "Please use a different point",
+                    """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+                )
+                self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
+                self.moved_idxs -= 1
 
         else:
-            idx -= self.moved_idxs
-            self.create_vertex(point, idx)
+            try:
+                idx -= self.moved_idxs
+                idx -= self.error_idxs
+                self.create_vertex(point, idx)
 
-        if self.routing_fromline_list.count() > 1 and self.toggle_preview.isChecked():
-            self.create_rubber_band(True)
-            self.moving = False
-        elif self.routing_fromline_list.count() > 1:
-            self.create_rubber_band(False)
-            self.moving = False
+                if self.routing_fromline_list.count() > 1:
+                    self.create_rubber_band()
+                    self.moving = False
+            except ApiError:
+                self.error_idxs += 1
+                num = len(self.routing_fromline_list) - 1
 
-    def create_rubber_band(self, preview=False):
+                if num < 2:
+                    self.routing_fromline_list.clear()
+                    for annotation in self.annotations:
+                        self.project.annotationManager().removeAnnotation(annotation)
+                    self.annotations = []
+                else:
+                    self.routing_fromline_list.takeItem(num)
+                    self.create_rubber_band()
+                QMessageBox.warning(
+                    self,
+                    "Please use a different point",
+                    """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+                )
+
+    def create_rubber_band(self):
         if self.rubber_band:
             self.rubber_band.reset()
         self.rubber_band = QgsRubberBand(self._iface.mapCanvas(), QgsWkbTypes.LineGeometry)
@@ -523,21 +570,21 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         color.setAlpha(100)
         self.rubber_band.setStrokeColor(color)
         self.rubber_band.setWidth(5)
-        if preview:
+        if self.toggle_preview.isChecked():
             route_layer = router.route_as_layer(self)
             feature = next(route_layer.getFeatures())
             self.rubber_band.addGeometry(feature.geometry(), route_layer)
             self.rubber_band.show()
         else:
             dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
-            original_crs = QgsCoordinateReferenceSystem('EPSG:4326')
+            original_crs = QgsCoordinateReferenceSystem("EPSG:4326")
             transform = QgsCoordinateTransform(original_crs, dest_crs, QgsProject.instance())
             items = [
                 self.routing_fromline_list.item(x).text()
                 for x in range(self.routing_fromline_list.count())
             ]
             split = [x.split(":")[1] for x in items]
-            coords = [tuple(map(float, coord.split(', '))) for coord in split]
+            coords = [tuple(map(float, coord.split(", "))) for coord in split]
             points_xy = [QgsPointXY(x, y) for x, y in coords]
             reprojected_point = [transform.transform(point) for point in points_xy]
             for point in reprojected_point:
@@ -554,7 +601,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         point_wgs = transformer.transform(point)
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
-        annotation = self._linetool_annotate_point(point, idx)
+        crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        annotation = self._linetool_annotate_point(point, idx, crs)
         self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
 
@@ -584,6 +632,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         Populate line list widget with coordinates, end point moving and show dialog again.
         """
         self.moved_idxs = 0
+        self.error_idxs = 0
+        self._reindex_list_items()
         self.line_tool.mouseMoved.disconnect()
         self.line_tool.pointPressed.disconnect()
         self.line_tool.doubleClicked.disconnect()
