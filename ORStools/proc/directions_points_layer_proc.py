@@ -151,11 +151,10 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         elif QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.MultiPoint:
             # loop through multipoint features
             for feat in sorted(source.getFeatures(), key=sort):
-                points = list()
                 for point in feat.geometry().asMultiPoint():
-                    points.append(x_former.transform(QgsPointXY(point)))
-                input_points.append(points)
+                    input_points.append(x_former.transform(QgsPointXY(point)))
                 from_values.append(feat[source_field_name] if source_field_name else None)
+            input_points = [input_points]
 
         for num, (points, from_value) in enumerate(zip(input_points, from_values)):
             # Stop the algorithm if cancel button has been clicked
