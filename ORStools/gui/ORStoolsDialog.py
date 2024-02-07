@@ -443,6 +443,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     def _on_linetool_init(self):
         """Hides GUI dialog, inits line maptool and add items to line list box."""
         self.hide()
+        self._clear_annotations()
+        self.routing_fromline_list.clear()
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
         self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
