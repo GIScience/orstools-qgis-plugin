@@ -26,13 +26,14 @@
  *                                                                         *
  ***************************************************************************/
 """
-
 import json
 import os
+
 import processing
 import webbrowser
 
-from qgis._core import Qgis
+from qgis._core import Qgis, QgsWkbTypes, QgsCoordinateTransform
+from qgis._gui import QgsRubberBand
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -45,31 +46,33 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
-from PyQt5.QtGui import QIcon, QTextDocument
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings, Qt
+from PyQt5.QtGui import QIcon, QTextDocument, QColor
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
 from ORStools import (
     RESOURCE_PREFIX,
     PLUGIN_NAME,
     DEFAULT_COLOR,
+    ROUTE_COLOR,
     __version__,
     __email__,
     __web__,
     __help__,
 )
 from ORStools.common import (
-    client,
-    directions_core,
     PROFILES,
     PREFERENCES,
 )
-from ORStools.gui import directions_gui
-from ORStools.utils import exceptions, maptools, logger, configmanager, transform
+from ORStools.utils import maptools, configmanager, transform, router
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
 from . import resources_rc  # noqa: F401
+
+from shapely.geometry import Point
+
+from ..utils.exceptions import ApiError
 
 
 def on_config_click(parent):
@@ -238,10 +241,22 @@ class ORStoolsDialogMain:
 
     def run_gui_control(self):
         """Slot function for OK button of main dialog."""
+        # Associate annotations with map layer, so they get deleted when layer is deleted
+        for annotation in self.dlg.annotations:
+            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
+            # , you can change order after optimization
+            # Then in theory, when the layer is remove, the annotation is removed as well
+            # Doesn't work though, the annotations are still there when project is re-opened
+            # annotation.setMapLayer(layer_out)
+            self.project.annotationManager().removeAnnotation(annotation)
+        self.dlg.annotations = []
+        if self.dlg.rubber_band:
+            self.dlg.rubber_band.reset()
 
-        layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
-        layer_out.dataProvider().addAttributes(directions_core.get_fields())
-        layer_out.updateFields()
+        route_layer = router.route_as_layer(self.dlg)
+        self.project.addMapLayer(route_layer)
+
+        self.dlg.moved_idxs = 0
 
         basepath = os.path.dirname(__file__)
 
@@ -254,131 +269,10 @@ class ORStoolsDialogMain:
 
         # style output layer
         qml_path = os.path.join(basepath, "linestyle.qml")
-        layer_out.loadNamedStyle(qml_path, True)
-        layer_out.triggerRepaint()
+        route_layer.loadNamedStyle(qml_path, True)
+        route_layer.triggerRepaint()
 
-        # Associate annotations with map layer, so they get deleted when layer is deleted
-        for annotation in self.dlg.annotations:
-            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
-            # , you can change order after optimization
-            # Then in theory, when the layer is remove, the annotation is removed as well
-            # Doesn't work though, the annotations are still there when project is re-opened
-            # annotation.setMapLayer(layer_out)
-            self.project.annotationManager().removeAnnotation(annotation)
-        self.dlg.annotations = []
-
-        provider_id = self.dlg.provider_combo.currentIndex()
-        provider = configmanager.read_config()["providers"][provider_id]
-
-        # if there are no coordinates, throw an error message
-        if not self.dlg.routing_fromline_list.count():
-            QMessageBox.critical(
-                self.dlg,
-                "Missing Waypoints",
-                """
-                Did you forget to set routing waypoints?<br><br>
-                
-                Use the 'Add Waypoint' button to add up to 50 waypoints.
-                """,
-            )
-            return
-
-        # if no API key is present, when ORS is selected, throw an error message
-        if not provider["key"] and provider["base_url"].startswith(
-            "https://api.openrouteservice.org"
-        ):
-            QMessageBox.critical(
-                self.dlg,
-                "Missing API key",
-                """
-                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
-                
-                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
-                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
-            )
-            return
-
-        agent = "QGIS_ORStoolsDialog"
-        clnt = client.Client(provider, agent)
-        clnt_msg = ""
-
-        directions = directions_gui.Directions(self.dlg)
-        params = None
-        try:
-            params = directions.get_parameters()
-            if self.dlg.optimization_group.isChecked():
-                if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
-                    QMessageBox.critical(
-                        self.dlg,
-                        "Wrong number of waypoints",
-                        """At least 3 or 4 waypoints are needed to perform routing optimization. 
-
-Remember, the first and last location are not part of the optimization.
-                        """,
-                    )
-                    return
-                response = clnt.request("/optimization", {}, post_json=params)
-                feat = directions_core.get_output_features_optimization(
-                    response, params["vehicles"][0]["profile"]
-                )
-            else:
-                params["coordinates"] = directions.get_request_line_feature()
-                profile = self.dlg.routing_travel_combo.currentText()
-                # abort on empty avoid polygons layer
-                if (
-                    "options" in params
-                    and "avoid_polygons" in params["options"]
-                    and params["options"]["avoid_polygons"] == {}
-                ):
-                    QMessageBox.warning(
-                        self.dlg,
-                        "Empty layer",
-                        """
-The specified avoid polygon(s) layer does not contain any features.
-Please add polygons to the layer or uncheck avoid polygons.
-                        """,
-                    )
-                    msg = "The request has been aborted!"
-                    logger.log(msg, 0)
-                    self.dlg.debug_text.setText(msg)
-                    return
-                response = clnt.request(
-                    "/v2/directions/" + profile + "/geojson", {}, post_json=params
-                )
-                feat = directions_core.get_output_feature_directions(
-                    response, profile, params["preference"], directions.options
-                )
-
-            layer_out.dataProvider().addFeature(feat)
-
-            layer_out.updateExtents()
-            self.project.addMapLayer(layer_out)
-
-            # Update quota; handled in client module after successful request
-            # if provider.get('ENV_VARS'):
-            #     self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
-        except exceptions.Timeout:
-            msg = "The connection has timed out!"
-            logger.log(msg, 2)
-            self.dlg.debug_text.setText(msg)
-            return
-
-        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
-            clnt_msg += f"<b>{e.__class__.__name__}</b>: ({str(e)})<br>"
-            raise
-
-        except Exception as e:
-            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
-            clnt_msg += f"<b>{e.__class__.__name__}</b>: {str(e)}<br>"
-            raise
-
-        finally:
-            # Set URL in debug window
-            if params:
-                clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
-            self.dlg.debug_text.setHtml(clnt_msg)
+        self.dlg.routing_fromline_list.clear()
 
     def tr(self, string):
         return QCoreApplication.translate(str(self.__class__.__name__), string)
@@ -405,6 +299,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool = None
         self.last_maptool = self._iface.mapCanvas().mapTool()
         self.annotations = []
+        self.rubber_band = None
 
         # Set up env variables for remaining quota
         os.environ["ORS_QUOTA"] = "None"
@@ -454,6 +349,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+        self.moving = None
+        self.moved_idxs = 0
+        self.error_idxs = 0
+        self.click_dist = 10
 
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""
@@ -505,13 +405,16 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.clear()
             self._clear_annotations()
 
-        # Remove blue lines (rubber band)
-        if self.line_tool:
-            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
+        if self.rubber_band:
+            self.rubber_band.reset()
+            self.line_tool.deactivate()
 
     def _linetool_annotate_point(self, point, idx, crs=None):
-        if not crs:
-            crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+
+        if crs:
+            transform = QgsCoordinateTransform(crs, dest_crs, QgsProject.instance())
+            point = transform.transform(point)
 
         annotation = QgsTextAnnotation()
 
@@ -524,7 +427,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation.setFrameSizeMm(QSizeF(7, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
         annotation.setMapPosition(point)
-        annotation.setMapPositionCrs(crs)
+        annotation.setMapPositionCrs(dest_crs)
 
         return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
 
@@ -534,26 +437,182 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
+        if self.rubber_band:
+            self.rubber_band.reset()
 
     def _on_linetool_init(self):
         """Hides GUI dialog, inits line maptool and add items to line list box."""
-        # Remove blue lines (rubber band)
-        if self.line_tool:
-            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
-
         self.hide()
-        self.routing_fromline_list.clear()
-        # Remove all annotations which were added (if any)
         self._clear_annotations()
-
+        self.routing_fromline_list.clear()
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
-        self.line_tool.pointDrawn.connect(
-            lambda point, idx: self._on_linetool_map_click(point, idx)
+        self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
+        self.line_tool.pointReleased.connect(
+            lambda point, idx: self._on_movetool_map_release(point, idx)
         )
-        self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
+        self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
+        self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
-    def _on_linetool_map_click(self, point, idx):
+    def change_cursor_on_hover(self, pos):
+        idx = self.check_annotation_hover(pos)
+        if idx:
+            QApplication.setOverrideCursor(Qt.OpenHandCursor)
+        else:
+            if not self.moving:
+                QApplication.restoreOverrideCursor()
+
+    def check_annotation_hover(self, pos):
+        click = Point(pos.x(), pos.y())
+        dists = {}
+        for i, anno in enumerate(self.annotations):
+            x, y = anno.mapPosition()
+            mapcanvas = self._iface.mapCanvas()
+            point = mapcanvas.getCoordinateTransform().transform(x, y)  # die ist es
+            p = Point(point.x(), point.y())
+            dist = click.distance(p)
+            if dist > 0:
+                dists[dist] = anno
+        if dists and min(dists) < self.click_dist:
+            idx = dists[min(dists)]
+            return idx
+
+    def _on_movetool_map_press(self, pos):
+        idx = self.check_annotation_hover(pos)
+        if idx:
+            self.line_tool.mouseMoved.disconnect()
+            QApplication.setOverrideCursor(Qt.ClosedHandCursor)
+            if self.rubber_band:
+                self.rubber_band.reset()
+            self.move_i = self.annotations.index(idx)
+            self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
+            self.moving = True
+
+    def _on_movetool_map_release(self, point, idx):
+        if self.moving:
+            try:
+                self.moving = False
+                QApplication.restoreOverrideCursor()
+                crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+
+                annotation = self._linetool_annotate_point(point, self.move_i, crs=crs)
+                self.annotations.insert(self.move_i, annotation)
+                self.project.annotationManager().addAnnotation(annotation)
+
+                transformer = transform.transformToWGS(crs)
+                point_wgs = transformer.transform(point)
+
+                items = [
+                    self.routing_fromline_list.item(x).text()
+                    for x in range(self.routing_fromline_list.count())
+                ]
+                backup = items.copy()
+                items[
+                    self.move_i
+                ] = f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
+                self.moved_idxs += 1
+
+                self.routing_fromline_list.clear()
+                for i, x in enumerate(items):
+                    coords = x.split(":")[1]
+                    item = f"Point {i}:{coords}"
+                    self.routing_fromline_list.addItem(item)
+                self.create_rubber_band()
+                self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
+
+            except ApiError as e:
+                json_start_index = e.message.find("{")
+                json_end_index = e.message.rfind("}") + 1
+                json_str = e.message[json_start_index:json_end_index]
+                error_dict = json.loads(json_str)
+                error_code = error_dict["error"]["code"]
+                if error_code == 2010:
+                    self.error_idxs += 1
+                    self.moving = False
+                    self.routing_fromline_list.clear()
+                    for i, x in enumerate(backup):
+                        coords = x.split(":")[1]
+                        item = f"Point {i}:{coords}"
+                        self.routing_fromline_list.addItem(item)
+                    self._reindex_list_items()
+                    QMessageBox.warning(
+                        self,
+                        "Please use a different point",
+                        """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+                    )
+                    self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
+                    self.moved_idxs -= 1
+                else:
+                    raise e
+
+        else:
+            try:
+                idx -= self.moved_idxs
+                idx -= self.error_idxs
+                self.create_vertex(point, idx)
+
+                if self.routing_fromline_list.count() > 1:
+                    self.create_rubber_band()
+                    self.moving = False
+            except ApiError as e:
+                json_start_index = e.message.find("{")
+                json_end_index = e.message.rfind("}") + 1
+                json_str = e.message[json_start_index:json_end_index]
+                error_dict = json.loads(json_str)
+                error_code = error_dict["error"]["code"]
+                if error_code == 2010:
+                    self.error_idxs += 1
+                    num = len(self.routing_fromline_list) - 1
+
+                    if num < 2:
+                        self.routing_fromline_list.clear()
+                        for annotation in self.annotations:
+                            self.project.annotationManager().removeAnnotation(annotation)
+                        self.annotations = []
+                    else:
+                        self.routing_fromline_list.takeItem(num)
+                        self.create_rubber_band()
+                    QMessageBox.warning(
+                        self,
+                        "Please use a different point",
+                        """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+                    )
+                else:
+                    raise e
+
+    def create_rubber_band(self):
+        if self.rubber_band:
+            self.rubber_band.reset()
+        self.rubber_band = QgsRubberBand(self._iface.mapCanvas(), QgsWkbTypes.LineGeometry)
+        color = QColor(ROUTE_COLOR)
+        color.setAlpha(100)
+        self.rubber_band.setStrokeColor(color)
+        self.rubber_band.setWidth(5)
+        if self.toggle_preview.isChecked():
+            route_layer = router.route_as_layer(self)
+            if route_layer:
+                feature = next(route_layer.getFeatures())
+                self.rubber_band.addGeometry(feature.geometry(), route_layer)
+                self.rubber_band.show()
+        else:
+            dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+            original_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            transform = QgsCoordinateTransform(original_crs, dest_crs, QgsProject.instance())
+            items = [
+                self.routing_fromline_list.item(x).text()
+                for x in range(self.routing_fromline_list.count())
+            ]
+            split = [x.split(":")[1] for x in items]
+            coords = [tuple(map(float, coord.split(", "))) for coord in split]
+            points_xy = [QgsPointXY(x, y) for x, y in coords]
+            reprojected_point = [transform.transform(point) for point in points_xy]
+            for point in reprojected_point:
+                if point == reprojected_point[-1]:
+                    self.rubber_band.addPoint(point, True)
+                self.rubber_band.addPoint(point, False)
+            self.rubber_band.show()
+
+    def create_vertex(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
         map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
@@ -561,7 +620,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         point_wgs = transformer.transform(point)
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
-        annotation = self._linetool_annotate_point(point, idx)
+        crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        annotation = self._linetool_annotate_point(point, idx, crs)
         self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
 
@@ -584,14 +644,19 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             annotation = self._linetool_annotate_point(point, idx, crs)
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
+        self.create_rubber_band()
 
-    def _on_linetool_map_doubleclick(self):
+    def _on_line_tool_map_doubleclick(self):
         """
-        Populate line list widget with coordinates, end line drawing and show dialog again.
+        Populate line list widget with coordinates, end point moving and show dialog again.
         """
-
-        self.line_tool.pointDrawn.disconnect()
+        self.moved_idxs = 0
+        self.error_idxs = 0
+        self._reindex_list_items()
+        self.line_tool.mouseMoved.disconnect()
+        self.line_tool.pointPressed.disconnect()
         self.line_tool.doubleClicked.disconnect()
+        self.line_tool.pointReleased.disconnect()
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()

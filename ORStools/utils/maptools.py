@@ -27,13 +27,9 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
+from qgis.gui import QgsMapToolEmitPoint
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QColor
-
-from ORStools import DEFAULT_COLOR
 
 
 class LineTool(QgsMapToolEmitPoint):
@@ -47,12 +43,6 @@ class LineTool(QgsMapToolEmitPoint):
         self.canvas = canvas
         QgsMapToolEmitPoint.__init__(self, self.canvas)
 
-        self.rubberBand = QgsRubberBand(
-            mapCanvas=self.canvas, geometryType=QgsWkbTypes.LineGeometry
-        )
-        self.rubberBand.setStrokeColor(QColor(DEFAULT_COLOR))
-        self.rubberBand.setWidth(3)
-
         self.crsSrc = self.canvas.mapSettings().destinationCrs()
         self.previous_point = None
         self.points = []
@@ -62,9 +52,9 @@ class LineTool(QgsMapToolEmitPoint):
         """reset rubber band and captured points."""
 
         self.points = []
-        self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
+        # self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
 
-    pointDrawn = pyqtSignal(["QgsPointXY", "int"])
+    pointReleased = pyqtSignal(["QgsPointXY", "int"])
 
     def canvasReleaseEvent(self, e):
         """Add marker to canvas and shows line."""
@@ -72,27 +62,28 @@ class LineTool(QgsMapToolEmitPoint):
         self.points.append(new_point)
 
         # noinspection PyUnresolvedReferences
-        self.pointDrawn.emit(new_point, self.points.index(new_point))
-        self.showLine()
-
-    def showLine(self):
-        """Builds rubber band from all points and adds it to the map canvas."""
-        self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
-        for point in self.points:
-            if point == self.points[-1]:
-                self.rubberBand.addPoint(point, True)
-            self.rubberBand.addPoint(point, False)
-        self.rubberBand.show()
-
-    doubleClicked = pyqtSignal()
+        self.pointReleased.emit(new_point, self.points.index(new_point))
 
     # noinspection PyUnusedLocal
     def canvasDoubleClickEvent(self, e):
         """Ends line drawing and deletes rubber band and markers from map canvas."""
         # noinspection PyUnresolvedReferences
         self.doubleClicked.emit()
-        self.canvas.scene().removeItem(self.rubberBand)
+        # self.canvas.scene().removeItem(self.rubberBand)
+
+    doubleClicked = pyqtSignal()
 
     def deactivate(self):
         super(LineTool, self).deactivate()
         self.deactivated.emit()
+
+    pointPressed = pyqtSignal(["QPoint"])
+
+    def canvasPressEvent(self, e):
+        # Make tooltip look like marker
+        self.pointPressed.emit(e.pos())
+
+    mouseMoved = pyqtSignal(["QPoint"])
+
+    def canvasMoveEvent(self, e):
+        self.mouseMoved.emit(e.pos())
