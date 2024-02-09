@@ -590,9 +590,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.rubber_band.setWidth(5)
         if self.toggle_preview.isChecked():
             route_layer = router.route_as_layer(self)
-            feature = next(route_layer.getFeatures())
-            self.rubber_band.addGeometry(feature.geometry(), route_layer)
-            self.rubber_band.show()
+            if route_layer:
+                feature = next(route_layer.getFeatures())
+                self.rubber_band.addGeometry(feature.geometry(), route_layer)
+                self.rubber_band.show()
         else:
             dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
             original_crs = QgsCoordinateReferenceSystem("EPSG:4326")
