@@ -188,10 +188,10 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
-        self.setToolTip(parameters[0], "Select features that should be avoided by the algorithm")
-        self.setToolTip(parameters[1], "Select borders that should be avoided by the algorithm")
-        self.setToolTip(parameters[2], "Select countries that should be avoided by the algorithm")
-        self.setToolTip(parameters[3], "Select polygons that should be avoided by the algorithm")
+        self.setToolTip(parameters[0], "Select features that should be avoided by the algorithm.")
+        self.setToolTip(parameters[1], "Select borders that should be avoided by the algorithm.")
+        self.setToolTip(parameters[2], "Select countries that should be avoided by the algorithm.")
+        self.setToolTip(parameters[3], "Select polygons that should be avoided by the algorithm.")
 
         return parameters
 
