@@ -245,3 +245,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
     def tr(self, string, context=None):
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
+
+    def setToolTip(self, parameter, text):
+        basic = parameter.toolTip()
+        parameter.toolTip = lambda: f'{basic}\n{text}'
