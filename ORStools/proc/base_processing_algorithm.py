@@ -131,7 +131,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for profile, used in all child classes
         """
-        parameter =  QgsProcessingParameterEnum(
+        parameter = QgsProcessingParameterEnum(
             self.IN_PROFILE,
             self.tr("Travel mode", "ORSBaseProcessingAlgorithm"),
             PROFILES,
@@ -266,4 +266,4 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def setToolTip(self, parameter, text):
         basic = parameter.toolTip()
-        parameter.toolTip = lambda: f'{basic}\n{text}'
+        parameter.toolTip = lambda: f"{basic}\n{text}"

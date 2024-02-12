@@ -93,10 +93,21 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         ]
 
         self.setToolTip(self.PARAMETERS[0], "Point or MultiPoint layer.")
-        self.setToolTip(self.PARAMETERS[1], "Values will transfer to the output layer and can be used to join layers or group features afterwards.")
-        self.setToolTip(self.PARAMETERS[2], "Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x).")
-        self.setToolTip(self.PARAMETERS[3], "Dictates the cost. For longer routes don't use Shortest Path.")
-        self.setToolTip(self.PARAMETERS[4], "You can optionally perform a Traveling Salesman Optimization on the waypoints of each (Multi)Point feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest.")
+        self.setToolTip(
+            self.PARAMETERS[1],
+            "Values will transfer to the output layer and can be used to join layers or group features afterwards.",
+        )
+        self.setToolTip(
+            self.PARAMETERS[2],
+            "Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x).",
+        )
+        self.setToolTip(
+            self.PARAMETERS[3], "Dictates the cost. For longer routes don't use Shortest Path."
+        )
+        self.setToolTip(
+            self.PARAMETERS[4],
+            "You can optionally perform a Traveling Salesman Optimization on the waypoints of each (Multi)Point feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest.",
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
