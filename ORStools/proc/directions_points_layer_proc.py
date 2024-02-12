@@ -65,7 +65,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
-                description=self.tr("Layer ID Field"),
+                description=self.tr("Layer ID Field (can be used for joining)"),
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
                 optional=True,
