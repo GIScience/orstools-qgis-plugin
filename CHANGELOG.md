@@ -40,6 +40,9 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+# Unreleased
+
+- Add tooltip hints in processing algorithms ([#196](https://github.com/GIScience/orstools-qgis-plugin/issues/196))
 
 ## [1.7.1] - 2024-01-15
 
