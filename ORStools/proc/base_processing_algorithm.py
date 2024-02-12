@@ -116,35 +116,46 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Parameter definition for provider, used in all child classes
         """
         providers = [provider["name"] for provider in configmanager.read_config()["providers"]]
-        return QgsProcessingParameterEnum(
+        parameter = QgsProcessingParameterEnum(
             self.IN_PROVIDER,
             self.tr("Provider", "ORSBaseProcessingAlgorithm"),
             providers,
             defaultValue=providers[0],
         )
 
+        self.setToolTip(parameter, "Select the provider that should be used.")
+
+        return parameter
+
     def profile_parameter(self) -> QgsProcessingParameterEnum:
         """
         Parameter definition for profile, used in all child classes
         """
-        return QgsProcessingParameterEnum(
+        parameter =  QgsProcessingParameterEnum(
             self.IN_PROFILE,
             self.tr("Travel mode", "ORSBaseProcessingAlgorithm"),
             PROFILES,
             defaultValue=PROFILES[0],
         )
 
+        self.setToolTip(parameter, "Select a mode of travel.")
+
+        return parameter
+
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:
         """
         Parameter definition for output, used in all child classes
         """
-        return QgsProcessingParameterFeatureSink(
+        parameter = QgsProcessingParameterFeatureSink(
             name=self.OUT,
             description=self.GROUP,
         )
+        self.setToolTip(parameter, "Select where the output should be saved.")
+
+        return parameter
 
     def option_parameters(self) -> [QgsProcessingParameterDefinition]:
-        return [
+        parameters = [
             QgsProcessingParameterEnum(
                 self.IN_AVOID_FEATS,
                 self.tr("Features to avoid", "ORSBaseProcessingAlgorithm"),
@@ -176,6 +187,13 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
                 optional=True,
             ),
         ]
+
+        self.setToolTip(parameters[0], "Select features that should be avoided by the algorithm")
+        self.setToolTip(parameters[1], "Select borders that should be avoided by the algorithm")
+        self.setToolTip(parameters[2], "Select countries that should be avoided by the algorithm")
+        self.setToolTip(parameters[3], "Select polygons that should be avoided by the algorithm")
+
+        return parameters
 
     @classmethod
     def _get_ors_client_from_provider(
