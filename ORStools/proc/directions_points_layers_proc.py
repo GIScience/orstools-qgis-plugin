@@ -108,6 +108,14 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=self.MODE_SELECTION[0],
             ),
         ]
+        self.setToolTip(self.PARAMETERS[0], "Only Point layers are allowed, not MultiPoint.")
+        self.setToolTip(self.PARAMETERS[1], "Values will transfer to the output layer and can be used to join layers or group features afterwards.")
+        self.setToolTip(self.PARAMETERS[2], "Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)")
+        self.setToolTip(self.PARAMETERS[3], "Only Point layers are allowed, not MultiPoint.")
+        self.setToolTip(self.PARAMETERS[4], "Values will transfer to the output layer and can be used to join layers or group features afterwards.")
+        self.setToolTip(self.PARAMETERS[5], "Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)")
+        self.setToolTip(self.PARAMETERS[6], "Dictates the cost. For longer routes don't use Shortest Path.")
+        self.setToolTip(self.PARAMETERS[7], "Either 'row-by-row' until one layers has no more features or 'all-by-all' for every feature combination")
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
