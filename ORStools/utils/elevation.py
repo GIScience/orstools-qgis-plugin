@@ -52,7 +52,6 @@ class Elevation:
         self.route = None
 
         self.base()
-        self.make_image()
 
     def base(self):
         basepath = os.path.dirname(__file__)
@@ -200,7 +199,17 @@ Please add polygons to the layer or uncheck avoid polygons.
             ax.set_xlabel("Distance [km]")
             ax.set_ylabel("Elevation [m]")
 
-            temp_dir = tempfile.mkdtemp(prefix="ORS_qgis_plugin_")
+            present = None
+            prefix = "ORS_qgis_plugin_"
+            for dirpath, dirnames, filenames in os.walk(tempfile.gettempdir()):
+                for dirname in dirnames:
+                    if prefix in dirname:
+                        temp_dir = os.path.join(dirpath, dirname)
+                        present = True
+
+            if not present:
+                temp_dir = tempfile.mkdtemp(prefix=prefix)
+
             temp_image_path = os.path.join(temp_dir, "elevation_profile.jpg")
             fig.savefig(temp_image_path, dpi=100)
 

@@ -469,7 +469,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.checkBox_elevation_profile.toggled.connect(self.toggle_elevation_profile)
 
     def update_elevation_profile(self):
-        Elevation(self).make_image()
+        elev = Elevation(self)
+        elev.make_image()
 
     def toggle_elevation_profile(self):
         if self.routing_fromline_list.count() not in [0, 1]:
