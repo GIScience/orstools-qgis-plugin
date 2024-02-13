@@ -499,11 +499,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     lineEdit.setText("")
 
                 e = self._iface.mapCanvas().extent()
-                lat = e.xMinimum() + (e.yMaximum() - e.xMinimum()) / 2
-                sourceCrs = QgsCoordinateReferenceSystem(3857)
-                destCrs = QgsCoordinateReferenceSystem(4326)
+                lat = e.yMinimum() + (e.yMaximum() - e.yMinimum()) / 2
+                lon = e.xMinimum() + (e.xMaximum() - e.xMinimum()) / 2
+                sourceCrs = self._iface.mapCanvas().mapSettings().destinationCrs()
+                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
                 tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-                middle = tr.transform(QgsPointXY(0, lat))
+                middle = tr.transform(QgsPointXY(lon, lat))
 
                 url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={lineEdit.text()}&sources=geonames&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
                 request = QgsBlockingNetworkRequest()
@@ -685,7 +686,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         ]
         self.routing_fromline_list.clear()
         self._clear_annotations()
-        crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        crs = QgsCoordinateReferenceSystem.fromEpsgId("EPSG:4326")
         for idx, x in enumerate(items):
             coords = x.split(":")[1]
             item = f"Point {idx}:{coords}"
