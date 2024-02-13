@@ -458,8 +458,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         # Recalculate elevation profile when vertex list changes
         self.routing_fromline_list.model().rowsMoved.connect(self.update_elevation_profile)
-        self.routing_fromline_list.model().rowsRemoved.connect(self.update_elevation_profile)
-        self.routing_fromline_list.model().rowsInserted.connect(self.update_elevation_profile)
 
         self.routing_travel_combo.currentIndexChanged.connect(self.update_elevation_profile)
         self.routing_preference_combo.currentIndexChanged.connect(self.update_elevation_profile)
@@ -469,12 +467,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.checkBox_elevation_profile.toggled.connect(self.toggle_elevation_profile)
 
     def update_elevation_profile(self):
-        elev = Elevation(self)
-        elev.make_image()
+        if self.checkBox_elevation_profile.isChecked():
+            elev = Elevation(self)
+            elev.make_image()
 
     def toggle_elevation_profile(self):
+        elev_check = self.checkBox_elevation_profile.isChecked()
+        if elev_check:
+            elev = Elevation(self)
+            elev.make_image()
         if self.routing_fromline_list.count() not in [0, 1]:
-            self.label_elevation_profile.setVisible(self.checkBox_elevation_profile.isChecked())
+            self.label_elevation_profile.setVisible(elev_check)
         else:
             if self.checkBox_elevation_profile.isChecked():
                 QMessageBox.critical(
