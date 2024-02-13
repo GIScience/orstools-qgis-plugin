@@ -382,7 +382,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>16777215</height>
+           <height>20</height>
           </size>
          </property>
          <property name="title">
@@ -395,7 +395,7 @@
           <bool>false</bool>
          </property>
          <property name="collapsed">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="saveCollapsedState">
           <bool>false</bool>
