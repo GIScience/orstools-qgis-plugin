@@ -322,7 +322,6 @@ Remember, the first and last location are not part of the optimization.
                 response = clnt.request("/optimization", {}, post_json=params)
 
                 if self.dlg.export_jobs_order.isChecked():
-                    print('debug')
                     items = list()
                     for route in response["routes"]:
                         for i, step in enumerate(route["steps"]):
@@ -343,7 +342,6 @@ Remember, the first and last location are not part of the optimization.
                         point_layer.dataProvider().addFeature(feature)
                     QgsProject.instance().addMapLayer(point_layer)
                     self.dlg._iface.mapCanvas().refresh()
-
 
                 feat = directions_core.get_output_features_optimization(
                     response, params["vehicles"][0]["profile"]
