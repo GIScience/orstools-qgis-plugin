@@ -26,7 +26,13 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis._core import QgsVectorLayer, QgsFeature, QgsGeometry, QgsProject, QgsProcessingParameterBoolean
+from qgis._core import (
+    QgsVectorLayer,
+    QgsFeature,
+    QgsGeometry,
+    QgsProject,
+    QgsProcessingParameterBoolean,
+)
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -91,10 +97,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
-            QgsProcessingParameterBoolean(
-                self.EXPORT_ORDER,
-                self.tr("Export order of jobs")
-            ),
+            QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -181,9 +184,9 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     export_value = self.parameterAsBool(parameters, self.EXPORT_ORDER, context)
                     if export_value:
                         items = list()
-                        for route in response['routes']:
-                            for i, step in enumerate(route['steps']):
-                                location = step['location']
+                        for route in response["routes"]:
+                            for i, step in enumerate(route["steps"]):
+                                location = step["location"]
                                 items.append(location)
 
                         point_layer = QgsVectorLayer(
