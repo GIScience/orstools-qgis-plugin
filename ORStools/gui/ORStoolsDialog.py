@@ -479,6 +479,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
+        self.annotation_canvas = self._iface.mapCanvas()
+
     def _save_vertices_to_layer(self):
         """Saves the vertices list to a temp layer"""
         items = [
@@ -550,11 +552,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation.setMapPosition(point)
         annotation.setMapPositionCrs(crs)
 
-        return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
+        return QgsMapCanvasAnnotationItem(annotation, self.annotation_canvas).annotation()
 
     def _clear_annotations(self):
         """Clears annotations"""
-        for annotation in self.annotations:
+        for annotation_item in self.annotation_canvas.annotationItems():
+            annotation = annotation_item.annotation()
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
@@ -586,7 +589,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
         annotation = self._linetool_annotate_point(point, idx)
-        self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
 
     def _reindex_list_items(self):
@@ -606,7 +608,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
             self.routing_fromline_list.addItem(item)
             annotation = self._linetool_annotate_point(point, idx, crs)
-            self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
 
     def _on_linetool_map_doubleclick(self):
