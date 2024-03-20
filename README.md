@@ -1,5 +1,8 @@
 # ORS Tools QGIS plugin
 
+![Testing](https://github.com/Merydian/orstools-qgis-plugin/actions/workflows/test.yml/badge.svg)
+![Ruff](https://github.com/Merydian/orstools-qgis-plugin/actions/workflows/ruff.yml/badge.svg)
+
 ![ORS Tools](https://user-images.githubusercontent.com/23240110/122937401-3ee72400-d372-11eb-8e3b-6c435d1dd964.png)
 
 Set of tools for QGIS to use the [openrouteservice](https://openrouteservice.org) (ORS) API.
