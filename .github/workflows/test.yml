@@ -1,0 +1,34 @@
+
+name: Testing
+
+on:
+  pull_request:
+
+jobs:
+  test_3_16:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run test 3.16
+      run: |
+        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:release-3_16 sh -c 'apt-get -y update && apt-get -y install xvfb && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && export DISPLAY=:0.0 && pip install -U pytest && xvfb-run pytest'
+      env:
+        DOCKER_IMAGE: ${{ steps.docker-build.outputs.FULL_IMAGE_NAME }}
+  test_3_22:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run test 3.22
+      run: |
+        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:release-3_22 sh -c 'apt-get -y update && apt-get -y install xvfb && export DISPLAY=:0.0 && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && export DISPLAY=:0.0 && pip install -U pytest && xvfb-run pytest'
+      env:
+        DOCKER_IMAGE: ${{ steps.docker-build.outputs.FULL_IMAGE_NAME }}
+  test_latest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run test latest
+      run: |
+        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:latest sh -c 'apt-get -y update && apt-get -y install xvfb && export DISPLAY=:0.0 && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && pip install -U pytest && xvfb-run pytest'
+      env:
+        DOCKER_IMAGE: ${{ steps.docker-build.outputs.FULL_IMAGE_NAME }}

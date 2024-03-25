@@ -1,5 +1,8 @@
 # ORS Tools QGIS plugin
 
+![Testing](https://github.com/Merydian/orstools-qgis-plugin/actions/workflows/test.yml/badge.svg)
+![Ruff](https://github.com/Merydian/orstools-qgis-plugin/actions/workflows/ruff.yml/badge.svg)
+
 ![ORS Tools](https://user-images.githubusercontent.com/23240110/122937401-3ee72400-d372-11eb-8e3b-6c435d1dd964.png)
 
 Set of tools for QGIS to use the [openrouteservice](https://openrouteservice.org) (ORS) API.
@@ -119,6 +122,49 @@ where `<qgis_plugins_path>` is one of:
 - Linux: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/ORStools`
 - Windows: `C:\Users\USER\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\ORStools`
 - Mac OS: `Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ORStools`
+
+### CI
+#### Testing
+The repository tests on the QGis Versions *3.16*, *3.22* and the *latest* version. 
+Until now, it's only possible to test one version at a time.
+
+To do local test runs you can use a [conda installation](https://github.com/opengisch/qgis-conda-builder) of the QGis version you want to test.
+You will also have to install *xvfb* to run the tests on involving an interface. 
+Lastly, we need [*Pytest*](https://docs.pytest.org/en/8.0.x/) to run tests in general. 
+
+To do the above run use these commands:
+1. Install a version of anaconda, preferrably [*miniforge*](https://github.com/conda-forge/miniforge).
+
+2. Create and prepare the environment.
+```shell
+# create environment
+mamba create --name qgis_test
+# activate envotonment
+conda activate qgis_test
+# install pip
+mamba install qgis pip
+```
+3. Install QGis using mamba.
+```shell
+mamba install -c conda-forge qgis=[3.16, 3.22, latest] # choose one
+```
+
+4. Install *xvfb*
+```shell
+sudo apt-get update
+sudo apt install xvfb
+```
+
+5. Install *Pytest* using pip in testing environment.
+```shell
+pip install -U pytest
+```
+
+To run the tests you will need an ORS-API key:
+```shell
+cd orstools-qgis-plugin
+export ORS_API_KEY=[Your API key here] && xvfb-run pytest
+```
 
 ### Debugging
 In the **PyCharm community edition** you will have to use logging and printing to inspect elements.
