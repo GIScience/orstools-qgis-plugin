@@ -521,7 +521,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         annotation.setDocument(c)
 
-        annotation.setFrameSizeMm(QSizeF(7, 5))
+        annotation.setFrameSizeMm(QSizeF(8, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
         annotation.setMapPosition(point)
         annotation.setMapPositionCrs(crs)
