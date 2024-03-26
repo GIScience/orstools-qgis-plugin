@@ -494,12 +494,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         """Clears the contents of the QgsListWidget and the annotations."""
         items = self.routing_fromline_list.selectedItems()
         if items:
+            rows = [self.routing_fromline_list.row(item) for item in items]
             # if items are selected, only clear those
-            for item in items:
-                row = self.routing_fromline_list.row(item)
-                self.routing_fromline_list.takeItem(row)
+            for row in sorted(rows, reverse=True):
                 if self.annotations:
                     self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
+                self.routing_fromline_list.takeItem(row)
         else:
             # else clear all items and annotations
             self.routing_fromline_list.clear()
