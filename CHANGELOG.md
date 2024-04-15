@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+
+### Added
+- Add support for decimal ranges with isochrones([#237](https://github.com/GIScience/orstools-qgis-plugin/issues/237))
 
 ## [1.7.1] - 2024-01-15
 
