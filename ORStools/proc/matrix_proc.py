@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+from typing import Dict
 
 from qgis.core import (
     QgsWkbTypes,
