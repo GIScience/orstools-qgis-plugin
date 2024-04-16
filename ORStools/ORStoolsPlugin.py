@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from qgis._gui import QgisInterface
 from qgis.core import QgsApplication
 from PyQt5.QtCore import QTranslator, QSettings, qVersion, QCoreApplication

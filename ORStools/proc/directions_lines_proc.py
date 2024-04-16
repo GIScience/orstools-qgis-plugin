@@ -26,9 +26,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-from typing import List, Dict, Any, Tuple, Generator
 
-from qgis._core import QgsFeatureSink
+from typing import List, Dict, Generator
+
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -128,7 +128,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         count = source.featureCount()
 
         for num, (line, field_value) in enumerate(
-                self._get_sorted_lines(source, source_field_name)
+            self._get_sorted_lines(source, source_field_name)
         ):
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():

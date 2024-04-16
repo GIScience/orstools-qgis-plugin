@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from typing import Dict
 
 from qgis._core import QgsField
@@ -213,7 +214,14 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_route_dict(source: QgsProcessingParameterFeatureSource, source_field: QgsField, sort_start, destination: QgsProcessingParameterFeatureSource, destination_field: QgsField, sort_end) -> dict:
+    def _get_route_dict(
+        source: QgsProcessingParameterFeatureSource,
+        source_field: QgsField,
+        sort_start,
+        destination: QgsProcessingParameterFeatureSource,
+        destination_field: QgsField,
+        sort_end,
+    ) -> dict:
         """
         Compute route_dict from input layer.
 

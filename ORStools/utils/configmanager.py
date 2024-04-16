@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import os
 
 import yaml
@@ -33,7 +34,7 @@ import yaml
 from ORStools import CONFIG_PATH
 
 
-def read_config()-> dict:
+def read_config() -> dict:
     """
     Reads config.yml from file and returns the parsed dict.
 

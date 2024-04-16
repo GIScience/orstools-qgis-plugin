@@ -88,7 +88,14 @@ class Client(QObject):
 
     overQueryLimit = pyqtSignal()
 
-    def request(self, url: str, params: dict, first_request_time: datetime.time = None, retry_counter: int = 0, post_json: dict = None):
+    def request(
+        self,
+        url: str,
+        params: dict,
+        first_request_time: datetime.time = None,
+        retry_counter: int = 0,
+        post_json: dict = None,
+    ):
         """Performs HTTP GET/POST with credentials, returning the body as
         JSON.
 

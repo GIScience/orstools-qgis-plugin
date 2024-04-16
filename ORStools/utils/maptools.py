@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from qgis._gui import QgsMapCanvas, QgsMapMouseEvent
 from qgis.core import QgsWkbTypes
 from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand

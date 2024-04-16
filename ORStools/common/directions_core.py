@@ -117,7 +117,12 @@ def get_fields(
 
 
 def get_output_feature_directions(
-    response: dict, profile: str, preference: str, options: str = None, from_value: Any = None, to_value: Any = None
+    response: dict,
+    profile: str,
+    preference: str,
+    options: str = None,
+    from_value: Any = None,
+    to_value: Any = None,
 ) -> QgsFeature:
     """
     Build output feature based on response attributes for directions endpoint.
@@ -165,7 +170,9 @@ def get_output_feature_directions(
     return feat
 
 
-def get_output_features_optimization(response: dict, profile: str, from_value: Any = None) -> QgsFeature:
+def get_output_features_optimization(
+    response: dict, profile: str, from_value: Any = None
+) -> QgsFeature:
     """
     Build output feature based on response attributes for optimization endpoint.
 

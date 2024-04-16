@@ -48,7 +48,15 @@ from qgis.gui import QgsMapCanvasAnnotationItem
 
 from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
 from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox, QWidget
+from PyQt5.QtWidgets import (
+    QAction,
+    QDialog,
+    QApplication,
+    QMenu,
+    QMessageBox,
+    QDialogButtonBox,
+    QWidget,
+)
 
 from ORStools import (
     RESOURCE_PREFIX,

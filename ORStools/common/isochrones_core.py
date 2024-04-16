@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from typing import Any, Generator
 
 from qgis._core import QgsMapLayer
@@ -62,7 +63,12 @@ class Isochrones:
         self.field_dimension_name = None
 
     def set_parameters(
-        self, profile: str, dimension: str, factor: int, id_field_type: QVariant.String = QVariant.String, id_field_name: str = "ID"
+        self,
+        profile: str,
+        dimension: str,
+        factor: int,
+        id_field_type: QVariant.String = QVariant.String,
+        id_field_name: str = "ID",
     ) -> None:
         """
         Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know
@@ -108,7 +114,9 @@ class Isochrones:
 
         return fields
 
-    def get_features(self, response: dict, id_field_value: Any) -> Generator[QgsFeature, None, None]:
+    def get_features(
+        self, response: dict, id_field_value: Any
+    ) -> Generator[QgsFeature, None, None]:
         """
         Generator to return output isochrone features from response.
 

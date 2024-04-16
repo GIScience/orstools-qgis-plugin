@@ -185,7 +185,9 @@ class NetworkAccessManager(object):
     def auth_manager(self) -> None:
         return QgsApplication.authManager()
 
-    def request(self, url: str, method: str = "GET", body=None, headers=None, blocking: bool = True):
+    def request(
+        self, url: str, method: str = "GET", body=None, headers=None, blocking: bool = True
+    ):
         """
         Make a network request by calling QgsNetworkAccessManager.
         redirections argument is ignored and is here only for httplib2 compatibility.
