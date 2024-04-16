@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+
+### Fixed
+- Improved documentation of type hints
 
 ## [1.7.1] - 2024-01-15
 
