@@ -26,7 +26,9 @@
  *                                                                         *
  ***************************************************************************/
 """
+from typing import Dict
 
+from qgis._core import QgsField
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -45,18 +47,18 @@ from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "directions_from_points_2_layers"
-        self.GROUP = "Directions"
+        self.ALGO_NAME: str = "directions_from_points_2_layers"
+        self.GROUP: str = "Directions"
         self.MODE_SELECTION: list = ["Row-by-Row", "All-by-All"]
-        self.IN_START = "INPUT_START_LAYER"
-        self.IN_START_FIELD = "INPUT_START_FIELD"
-        self.IN_SORT_START_BY = "INPUT_SORT_START_BY"
-        self.IN_END = "INPUT_END_LAYER"
-        self.IN_END_FIELD = "INPUT_END_FIELD"
-        self.IN_SORT_END_BY = "INPUT_SORT_END_BY"
-        self.IN_PREFERENCE = "INPUT_PREFERENCE"
-        self.IN_MODE = "INPUT_MODE"
-        self.PARAMETERS = [
+        self.IN_START: str = "INPUT_START_LAYER"
+        self.IN_START_FIELD: str = "INPUT_START_FIELD"
+        self.IN_SORT_START_BY: str = "INPUT_SORT_START_BY"
+        self.IN_END: str = "INPUT_END_LAYER"
+        self.IN_END_FIELD: str = "INPUT_END_FIELD"
+        self.IN_SORT_END_BY: str = "INPUT_SORT_END_BY"
+        self.IN_PREFERENCE: str = "INPUT_PREFERENCE"
+        self.IN_MODE: str = "INPUT_MODE"
+        self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
                 description=self.tr("Input Start Point layer"),
@@ -111,7 +113,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(self, parameters, context, feedback) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -211,7 +213,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_route_dict(source, source_field, sort_start, destination, destination_field, sort_end):
+    def _get_route_dict(source: QgsProcessingParameterFeatureSource, source_field: QgsField, sort_start, destination: QgsProcessingParameterFeatureSource, destination_field: QgsField, sort_end) -> dict:
         """
         Compute route_dict from input layer.
 
