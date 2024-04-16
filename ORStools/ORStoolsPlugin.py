@@ -26,7 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-
+from qgis._gui import QgisInterface
 from qgis.core import QgsApplication
 from PyQt5.QtCore import QTranslator, QSettings, qVersion, QCoreApplication
 import os.path
@@ -40,7 +40,7 @@ class ORStools:
 
     # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
 
-    def __init__(self, iface):
+    def __init__(self, iface: QgisInterface) -> None:
         """Constructor.
 
         :param iface: An interface instance that will be passed to this class
@@ -65,13 +65,13 @@ class ORStools:
             if qVersion() > "4.3.3":
                 QCoreApplication.installTranslator(self.translator)
 
-    def initGui(self):
+    def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         QgsApplication.processingRegistry().addProvider(self.provider)
         self.dialog.initGui()
 
-    def unload(self):
+    def unload(self) -> None:
         """remove menu entry and toolbar icons"""
         QgsApplication.processingRegistry().removeProvider(self.provider)
         self.dialog.unload()
