@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+from typing import Dict, List
 
 from qgis.core import (
     QgsWkbTypes,
@@ -49,15 +50,15 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "directions_from_points_1_layer"
-        self.GROUP = "Directions"
-        self.IN_POINTS = "INPUT_POINT_LAYER"
-        self.IN_FIELD = "INPUT_LAYER_FIELD"
-        self.IN_PREFERENCE = "INPUT_PREFERENCE"
-        self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
-        self.IN_MODE = "INPUT_MODE"
-        self.IN_SORTBY = "INPUT_SORTBY"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "directions_from_points_1_layer"
+        self.GROUP: str = "Directions"
+        self.IN_POINTS: str = "INPUT_POINT_LAYER"
+        self.IN_FIELD: str = "INPUT_LAYER_FIELD"
+        self.IN_PREFERENCE: str = "INPUT_PREFERENCE"
+        self.IN_OPTIMIZE: str = "INPUT_OPTIMIZE"
+        self.IN_MODE: str = "INPUT_MODE"
+        self.IN_SORTBY: str = "INPUT_SORTBY"
+        self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
                 description=self.tr("Input (Multi)Point layer"),
@@ -92,7 +93,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(self, parameters, context, feedback) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
