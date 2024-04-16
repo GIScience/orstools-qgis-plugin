@@ -153,7 +153,7 @@ class NetworkAccessManager(object):
         exception_class=None,
         debug=True,
         timeout=60,
-    ):
+    ) -> None:
         self.disable_ssl_certificate_validation = disable_ssl_certificate_validation
         self.authid = authid
         self.reply = None
@@ -175,17 +175,17 @@ class NetworkAccessManager(object):
         )
         self.timeout = timeout
 
-    def msg_log(self, msg):
+    def msg_log(self, msg: str) -> None:
         if self.debug:
             QgsMessageLog.logMessage(msg, "NetworkAccessManager")
 
-    def httpResult(self):
+    def httpResult(self) -> None:
         return self.http_call_result
 
-    def auth_manager(self):
+    def auth_manager(self) -> None:
         return QgsApplication.authManager()
 
-    def request(self, url, method="GET", body=None, headers=None, blocking=True):
+    def request(self, url: str, method: str = "GET", body=None, headers=None, blocking: bool = True):
         """
         Make a network request by calling QgsNetworkAccessManager.
         redirections argument is ignored and is here only for httplib2 compatibility.
@@ -279,19 +279,19 @@ class NetworkAccessManager(object):
 
         return self.http_call_result, self.http_call_result.content
 
-    def downloadProgress(self, bytesReceived, bytesTotal):
+    def downloadProgress(self, bytesReceived, bytesTotal) -> None:
         """Keep track of the download progress"""
         # self.msg_log("downloadProgress %s of %s ..." % (bytesReceived, bytesTotal))
         pass
 
     # noinspection PyUnusedLocal
-    def requestTimedOut(self, reply):
+    def requestTimedOut(self, reply) -> None:
         """Trap the timeout. In Async mode requestTimedOut is called after replyFinished"""
         # adapt http_call_result basing on receiving qgs timer timout signal
         self.exception_class = RequestsExceptionTimeout
         self.http_call_result.exception = RequestsExceptionTimeout("Timeout error")
 
-    def replyFinished(self):
+    def replyFinished(self) -> None:
         err = self.reply.error()
         httpStatus = self.reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
         httpStatusMessage = self.reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute)
@@ -401,7 +401,7 @@ class NetworkAccessManager(object):
         else:
             self.msg_log("Reply was already deleted ...")
 
-    def sslErrors(self, ssl_errors):
+    def sslErrors(self, ssl_errors) -> None:
         """
         Handle SSL errors, logging them if debug is on and ignoring them
         if disable_ssl_certificate_validation is set.
@@ -412,7 +412,7 @@ class NetworkAccessManager(object):
         if self.disable_ssl_certificate_validation:
             self.reply.ignoreSslErrors()
 
-    def abort(self):
+    def abort(self) -> None:
         """
         Handle request to cancel HTTP call
         """
