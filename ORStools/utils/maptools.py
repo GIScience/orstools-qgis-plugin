@@ -26,7 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-
+from qgis._gui import QgsMapCanvas, QgsMapMouseEvent
 from qgis.core import QgsWkbTypes
 from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 
@@ -39,7 +39,7 @@ from ORStools import DEFAULT_COLOR
 class LineTool(QgsMapToolEmitPoint):
     """Line Map tool to capture mapped lines."""
 
-    def __init__(self, canvas):
+    def __init__(self, canvas: QgsMapCanvas) -> None:
         """
         :param canvas: current map canvas
         :type canvas: QgsMapCanvas
@@ -58,7 +58,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.points = []
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         """reset rubber band and captured points."""
 
         self.points = []
@@ -66,7 +66,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     pointDrawn = pyqtSignal(["QgsPointXY", "int"])
 
-    def canvasReleaseEvent(self, e):
+    def canvasReleaseEvent(self, e: QgsMapMouseEvent) -> None:
         """Add marker to canvas and shows line."""
         new_point = self.toMapCoordinates(e.pos())
         self.points.append(new_point)
@@ -75,7 +75,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.pointDrawn.emit(new_point, self.points.index(new_point))
         self.showLine()
 
-    def showLine(self):
+    def showLine(self) -> None:
         """Builds rubber band from all points and adds it to the map canvas."""
         self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
         for point in self.points:
@@ -87,12 +87,12 @@ class LineTool(QgsMapToolEmitPoint):
     doubleClicked = pyqtSignal()
 
     # noinspection PyUnusedLocal
-    def canvasDoubleClickEvent(self, e):
+    def canvasDoubleClickEvent(self, e: QgsMapMouseEvent) -> None:
         """Ends line drawing and deletes rubber band and markers from map canvas."""
         # noinspection PyUnresolvedReferences
         self.doubleClicked.emit()
         self.canvas.scene().removeItem(self.rubberBand)
 
-    def deactivate(self):
+    def deactivate(self) -> None:
         super(LineTool, self).deactivate()
         self.deactivated.emit()
