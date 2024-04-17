@@ -39,7 +39,7 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingFeedback,
 )
-from typing import Any
+from typing import Any, Dict
 
 from PyQt5.QtGui import QIcon
 

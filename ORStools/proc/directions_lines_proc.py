@@ -37,6 +37,7 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
     QgsPointXY,
+    QgsFeatureSource,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
