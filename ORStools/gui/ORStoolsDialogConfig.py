@@ -155,7 +155,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
-    def _add_box(self, name, url, key, timeout, new=False) -> None:
+    def _add_box(self, name: str, url: str, key: str, timeout: int, new: bool = False) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
 
