@@ -221,7 +221,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         return options
 
     # noinspection PyUnusedLocal
-    def initAlgorithm(self, configuration) -> None:
+    def initAlgorithm(self, configuration: Dict) -> None:
         """
         Combines default and algorithm parameters and adds them in order to the
         algorithm dialog window.
