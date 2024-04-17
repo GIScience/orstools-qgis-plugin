@@ -75,7 +75,7 @@ def get_request_point_features(route_dict: dict, row_by_row: str) -> Generator[L
 
 
 def get_fields(
-    from_type: QVariant.String = QVariant.String,
+    from_type: QVariant.Type = QVariant.String,
     to_type: QVariant.Type = QVariant.String,
     from_name: str = "FROM_ID",
     to_name: str = "TO_ID",
