@@ -37,6 +37,7 @@ from qgis.core import (
     QgsProcessingParameterField,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
+    QgsProcessingFeatureSource,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES
@@ -215,10 +216,10 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
 
     @staticmethod
     def _get_route_dict(
-        source: QgsProcessingParameterFeatureSource,
+        source: QgsProcessingFeatureSource,
         source_field: QgsField,
         sort_start,
-        destination: QgsProcessingParameterFeatureSource,
+        destination: QgsProcessingFeatureSource,
         destination_field: QgsField,
         sort_end,
     ) -> dict:
@@ -226,13 +227,13 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         Compute route_dict from input layer.
 
         :param source: Input from layer
-        :type source: QgsProcessingParameterFeatureSource
+        :type source: QgsProcessingFeatureSource
 
         :param source_field: ID field from layer.
         :type source_field: QgsField
 
         :param destination: Input to layer.
-        :type destination: QgsProcessingParameterFeatureSource
+        :type destination: QgsProcessingFeatureSource
 
         :param destination_field: ID field to layer.
         :type destination_field: QgsField
