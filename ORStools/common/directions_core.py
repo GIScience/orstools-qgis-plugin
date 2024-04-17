@@ -120,7 +120,7 @@ def get_output_feature_directions(
     response: dict,
     profile: str,
     preference: str,
-    options: str = None,
+    options: Optional[str] = None,
     from_value: Any = None,
     to_value: Any = None,
 ) -> QgsFeature:
