@@ -168,7 +168,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_sorted_lines(layer: QgsProcessingParameterFeatureSource, field_name: str) -> Generator:
+    def _get_sorted_lines(layer: QgsFeatureSource, field_name: str) -> Generator:
         """
         Generator to yield geometry and ID value sorted by feature ID. Careful: feat.id() is not necessarily
         permanent
