@@ -31,7 +31,7 @@ import json
 import random
 import time
 from datetime import datetime, timedelta
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -49,7 +49,7 @@ _USER_AGENT = f"ORSQGISClient@v{__version__}"
 class Client(QObject):
     """Performs requests to the ORS API services."""
 
-    def __init__(self, provider: dict = None, agent: str = None) -> None:
+    def __init__(self, provider: Optional[dict] = None, agent: Optional[str] = None) -> None:
         """
         :param provider: A openrouteservice provider from config.yml
         :type provider: dict
@@ -92,9 +92,9 @@ class Client(QObject):
         self,
         url: str,
         params: dict,
-        first_request_time: datetime.time = None,
+        first_request_time: Optional[datetime.time] = None,
         retry_counter: int = 0,
-        post_json: dict = None,
+        post_json: Optional[dict] = None,
     ):
         """Performs HTTP GET/POST with credentials, returning the body as
         JSON.
