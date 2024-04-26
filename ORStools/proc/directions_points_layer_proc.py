@@ -37,7 +37,7 @@ from qgis.core import (
     QgsPointXY,
 )
 
-from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
+from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
@@ -57,6 +57,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
         self.IN_MODE = "INPUT_MODE"
         self.IN_SORTBY = "INPUT_SORTBY"
+        self.EXTRA_INFO = "EXTRA_INFO"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
@@ -90,6 +91,12 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
+            QgsProcessingParameterEnum(
+                self.EXTRA_INFO,
+                self.tr("Extra Info"),
+                options=EXTRA_INFOS,
+                allowMultiple=True,
+                optional=True),
         ]
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -102,6 +109,9 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         optimization_mode = parameters[self.IN_OPTIMIZE]
 
         options = self.parseOptions(parameters, context)
+
+        extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
+        extra_info = [EXTRA_INFOS[i] for i in extra_info]
 
         # Get parameter values
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
@@ -173,7 +183,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     )
                 else:
                     params = directions_core.build_default_parameters(
-                        preference, point_list=points, options=options
+                        preference, point_list=points, options=options, extra_info=extra_info
                     )
                     response = ors_client.request(
                         "/v2/directions/" + profile + "/geojson", {}, post_json=params

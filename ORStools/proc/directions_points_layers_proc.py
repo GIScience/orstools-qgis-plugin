@@ -36,7 +36,7 @@ from qgis.core import (
     QgsProcessingParameterEnum,
 )
 
-from ORStools.common import directions_core, PROFILES, PREFERENCES
+from ORStools.common import directions_core, PROFILES, PREFERENCES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
@@ -56,6 +56,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         self.IN_SORT_END_BY = "INPUT_SORT_END_BY"
         self.IN_PREFERENCE = "INPUT_PREFERENCE"
         self.IN_MODE = "INPUT_MODE"
+        self.EXTRA_INFO = "EXTRA_INFO"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
@@ -107,6 +108,12 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 self.MODE_SELECTION,
                 defaultValue=self.MODE_SELECTION[0],
             ),
+            QgsProcessingParameterEnum(
+                self.EXTRA_INFO,
+                self.tr("Extra Info"),
+                options=EXTRA_INFOS,
+                allowMultiple=True,
+                optional=True),
         ]
 
     # TODO: preprocess parameters to options the range cleanup below:
@@ -121,6 +128,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         mode = dict(enumerate(self.MODE_SELECTION))[parameters[self.IN_MODE]]
 
         options = self.parseOptions(parameters, context)
+
+        extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
+        extra_info = [EXTRA_INFOS[i] for i in extra_info]
 
         # Get parameter values
         source = self.parameterAsSource(parameters, self.IN_START, context)
@@ -186,7 +196,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 break
 
             params = directions_core.build_default_parameters(
-                preference, coordinates=coordinates, options=options
+                preference, coordinates=coordinates, options=options, extra_info=extra_info
             )
 
             try:
