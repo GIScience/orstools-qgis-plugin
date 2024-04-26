@@ -80,6 +80,7 @@ def get_fields(
     from_name="FROM_ID",
     to_name="TO_ID",
     line=False,
+    extra_info: list = []
 ):
     """
     Builds output fields for directions response layer.
@@ -112,6 +113,8 @@ def get_fields(
     fields.append(QgsField(from_name, from_type))
     if not line:
         fields.append(QgsField(to_name, to_type))
+    for info in extra_info:
+        fields.append(QgsField(info.upper(), QVariant.String))
 
     return fields
 

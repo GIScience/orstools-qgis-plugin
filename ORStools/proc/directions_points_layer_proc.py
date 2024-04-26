@@ -124,7 +124,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 from_name=source_field_name,
             )
 
-        sink_fields = directions_core.get_fields(**get_fields_options, line=True)
+        sink_fields = directions_core.get_fields(**get_fields_options, line=True, extra_info=extra_info)
 
         (sink, dest_id) = self.parameterAsSink(
             parameters,
