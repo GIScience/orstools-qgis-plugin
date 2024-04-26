@@ -108,7 +108,9 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
 
         factor = 60 if dimension == "time" else 1
         ranges_raw = parameters[self.IN_RANGES]
-        ranges_proc = [x * factor for x in map(int, ranges_raw.split(","))]
+        ranges_proc = [x * factor for x in map(float, ranges_raw.split(","))]
+        # round to the nearest second or meter
+        ranges_proc = list(map(int, ranges_proc))
         smoothing = parameters[self.IN_SMOOTHING]
 
         options = self.parseOptions(parameters, context)
