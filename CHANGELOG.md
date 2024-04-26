@@ -40,6 +40,8 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+- Rename `Ok` button in configuration window to `Save` for clarification([#241](https://github.com/GIScience/orstools-qgis-plugin/issues/241))
 
 ## [1.7.1] - 2024-01-15
 
