@@ -60,4 +60,4 @@ ADVANCED_PARAMETERS = [
 
 LOCATION_TYPES = ["start", "destination"]
 
-EXTRA_INFO = ["steepness","suitability","surface","waytype","waycategory","tollways","traildifficulty","osmid","roadaccessrestrictions","countryinfo","green","noise","csv", "shadow"]
+EXTRA_INFOS = ["steepness", "suitability", "surface", "waytype", "waycategory", "tollways", "traildifficulty", "osmid", "roadaccessrestrictions", "countryinfo", "green", "noise", "csv", "shadow"]
