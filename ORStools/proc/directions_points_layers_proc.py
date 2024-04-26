@@ -113,7 +113,8 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 self.tr("Extra Info"),
                 options=EXTRA_INFOS,
                 allowMultiple=True,
-                optional=True),
+                optional=True,
+            ),
         ]
 
     # TODO: preprocess parameters to options the range cleanup below:

@@ -96,7 +96,8 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 self.tr("Extra Info"),
                 options=EXTRA_INFOS,
                 allowMultiple=True,
-                optional=True),
+                optional=True,
+            ),
         ]
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -124,7 +125,9 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 from_name=source_field_name,
             )
 
-        sink_fields = directions_core.get_fields(**get_fields_options, line=True, extra_info=extra_info)
+        sink_fields = directions_core.get_fields(
+            **get_fields_options, line=True, extra_info=extra_info
+        )
 
         (sink, dest_id) = self.parameterAsSink(
             parameters,

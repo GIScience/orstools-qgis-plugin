@@ -80,7 +80,7 @@ def get_fields(
     from_name="FROM_ID",
     to_name="TO_ID",
     line=False,
-    extra_info: list = []
+    extra_info: list = [],
 ):
     """
     Builds output fields for directions response layer.
@@ -243,7 +243,7 @@ def build_default_parameters(
         "elevation": True,
         "id": None,
         "options": options,
-        "extra_info": extra_info
+        "extra_info": extra_info,
     }
 
     return params
