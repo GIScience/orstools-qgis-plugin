@@ -208,6 +208,7 @@ def build_default_parameters(
     point_list: List[QgsPointXY] = None,
     coordinates: list = None,
     options: dict = None,
+    extra_info: list = None,
 ) -> dict:
     """
     Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates
@@ -239,6 +240,7 @@ def build_default_parameters(
         "elevation": True,
         "id": None,
         "options": options,
+        "extra_info": extra_info
     }
 
     return params
