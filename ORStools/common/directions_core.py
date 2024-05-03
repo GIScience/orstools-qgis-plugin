@@ -33,7 +33,7 @@ from typing import List
 
 from PyQt5.QtCore import QVariant
 
-from ORStools.utils import convert
+from ORStools.utils import convert, logger
 
 
 def get_request_point_features(route_dict, row_by_row):
@@ -105,16 +105,17 @@ def get_fields(
     """
 
     fields = QgsFields()
-    fields.append(QgsField("DIST_KM", QVariant.Double))
-    fields.append(QgsField("DURATION_H", QVariant.Double))
-    fields.append(QgsField("PROFILE", QVariant.String))
-    fields.append(QgsField("PREF", QVariant.String))
-    fields.append(QgsField("OPTIONS", QVariant.String))
-    fields.append(QgsField(from_name, from_type))
+    if not extra_info:
+        fields.append(QgsField("DIST_KM", QVariant.Double))
+        fields.append(QgsField("DURATION_H", QVariant.Double))
+        fields.append(QgsField("PROFILE", QVariant.String))
+        fields.append(QgsField("PREF", QVariant.String))
+        fields.append(QgsField("OPTIONS", QVariant.String))
+        fields.append(QgsField(from_name, from_type))
     if not line:
         fields.append(QgsField(to_name, to_type))
     for info in extra_info:
-        fields.append(QgsField(info.upper(), QVariant.String))
+        fields.append(QgsField(info.upper(), QVariant.Int))
 
     return fields
 
@@ -247,3 +248,31 @@ def build_default_parameters(
     }
 
     return params
+
+
+def get_extra_info_features_directions(response: dict):
+    response_mini = response["features"][0]
+    coordinates = response_mini["geometry"]["coordinates"]
+    feats = list()
+    extra_info = response_mini["properties"]["extras"]
+    logger.log(str(extra_info))
+    extras_list = {i: [] for i in extra_info}
+    for key in extra_info:
+        values = extra_info[key]["values"]
+        for val in values:
+            for i in range(val[0], val[1]):
+                extras_list[key].append(val[2])
+
+    for i in range(len(coordinates)-1):
+        feat = QgsFeature()
+        qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates[i : i + 2]]
+        feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
+        attrs = list()
+        for j in extras_list:
+            extra = extras_list[j]
+            attr = extra[i]
+            attrs.append(attr)
+        feat.setAttributes(attrs)
+        feats.append(feat)
+
+    return feats
