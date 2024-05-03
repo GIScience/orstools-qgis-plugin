@@ -209,12 +209,17 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue
-
-            sink.addFeature(
-                directions_core.get_output_feature_directions(
-                    response, profile, preference, from_value=values[0], to_value=values[1]
+            logger.log(str(response))
+            if extra_info:
+                feats = directions_core.get_extra_info_features_directions(response)
+                for feat in feats:
+                    sink.addFeature(feat)
+            else:
+                sink.addFeature(
+                    directions_core.get_output_feature_directions(
+                        response, profile, preference, from_value=values[0], to_value=values[1]
+                    )
                 )
-            )
 
             counter += 1
             feedback.setProgress(int(100.0 / route_count * counter))

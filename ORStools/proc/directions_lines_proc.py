@@ -163,11 +163,16 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                         "/v2/directions/" + profile + "/geojson", {}, post_json=params
                     )
 
-                    sink.addFeature(
-                        directions_core.get_output_feature_directions(
-                            response, profile, preference, from_value=field_value
+                    if extra_info:
+                        feats = directions_core.get_extra_info_features_directions(response)
+                        for feat in feats:
+                            sink.addFeature(feat)
+                    else:
+                        sink.addFeature(
+                            directions_core.get_output_feature_directions(
+                                response, profile, preference, from_value=field_value
+                            )
                         )
-                    )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {num} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
