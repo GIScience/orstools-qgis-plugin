@@ -42,10 +42,11 @@ from qgis.core import (
     QgsPointXY,
     QgsGeometry,
     QgsCoordinateReferenceSystem,
+    QgsSettings,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
@@ -247,10 +248,10 @@ class ORStoolsDialogMain:
 
         # add ors svg path
         my_new_path = os.path.join(basepath, "img/svg")
-        svg_paths = QSettings().value("svg/searchPathsForSVG") or []
+        svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
         if my_new_path not in svg_paths:
             svg_paths.append(my_new_path)
-            QSettings().setValue("svg/searchPathsForSVG", svg_paths)
+            QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
 
         # style output layer
         qml_path = os.path.join(basepath, "linestyle.qml")
