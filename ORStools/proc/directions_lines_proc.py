@@ -36,6 +36,7 @@ from qgis.core import (
     QgsProcessingParameterEnum,
     QgsPointXY,
     QgsProcessingParameterNumber,
+    QgsProcessingParameterString,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
@@ -59,6 +60,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         self.IN_MODE = "INPUT_MODE"
         self.EXTRA_INFO = "EXTRA_INFO"
         self.CSV_FACTOR = "CSV_FACTOR"
+        self.CSV_COLUMN = "CSV_COLUMN"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
@@ -98,6 +100,13 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Double,
                 minValue=0,
                 maxValue=1,
+                defaultValue=None,
+                optional=True,
+            ),
+            QgsProcessingParameterString(
+                self.CSV_COLUMN,
+                self.tr("Csv Column"),
+                optional=True,
             ),
         ]
 

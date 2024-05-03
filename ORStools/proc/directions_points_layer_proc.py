@@ -36,6 +36,7 @@ from qgis.core import (
     QgsProcessingParameterEnum,
     QgsPointXY,
     QgsProcessingParameterNumber,
+    QgsProcessingParameterString,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
@@ -60,6 +61,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.IN_SORTBY = "INPUT_SORTBY"
         self.EXTRA_INFO = "EXTRA_INFO"
         self.CSV_FACTOR = "CSV_FACTOR"
+        self.CSV_COLUMN = "CSV_COLUMN"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
@@ -106,6 +108,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Double,
                 minValue=0,
                 maxValue=1,
+                defaultValue=None,
+                optional=True,
+            ),
+            QgsProcessingParameterString(
+                self.CSV_COLUMN,
+                self.tr("Csv Column"),
+                optional=True,
             ),
         ]
 
@@ -120,9 +129,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
         options = self.parseOptions(parameters, context)
 
+        csv_column = self.parameterAsString(parameters, self.CSV_COLUMN, context)
+
         csv_factor = self.parameterAsDouble(parameters, self.CSV_FACTOR, context)
         if csv_factor > 0:
-            options["profile_params"] = {"weightings": {"csv_factor": csv_factor}}
+            options["profile_params"] = {
+                "weightings": {"csv_factor": round(csv_factor, 2), "csv_column": csv_column}
+            }
 
         extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
         extra_info = [EXTRA_INFOS[i] for i in extra_info]
