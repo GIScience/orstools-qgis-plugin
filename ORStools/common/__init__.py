@@ -56,6 +56,8 @@ ADVANCED_PARAMETERS = [
     "INPUT_AVOID_POLYGONS",
     "INPUT_SMOOTHING",
     "EXTRA_INFO",
+    "CSV_FACTOR",
+    "CSV_COLUMN",
 ]
 
 LOCATION_TYPES = ["start", "destination"]

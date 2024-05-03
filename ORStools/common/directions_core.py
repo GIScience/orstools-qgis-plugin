@@ -263,7 +263,7 @@ def get_extra_info_features_directions(response: dict):
             for i in range(val[0], val[1]):
                 extras_list[key].append(val[2])
 
-    for i in range(len(coordinates)-1):
+    for i in range(len(coordinates) - 1):
         feat = QgsFeature()
         qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates[i : i + 2]]
         feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))

@@ -34,6 +34,7 @@ from qgis.core import (
     QgsProcessingParameterField,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
+    QgsProcessingParameterNumber,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, EXTRA_INFOS
@@ -57,6 +58,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         self.IN_PREFERENCE = "INPUT_PREFERENCE"
         self.IN_MODE = "INPUT_MODE"
         self.EXTRA_INFO = "EXTRA_INFO"
+        self.CSV_FACTOR = "CSV_FACTOR"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
@@ -115,6 +117,13 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 allowMultiple=True,
                 optional=True,
             ),
+            QgsProcessingParameterNumber(
+                self.CSV_FACTOR,
+                self.tr("Csv Factor"),
+                type=QgsProcessingParameterNumber.Double,
+                minValue=0,
+                maxValue=1,
+            ),
         ]
 
     # TODO: preprocess parameters to options the range cleanup below:
@@ -129,6 +138,10 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         mode = dict(enumerate(self.MODE_SELECTION))[parameters[self.IN_MODE]]
 
         options = self.parseOptions(parameters, context)
+
+        csv_factor = self.parameterAsDouble(parameters, self.CSV_FACTOR, context)
+        if csv_factor > 0:
+            options["profile_params"] = {"weightings": {"csv_factor": csv_factor}}
 
         extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
         extra_info = [EXTRA_INFOS[i] for i in extra_info]
@@ -209,7 +222,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue
-            logger.log(str(response))
+
             if extra_info:
                 feats = directions_core.get_extra_info_features_directions(response)
                 for feat in feats:

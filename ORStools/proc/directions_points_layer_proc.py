@@ -35,6 +35,7 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
     QgsPointXY,
+    QgsProcessingParameterNumber,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
@@ -58,6 +59,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.IN_MODE = "INPUT_MODE"
         self.IN_SORTBY = "INPUT_SORTBY"
         self.EXTRA_INFO = "EXTRA_INFO"
+        self.CSV_FACTOR = "CSV_FACTOR"
         self.PARAMETERS = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
@@ -98,6 +100,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 allowMultiple=True,
                 optional=True,
             ),
+            QgsProcessingParameterNumber(
+                self.CSV_FACTOR,
+                self.tr("Csv Factor"),
+                type=QgsProcessingParameterNumber.Double,
+                minValue=0,
+                maxValue=1,
+            ),
         ]
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -110,6 +119,10 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         optimization_mode = parameters[self.IN_OPTIMIZE]
 
         options = self.parseOptions(parameters, context)
+
+        csv_factor = self.parameterAsDouble(parameters, self.CSV_FACTOR, context)
+        if csv_factor > 0:
+            options["profile_params"] = {"weightings": {"csv_factor": csv_factor}}
 
         extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
         extra_info = [EXTRA_INFOS[i] for i in extra_info]
