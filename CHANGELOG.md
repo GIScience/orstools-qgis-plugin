@@ -45,6 +45,7 @@ RELEASING:
 ### Fixed
 - QGis crashes when selecting more than two vertices for deletion ([#230](https://github.com/GIScience/orstools-qgis-plugin/issues/230))
 - Vertices on canvas not depicted fully with n having more than one digit in length ([#235](https://github.com/GIScience/orstools-qgis-plugin/issues/235))
+- Replace qt QSettings with QgsSettings for centralized configuration management ([#239](https://github.com/GIScience/orstools-qgis-plugin/issues/239))
 
 ### Added
 - Add support for decimal ranges with isochrones([#237](https://github.com/GIScience/orstools-qgis-plugin/issues/237))
