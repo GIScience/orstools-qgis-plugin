@@ -29,7 +29,7 @@
 
 from qgis.gui import QgsCollapsibleGroupBox
 
-from PyQt5 import QtWidgets
+from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QMetaObject
 from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit
 from qgis.PyQt.QtGui import QIntValidator
