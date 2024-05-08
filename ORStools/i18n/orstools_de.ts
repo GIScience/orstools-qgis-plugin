@@ -6,7 +6,7 @@
     <message>
         <location filename="../gui/ORStoolsDialog.py" line="79"/>
         <source>&lt;b&gt;ORS Tools&lt;/b&gt; provides access to &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; routing functionalities.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</source>
-        <translation>&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
+        <translation type="obsolete">&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialog.py" line="110"/>
@@ -17,44 +17,44 @@
 <context>
     <name>ORSBaseProcessingAlgorithm</name>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="119"/>
+        <location filename="../proc/base_processing_algorithm.py" line="120"/>
         <source>Provider</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Dienst wählen</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="130"/>
+        <location filename="../proc/base_processing_algorithm.py" line="131"/>
         <source>Travel mode</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Verkehrsmittel</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="148"/>
+        <location filename="../proc/base_processing_algorithm.py" line="149"/>
         <source>Features to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Vermeiden</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="156"/>
+        <location filename="../proc/base_processing_algorithm.py" line="157"/>
         <source>Types of borders to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Grenzen vermeiden</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="163"/>
+        <location filename="../proc/base_processing_algorithm.py" line="164"/>
         <source>Comma-separated list of ids of countries to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>zu vermeidende Länder-IDs (komma-separiert)</translation>
     </message>
     <message>
-        <location filename="../proc/base_processing_algorithm.py" line="172"/>
+        <location filename="../proc/base_processing_algorithm.py" line="173"/>
         <source>Polygons to avoid</source>
         <comment>ORSBaseProcessingAlgorithm</comment>
         <translation>Flächen vermeiden</translation>
     </message>
 </context>
 <context>
-    <name>ORSDirectionsLinesAlgorithm</name>
+    <name>ORSDirectionsLinesAlgo</name>
     <message>
         <location filename="../proc/directions_lines_proc.py" line="60"/>
         <source>Input Line layer</source>
@@ -79,6 +79,34 @@
         <location filename="../proc/directions_lines_proc.py" line="207"/>
         <source>Directions from 1 Polyline-Layer</source>
         <translation>Routenberechnung aus einem Polyline-Layer</translation>
+    </message>
+</context>
+<context>
+    <name>ORSDirectionsLinesAlgorithm</name>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="60"/>
+        <source>Input Line layer</source>
+        <translation type="obsolete">Eingabelayer (Linien)</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="65"/>
+        <source>Layer ID Field</source>
+        <translation type="obsolete">ID-Attribut</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="72"/>
+        <source>Travel preference</source>
+        <translation type="obsolete">Routenpräferenz</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="78"/>
+        <source>Traveling Salesman (omits other configurations)</source>
+        <translation type="obsolete">Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="207"/>
+        <source>Directions from 1 Polyline-Layer</source>
+        <translation type="obsolete">Routenberechnung aus einem Polyline-Layer</translation>
     </message>
 </context>
 <context>
@@ -109,7 +137,7 @@
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="203"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="202"/>
         <source>Directions from 1 Point-Layer</source>
         <translation>Routenberechnung aus einem Punkt-Layer</translation>
     </message>
@@ -264,12 +292,12 @@
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="403"/>
+        <location filename="../gui/ORStoolsDialog.py" line="418"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="404"/>
+        <location filename="../gui/ORStoolsDialog.py" line="419"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -551,8 +579,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="353"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Punkte aus Liste in Layer speichern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer. Use the processing algorithms (batch jobs) to work with points from layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Punkte aus Liste in Layer speichern. Verarbeitungswerkzeuge für die Arbeit mit Layern nutzen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -576,39 +604,44 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ORStoolsDialogConfigMain</name>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="124"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="127"/>
         <source>Enter a name for the provider</source>
         <translation>Name für Dienst angeben</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="135"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="138"/>
         <source>Remove ORS provider</source>
         <translation>Dienst entfernen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="135"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="138"/>
         <source>Choose provider to remove</source>
         <translation>Zu entfernenden Dienst auswählen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="186"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="189"/>
         <source>API Key</source>
         <translation>API-Key</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="194"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="197"/>
         <source>Base URL</source>
         <translation>Basis-URL</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="203"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="206"/>
         <source>Request timeout in seconds (1 - 3600)</source>
         <translation>Anfragen-Timeout in Sekunden (1 – 3600)</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialogConfig.py" line="124"/>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="127"/>
         <source>New ORS provider</source>
         <translation>Neuer ORS-Provider</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialogConfig.py" line="63"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
