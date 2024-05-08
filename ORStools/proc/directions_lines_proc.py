@@ -60,7 +60,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
                 description=self.tr("Input Line layer"),
-                types=[QgsProcessing.TypeVectorLine],
+                types=[QgsProcessing.SourceType.TypeVectorLine],
             ),
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
@@ -184,7 +184,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
             line = None
             field_value = feat[field_name] if field_name else None
 
-            if QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.MultiLineString:
+            if QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.Type.MultiLineString:
                 # TODO: only takes the first polyline geometry from the multiline geometry currently
                 # Loop over all polyline geometries
                 line = [
@@ -192,7 +192,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                     for point in feat.geometry().asMultiPolyline()[0]
                 ]
 
-            elif QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.LineString:
+            elif QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.Type.LineString:
                 line = [
                     x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()
                 ]

@@ -138,7 +138,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             self.OUT,
             context,
             self.isochrones.get_fields(),
-            QgsWkbTypes.Polygon,
+            QgsWkbTypes.Type.Polygon,
             # Needs Multipolygon if difference parameter will ever be
             # reactivated
             self.crs_out,

@@ -61,7 +61,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
                 description=self.tr("Input (Multi)Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
@@ -121,7 +121,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             self.OUT,
             context,
             sink_fields,
-            QgsWkbTypes.LineString,
+            QgsWkbTypes.Type.LineString,
             QgsCoordinateReferenceSystem.fromEpsgId(4326),
         )
 
@@ -142,13 +142,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         from_values = list()
         x_former = transform.transformToWGS(source.sourceCrs())
 
-        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Point:
+        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Type.Point:
             points = list()
             for feat in sorted(source.getFeatures(), key=sort):
                 points.append(x_former.transform(QgsPointXY(feat.geometry().asPoint())))
             input_points.append(points)
             from_values.append(None)
-        elif QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.MultiPoint:
+        elif QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Type.MultiPoint:
             # loop through multipoint features
             for feat in sorted(source.getFeatures(), key=sort):
                 for point in feat.geometry().asMultiPoint():

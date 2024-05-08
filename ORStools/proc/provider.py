@@ -29,7 +29,7 @@
 
 from qgis.core import QgsProcessingProvider
 
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
 from .directions_lines_proc import ORSDirectionsLinesAlgo

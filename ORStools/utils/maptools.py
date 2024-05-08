@@ -30,8 +30,8 @@
 from qgis.core import QgsWkbTypes
 from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtGui import QColor
 
 from ORStools import DEFAULT_COLOR
 
@@ -48,7 +48,7 @@ class LineTool(QgsMapToolEmitPoint):
         QgsMapToolEmitPoint.__init__(self, self.canvas)
 
         self.rubberBand = QgsRubberBand(
-            mapCanvas=self.canvas, geometryType=QgsWkbTypes.LineGeometry
+            mapCanvas=self.canvas, geometryType=QgsWkbTypes.GeometryType.LineGeometry
         )
         self.rubberBand.setStrokeColor(QColor(DEFAULT_COLOR))
         self.rubberBand.setWidth(3)
@@ -62,7 +62,7 @@ class LineTool(QgsMapToolEmitPoint):
         """reset rubber band and captured points."""
 
         self.points = []
-        self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
+        self.rubberBand.reset(geometryType=QgsWkbTypes.GeometryType.LineGeometry)
 
     pointDrawn = pyqtSignal(["QgsPointXY", "int"])
 
@@ -77,7 +77,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     def showLine(self):
         """Builds rubber band from all points and adds it to the map canvas."""
-        self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
+        self.rubberBand.reset(geometryType=QgsWkbTypes.GeometryType.LineGeometry)
         for point in self.points:
             if point == self.points[-1]:
                 self.rubberBand.addPoint(point, True)

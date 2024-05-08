@@ -30,9 +30,9 @@
 from qgis.gui import QgsCollapsibleGroupBox
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QMetaObject
-from PyQt5.QtWidgets import QDialog, QInputDialog, QLineEdit
-from PyQt5.QtGui import QIntValidator
+from qgis.PyQt.QtCore import QMetaObject
+from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit
+from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase

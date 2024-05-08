@@ -39,8 +39,8 @@ from qgis.core import (
     QgsCategorizedSymbolRenderer,
 )
 
-from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QColor
 
 
 # import processing
