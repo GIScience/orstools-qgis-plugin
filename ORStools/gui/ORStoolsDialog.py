@@ -522,6 +522,15 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
         self.annotation_canvas = self._iface.mapCanvas()
 
+        # Add icons to buttons
+        self.routing_fromline_map.setIcon(gui.GuiUtils.get_icon("icon_add.png"))
+        self.routing_fromline_clear.setIcon(gui.GuiUtils.get_icon("icon_clear.png"))
+        self.save_vertices.setIcon(gui.GuiUtils.get_icon("save_vertices.png"))
+        self.provider_refresh.setIcon(gui.GuiUtils.get_icon("icon_refresh.png"))
+        self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
+        self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
+        self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
+
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
         items = [
