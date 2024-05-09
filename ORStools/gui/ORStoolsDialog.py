@@ -32,6 +32,7 @@ import os
 import processing
 import webbrowser
 
+from qgis.PyQt import uic
 from qgis._core import Qgis
 from qgis.core import (
     QgsProject,
@@ -66,11 +67,9 @@ from ORStools.common import (
     PREFERENCES,
 )
 from ORStools.gui import directions_gui
-from ORStools.utils import exceptions, maptools, logger, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
-from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
-
 from . import resources_rc  # noqa: F401
+from ORStools.utils import exceptions, maptools, logger, configmanager, transform, gui
 
 
 def on_config_click(parent):
@@ -384,8 +383,9 @@ Please add polygons to the layer or uncheck avoid polygons.
     def tr(self, string):
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
+MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path('ORStoolsDialogUI.ui'))
 
-class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
+class ORStoolsDialog(QDialog, MAIN_WIDGET):
     """Define the custom behaviour of Dialog"""
 
     def __init__(self, iface, parent=None):
