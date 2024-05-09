@@ -39,12 +39,13 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtGui import QIntValidator
 
-from ORStools.utils import configmanager
+from ORStools.utils import configmanager, gui
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
 from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
+CONFIG_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path('ORStoolsDialogConfigUI.ui'))
 
-class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
+class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
     """Builds provider config dialog."""
 
     def __init__(self, parent=None) -> None:
