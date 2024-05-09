@@ -240,7 +240,9 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
                 else:
                     # flags() is a wrapper around an enum of ints for type-safety.
                     # Flags are added by or-ing values, much like the union operator would work
-                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
+                    param.setFlags(
+                        param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced
+                    )
 
             self.addParameter(param)
 

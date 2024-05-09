@@ -294,7 +294,9 @@ class NetworkAccessManager(object):
     def replyFinished(self):
         err = self.reply.error()
         httpStatus = self.reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
-        httpStatusMessage = self.reply.attribute(QNetworkRequest.Attribute.HttpReasonPhraseAttribute)
+        httpStatusMessage = self.reply.attribute(
+            QNetworkRequest.Attribute.HttpReasonPhraseAttribute
+        )
         self.http_call_result.status_code = httpStatus
         self.http_call_result.status = httpStatus
         self.http_call_result.status_message = httpStatusMessage
@@ -348,7 +350,9 @@ class NetworkAccessManager(object):
 
         else:
             # Handle redirections
-            redirectionUrl = self.reply.attribute(QNetworkRequest.Attribute.RedirectionTargetAttribute)
+            redirectionUrl = self.reply.attribute(
+                QNetworkRequest.Attribute.RedirectionTargetAttribute
+            )
             if redirectionUrl is not None and redirectionUrl != self.reply.url():
                 if redirectionUrl.isRelative():
                     redirectionUrl = self.reply.url().resolved(redirectionUrl)
