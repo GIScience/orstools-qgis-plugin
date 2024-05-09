@@ -34,11 +34,11 @@ from qgis.PyQt.QtCore import QMetaObject
 from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit, QDialogButtonBox
 from qgis.PyQt.QtGui import QIntValidator
 
-from ORStools.utils import configmanager
-from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
+from ORStools.utils import configmanager, gui
 
+CONFIG_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path('ORStoolsDialogConfigUI.ui'))
 
-class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
+class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
     """Builds provider config dialog."""
 
     def __init__(self, parent=None) -> None:
