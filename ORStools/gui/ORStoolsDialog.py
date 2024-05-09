@@ -83,7 +83,6 @@ from ORStools.common import (
 )
 from ORStools.gui import directions_gui
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
-from . import resources_rc  # noqa: F401
 from ORStools.utils import exceptions, maptools, logger, configmanager, transform, gui
 
 
