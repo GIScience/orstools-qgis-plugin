@@ -27,6 +27,7 @@
  ***************************************************************************/
 """
 
+import json
 import os
 from typing import Optional
 
@@ -41,6 +42,8 @@ except ModuleNotFoundError:
 
 import webbrowser
 
+from qgis.PyQt import uic
+from qgis._core import Qgis
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -83,6 +86,7 @@ from ORStools.common import (
     PREFERENCES,
 )
 from ORStools.utils import maptools, configmanager, transform
+from ORStools.gui import directions_gui
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
@@ -293,8 +297,9 @@ class ORStoolsDialogMain:
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
+MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path('ORStoolsDialogUI.ui'))
 
-class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
+class ORStoolsDialog(QDialog, MAIN_WIDGET):
     """Define the custom behaviour of Dialog"""
 
     def __init__(self, iface: QgisInterface, parent=None) -> None:
