@@ -151,19 +151,7 @@ class ORStoolsDialogMain:
     def initGui(self) -> None:
         """Called when plugin is activated (on QGIS startup or when activated in Plugin Manager)."""
 
-        def create_icon(f: str) -> QIcon:
-            """
-            internal function to create action icons
-
-            :param f: file name of icon.
-            :type f: str
-
-            :returns: icon object to insert to QAction
-            :rtype: QIcon
-            """
-            return QIcon(RESOURCE_PREFIX + f)
-
-        icon_plugin = create_icon("icon_orstools.png")
+        icon_plugin = gui.GuiUtils.get_icon("icon_orstools.png")
 
         self.actions = [
             QAction(
@@ -173,14 +161,14 @@ class ORStoolsDialogMain:
             ),
             # Config dialog
             QAction(
-                create_icon("icon_settings.png"),
+                gui.GuiUtils.get_icon("icon_settings.png"),
                 self.tr("Provider Settings"),
                 self.iface.mainWindow(),
             ),
             # About dialog
-            QAction(create_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()),
+            QAction(gui.GuiUtils.get_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()),
             # Help page
-            QAction(create_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()),
+            QAction(gui.GuiUtils.get_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()),
         ]
 
         # Create menu
