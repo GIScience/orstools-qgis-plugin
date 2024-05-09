@@ -864,9 +864,6 @@ p, li { white-space: pre-wrap; }
         <property name="autoFormatting">
          <set>QTextEdit::AutoBulletList</set>
         </property>
-        <property name="tabStopWidth">
-         <number>80</number>
-        </property>
         <property name="placeholderText">
          <string>Queries and errors will be printed here.</string>
         </property>
