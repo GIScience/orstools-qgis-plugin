@@ -29,7 +29,7 @@
 
 from qgis.gui import QgsCollapsibleGroupBox
 
-from qgis.PyQt import QtWidgets
+from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QMetaObject
 from qgis.PyQt.QtWidgets import (
     QDialog,
@@ -192,7 +192,7 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             provider_id = providers.index(provider)
             del self.temp_config["providers"][provider_id]
 
-    def _collapse_boxes(self) -> None:
+    def _collapse_boxes(self):
         """Collapse all QgsCollapsibleGroupBoxes."""
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for box in collapsible_boxes:
