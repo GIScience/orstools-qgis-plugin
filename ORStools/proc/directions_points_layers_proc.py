@@ -60,7 +60,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
                 description=self.tr("Input Start Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_START_FIELD,
@@ -79,7 +79,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
                 description=self.tr("Input End Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_END_FIELD,
@@ -175,7 +175,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             self.OUT,
             context,
             sink_fields,
-            QgsWkbTypes.LineString,
+            QgsWkbTypes.Type.LineString,
             QgsCoordinateReferenceSystem.fromEpsgId(4326),
         )
 

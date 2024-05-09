@@ -28,7 +28,7 @@
 """
 
 from qgis.core import QgsApplication, QgsSettings
-from PyQt5.QtCore import QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication
 import os.path
 
 from .gui import ORStoolsDialog

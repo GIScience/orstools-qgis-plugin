@@ -263,7 +263,7 @@ class NetworkAccessManager(object):
 
         # Catch all exceptions (and clean up requests)
         try:
-            self.el.exec_(QEventLoop.ExcludeUserInputEvents)
+            self.el.exec(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
         except Exception as e:
             raise e
 
@@ -293,8 +293,8 @@ class NetworkAccessManager(object):
 
     def replyFinished(self):
         err = self.reply.error()
-        httpStatus = self.reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
-        httpStatusMessage = self.reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute)
+        httpStatus = self.reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
+        httpStatusMessage = self.reply.attribute(QNetworkRequest.Attribute.HttpReasonPhraseAttribute)
         self.http_call_result.status_code = httpStatus
         self.http_call_result.status = httpStatus
         self.http_call_result.status_message = httpStatusMessage
@@ -306,7 +306,7 @@ class NetworkAccessManager(object):
                 v.data(), encoding="utf-8"
             )
 
-        if err != QNetworkReply.NoError:
+        if err != QNetworkReply.NetworkError.NoError:
             # handle error
             # check if errorString is empty, if so, then set err string as
             # reply dump
@@ -326,13 +326,13 @@ class NetworkAccessManager(object):
             self.http_call_result.ok = False
             self.msg_log(msg)
             # set return exception
-            if err == QNetworkReply.TimeoutError:
+            if err == QNetworkReply.NetworkError.TimeoutError:
                 self.http_call_result.exception = RequestsExceptionTimeout(msg)
 
-            elif err == QNetworkReply.ConnectionRefusedError:
+            elif err == QNetworkReply.NetworkError.ConnectionRefusedError:
                 self.http_call_result.exception = RequestsExceptionConnectionError(msg)
 
-            elif err == QNetworkReply.OperationCanceledError:
+            elif err == QNetworkReply.NetworkError.OperationCanceledError:
                 # request abort by calling NAM.abort() => cancelled by the user
                 if self.on_abort:
                     self.http_call_result.exception = RequestsExceptionUserAbort(msg)
@@ -348,7 +348,7 @@ class NetworkAccessManager(object):
 
         else:
             # Handle redirections
-            redirectionUrl = self.reply.attribute(QNetworkRequest.RedirectionTargetAttribute)
+            redirectionUrl = self.reply.attribute(QNetworkRequest.Attribute.RedirectionTargetAttribute)
             if redirectionUrl is not None and redirectionUrl != self.reply.url():
                 if redirectionUrl.isRelative():
                     redirectionUrl = self.reply.url().resolved(redirectionUrl)

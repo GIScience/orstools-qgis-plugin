@@ -46,9 +46,9 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
-from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
+from qgis.PyQt.QtGui import QIcon, QTextDocument
+from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
 from ORStools import (
     RESOURCE_PREFIX,
@@ -80,7 +80,7 @@ def on_config_click(parent):
     :type parent: QDialog
     """
     config_dlg = ORStoolsDialogConfigMain(parent=parent)
-    config_dlg.exec_()
+    config_dlg.exec()
 
 
 def on_help_click():
@@ -227,7 +227,7 @@ class ORStoolsDialogMain:
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
-            self.dlg.avoidpolygon_dropdown.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+            self.dlg.avoidpolygon_dropdown.setFilters(QgsMapLayerProxyModel.Filter.PolygonLayer)
 
         # Populate provider box on window startup, since can be changed from multiple menus/buttons
         providers = configmanager.read_config()["providers"]
@@ -416,8 +416,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_preference_combo.addItems(PREFERENCES)
 
         # Change OK and Cancel button names
-        self.global_buttons.button(QDialogButtonBox.Ok).setText(self.tr("Apply"))
-        self.global_buttons.button(QDialogButtonBox.Cancel).setText(self.tr("Close"))
+        self.global_buttons.button(QDialogButtonBox.StandardButton.Ok).setText(self.tr("Apply"))
+        self.global_buttons.button(QDialogButtonBox.StandardButton.Cancel).setText(self.tr("Close"))
 
         # Set up signals/slots
 
@@ -480,7 +480,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self._iface.mapCanvas().refresh()
 
         self._iface.messageBar().pushMessage(
-            "Success", "Vertices saved to layer.", level=Qgis.Success
+            "Success", "Vertices saved to layer.", level=Qgis.MessageLevel.Success
         )
 
     def _on_prov_refresh_click(self):
