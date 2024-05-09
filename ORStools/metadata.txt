@@ -2,6 +2,7 @@
 name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
+supportsQt6=True
 
 version=1.7.1
 author=HeiGIT gGmbH
