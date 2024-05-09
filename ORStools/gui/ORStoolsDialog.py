@@ -359,6 +359,16 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
+        # Add icons to buttons
+        self.routing_fromline_map.setIcon(gui.GuiUtils.get_icon("icon_add.png"))
+        self.routing_fromline_clear.setIcon(gui.GuiUtils.get_icon("icon_clear.png"))
+        self.save_vertices.setIcon(gui.GuiUtils.get_icon("save_vertices.png"))
+        self.provider_refresh.setIcon(gui.GuiUtils.get_icon("icon_refresh.png"))
+        self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
+        self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
+        self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
+
+    def _save_vertices_to_layer(self):
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(
             lambda: self.color_duplicate_items(self.routing_fromline_list)
@@ -528,13 +538,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             else:
                 item_dict[text] = [index]
 
-        for indices in item_dict.values():
-            if len(indices) > 1:
-                for index in indices:
-                    item = list_widget.item(index)
-                    item.setBackground(QColor("lightsalmon"))
-
-    def reload_rubber_band(self) -> None:
-        """Reloads the rubber band of the linetool."""
-        if self.line_tool is not None:
-            self.line_tool.create_rubber_band()
+        self.line_tool.pointDrawn.disconnect()
+        self.line_tool.doubleClicked.disconnect()
+        QApplication.restoreOverrideCursor()
+        self._iface.mapCanvas().setMapTool(self.last_maptool)
+        self.show()
