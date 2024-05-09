@@ -212,4 +212,3 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         gridLayout_3.addWidget(timeout_text, 5, 0, 1, 4)
 
         self.verticalLayout.addWidget(provider)
-        provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
