@@ -32,7 +32,6 @@ import os
 from qgis.core import QgsSettings
 
 
-
 def read_config():
     """
     Reads config.yml from file and returns the parsed dict.
