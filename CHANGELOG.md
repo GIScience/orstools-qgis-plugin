@@ -40,6 +40,8 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+# Unreleased
+- Add option to export order of optimization route points ([#145](https://github.com/GIScience/orstools-qgis-plugin/issues/145))
 
 ## Unreleased
 

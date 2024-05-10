@@ -320,6 +320,29 @@ Remember, the first and last location are not part of the optimization.
                     )
                     return
                 response = clnt.request("/optimization", {}, post_json=params)
+
+                if self.dlg.export_jobs_order.isChecked():
+                    items = list()
+                    for route in response["routes"]:
+                        for i, step in enumerate(route["steps"]):
+                            location = step["location"]
+                            items.append(location)
+
+                    point_layer = QgsVectorLayer(
+                        "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                    )
+
+                    point_layer.updateFields()
+                    for idx, coords in enumerate(items):
+                        x, y = coords
+                        feature = QgsFeature()
+                        feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                        feature.setAttributes([idx])
+
+                        point_layer.dataProvider().addFeature(feature)
+                    QgsProject.instance().addMapLayer(point_layer)
+                    self.dlg._iface.mapCanvas().refresh()
+
                 feat = directions_core.get_output_features_optimization(
                     response, params["vehicles"][0]["profile"]
                 )
