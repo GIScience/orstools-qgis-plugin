@@ -40,6 +40,7 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+
 ## Unreleased
 
 ### Fixed
@@ -49,6 +50,7 @@ RELEASING:
 
 ### Added
 - Add support for decimal ranges with isochrones([#237](https://github.com/GIScience/orstools-qgis-plugin/issues/237))
+- Add hint for joining with `Layer ID Field` ([#143](https://github.com/GIScience/orstools-qgis-plugin/issues/143))
 
 ### Changed
 - Rename `Ok` button in configuration window to `Save` for clarification([#241](https://github.com/GIScience/orstools-qgis-plugin/issues/241))
