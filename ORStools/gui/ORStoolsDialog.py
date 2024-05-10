@@ -518,7 +518,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         if self.line_tool:
             self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
 
-    def _linetool_annotate_point(self, point: QgsPointXY, idx: int, crs=None) -> QgsAnnotation:
+    def _linetool_annotate_point(self, point: QgsPointXY, idx: int, crs: Optional [QgsCoordinateReferenceSystem]=None) -> QgsAnnotation:
         if not crs:
             crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
