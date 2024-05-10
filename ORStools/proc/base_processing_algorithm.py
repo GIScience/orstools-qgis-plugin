@@ -27,7 +27,6 @@
  ***************************************************************************/
 """
 
-
 from PyQt5.QtCore import QCoreApplication, QSettings
 from qgis.core import (
     QgsProcessing,
