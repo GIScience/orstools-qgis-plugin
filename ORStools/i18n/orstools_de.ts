@@ -117,11 +117,6 @@
         <translation>Eingabelayer ((Multi)Point)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="66"/>
-        <source>Layer ID Field</source>
-        <translation>ID-Attribut</translation>
-    </message>
-    <message>
         <location filename="../proc/directions_points_layer_proc.py" line="73"/>
         <source>Sort Points by</source>
         <translation>Punkte sortieren nach</translation>
@@ -140,6 +135,11 @@
         <location filename="../proc/directions_points_layer_proc.py" line="202"/>
         <source>Directions from 1 Point-Layer</source>
         <translation>Routenberechnung aus einem Punkt-Layer</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layer_proc.py" line="66"/>
+        <source>Layer ID Field (can be used for joining)</source>
+        <translation>ID-Attribut (zum Beispiel für joins)</translation>
     </message>
 </context>
 <context>
@@ -580,7 +580,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="353"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer. Use the processing algorithms (batch jobs) to work with points from layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Punkte aus Liste in Layer speichern. Verarbeitungswerkzeuge für die Arbeit mit Layern nutzen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Punkte aus Liste in Layer speichern. Verarbeitungswerkzeuge für die Arbeit mit Punkt-Layern verwenden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
