@@ -42,10 +42,11 @@ from qgis.core import (
     QgsPointXY,
     QgsGeometry,
     QgsCoordinateReferenceSystem,
+    QgsSettings,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 
@@ -247,10 +248,10 @@ class ORStoolsDialogMain:
 
         # add ors svg path
         my_new_path = os.path.join(basepath, "img/svg")
-        svg_paths = QSettings().value("svg/searchPathsForSVG") or []
+        svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
         if my_new_path not in svg_paths:
             svg_paths.append(my_new_path)
-            QSettings().setValue("svg/searchPathsForSVG", svg_paths)
+            QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
 
         # style output layer
         qml_path = os.path.join(basepath, "linestyle.qml")
@@ -494,12 +495,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         """Clears the contents of the QgsListWidget and the annotations."""
         items = self.routing_fromline_list.selectedItems()
         if items:
+            rows = [self.routing_fromline_list.row(item) for item in items]
             # if items are selected, only clear those
-            for item in items:
-                row = self.routing_fromline_list.row(item)
-                self.routing_fromline_list.takeItem(row)
+            for row in sorted(rows, reverse=True):
                 if self.annotations:
                     self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
+                self.routing_fromline_list.takeItem(row)
         else:
             # else clear all items and annotations
             self.routing_fromline_list.clear()
@@ -521,7 +522,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         annotation.setDocument(c)
 
-        annotation.setFrameSizeMm(QSizeF(7, 5))
+        annotation.setFrameSizeMm(QSizeF(8, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
         annotation.setMapPosition(point)
         annotation.setMapPositionCrs(crs)

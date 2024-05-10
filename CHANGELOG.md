@@ -40,8 +40,20 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-# Unreleased
+
+## Unreleased
+
+### Fixed
+- QGis crashes when selecting more than two vertices for deletion ([#230](https://github.com/GIScience/orstools-qgis-plugin/issues/230))
+- Vertices on canvas not depicted fully with n having more than one digit in length ([#235](https://github.com/GIScience/orstools-qgis-plugin/issues/235))
+- Replace qt QSettings with QgsSettings for centralized configuration management ([#239](https://github.com/GIScience/orstools-qgis-plugin/issues/239))
+
+### Added
+- Add support for decimal ranges with isochrones([#237](https://github.com/GIScience/orstools-qgis-plugin/issues/237))
 - Add hint for joining with `Layer ID Field` ([#143](https://github.com/GIScience/orstools-qgis-plugin/issues/143))
+
+### Changed
+- Rename `Ok` button in configuration window to `Save` for clarification([#241](https://github.com/GIScience/orstools-qgis-plugin/issues/241))
 
 ## [1.7.1] - 2024-01-15
 

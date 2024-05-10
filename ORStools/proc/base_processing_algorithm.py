@@ -26,7 +26,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QCoreApplication, QSettings
+
+from PyQt5.QtCore import QCoreApplication
 from qgis.core import (
     QgsProcessing,
     QgsProcessingAlgorithm,
@@ -37,6 +38,7 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
     QgsProcessingFeedback,
+    QgsSettings,
 )
 from typing import Any
 
@@ -94,7 +96,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Displays the sidebar help in the algorithm window
         """
-        locale = QSettings().value("locale/userLocale")[0:2]
+        locale = QgsSettings().value("locale/userLocale")[0:2]
 
         return read_help_file(algorithm=self.ALGO_NAME, locale=locale)
 
