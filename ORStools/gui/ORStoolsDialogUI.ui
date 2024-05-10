@@ -357,7 +357,7 @@
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/save_vertices.png</normaloff>:/plugins/ORStools/img/save_vertices.png</iconset>
+              <normaloff>:/plugins/ORStools/img/icon_save.png</normaloff>:/plugins/ORStools/img/icon_save.png</iconset>
             </property>
            </widget>
           </item>
@@ -387,10 +387,10 @@
          <property name="checked">
           <bool>false</bool>
          </property>
-         <property name="collapsed">
+         <property name="collapsed" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="saveCollapsedState">
+         <property name="saveCollapsedState" stdset="0">
           <bool>false</bool>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -429,10 +429,10 @@
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0">
@@ -541,10 +541,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
@@ -615,10 +615,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -661,10 +661,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -673,7 +673,7 @@ p, li { white-space: pre-wrap; }
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid areas by specifying a (Multi-)Polygon layer. &lt;/p&gt;&lt;p&gt;Does &lt;span style=&quot; font-weight:600;&quot;&gt;not work&lt;/span&gt; for memory (scratch) Polygon layers!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;, only the first feature of the layer will be respected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
-               <property name="showCrs">
+               <property name="showCrs" stdset="0">
                 <bool>false</bool>
                </property>
               </widget>
@@ -821,10 +821,10 @@ p, li { white-space: pre-wrap; }
      <property name="flat">
       <bool>true</bool>
      </property>
-     <property name="collapsed">
+     <property name="collapsed" stdset="0">
       <bool>true</bool>
      </property>
-     <property name="saveCollapsedState">
+     <property name="saveCollapsedState" stdset="0">
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">

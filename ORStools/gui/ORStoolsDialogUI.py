@@ -205,7 +205,7 @@ class Ui_ORStoolsDialogBase(object):
         self.save_vertices.setSizePolicy(sizePolicy)
         self.save_vertices.setText("")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/plugins/ORStools/img/save_vertices.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(":/plugins/ORStools/img/icon_save.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.save_vertices.setIcon(icon4)
         self.save_vertices.setObjectName("save_vertices")
         self.gridLayout.addWidget(self.save_vertices, 2, 0, 1, 1)
