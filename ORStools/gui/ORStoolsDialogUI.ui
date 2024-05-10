@@ -520,6 +520,9 @@ p, li { white-space: pre-wrap; }
              </item>
              <item row="3" column="1" colspan="2">
               <widget class="QCheckBox" name="export_jobs_order">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;body&gt;&lt;p&gt;Create a point layer with the order in which the waypoints are traversed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Export order of jobs</string>
                </property>
