@@ -78,7 +78,7 @@ class ORStools:
         QgsApplication.processingRegistry().removeProvider(self.provider)
         self.dialog.unload()
 
-    def add_default_provoder_to_settings(self):
+    def add_default_provider_to_settings(self):
         s = QgsSettings()
         settings = s.value("ORStools/config")
         if not settings:
