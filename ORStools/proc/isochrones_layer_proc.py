@@ -207,7 +207,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: self.dest_id}
 
     # noinspection PyUnusedLocal
-    def postProcessAlgorithm(self, context, feedback) -> Dict[str, str]:
+    def postProcessAlgorithm(
+        self, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         """Style polygon layer in post-processing step."""
         # processed_layer = self.isochrones.calculate_difference(self.dest_id, context)
         processed_layer = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
