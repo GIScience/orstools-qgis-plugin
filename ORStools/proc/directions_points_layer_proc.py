@@ -37,6 +37,8 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
     QgsPointXY,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
@@ -94,7 +96,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback) -> Dict[str, str]:
+    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
