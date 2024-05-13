@@ -86,7 +86,9 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> Dict[str, str]:
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         # Get profile value

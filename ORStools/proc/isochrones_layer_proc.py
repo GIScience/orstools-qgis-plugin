@@ -42,7 +42,6 @@ from qgis.core import (
     QgsProcessingParameterNumber,
     QgsProcessingContext,
     QgsProcessingFeedback,
-
 )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
@@ -118,7 +117,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.prepareAlgorithm
-    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> Dict[str, str]:
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
