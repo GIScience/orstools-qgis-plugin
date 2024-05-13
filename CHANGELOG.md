@@ -41,6 +41,7 @@ RELEASING:
  -->
 
 ## Unreleased
+- Use QgsSettings instead of config.yml file to avoid deletion of providers on update ([#108](https://github.com/GIScience/orstools-qgis-plugin/issues/108))
 
 ### Fixed
 - QGis crashes when selecting more than two vertices for deletion ([#230](https://github.com/GIScience/orstools-qgis-plugin/issues/230))
