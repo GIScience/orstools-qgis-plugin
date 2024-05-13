@@ -38,6 +38,8 @@ from qgis.core import (
     QgsProcessingException,
     QgsProcessingParameterField,
     QgsProcessingParameterFeatureSource,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
 from PyQt5.QtCore import QVariant
@@ -84,7 +86,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback) -> Dict[str, str]:
+    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         # Get profile value
