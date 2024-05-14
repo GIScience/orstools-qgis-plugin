@@ -147,10 +147,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/plugins/ORStools/img/icon_refresh.png</normaloff>:/plugins/ORStools/img/icon_refresh.png</iconset>
-        </property>
        </widget>
       </item>
       <item>
@@ -166,10 +162,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/plugins/ORStools/img/icon_settings.png</normaloff>:/plugins/ORStools/img/icon_settings.png</iconset>
         </property>
        </widget>
       </item>
@@ -278,10 +270,6 @@
             <property name="text">
              <string/>
             </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/icon_add.png</normaloff>:/plugins/ORStools/img/icon_add.png</iconset>
-            </property>
            </widget>
           </item>
           <item row="1" column="0">
@@ -297,10 +285,6 @@
             </property>
             <property name="text">
              <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/icon_clear.png</normaloff>:/plugins/ORStools/img/icon_clear.png</iconset>
             </property>
            </widget>
           </item>
@@ -354,10 +338,6 @@
             </property>
             <property name="text">
              <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/icon_save.png</normaloff>:/plugins/ORStools/img/icon_save.png</iconset>
             </property>
            </widget>
           </item>
@@ -895,20 +875,12 @@ p, li { white-space: pre-wrap; }
         <property name="text">
          <string>  Help</string>
         </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/plugins/ORStools/img/icon_help.png</normaloff>:/plugins/ORStools/img/icon_help.png</iconset>
-        </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="about_button">
         <property name="text">
          <string>About</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/plugins/ORStools/img/icon_about.png</normaloff>:/plugins/ORStools/img/icon_about.png</iconset>
         </property>
        </widget>
       </item>
@@ -950,9 +922,6 @@ p, li { white-space: pre-wrap; }
    <header>qgsmaplayercombobox.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
  <connections>
   <connection>
    <sender>global_buttons</sender>
