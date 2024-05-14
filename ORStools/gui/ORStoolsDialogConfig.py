@@ -76,7 +76,7 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             ).text()
             timeout_input = box.findChild(QtWidgets.QLineEdit, box.title() + "_timeout_text")
             # https://doc.qt.io/qt-5/qvalidator.html#State-enum
-            if timeout_input.validator().State() != 2:
+            if timeout_input.validator().State != 2:
                 self._adjust_timeout_input(timeout_input)
             current_provider["timeout"] = int(timeout_input.text())
 
