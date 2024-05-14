@@ -7,19 +7,16 @@ the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 """
 
-__author__ = '(C) 2018 by Nyall Dawson'
-__date__ = '20/04/2018'
-__copyright__ = 'Copyright 2018, North Road'
+__author__ = "(C) 2018 by Nyall Dawson"
+__date__ = "20/04/2018"
+__copyright__ = "Copyright 2018, North Road"
 # This will get replaced with a git SHA1 when you do a git archive
-__revision__ = '$Format:%H$'
+__revision__ = "$Format:%H$"
 
 import math
 import os
 import re
-from typing import (
-    Optional,
-    Union
-)
+from typing import Optional, Union
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import (
@@ -30,18 +27,13 @@ from qgis.PyQt.QtGui import (
     QPixmap,
     QFontDatabase,
     QColor,
-    QPainter
+    QPainter,
 )
 from qgis.PyQt.QtSvg import QSvgRenderer
-from qgis.PyQt.QtWidgets import (
-    QMenu
-)
-from qgis.core import (
-    Qgis
-)
+from qgis.PyQt.QtWidgets import QMenu
+from qgis.core import Qgis
 from qgis.utils import iface
 
-from ORStools import RESOURCE_PREFIX
 from ORStools.utils import logger
 
 FONT_FAMILIES = ""
@@ -80,9 +72,9 @@ class GuiUtils:
     APPLICATION_FONT_MAP = {}
 
     @staticmethod
-    def set_link_color(html: str,
-                       wrap_color=True,
-                       color: Optional[Union[QColor, str]] = None) -> str:
+    def set_link_color(
+        html: str, wrap_color=True, color: Optional[Union[QColor, str]] = None
+    ) -> str:
         """
         Adds style tags to links in a HTML string for the standard link color
         """
@@ -92,13 +84,10 @@ class GuiUtils:
             else:
                 color_string = color.name()
         else:
-            color_string = 'rgba(0,0,0,.3)'
-        res = re.sub(r'(<a href.*?)>',
-                     r'\1 style="color: {};">'.format(color_string),
-                     html)
+            color_string = "rgba(0,0,0,.3)"
+        res = re.sub(r"(<a href.*?)>", r'\1 style="color: {};">'.format(color_string), html)
         if wrap_color:
-            res = '<span style="color: {};">{}</span>'.format(color_string,
-                                                              res)
+            res = '<span style="color: {};">{}</span>'.format(color_string, res)
         return res
 
     @staticmethod
@@ -121,14 +110,10 @@ class GuiUtils:
         :param icon: icon name (svg file name)
         :return: icon svg path
         """
-        path = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            'gui/img',
-            icon)
+        path = os.path.join(os.path.dirname(__file__), "..", "gui/img", icon)
         logger.log(path)
         if not os.path.exists(path):
-            return ''
+            return ""
 
         return path
 
@@ -139,11 +124,7 @@ class GuiUtils:
         :param icon: icon name (png file name)
         :return: icon png path
         """
-        path = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            'icons',
-            icon)
+        path = os.path.join(os.path.dirname(__file__), "..", "icons", icon)
         if not os.path.exists(path):
             return QPixmap()
 
@@ -151,9 +132,13 @@ class GuiUtils:
         return QPixmap.fromImage(im)
 
     @staticmethod
-    def get_svg_as_image(icon: str, width: int, height: int,
-                         background_color: Optional[QColor] = None,
-                         device_pixel_ratio: float = 1) -> QImage:
+    def get_svg_as_image(
+        icon: str,
+        width: int,
+        height: int,
+        background_color: Optional[QColor] = None,
+        device_pixel_ratio: float = 1,
+    ) -> QImage:
         """
         Returns an SVG returned as an image
         """
@@ -162,9 +147,9 @@ class GuiUtils:
             return QImage()
 
         renderer = QSvgRenderer(path)
-        image = QImage(int(width * device_pixel_ratio),
-                       int(height * device_pixel_ratio),
-                       QImage.Format_ARGB32)
+        image = QImage(
+            int(width * device_pixel_ratio), int(height * device_pixel_ratio), QImage.Format_ARGB32
+        )
         image.setDevicePixelRatio(device_pixel_ratio)
         if not background_color:
             image.fill(Qt.transparent)
@@ -172,8 +157,7 @@ class GuiUtils:
             image.fill(background_color)
 
         painter = QPainter(image)
-        painter.scale(1 / device_pixel_ratio,
-                      1 / device_pixel_ratio)
+        painter.scale(1 / device_pixel_ratio, 1 / device_pixel_ratio)
         renderer.render(painter)
         painter.end()
 
@@ -186,11 +170,7 @@ class GuiUtils:
         :param file: file name (uifile name)
         :return: ui file path
         """
-        path = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            'gui',
-            file)
+        path = os.path.join(os.path.dirname(__file__), "..", "gui", file)
         if not os.path.exists(path):
             return path
 
@@ -203,8 +183,9 @@ class GuiUtils:
         """
         fm = QFontMetrics((QFont()))
         scale = 1.1 * standard_size / 24.0
-        return int(math.floor(max(Qgis.UI_SCALE_FACTOR * fm.height() * scale,
-                                  float(standard_size))))
+        return int(
+            math.floor(max(Qgis.UI_SCALE_FACTOR * fm.height() * scale, float(standard_size)))
+        )
 
     @staticmethod
     def get_default_font() -> QFont:
@@ -212,8 +193,8 @@ class GuiUtils:
         Returns the best font match for the Koordinates default font
         families which is available on the system
         """
-        for family in FONT_FAMILIES.split(','):
-            family_cleaned = re.match(r'^\s*\'?(.*?)\'?\s*$', family).group(1)
+        for family in FONT_FAMILIES.split(","):
+            family_cleaned = re.match(r"^\s*\'?(.*?)\'?\s*$", family).group(1)
             font = QFont(family_cleaned)
             if font.exactMatch():
                 return font
@@ -227,13 +208,9 @@ class GuiUtils:
         :param font: font name
         :return: font file path
         """
-        path = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            'fonts',
-            font)
+        path = os.path.join(os.path.dirname(__file__), "..", "fonts", font)
         if not os.path.exists(path):
-            return ''
+            return ""
 
         return path
 
@@ -267,8 +244,7 @@ class GuiUtils:
             pass
 
         project_menu = iface.projectMenu()
-        matches = [m for m in project_menu.children()
-                   if m.objectName() == 'menuImport_Export']
+        matches = [m for m in project_menu.children() if m.objectName() == "menuImport_Export"]
         if matches:
             return matches[0]
 

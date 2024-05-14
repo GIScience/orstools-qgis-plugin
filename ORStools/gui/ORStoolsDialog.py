@@ -67,7 +67,6 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ORStools import (
-    RESOURCE_PREFIX,
     PLUGIN_NAME,
     DEFAULT_COLOR,
     __version__,
@@ -166,9 +165,13 @@ class ORStoolsDialogMain:
                 self.iface.mainWindow(),
             ),
             # About dialog
-            QAction(gui.GuiUtils.get_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()
+            ),
             # Help page
-            QAction(gui.GuiUtils.get_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()
+            ),
         ]
 
         # Create menu
@@ -439,7 +442,9 @@ Please add polygons to the layer or uncheck avoid polygons.
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
-MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path('ORStoolsDialogUI.ui'))
+
+MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
+
 
 class ORStoolsDialog(QDialog, MAIN_WIDGET):
     """Define the custom behaviour of Dialog"""
