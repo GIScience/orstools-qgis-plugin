@@ -60,6 +60,8 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInterface
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
+from qgis.PyQt.QtGui import QTextDocument
+from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
 from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
 from qgis.PyQt.QtWidgets import (
     QAction,

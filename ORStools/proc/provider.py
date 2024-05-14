@@ -29,9 +29,8 @@
 
 from qgis.core import QgsProcessingProvider
 
-from qgis.PyQt.QtGui import QIcon
 
-from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
+from ORStools import PLUGIN_NAME, __version__
 from .directions_lines_proc import ORSDirectionsLinesAlgo
 from .directions_points_layer_proc import ORSDirectionsPointsLayerAlgo
 from .directions_points_layers_proc import ORSDirectionsPointsLayersAlgo
@@ -43,7 +42,6 @@ from ORStools.utils.gui import GuiUtils
 
 from .snap_layer_proc import ORSSnapLayerAlgo
 from .snap_point_proc import ORSSnapPointAlgo
-
 
 class ORStoolsProvider(QgsProcessingProvider):
     def __init__(self):
