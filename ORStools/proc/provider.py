@@ -39,6 +39,8 @@ from .export_proc import ORSExportAlgo
 from .isochrones_layer_proc import ORSIsochronesLayerAlgo
 from .isochrones_point_proc import ORSIsochronesPointAlgo
 from .matrix_proc import ORSMatrixAlgo
+from ORStools.utils.gui import GuiUtils
+
 
 
 class ORStoolsProvider(QgsProcessingProvider):
@@ -67,8 +69,8 @@ class ORStoolsProvider(QgsProcessingProvider):
         self.addAlgorithm(ORSExportAlgo())
 
     @staticmethod
-    def icon() -> QIcon:
-        return QIcon(RESOURCE_PREFIX + "icon_orstools.png")
+    def icon():
+        return GuiUtils.get_icon("icon_orstools.png")
 
     @staticmethod
     def id() -> str:
