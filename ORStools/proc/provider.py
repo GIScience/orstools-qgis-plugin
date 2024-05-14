@@ -38,6 +38,8 @@ from .directions_points_layers_proc import ORSDirectionsPointsLayersAlgo
 from .isochrones_layer_proc import ORSIsochronesLayerAlgo
 from .isochrones_point_proc import ORSIsochronesPointAlgo
 from .matrix_proc import ORSMatrixAlgo
+from ORStools.utils.gui import GuiUtils
+
 
 
 class ORStoolsProvider(QgsProcessingProvider):
@@ -66,7 +68,7 @@ class ORStoolsProvider(QgsProcessingProvider):
 
     @staticmethod
     def icon():
-        return QIcon(RESOURCE_PREFIX + "icon_orstools.png")
+        return GuiUtils.get_icon("icon_orstools.png")
 
     @staticmethod
     def id():
