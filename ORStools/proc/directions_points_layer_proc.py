@@ -156,7 +156,6 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             **get_fields_options, line=True, extra_info=extra_info
         )
 
-
         (sink, dest_id) = self.parameterAsSink(
             parameters,
             self.OUT,
@@ -221,7 +220,9 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     )
 
                     if extra_info:
-                        feats = directions_core.get_extra_info_features_directions(response, extra_info)
+                        feats = directions_core.get_extra_info_features_directions(
+                            response, extra_info
+                        )
                         for feat in feats:
                             sink.addFeature(feat)
                     else:
