@@ -27,6 +27,8 @@
  ***************************************************************************/
 """
 
+from typing import List, Dict, Generator
+
 from qgis._core import (
     QgsFeature,
     QgsVectorLayer,
@@ -42,6 +44,9 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
     QgsPointXY,
+    QgsProcessingFeatureSource,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
@@ -56,15 +61,15 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
 
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "directions_from_polylines_layer"
-        self.GROUP = "Directions"
-        self.IN_LINES = "INPUT_LINE_LAYER"
-        self.IN_FIELD = "INPUT_LAYER_FIELD"
-        self.IN_PREFERENCE = "INPUT_PREFERENCE"
-        self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
-        self.IN_MODE = "INPUT_MODE"
-        self.EXPORT_ORDER = "EXPORT_ORDER"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "directions_from_polylines_layer"
+        self.GROUP: str = "Directions"
+        self.IN_LINES: str = "INPUT_LINE_LAYER"
+        self.IN_FIELD: str = "INPUT_LAYER_FIELD"
+        self.IN_PREFERENCE: str = "INPUT_PREFERENCE"
+        self.IN_OPTIMIZE: str = "INPUT_OPTIMIZE"
+        self.IN_MODE: str = "INPUT_MODE"
+        self.EXPORT_ORDER: str = "EXPORT_ORDER"
+        self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
                 description=self.tr("Input Line layer"),
@@ -93,7 +98,9 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -199,7 +206,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_sorted_lines(layer, field_name):
+    def _get_sorted_lines(layer: QgsProcessingFeatureSource, field_name: str) -> Generator:
         """
         Generator to yield geometry and ID value sorted by feature ID. Careful: feat.id() is not necessarily
         permanent
@@ -229,7 +236,6 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 line = [
                     x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()
                 ]
-
             yield line, field_value
 
     def displayName(self) -> str:

@@ -29,14 +29,14 @@
 
 from itertools import product
 from qgis.core import QgsPoint, QgsPointXY, QgsGeometry, QgsFeature, QgsFields, QgsField
-from typing import List
+from typing import List, Generator, Tuple, Any, Optional
 
 from PyQt5.QtCore import QVariant
 
 from ORStools.utils import convert
 
 
-def get_request_point_features(route_dict, row_by_row):
+def get_request_point_features(route_dict: dict, row_by_row: str) -> Generator[List, Tuple, None]:
     """
     Processes input point features depending on the layer to layer relation in directions settings
 
@@ -75,12 +75,12 @@ def get_request_point_features(route_dict, row_by_row):
 
 
 def get_fields(
-    from_type=QVariant.String,
-    to_type=QVariant.String,
-    from_name="FROM_ID",
-    to_name="TO_ID",
-    line=False,
-):
+    from_type: QVariant.Type = QVariant.String,
+    to_type: QVariant.Type = QVariant.String,
+    from_name: str = "FROM_ID",
+    to_name: str = "TO_ID",
+    line: bool = False,
+) -> QgsFields:
     """
     Builds output fields for directions response layer.
 
@@ -117,8 +117,13 @@ def get_fields(
 
 
 def get_output_feature_directions(
-    response, profile, preference, options=None, from_value=None, to_value=None
-):
+    response: dict,
+    profile: str,
+    preference: str,
+    options: Optional[str] = None,
+    from_value: Any = None,
+    to_value: Any = None,
+) -> QgsFeature:
     """
     Build output feature based on response attributes for directions endpoint.
 
@@ -165,7 +170,9 @@ def get_output_feature_directions(
     return feat
 
 
-def get_output_features_optimization(response, profile, from_value=None):
+def get_output_features_optimization(
+    response: dict, profile: str, from_value: Any = None
+) -> QgsFeature:
     """
     Build output feature based on response attributes for optimization endpoint.
 
@@ -205,9 +212,9 @@ def get_output_features_optimization(response, profile, from_value=None):
 
 def build_default_parameters(
     preference: str,
-    point_list: List[QgsPointXY] = None,
-    coordinates: list = None,
-    options: dict = None,
+    point_list: Optional[List[QgsPointXY]] = None,
+    coordinates: Optional[list] = None,
+    options: Optional[dict] = None,
 ) -> dict:
     """
     Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates

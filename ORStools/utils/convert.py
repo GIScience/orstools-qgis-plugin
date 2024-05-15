@@ -28,7 +28,7 @@
 """
 
 
-def decode_polyline(polyline, is3d=False):
+def decode_polyline(polyline: str, is3d: bool = False) -> dict:
     """Decodes a Polyline string into a GeoJSON geometry.
 
     :param polyline: An encoded polyline, only the geometry.
