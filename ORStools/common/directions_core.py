@@ -262,9 +262,11 @@ def get_extra_info_features_directions(response: dict, extra_info_order: list[st
         values = extra_info[key]["values"]
         for val in values:
             for i in range(val[0], val[1]):
+                # TODO: translate integer val[2] to readable value according to BE docs
                 extras_list[key].append(val[2])
 
     for i in range(len(coordinates) - 1):
+        # TODO: dissolve, but is one layer per extra info more valuable?
         feat = QgsFeature()
         qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates[i : i + 2]]
         feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))

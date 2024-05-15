@@ -99,6 +99,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 self.EXTRA_INFO,
                 self.tr("Extra Info"),
                 options=EXTRA_INFOS,
+                # TODO: allowMultiple=False? This way, we wouldn't have to worry about dissolving more stuff.
                 allowMultiple=True,
                 optional=True,
             ),
