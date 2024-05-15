@@ -29,7 +29,7 @@
 
 from itertools import product
 from qgis.core import QgsPoint, QgsPointXY, QgsGeometry, QgsFeature, QgsFields, QgsField
-from typing import List
+from typing import List, Optional
 
 from PyQt5.QtCore import QVariant
 
@@ -209,10 +209,10 @@ def get_output_features_optimization(response, profile, from_value=None):
 
 def build_default_parameters(
     preference: str,
-    point_list: List[QgsPointXY] = None,
-    coordinates: list = None,
-    options: dict = None,
-    extra_info: list = None,
+    point_list: Optional[List[QgsPointXY]] = None,
+    coordinates: Optional[list] = None,
+    options: Optional[dict] = None,
+    extra_info: Optional[list] = None,
 ) -> dict:
     """
     Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates
