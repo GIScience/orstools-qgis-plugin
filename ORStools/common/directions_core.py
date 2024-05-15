@@ -250,14 +250,15 @@ def build_default_parameters(
     return params
 
 
-def get_extra_info_features_directions(response: dict):
+def get_extra_info_features_directions(response: dict, extra_info_order: list[str]):
+    extra_info_order = [key if key != "waytype" else "waytypes" for key in extra_info_order] # inconsistency in API
     response_mini = response["features"][0]
     coordinates = response_mini["geometry"]["coordinates"]
     feats = list()
     extra_info = response_mini["properties"]["extras"]
     logger.log(str(extra_info))
-    extras_list = {i: [] for i in extra_info}
-    for key in extra_info:
+    extras_list = {i: [] for i in extra_info_order}
+    for key in extra_info_order:
         values = extra_info[key]["values"]
         for val in values:
             for i in range(val[0], val[1]):
