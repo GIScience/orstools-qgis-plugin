@@ -27,6 +27,8 @@
  ***************************************************************************/
 """
 
+from typing import Dict
+
 from qgis.core import (
     QgsWkbTypes,
     QgsFeature,
@@ -36,6 +38,8 @@ from qgis.core import (
     QgsProcessingException,
     QgsProcessingParameterField,
     QgsProcessingParameterFeatureSource,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
 from PyQt5.QtCore import QVariant
@@ -49,13 +53,13 @@ from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "matrix_from_layers"
-        self.GROUP = "Matrix"
-        self.IN_START = "INPUT_START_LAYER"
-        self.IN_START_FIELD = "INPUT_START_FIELD"
-        self.IN_END = "INPUT_END_LAYER"
-        self.IN_END_FIELD = "INPUT_END_FIELD"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "matrix_from_layers"
+        self.GROUP: str = "Matrix"
+        self.IN_START: str = "INPUT_START_LAYER"
+        self.IN_START_FIELD: str = "INPUT_START_FIELD"
+        self.IN_END: str = "INPUT_END_LAYER"
+        self.IN_END_FIELD: str = "INPUT_END_FIELD"
+        self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
                 description=self.tr("Input Start Point layer"),
@@ -82,7 +86,9 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         # Get profile value

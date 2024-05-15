@@ -27,6 +27,15 @@
  ***************************************************************************/
 """
 
+from typing import List, Dict, Generator
+
+from qgis._core import (
+    QgsFeature,
+    QgsVectorLayer,
+    QgsGeometry,
+    QgsProject,
+    QgsProcessingParameterBoolean,
+)
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -37,6 +46,9 @@ from qgis.core import (
     QgsPointXY,
     QgsProcessingParameterNumber,
     QgsProcessingParameterString,
+    QgsProcessingFeatureSource,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
@@ -51,17 +63,18 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
 
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "directions_from_polylines_layer"
-        self.GROUP = "Directions"
-        self.IN_LINES = "INPUT_LINE_LAYER"
-        self.IN_FIELD = "INPUT_LAYER_FIELD"
-        self.IN_PREFERENCE = "INPUT_PREFERENCE"
-        self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
-        self.IN_MODE = "INPUT_MODE"
-        self.EXTRA_INFO = "EXTRA_INFO"
-        self.CSV_FACTOR = "CSV_FACTOR"
-        self.CSV_COLUMN = "CSV_COLUMN"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "directions_from_polylines_layer"
+        self.GROUP: str = "Directions"
+        self.IN_LINES: str = "INPUT_LINE_LAYER"
+        self.IN_FIELD: str = "INPUT_LAYER_FIELD"
+        self.IN_PREFERENCE: str = "INPUT_PREFERENCE"
+        self.IN_OPTIMIZE: str = "INPUT_OPTIMIZE"
+        self.IN_MODE: str = "INPUT_MODE"
+        self.EXPORT_ORDER: str = "EXPORT_ORDER"
+        self.EXTRA_INFO: str = "EXTRA_INFO"
+        self.CSV_FACTOR: str = "CSV_FACTOR"
+        self.CSV_COLUMN: str = "CSV_COLUMN"
+        self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
                 description=self.tr("Input Line layer"),
@@ -108,9 +121,12 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 self.tr("Csv Column"),
                 optional=True,
             ),
+            QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -177,6 +193,30 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                             response, profile, from_value=field_value
                         )
                     )
+
+                    # Export layer of points with optimization order
+                    export_value = self.parameterAsBool(parameters, self.EXPORT_ORDER, context)
+                    if export_value:
+                        items = list()
+                        for route in response["routes"]:
+                            for i, step in enumerate(route["steps"]):
+                                location = step["location"]
+                                items.append(location)
+
+                        point_layer = QgsVectorLayer(
+                            "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                        )
+
+                        point_layer.updateFields()
+                        for idx, coords in enumerate(items):
+                            x, y = coords
+                            feature = QgsFeature()
+                            feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                            feature.setAttributes([idx])
+
+                            point_layer.dataProvider().addFeature(feature)
+                        QgsProject.instance().addMapLayer(point_layer)
+
                 else:
                     params = directions_core.build_default_parameters(
                         preference, point_list=line, options=options, extra_info=extra_info
@@ -206,7 +246,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_sorted_lines(layer, field_name):
+    def _get_sorted_lines(layer: QgsProcessingFeatureSource, field_name: str) -> Generator:
         """
         Generator to yield geometry and ID value sorted by feature ID. Careful: feat.id() is not necessarily
         permanent
@@ -236,7 +276,6 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 line = [
                     x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()
                 ]
-
             yield line, field_value
 
     def displayName(self) -> str:
