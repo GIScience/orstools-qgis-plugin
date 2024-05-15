@@ -45,10 +45,11 @@ from qgis.core import (
     QgsPointXY,
     QgsGeometry,
     QgsCoordinateReferenceSystem,
+    QgsSettings,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication, QSettings
+from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
 from PyQt5.QtGui import QIcon, QTextDocument
 from PyQt5.QtWidgets import (
     QAction,
@@ -258,10 +259,10 @@ class ORStoolsDialogMain:
 
         # add ors svg path
         my_new_path = os.path.join(basepath, "img/svg")
-        svg_paths = QSettings().value("svg/searchPathsForSVG") or []
+        svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
         if my_new_path not in svg_paths:
             svg_paths.append(my_new_path)
-            QSettings().setValue("svg/searchPathsForSVG", svg_paths)
+            QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
 
         # style output layer
         qml_path = os.path.join(basepath, "linestyle.qml")
@@ -330,6 +331,29 @@ Remember, the first and last location are not part of the optimization.
                     )
                     return
                 response = clnt.request("/optimization", {}, post_json=params)
+
+                if self.dlg.export_jobs_order.isChecked():
+                    items = list()
+                    for route in response["routes"]:
+                        for i, step in enumerate(route["steps"]):
+                            location = step["location"]
+                            items.append(location)
+
+                    point_layer = QgsVectorLayer(
+                        "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                    )
+
+                    point_layer.updateFields()
+                    for idx, coords in enumerate(items):
+                        x, y = coords
+                        feature = QgsFeature()
+                        feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                        feature.setAttributes([idx])
+
+                        point_layer.dataProvider().addFeature(feature)
+                    QgsProject.instance().addMapLayer(point_layer)
+                    self.dlg._iface.mapCanvas().refresh()
+
                 feat = directions_core.get_output_features_optimization(
                     response, params["vehicles"][0]["profile"]
                 )
@@ -466,6 +490,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
+        self.annotation_canvas = self._iface.mapCanvas()
+
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
         items = [
@@ -505,12 +531,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         """Clears the contents of the QgsListWidget and the annotations."""
         items = self.routing_fromline_list.selectedItems()
         if items:
+            rows = [self.routing_fromline_list.row(item) for item in items]
             # if items are selected, only clear those
-            for item in items:
-                row = self.routing_fromline_list.row(item)
-                self.routing_fromline_list.takeItem(row)
+            for row in sorted(rows, reverse=True):
                 if self.annotations:
                     self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
+                self.routing_fromline_list.takeItem(row)
         else:
             # else clear all items and annotations
             self.routing_fromline_list.clear()
@@ -534,16 +560,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         annotation.setDocument(c)
 
-        annotation.setFrameSizeMm(QSizeF(7, 5))
+        annotation.setFrameSizeMm(QSizeF(8, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
         annotation.setMapPosition(point)
         annotation.setMapPositionCrs(crs)
 
-        return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
+        return QgsMapCanvasAnnotationItem(annotation, self.annotation_canvas).annotation()
 
     def _clear_annotations(self) -> None:
         """Clears annotations"""
-        for annotation in self.annotations:
+        for annotation_item in self.annotation_canvas.annotationItems():
+            annotation = annotation_item.annotation()
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
@@ -575,7 +602,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
         annotation = self._linetool_annotate_point(point, idx)
-        self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
 
     def _reindex_list_items(self) -> None:
@@ -595,7 +621,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
             self.routing_fromline_list.addItem(item)
             annotation = self._linetool_annotate_point(point, idx, crs)
-            self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
 
     def _on_linetool_map_doubleclick(self) -> None:

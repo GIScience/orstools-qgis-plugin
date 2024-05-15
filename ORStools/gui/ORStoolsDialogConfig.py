@@ -31,7 +31,7 @@ from qgis.gui import QgsCollapsibleGroupBox
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QMetaObject
-from PyQt5.QtWidgets import QDialog, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import QDialog, QInputDialog, QLineEdit, QDialogButtonBox
 from PyQt5.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
@@ -58,6 +58,9 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         self.provider_add.clicked.connect(self._add_provider)
         self.provider_remove.clicked.connect(self._remove_provider)
+
+        # Change OK to Save in config window
+        self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
 
     def accept(self) -> None:
         """When the OK Button is clicked, in-memory temp_config is updated and written to config.yml"""

@@ -28,8 +28,8 @@
 """
 
 from qgis.gui import QgisInterface
-from qgis.core import QgsApplication
-from PyQt5.QtCore import QTranslator, QSettings, qVersion, QCoreApplication
+from qgis.core import QgsApplication, QgsSettings
+from PyQt5.QtCore import QTranslator, qVersion, QCoreApplication
 import os.path
 
 from .gui import ORStoolsDialog
@@ -56,7 +56,7 @@ class ORStools:
         self.plugin_dir = os.path.dirname(__file__)
 
         # initialize locale
-        locale = QSettings().value("locale/userLocale")[0:2]
+        locale = QgsSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(self.plugin_dir, "i18n", "orstools_{}.qm".format(locale))
 
         if os.path.exists(locale_path):

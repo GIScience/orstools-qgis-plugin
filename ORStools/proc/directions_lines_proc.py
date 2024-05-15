@@ -29,6 +29,13 @@
 
 from typing import List, Dict, Generator
 
+from qgis._core import (
+    QgsFeature,
+    QgsVectorLayer,
+    QgsGeometry,
+    QgsProject,
+    QgsProcessingParameterBoolean,
+)
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -61,6 +68,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         self.IN_PREFERENCE: str = "INPUT_PREFERENCE"
         self.IN_OPTIMIZE: str = "INPUT_OPTIMIZE"
         self.IN_MODE: str = "INPUT_MODE"
+        self.EXPORT_ORDER: str = "EXPORT_ORDER"
         self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
@@ -87,6 +95,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
+            QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
     def processAlgorithm(
@@ -149,6 +158,30 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                             response, profile, from_value=field_value
                         )
                     )
+
+                    # Export layer of points with optimization order
+                    export_value = self.parameterAsBool(parameters, self.EXPORT_ORDER, context)
+                    if export_value:
+                        items = list()
+                        for route in response["routes"]:
+                            for i, step in enumerate(route["steps"]):
+                                location = step["location"]
+                                items.append(location)
+
+                        point_layer = QgsVectorLayer(
+                            "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                        )
+
+                        point_layer.updateFields()
+                        for idx, coords in enumerate(items):
+                            x, y = coords
+                            feature = QgsFeature()
+                            feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                            feature.setAttributes([idx])
+
+                            point_layer.dataProvider().addFeature(feature)
+                        QgsProject.instance().addMapLayer(point_layer)
+
                 else:
                     params = directions_core.build_default_parameters(
                         preference, point_list=line, options=options

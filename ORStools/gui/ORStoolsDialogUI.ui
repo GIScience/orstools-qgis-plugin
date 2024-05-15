@@ -357,7 +357,7 @@
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/save_vertices.png</normaloff>:/plugins/ORStools/img/save_vertices.png</iconset>
+              <normaloff>:/plugins/ORStools/img/icon_save.png</normaloff>:/plugins/ORStools/img/icon_save.png</iconset>
             </property>
            </widget>
           </item>
@@ -439,6 +439,22 @@
              <property name="sizeConstraint">
               <enum>QLayout::SetDefaultConstraint</enum>
              </property>
+             <item row="2" column="3">
+              <widget class="QRadioButton" name="fix_both">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First and last waypoints are not optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Fix Both</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">optimize_button_group</string>
+               </attribute>
+              </widget>
+             </item>
              <item row="0" column="0" colspan="4">
               <widget class="QLabel" name="label_4">
                <property name="enabled">
@@ -453,17 +469,11 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QRadioButton" name="fix_start">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First waypoint won't be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
+             <item row="1" column="0" colspan="3" alignment="Qt::AlignHCenter">
+              <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>Fix Start</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Other Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
-               <attribute name="buttonGroup">
-                <string notr="true">optimize_button_group</string>
-               </attribute>
               </widget>
              </item>
              <item row="2" column="2">
@@ -479,23 +489,13 @@ p, li { white-space: pre-wrap; }
                </attribute>
               </widget>
              </item>
-             <item row="1" column="0" colspan="3" alignment="Qt::AlignHCenter">
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Other Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="3">
-              <widget class="QRadioButton" name="fix_both">
+             <item row="2" column="1">
+              <widget class="QRadioButton" name="fix_start">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First and last waypoints are not optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First waypoint won't be optimized.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Fix Both</string>
-               </property>
-               <property name="checked">
-                <bool>false</bool>
+                <string>Fix Start</string>
                </property>
                <attribute name="buttonGroup">
                 <string notr="true">optimize_button_group</string>
@@ -516,6 +516,16 @@ p, li { white-space: pre-wrap; }
                <attribute name="buttonGroup">
                 <string notr="true">optimize_button_group</string>
                </attribute>
+              </widget>
+             </item>
+             <item row="3" column="1" colspan="2">
+              <widget class="QCheckBox" name="export_jobs_order">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;body&gt;&lt;p&gt;Create a point layer with the order in which the waypoints are traversed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Export order of jobs</string>
+               </property>
               </widget>
              </item>
             </layout>
@@ -627,7 +637,7 @@ p, li { white-space: pre-wrap; }
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid countries based on ISO 3166 Alpha-2 or Alpha-3 codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
-               <property name="qgisRelation" stdset="0">
+               <property name="qgisRelation">
                 <string notr="true"/>
                </property>
               </widget>
@@ -783,7 +793,7 @@ p, li { white-space: pre-wrap; }
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0">
+         <property name="sizeHint">
           <size>
            <width>20</width>
            <height>40</height>

@@ -29,6 +29,14 @@
 
 from typing import Dict, List
 
+
+from qgis._core import (
+    QgsVectorLayer,
+    QgsFeature,
+    QgsGeometry,
+    QgsProject,
+    QgsProcessingParameterBoolean,
+)
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -61,6 +69,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.IN_OPTIMIZE: str = "INPUT_OPTIMIZE"
         self.IN_MODE: str = "INPUT_MODE"
         self.IN_SORTBY: str = "INPUT_SORTBY"
+        self.EXPORT_ORDER: str = "EXPORT_ORDER"
         self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
@@ -69,7 +78,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
-                description=self.tr("Layer ID Field"),
+                description=self.tr("Layer ID Field (can be used for joining)"),
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
                 optional=True,
@@ -94,6 +103,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
+            QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
     def processAlgorithm(
@@ -177,6 +187,30 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                             response, profile, from_value=from_value
                         )
                     )
+
+                    # Export layer of points with optimization order
+                    export_value = self.parameterAsBool(parameters, self.EXPORT_ORDER, context)
+                    if export_value:
+                        items = list()
+                        for route in response["routes"]:
+                            for i, step in enumerate(route["steps"]):
+                                location = step["location"]
+                                items.append(location)
+
+                        point_layer = QgsVectorLayer(
+                            "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                        )
+
+                        point_layer.updateFields()
+                        for idx, coords in enumerate(items):
+                            x, y = coords
+                            feature = QgsFeature()
+                            feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                            feature.setAttributes([idx])
+
+                            point_layer.dataProvider().addFeature(feature)
+                        QgsProject.instance().addMapLayer(point_layer)
+
                 else:
                     params = directions_core.build_default_parameters(
                         preference, point_list=points, options=options
