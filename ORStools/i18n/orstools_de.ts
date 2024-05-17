@@ -9,7 +9,7 @@
         <translation type="obsolete">&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="111"/>
+        <location filename="../gui/ORStoolsDialog.py" line="122"/>
         <source>About {}</source>
         <translation>Über {}</translation>
     </message>
@@ -59,34 +59,49 @@
 <context>
     <name>ORSDirectionsLinesAlgo</name>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="67"/>
+        <location filename="../proc/directions_lines_proc.py" line="78"/>
         <source>Input Line layer</source>
         <translation>Eingabelayer (Linien)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="72"/>
+        <location filename="../proc/directions_lines_proc.py" line="83"/>
         <source>Layer ID Field</source>
         <translation>ID-Attribut</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="79"/>
+        <location filename="../proc/directions_lines_proc.py" line="90"/>
         <source>Travel preference</source>
         <translation>Routenpräferenz</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="85"/>
+        <location filename="../proc/directions_lines_proc.py" line="96"/>
         <source>Traveling Salesman (omits other configurations)</source>
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="239"/>
+        <location filename="../proc/directions_lines_proc.py" line="286"/>
         <source>Directions from 1 Polyline-Layer</source>
         <translation>Routenberechnung aus einem Polyline-Layer</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="92"/>
+        <location filename="../proc/directions_lines_proc.py" line="124"/>
         <source>Export order of jobs</source>
         <translation>Reihenfolge exportieren</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="103"/>
+        <source>Extra Info</source>
+        <translation>Extra Info</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="110"/>
+        <source>Csv Factor (needs Csv Column and csv in Extra Info)</source>
+        <translation>Csv Faktor (benötigt Csv Spalte und csv in Extra Info)</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_lines_proc.py" line="119"/>
+        <source>Csv Column (needs Csv Factor and csv in Extra Info)</source>
+        <translation>Csv Spalte (benötigt Csv Faktor und csv in Extra Info)</translation>
     </message>
 </context>
 <context>
@@ -120,123 +135,153 @@
 <context>
     <name>ORSDirectionsPointsLayerAlgo</name>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="68"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="79"/>
         <source>Input (Multi)Point layer</source>
         <translation>Eingabelayer ((Multi)Point)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="80"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="91"/>
         <source>Sort Points by</source>
         <translation>Punkte sortieren nach</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="87"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="98"/>
         <source>Travel preference</source>
         <translation>Routenpräferenz</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="93"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="104"/>
         <source>Traveling Salesman (omits other configurations)</source>
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="234"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="289"/>
         <source>Directions from 1 Point-Layer</source>
         <translation>Routenberechnung aus einem Punkt-Layer</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="73"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="84"/>
         <source>Layer ID Field (can be used for joining)</source>
         <translation>ID-Attribut (zum Beispiel für joins)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="100"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="133"/>
         <source>Export order of jobs</source>
         <translation>Reihenfolge exportieren</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layer_proc.py" line="111"/>
+        <source>Extra Info</source>
+        <translation>Extra Info</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layer_proc.py" line="119"/>
+        <source>Csv Factor (needs Csv Column and csv in Extra Info)</source>
+        <translation>Csv Faktor (benötigt Csv Spalte und csv in Extra Info)</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layer_proc.py" line="128"/>
+        <source>Csv Column (needs Csv Factor and csv in Extra Info)</source>
+        <translation>Csv Spalte (benötigt Csv Faktor und csv in Extra Info)</translation>
     </message>
 </context>
 <context>
     <name>ORSDirectionsPointsLayersAlgo</name>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="60"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="71"/>
         <source>Input Start Point layer</source>
         <translation>Startpunkt-Layer wählen</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="65"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="76"/>
         <source>Start ID Field (can be used for joining)</source>
         <translation>ID-Attribut Startpunkte (für joins nutzbar)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="72"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="83"/>
         <source>Sort Start Points by</source>
         <translation>Startpunkte sortieren nach</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="79"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="90"/>
         <source>Input End Point layer</source>
         <translation>Endpunkt-Layer wählen</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="84"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="95"/>
         <source>End ID Field (can be used for joining)</source>
         <translation>ID-Attribut Endpunkte (für joins nutzbar)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="91"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="102"/>
         <source>Sort End Points by</source>
         <translation>Endpunkte sortieren nach</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="98"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="109"/>
         <source>Travel preference</source>
         <translation>Routenpräferenz</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="104"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="115"/>
         <source>Layer mode</source>
         <translation>Zuordnungs-Verfahren</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="266"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="319"/>
         <source>Directions from 2 Point-Layers</source>
         <translation>Routenberechnung aus zwei Punkt-Layern</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layers_proc.py" line="121"/>
+        <source>Extra Info</source>
+        <translation>Extra Info</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layers_proc.py" line="128"/>
+        <source>Csv Factor (needs Csv Column and csv in Extra Info)</source>
+        <translation>Csv Faktor (benötigt Csv Spalte und csv in Extra Info)</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layers_proc.py" line="137"/>
+        <source>Csv Column (needs Csv Factor and csv in Extra Info)</source>
+        <translation>Csv Spalte (benötigt Csv Faktor und csv in Extra Info)</translation>
     </message>
 </context>
 <context>
     <name>ORSIsochronesLayerAlgo</name>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="65"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="69"/>
         <source>Input Point layer</source>
         <translation>Eingabelayer (Punkte)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="74"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="78"/>
         <source>Input layer ID Field (mutually exclusive with Point option)</source>
         <translation>ID-Attribut (schließt Punkt-Option aus)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="80"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="84"/>
         <source>Dimension</source>
         <translation>Dimension</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="86"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="90"/>
         <source>Comma-separated ranges [min or m]</source>
         <translation>Komma-getrennte Reichweiten [min oder m]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="239"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="247"/>
         <source>Isochrones from Point-Layer</source>
         <translation>Isochronen aus Punkt-Layer</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="91"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="95"/>
         <source>Smoothing factor between 0 [detailed] and 100 [generalized]</source>
         <translation>Glättungsfaktor zwischen 0 [detailliert] und 100 [verallgemeinert]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_layer_proc.py" line="99"/>
+        <location filename="../proc/isochrones_layer_proc.py" line="103"/>
         <source>Location Type</source>
         <translation>Ortstyp</translation>
     </message>
@@ -244,32 +289,32 @@
 <context>
     <name>ORSIsochronesPointAlgo</name>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="59"/>
+        <location filename="../proc/isochrones_point_proc.py" line="63"/>
         <source>Input Point from map canvas (mutually exclusive with layer option)</source>
         <translation>Eingabepunkt aus Kartenansicht (schließt Ebenen-Option aus)</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="66"/>
+        <location filename="../proc/isochrones_point_proc.py" line="70"/>
         <source>Dimension</source>
         <translation>Dimension</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="72"/>
+        <location filename="../proc/isochrones_point_proc.py" line="76"/>
         <source>Comma-separated ranges [min or m]</source>
         <translation>Komma-getrennte Reichweiten [min oder m]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="174"/>
+        <location filename="../proc/isochrones_point_proc.py" line="180"/>
         <source>Isochrones from Point</source>
         <translation>Isochronen von einzelnem Punkt</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="77"/>
+        <location filename="../proc/isochrones_point_proc.py" line="81"/>
         <source>Smoothing factor between 0 [detailed] and 100 [generalized]</source>
         <translation>Glättungsfaktor zwischen 0 [detailliert] und 100 [verallgemeinert]</translation>
     </message>
     <message>
-        <location filename="../proc/isochrones_point_proc.py" line="85"/>
+        <location filename="../proc/isochrones_point_proc.py" line="89"/>
         <source>Location Type</source>
         <translation>Ortstyp</translation>
     </message>
@@ -277,27 +322,27 @@
 <context>
     <name>ORSMatrixAlgo</name>
     <message>
-        <location filename="../proc/matrix_proc.py" line="59"/>
+        <location filename="../proc/matrix_proc.py" line="63"/>
         <source>Input Start Point layer</source>
         <translation>Startpunkt-Layer wählen</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="64"/>
+        <location filename="../proc/matrix_proc.py" line="68"/>
         <source>Start ID Field (can be used for joining)</source>
         <translation>ID-Attribut Startpunkte (für joins nutzbar)</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="71"/>
+        <location filename="../proc/matrix_proc.py" line="75"/>
         <source>Input End Point layer</source>
         <translation>Endpunkt-Layer wählen</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="76"/>
+        <location filename="../proc/matrix_proc.py" line="80"/>
         <source>End ID Field (can be used for joining)</source>
         <translation>ID-Attribut Endpunkte (für joins nutzbar)</translation>
     </message>
     <message>
-        <location filename="../proc/matrix_proc.py" line="227"/>
+        <location filename="../proc/matrix_proc.py" line="233"/>
         <source>Matrix from Layers</source>
         <translation>Matrix-Berechnung aus Layer</translation>
     </message>
@@ -305,12 +350,12 @@
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="442"/>
+        <location filename="../gui/ORStoolsDialog.py" line="453"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="443"/>
+        <location filename="../gui/ORStoolsDialog.py" line="454"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -670,17 +715,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ORStoolsDialogMain</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="167"/>
+        <location filename="../gui/ORStoolsDialog.py" line="178"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="159"/>
+        <location filename="../gui/ORStoolsDialog.py" line="170"/>
         <source>Provider Settings</source>
         <translation>Dienst-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="165"/>
+        <location filename="../gui/ORStoolsDialog.py" line="176"/>
         <source>About</source>
         <translation>Über</translation>
     </message>
