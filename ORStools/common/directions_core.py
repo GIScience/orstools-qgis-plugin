@@ -282,7 +282,6 @@ def get_extra_info_features_directions(response: dict, extra_info_order: list[st
                 extras_list[key].append(value)
 
     for i in range(len(coordinates) - 1):
-        # TODO: dissolve, but is one layer per extra info more valuable?
         feat = QgsFeature()
         qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates[i : i + 2]]
         feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
