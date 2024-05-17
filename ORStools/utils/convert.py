@@ -139,55 +139,54 @@ def decode_extrainfo(extra_info: str, key: int) -> str | int:
         ">=16% incline",
     ]
 
-    match extra_info:
-        case "waytypes":
-            try:
-                return waytypes[key]
-            except IndexError:
-                return "Unknown"
-        case "surface":
-            try:
-                return surfaces[key]
-            except IndexError:
-                return "Unknown"
-        case "waycategory":
-            binary = list(bin(key))[2:]
-            padding = ["0"] * (len(waycategory) - len(binary))
-            padded_binary = padding + binary
-            category = ""
+    if extra_info == "waytypes":
+        try:
+            return waytypes[key]
+        except IndexError:
+            return "Unknown"
+    elif extra_info == "surface":
+        try:
+            return surfaces[key]
+        except IndexError:
+            return "Unknown"
+    elif extra_info == "waycategory":
+        binary = list(bin(key))[2:]
+        padding = ["0"] * (len(waycategory) - len(binary))
+        padded_binary = padding + binary
+        category = ""
 
-            for set_bit, value in zip(padded_binary, waycategory):
-                if set_bit == "1":
-                    category += value
+        for set_bit, value in zip(padded_binary, waycategory):
+            if set_bit == "1":
+                category += value
 
-            if category == "":
-                return "No category"
+        if category == "":
+            return "No category"
 
-            return category
-        case "roadaccessrestrictions":
-            binary = list(bin(key))[2:]
-            padding = ["0"] * (len(restrictions) - len(binary))
-            padded_binary = padding + binary
-            restriction = ""
+        return category
+    elif extra_info == "roadaccessrestrictions":
+        binary = list(bin(key))[2:]
+        padding = ["0"] * (len(restrictions) - len(binary))
+        padded_binary = padding + binary
+        restriction = ""
 
-            for set_bit, value in zip(padded_binary, restrictions):
-                if set_bit == "1":
-                    restriction += value
-                    restriction += " "
+        for set_bit, value in zip(padded_binary, restrictions):
+            if set_bit == "1":
+                restriction += value
+                restriction += " "
 
-            if restriction == "":
-                return "None"
+        if restriction == "":
+            return "None"
 
-            return restriction
-        case "steepness":
-            # We get values from -5 to 5 here, but our decoded array is 11 values long.
-            key += 5
-            try:
-                return steepness[key]
-            except IndexError:
-                return "No steepness available"
-        case "traildifficulty":
-            # TODO: we need to differentiate the profile here…
-            return key
-        case _:
-            return key
+        return restriction
+    elif extra_info == "steepness":
+        # We get values from -5 to 5 here, but our decoded array is 11 values long.
+        key += 5
+        try:
+            return steepness[key]
+        except IndexError:
+            return "No steepness available"
+    elif extra_info == "traildifficulty":
+        # TODO: we need to differentiate the profile here…
+        return key
+    else:
+        return key

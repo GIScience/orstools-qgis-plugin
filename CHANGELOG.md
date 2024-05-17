@@ -40,6 +40,11 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+
+### Fixed
+- use if-else instead of structural pattern matching
+
 ## [1.8.0] - 2024-05-17
 
 ### Added
