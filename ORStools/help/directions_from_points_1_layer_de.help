@@ -21,4 +21,4 @@ Die Aktivierung der Wegpunktoptimierung löscht alle anderen erweiterten Konfigu
 
 <i>Ausgabelayer</i>: ein LineString-Layer mit mehreren Routen-Feldern.
 
-Es gelten die <a href="https://openrouteservice.org/restrictionsi">Restriktionen</a> der openrouteservice-API.
+Es gelten die <a href="https://openrouteservice.org/restrictions/">Restriktionen</a> der openrouteservice-API.
