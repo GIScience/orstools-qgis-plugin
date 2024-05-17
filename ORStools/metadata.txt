@@ -3,33 +3,37 @@ name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.8.0
+version=1.8.1
 author=HeiGIT gGmbH
 email=support@openrouteservice.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2024/05/17 v1.8.0
-### Added
-- Add support for decimal ranges with isochrones
-- Add hint for joining with `Layer ID Field`
-- Add option to export order of optimization route points
-- Add `extra_info` parameter to directions processing algorithms
+changelog=2024/05/17 v1.8.1
+    Fixed
+    - remove structural pattern matching for compatibility with python<3.10
 
-### Changed
-- Rename `Ok` button in configuration window to `Save` for clarification
-- Replace PyQt5 imports with qgis.PyQt imports to prepare for Qt6-QGis builds
+    2024/05/17 v1.8.0
+    Added
+    - Add support for decimal ranges with isochrones
+    - Add hint for joining with `Layer ID Field`
+    - Add option to export order of optimization route points
+    - Add `extra_info` parameter to directions processing algorithms
 
-### Fixed
-- QGis crashes when selecting more than two vertices for deletion
-- Vertices on canvas not depicted fully with n having more than one digit in length
-- Replace qt QSettings with QgsSettings for centralized configuration management
-- Point Annotations stay after saving project and not deleting them manually
-- Issue with MultiPoint-layers and optimization
-- Improved type hints
+    Changed
+    - Rename `Ok` button in configuration window to `Save` for clarification
+    - Replace PyQt5 imports with qgis.PyQt imports to prepare for Qt6-QGis builds
 
-Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
-Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki
+    Fixed
+    - QGis crashes when selecting more than two vertices for deletion
+    - Vertices on canvas not depicted fully with n having more than one digit in length
+    - Replace qt QSettings with QgsSettings for centralized configuration management
+    - Point Annotations stay after saving project and not deleting them manually
+    - Issue with MultiPoint-layers and optimization
+    - Improved type hints
+
+    Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
+    Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki
 
 tracker=https://github.com/GIScience/orstools-qgis-plugin/issues
 repository=https://github.com/GIScience/orstools-qgis-plugin.git

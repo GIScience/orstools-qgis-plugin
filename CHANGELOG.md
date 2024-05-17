@@ -40,7 +40,7 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## Unreleased
+## [1.8.1] - 2024-05-17
 
 ### Fixed
 - use if-else instead of structural pattern matching
@@ -246,7 +246,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.6.0...v1.7.0
