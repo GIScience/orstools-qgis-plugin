@@ -19,4 +19,4 @@ Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung 
 
 <i>Ausgabelayer</i>: ein LineString-Layer mit mehreren Routen-Feldern.
 
-Es gelten die <a href="https://openrouteservice.org/restrictionsi">Restriktionen</a> der openrouteservice-API.
+Es gelten die <a href="https://openrouteservice.org/restrictions/">Restriktionen</a> der openrouteservice-API.
