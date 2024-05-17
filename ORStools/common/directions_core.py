@@ -274,8 +274,8 @@ def get_extra_info_features_directions(response: dict, extra_info_order: list[st
         values = extra_info[key]["values"]
         for val in values:
             for i in range(val[0], val[1]):
-                # TODO: translate integer val[2] to readable value according to BE docs
-                extras_list[key].append(val[2])
+                value = convert.decode_extrainfo(key, val[2])
+                extras_list[key].append(value)
 
     for i in range(len(coordinates) - 1):
         # TODO: dissolve, but is one layer per extra info more valuable?
