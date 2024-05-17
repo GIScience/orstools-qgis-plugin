@@ -271,7 +271,11 @@ def get_extra_info_features_directions(response: dict, extra_info_order: list[st
     logger.log(str(extra_info))
     extras_list = {i: [] for i in extra_info_order}
     for key in extra_info_order:
-        values = extra_info[key]["values"]
+        try:
+            values = extra_info[key]["values"]
+        except KeyError:
+            logger.log(f"{key} is not available as extra_info.")
+            continue
         for val in values:
             for i in range(val[0], val[1]):
                 value = convert.decode_extrainfo(key, val[2])
