@@ -115,7 +115,10 @@ def get_fields(
     if not line:
         fields.append(QgsField(to_name, to_type))
     for info in extra_info:
-        fields.append(QgsField(info.upper(), QVariant.Int))
+        field_type = QVariant.Int
+        if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions","steepness" ]:
+            field_type = QVariant.String
+        fields.append(QgsField(info.upper(), field_type))
 
     return fields
 
