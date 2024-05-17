@@ -116,7 +116,7 @@ def get_fields(
         fields.append(QgsField(to_name, to_type))
     for info in extra_info:
         field_type = QVariant.Int
-        if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions","steepness" ]:
+        if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions", "steepness"]:
             field_type = QVariant.String
         fields.append(QgsField(info.upper(), field_type))
 

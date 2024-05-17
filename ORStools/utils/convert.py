@@ -88,12 +88,56 @@ def decode_polyline(polyline: str, is3d: bool = False) -> list:
 
     return points
 
-def decode_extrainfo(extra_info: str, key: int) -> str|int:
-    waytypes = ["Unknown", "state Road", "Road", "Street", "Path", "Track", "Cycleway", "Footway", "Ferry", "Construction"]
-    surfaces = [ "Unknown", "Paved", "Unpaved", "Asphalt", "Concrete", "Cobblestone", "Metal", "Wood", "Compacted Gravel", "Fine Grave", "Gravel", "Dirt", "Ground", "Ice", "Paving Stones", "Sand", "Woodchips", "Grass", "Grass Paver"]
+
+def decode_extrainfo(extra_info: str, key: int) -> str | int:
+    waytypes = [
+        "Unknown",
+        "state Road",
+        "Road",
+        "Street",
+        "Path",
+        "Track",
+        "Cycleway",
+        "Footway",
+        "Ferry",
+        "Construction",
+    ]
+    surfaces = [
+        "Unknown",
+        "Paved",
+        "Unpaved",
+        "Asphalt",
+        "Concrete",
+        "Cobblestone",
+        "Metal",
+        "Wood",
+        "Compacted Gravel",
+        "Fine Grave",
+        "Gravel",
+        "Dirt",
+        "Ground",
+        "Ice",
+        "Paving Stones",
+        "Sand",
+        "Woodchips",
+        "Grass",
+        "Grass Paver",
+    ]
     waycategory = ["Ford", "Ferry", "Steps", "Tollways", "Highway"]
     restrictions = ["Permissive", "Private", "Delivery", "Destination", "Customers", "No"]
-    steepness = [">=16% decline", "10% - <16% decline", "7% - <10% decline", "4% - <7% decline", "1% - <4% decline", "0% - <1% decline", "1% - <4% incline", "4% - <7% incline", "7% - <10% incline", "10% - <16% incline", ">=16% incline"]
+    steepness = [
+        ">=16% decline",
+        "10% - <16% decline",
+        "7% - <10% decline",
+        "4% - <7% decline",
+        "1% - <4% decline",
+        "0% - <1% decline",
+        "1% - <4% incline",
+        "4% - <7% incline",
+        "7% - <10% incline",
+        "10% - <16% incline",
+        ">=16% incline",
+    ]
 
     match extra_info:
         case "waytypes":
@@ -108,12 +152,12 @@ def decode_extrainfo(extra_info: str, key: int) -> str|int:
                 return "Unknown"
         case "waycategory":
             binary = list(bin(key))[2:]
-            padding = ['0'] * (len(waycategory) - len(binary))
+            padding = ["0"] * (len(waycategory) - len(binary))
             padded_binary = padding + binary
             category = ""
 
             for set_bit, value in zip(padded_binary, waycategory):
-                if set_bit == '1':
+                if set_bit == "1":
                     category += value
 
             if category == "":
@@ -122,7 +166,7 @@ def decode_extrainfo(extra_info: str, key: int) -> str|int:
             return category
         case "roadaccessrestrictions":
             binary = list(bin(key))[2:]
-            padding = ['0'] * (len(restrictions)- len(binary))
+            padding = ["0"] * (len(restrictions) - len(binary))
             padded_binary = padding + binary
             restriction = ""
 
