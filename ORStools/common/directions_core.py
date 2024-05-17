@@ -33,7 +33,7 @@ from typing import List, Generator, Tuple, Any, Optional
 
 from PyQt5.QtCore import QVariant
 
-from ORStools.utils import convert
+from ORStools.utils import convert, logger
 
 
 def get_request_point_features(route_dict: dict, row_by_row: str) -> Generator[List, Tuple, None]:
@@ -80,6 +80,7 @@ def get_fields(
     from_name: str = "FROM_ID",
     to_name: str = "TO_ID",
     line: bool = False,
+    extra_info: list = [],
 ) -> QgsFields:
     """
     Builds output fields for directions response layer.
@@ -104,14 +105,20 @@ def get_fields(
     """
 
     fields = QgsFields()
-    fields.append(QgsField("DIST_KM", QVariant.Double))
-    fields.append(QgsField("DURATION_H", QVariant.Double))
-    fields.append(QgsField("PROFILE", QVariant.String))
-    fields.append(QgsField("PREF", QVariant.String))
-    fields.append(QgsField("OPTIONS", QVariant.String))
-    fields.append(QgsField(from_name, from_type))
+    if not extra_info:
+        fields.append(QgsField("DIST_KM", QVariant.Double))
+        fields.append(QgsField("DURATION_H", QVariant.Double))
+        fields.append(QgsField("PROFILE", QVariant.String))
+        fields.append(QgsField("PREF", QVariant.String))
+        fields.append(QgsField("OPTIONS", QVariant.String))
+        fields.append(QgsField(from_name, from_type))
     if not line:
         fields.append(QgsField(to_name, to_type))
+    for info in extra_info:
+        field_type = QVariant.Int
+        if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions", "steepness"]:
+            field_type = QVariant.String
+        fields.append(QgsField(info.upper(), field_type))
 
     return fields
 
@@ -215,6 +222,7 @@ def build_default_parameters(
     point_list: Optional[List[QgsPointXY]] = None,
     coordinates: Optional[list] = None,
     options: Optional[dict] = None,
+    extra_info: Optional[list] = None,
 ) -> dict:
     """
     Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates
@@ -246,6 +254,43 @@ def build_default_parameters(
         "elevation": True,
         "id": None,
         "options": options,
+        "extra_info": extra_info,
     }
 
     return params
+
+
+def get_extra_info_features_directions(response: dict, extra_info_order: list[str]):
+    extra_info_order = [
+        key if key != "waytype" else "waytypes" for key in extra_info_order
+    ]  # inconsistency in API
+    response_mini = response["features"][0]
+    coordinates = response_mini["geometry"]["coordinates"]
+    feats = list()
+    extra_info = response_mini["properties"]["extras"]
+    logger.log(str(extra_info))
+    extras_list = {i: [] for i in extra_info_order}
+    for key in extra_info_order:
+        try:
+            values = extra_info[key]["values"]
+        except KeyError:
+            logger.log(f"{key} is not available as extra_info.")
+            continue
+        for val in values:
+            for i in range(val[0], val[1]):
+                value = convert.decode_extrainfo(key, val[2])
+                extras_list[key].append(value)
+
+    for i in range(len(coordinates) - 1):
+        feat = QgsFeature()
+        qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates[i : i + 2]]
+        feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
+        attrs = list()
+        for j in extras_list:
+            extra = extras_list[j]
+            attr = extra[i]
+            attrs.append(attr)
+        feat.setAttributes(attrs)
+        feats.append(feat)
+
+    return feats
