@@ -27,6 +27,8 @@
  ***************************************************************************/
 """
 
+from typing import Union
+
 
 def decode_polyline(polyline: str, is3d: bool = False) -> list:
     """Decodes a Polyline string into a GeoJSON geometry.
@@ -89,7 +91,7 @@ def decode_polyline(polyline: str, is3d: bool = False) -> list:
     return points
 
 
-def decode_extrainfo(extra_info: str, key: int) -> str | int:
+def decode_extrainfo(extra_info: str, key: int) -> Union[int, str]:
     waytypes = [
         "Unknown",
         "state Road",
