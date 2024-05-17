@@ -109,7 +109,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
             ),
             QgsProcessingParameterNumber(
                 self.CSV_FACTOR,
-                self.tr("Csv Factor"),
+                self.tr("Csv Factor (needs Csv Column and csv in Extra Info)"),
                 type=QgsProcessingParameterNumber.Double,
                 minValue=0,
                 maxValue=1,
@@ -118,7 +118,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
             ),
             QgsProcessingParameterString(
                 self.CSV_COLUMN,
-                self.tr("Csv Column"),
+                self.tr("Csv Column (needs Csv Factor and csv in Extra Info)"),
                 optional=True,
             ),
             QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
