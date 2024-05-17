@@ -11,7 +11,7 @@ Current <a href="https://openrouteservice.org/restrictions/">restriction limits<
 
 <i>Location Type</i>: start treats the location(s) as starting point, destination as goal.
 
-<i>Advanced Parameters</i>: see <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">the documentation</a> for descriptions.
+<i>Advanced Parameters</i>: see <a href="https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/routing-options">the documentation</a> for descriptions.
 
 <i>Output layer</i>: a Polygon layer with ID, isochrone center latitude and longitude, range value, travel mode and total population (from <a href="https://ghsl.jrc.ec.europa.eu/about.php">GHSL</a>).
 The CRS is EPSG:4326.

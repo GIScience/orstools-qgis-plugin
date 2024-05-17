@@ -27,6 +27,15 @@
  ***************************************************************************/
 """
 
+from typing import List, Dict, Generator
+
+from qgis._core import (
+    QgsFeature,
+    QgsVectorLayer,
+    QgsGeometry,
+    QgsProject,
+    QgsProcessingParameterBoolean,
+)
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -35,9 +44,14 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
     QgsPointXY,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterString,
+    QgsProcessingFeatureSource,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
-from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
+from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
@@ -49,14 +63,18 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
 
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "directions_from_polylines_layer"
-        self.GROUP = "Directions"
-        self.IN_LINES = "INPUT_LINE_LAYER"
-        self.IN_FIELD = "INPUT_LAYER_FIELD"
-        self.IN_PREFERENCE = "INPUT_PREFERENCE"
-        self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
-        self.IN_MODE = "INPUT_MODE"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "directions_from_polylines_layer"
+        self.GROUP: str = "Directions"
+        self.IN_LINES: str = "INPUT_LINE_LAYER"
+        self.IN_FIELD: str = "INPUT_LAYER_FIELD"
+        self.IN_PREFERENCE: str = "INPUT_PREFERENCE"
+        self.IN_OPTIMIZE: str = "INPUT_OPTIMIZE"
+        self.IN_MODE: str = "INPUT_MODE"
+        self.EXPORT_ORDER: str = "EXPORT_ORDER"
+        self.EXTRA_INFO: str = "EXTRA_INFO"
+        self.CSV_FACTOR: str = "CSV_FACTOR"
+        self.CSV_COLUMN: str = "CSV_COLUMN"
+        self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
                 description=self.tr("Input Line layer"),
@@ -82,9 +100,33 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
+            QgsProcessingParameterEnum(
+                self.EXTRA_INFO,
+                self.tr("Extra Info"),
+                options=EXTRA_INFOS,
+                allowMultiple=True,
+                optional=True,
+            ),
+            QgsProcessingParameterNumber(
+                self.CSV_FACTOR,
+                self.tr("Csv Factor (needs Csv Column and csv in Extra Info)"),
+                type=QgsProcessingParameterNumber.Double,
+                minValue=0,
+                maxValue=1,
+                defaultValue=None,
+                optional=True,
+            ),
+            QgsProcessingParameterString(
+                self.CSV_COLUMN,
+                self.tr("Csv Column (needs Csv Factor and csv in Extra Info)"),
+                optional=True,
+            ),
+            QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -94,6 +136,13 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         optimization_mode = parameters[self.IN_OPTIMIZE]
 
         options = self.parseOptions(parameters, context)
+
+        csv_factor = self.parameterAsDouble(parameters, self.CSV_FACTOR, context)
+        if csv_factor > 0:
+            options["profile_params"] = {"weightings": {"csv_factor": csv_factor}}
+
+        extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
+        extra_info = [EXTRA_INFOS[i] for i in extra_info]
 
         # Get parameter values
         source = self.parameterAsSource(parameters, self.IN_LINES, context)
@@ -113,7 +162,9 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 from_name=source_field_name,
             )
 
-        sink_fields = directions_core.get_fields(**get_fields_options, line=True)
+        sink_fields = directions_core.get_fields(
+            **get_fields_options, line=True, extra_info=extra_info
+        )
 
         (sink, dest_id) = self.parameterAsSink(
             parameters,
@@ -142,19 +193,48 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                             response, profile, from_value=field_value
                         )
                     )
+
+                    # Export layer of points with optimization order
+                    export_value = self.parameterAsBool(parameters, self.EXPORT_ORDER, context)
+                    if export_value:
+                        items = list()
+                        for route in response["routes"]:
+                            for i, step in enumerate(route["steps"]):
+                                location = step["location"]
+                                items.append(location)
+
+                        point_layer = QgsVectorLayer(
+                            "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                        )
+
+                        point_layer.updateFields()
+                        for idx, coords in enumerate(items):
+                            x, y = coords
+                            feature = QgsFeature()
+                            feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                            feature.setAttributes([idx])
+
+                            point_layer.dataProvider().addFeature(feature)
+                        QgsProject.instance().addMapLayer(point_layer)
+
                 else:
                     params = directions_core.build_default_parameters(
-                        preference, point_list=line, options=options
+                        preference, point_list=line, options=options, extra_info=extra_info
                     )
                     response = ors_client.request(
                         "/v2/directions/" + profile + "/geojson", {}, post_json=params
                     )
 
-                    sink.addFeature(
-                        directions_core.get_output_feature_directions(
-                            response, profile, preference, from_value=field_value
+                    if extra_info:
+                        feats = directions_core.get_extra_info_features_directions(response)
+                        for feat in feats:
+                            sink.addFeature(feat)
+                    else:
+                        sink.addFeature(
+                            directions_core.get_output_feature_directions(
+                                response, profile, preference, from_value=field_value
+                            )
                         )
-                    )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {num} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
@@ -166,7 +246,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def _get_sorted_lines(layer, field_name):
+    def _get_sorted_lines(layer: QgsProcessingFeatureSource, field_name: str) -> Generator:
         """
         Generator to yield geometry and ID value sorted by feature ID. Careful: feat.id() is not necessarily
         permanent
@@ -196,7 +276,6 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                 line = [
                     x_former.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()
                 ]
-
             yield line, field_value
 
     def displayName(self) -> str:

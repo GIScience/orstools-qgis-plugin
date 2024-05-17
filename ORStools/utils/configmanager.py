@@ -34,7 +34,7 @@ import yaml
 from ORStools import CONFIG_PATH
 
 
-def read_config():
+def read_config() -> dict:
     """
     Reads config.yml from file and returns the parsed dict.
 
@@ -47,7 +47,7 @@ def read_config():
     return doc
 
 
-def write_config(new_config):
+def write_config(new_config: dict) -> None:
     """
     Dumps new config
 
@@ -58,7 +58,7 @@ def write_config(new_config):
         yaml.safe_dump(new_config, f)
 
 
-def write_env_var(key, value):
+def write_env_var(key: str, value: str) -> None:
     """
     Update quota env variables
 

@@ -10,4 +10,4 @@ Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung 
 
 <i>Ausgabelayer</i>: Tabelle ohne Geometrie, nur ID, Dauer und Entfernung
 
-Es gelten die <a href="https://openrouteservice.org/restrictionsi">Restriktionen</a> der openrouteservice-API.
+Es gelten die <a href="https://openrouteservice.org/restrictions/">Restriktionen</a> der openrouteservice-API.

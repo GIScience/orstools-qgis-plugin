@@ -30,7 +30,7 @@
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 
 
-def transformToWGS(old_crs):
+def transformToWGS(old_crs: QgsCoordinateReferenceSystem) -> QgsCoordinateTransform:
     """
     Returns a transformer to WGS84
 
