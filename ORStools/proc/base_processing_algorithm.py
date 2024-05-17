@@ -27,7 +27,7 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
     QgsProcessing,
     QgsProcessingAlgorithm,
@@ -42,7 +42,7 @@ from qgis.core import (
 )
 from typing import Any, Dict
 
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
@@ -174,7 +174,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 self.IN_AVOID_POLYGONS,
                 self.tr("Polygons to avoid", "ORSBaseProcessingAlgorithm"),
-                types=[QgsProcessing.TypeVectorPolygon],
+                types=[QgsProcessing.SourceType.TypeVectorPolygon],
                 optional=True,
             ),
         ]
@@ -236,11 +236,13 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
                 if self.GROUP == "Matrix":
-                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagHidden)
+                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagHidden)
                 else:
                     # flags() is a wrapper around an enum of ints for type-safety.
                     # Flags are added by or-ing values, much like the union operator would work
-                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+                    param.setFlags(
+                        param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced
+                    )
 
             self.addParameter(param)
 

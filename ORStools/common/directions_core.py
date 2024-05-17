@@ -31,7 +31,7 @@ from itertools import product
 from qgis.core import QgsPoint, QgsPointXY, QgsGeometry, QgsFeature, QgsFields, QgsField
 from typing import List, Generator, Tuple, Any, Optional
 
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 
 from ORStools.utils import convert, logger
 

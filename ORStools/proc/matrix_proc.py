@@ -42,7 +42,7 @@ from qgis.core import (
     QgsProcessingFeedback,
 )
 
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 
 from ORStools.common import PROFILES
 from ORStools.utils import transform, exceptions, logger
@@ -63,7 +63,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
                 description=self.tr("Input Start Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_START_FIELD,
@@ -75,7 +75,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
                 description=self.tr("Input End Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_END_FIELD,
@@ -112,7 +112,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         # Abort when MultiPoint type
         if (
             QgsWkbTypes.flatType(source.wkbType()) or QgsWkbTypes.flatType(destination.wkbType())
-        ) == QgsWkbTypes.MultiPoint:
+        ) == QgsWkbTypes.Type.MultiPoint:
             raise QgsProcessingException(
                 "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer."
             )
@@ -183,7 +183,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             logger.log(msg)
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUT, context, sink_fields, QgsWkbTypes.NoGeometry
+            parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.NoGeometry
         )
 
         sources_attributes = [

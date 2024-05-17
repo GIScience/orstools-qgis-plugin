@@ -41,6 +41,7 @@ RELEASING:
  -->
 
 ## Unreleased
+- Replace PyQt5 imports with qgis.PyQt imports to prepare for Qt6-QGis builds
 
 ### Fixed
 - QGis crashes when selecting more than two vertices for deletion ([#230](https://github.com/GIScience/orstools-qgis-plugin/issues/230))

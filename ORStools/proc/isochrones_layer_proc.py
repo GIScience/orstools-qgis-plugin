@@ -69,7 +69,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
                 description=self.tr("Input Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             # QgsProcessingParameterBoolean(
             #     name=self.IN_DIFFERENCE,
@@ -141,7 +141,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         # Make the actual requests
         requests = []
-        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.MultiPoint:
+        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Type.MultiPoint:
             raise QgsProcessingException(
                 "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer."
             )
@@ -181,7 +181,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             self.OUT,
             context,
             self.isochrones.get_fields(),
-            QgsWkbTypes.Polygon,
+            QgsWkbTypes.Type.Polygon,
             # Needs Multipolygon if difference parameter will ever be
             # reactivated
             self.crs_out,

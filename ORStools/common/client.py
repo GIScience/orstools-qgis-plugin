@@ -34,7 +34,7 @@ from datetime import datetime, timedelta
 from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 from requests.utils import unquote_unreserved
 
 from ORStools import __version__
