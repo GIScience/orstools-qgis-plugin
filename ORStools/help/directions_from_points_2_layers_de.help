@@ -15,7 +15,7 @@ Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung 
 
 <i>Zuordnungsverfahren<i>: entweder 'row-by-row' bis ein Layer keine Features mehr hat, oder 'all-by-all' für alle Feature-Kombinationen
 
-<i>Zusätzliche Parameter</i>: Beschreibung in der <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">Dokumentation</a>.
+<i>Fortgeschrittene Parameter</i>: Beschreibung in der <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">Dokumentation</a>.
 
 <i>Ausgabelayer</i>: ein LineString-Layer mit mehreren Routen-Feldern.
 
