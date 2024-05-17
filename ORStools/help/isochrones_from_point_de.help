@@ -6,7 +6,7 @@ Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung 
 
 <i>Reichweiten</i>: komma-separierte Liste von Ganzzahlen, keine Dezimalpunkte.
 
-<i>Zusätzliche Parameter</i>: Beschreibung in der <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">Dokumentation</a>.
+<i>Zusätzliche Parameter</i>: Beschreibung in der <a href="https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/routing-options">Dokumentation</a>.
 
 <i>Ortstyp</i>: start behandelt den/die Ort(e) als Startpunkt, destination als Ziel.
 
