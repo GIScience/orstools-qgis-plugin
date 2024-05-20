@@ -3,13 +3,17 @@ name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.8.1
+version=1.8.2
 author=HeiGIT gGmbH
 email=support@openrouteservice.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2024/05/17 v1.8.1
+changelog=2024/05/20 v1.8.2
+    Fixed
+    - use python 3.9-compatible type hint
+
+    2024/05/17 v1.8.1
     Fixed
     - remove structural pattern matching for compatibility with python<3.10
 
