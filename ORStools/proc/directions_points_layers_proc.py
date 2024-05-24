@@ -159,7 +159,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         csv_factor = self.parameterAsDouble(parameters, self.CSV_FACTOR, context)
         csv_column = self.parameterAsString(parameters, self.CSV_COLUMN, context)
         if csv_factor > 0:
-            options["profile_params"] = {"weightings": {"csv_factor": csv_factor, "csv_column": csv_column}}
+            options["profile_params"] = {
+                "weightings": {"csv_factor": csv_factor, "csv_column": csv_column}
+            }
 
         extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
         extra_info = [EXTRA_INFOS[i] for i in extra_info]
