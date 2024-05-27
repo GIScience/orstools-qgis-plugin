@@ -26,19 +26,21 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from typing import Dict
 
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import (QgsProcessingParameterFeatureSource,
-                       QgsProcessing,
-                       QgsProcessingParameterNumber,
-                       QgsProcessingContext,
-                       QgsProcessingFeedback,
-                       QgsWkbTypes,
-                       QgsFields,
-                       QgsCoordinateReferenceSystem,
-                       QgsField
-                       )
+from qgis.core import (
+    QgsProcessingParameterFeatureSource,
+    QgsProcessing,
+    QgsProcessingParameterNumber,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
+    QgsWkbTypes,
+    QgsFields,
+    QgsCoordinateReferenceSystem,
+    QgsField,
+)
 
 from ORStools.common import PROFILES
 from ORStools.common.snap_core import get_snapped_point_features
@@ -64,7 +66,6 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
                 name=self.RADIUS,
                 description=self.tr("Search Radius [m]"),
             ),
-
         ]
 
     def processAlgorithm(
@@ -88,7 +89,7 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
 
         params = {
             "locations": [[point.x(), point.y()] for point in sources_features_x_formed],
-            "radius": radius
+            "radius": radius,
         }
 
         # Make request and catch ApiError
@@ -105,7 +106,12 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
         sink_fields.append(QgsField("SNAPPED_DISTANCE", QVariant.Double))
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.Point, QgsCoordinateReferenceSystem.fromEpsgId(4326)
+            parameters,
+            self.OUT,
+            context,
+            sink_fields,
+            QgsWkbTypes.Type.Point,
+            QgsCoordinateReferenceSystem.fromEpsgId(4326),
         )
 
         point_features = get_snapped_point_features(response)
@@ -114,7 +120,6 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
             sink.addFeature(feat)
 
         return {self.OUT: dest_id}
-
 
     def displayName(self) -> str:
         """
