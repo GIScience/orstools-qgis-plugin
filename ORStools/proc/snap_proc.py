@@ -57,7 +57,7 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
         self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
-                description=self.tr("Input Point layer"),
+                description=self.tr("Input Point Layer"),
                 types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterNumber(
