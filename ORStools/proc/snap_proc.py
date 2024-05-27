@@ -26,8 +26,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+from typing import Dict
 
-from qgis.core import QgsProcessingParameterFeatureSource, QgsProcessing, QgsProcessingParameterNumber
+from qgis.core import (QgsProcessingParameterFeatureSource,
+                       QgsProcessing,
+                       QgsProcessingParameterNumber,
+                       QgsProcessingContext,
+                       QgsProcessingFeedback,
+                       )
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
@@ -50,6 +56,12 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
             ),
 
         ]
+
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
+        pass
+
     def displayName(self) -> str:
         """
         Algorithm name shown in QGIS toolbox
