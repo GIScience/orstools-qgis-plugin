@@ -26,9 +26,27 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+from qgis.core import QgsProcessingParameterFeatureSource, QgsProcessing, QgsProcessingParameterNumber
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
 # noinspection PyPep8Naming
 class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.IN_POINTS = "IN_POINTS"
+        self.RADIUS = "RADIUS"
+        self.PARAMETERS: list = [
+            QgsProcessingParameterFeatureSource(
+                name=self.IN_POINTS,
+                description=self.tr("Input Point layer"),
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
+            ),
+            QgsProcessingParameterNumber(
+                name=self.RADIUS,
+                description=self.tr("Search Radius [m]"),
+                default_value=300
+            ),
+
+        ]
