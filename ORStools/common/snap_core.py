@@ -26,18 +26,19 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
 
 from ORStools.utils import logger
 
 
 def get_snapped_point_features(response: dict) -> list:
-    locations = response['locations']
+    locations = response["locations"]
     feats = []
     for location in locations:
-        coords = location['location']
-        name = location['name']
-        snapped_distance = location['snapped_distance']
+        coords = location["location"]
+        name = location["name"]
+        snapped_distance = location["snapped_distance"]
 
         feat = QgsFeature()
         feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
