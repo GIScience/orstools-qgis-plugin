@@ -26,3 +26,9 @@
  *                                                                         *
  ***************************************************************************/
 """
+from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
+
+
+# noinspection PyPep8Naming
+class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
+    pass
