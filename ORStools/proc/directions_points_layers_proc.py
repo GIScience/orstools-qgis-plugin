@@ -212,7 +212,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             field_types.update({"from_type": source_field.type()})
         if destination_field:
             field_types.update({"to_type": destination_field.type()})
-        sink_fields = directions_core.get_fields(**field_types, extra_info=extra_info)
+        sink_fields = directions_core.get_fields(
+            **field_types, extra_info=extra_info, two_layers=True
+        )
 
         (sink, dest_id) = self.parameterAsSink(
             parameters,
@@ -244,7 +246,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 continue
 
             if extra_info:
-                feats = directions_core.get_extra_info_features_directions(response, extra_info)
+                feats = directions_core.get_extra_info_features_directions(
+                    response, extra_info, values
+                )
                 for feat in feats:
                     sink.addFeature(feat)
             else:
