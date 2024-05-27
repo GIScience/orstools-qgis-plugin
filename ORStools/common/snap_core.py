@@ -42,6 +42,7 @@ def get_snapped_point_features(response: dict) -> list:
 
         feat = QgsFeature()
         feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
+        feat.setAttributes([name, snapped_distance])
         feats.append(feat)
 
     return feats
