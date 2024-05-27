@@ -49,3 +49,9 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
             ),
 
         ]
+    def displayName(self) -> str:
+        """
+        Algorithm name shown in QGIS toolbox
+        :return:
+        """
+        return self.tr("Snap from Point Layer")
