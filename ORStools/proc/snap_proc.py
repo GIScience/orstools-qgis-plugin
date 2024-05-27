@@ -48,12 +48,12 @@ from ORStools.utils import exceptions, logger, transform
 
 # noinspection PyPep8Naming
 class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.ALGO_NAME: str = "snap_from_point_layer"
         self.GROUP: str = "Snap"
-        self.IN_POINTS = "IN_POINTS"
-        self.RADIUS = "RADIUS"
+        self.IN_POINTS: str = "IN_POINTS"
+        self.RADIUS: str = "RADIUS"
         self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
