@@ -28,6 +28,7 @@
 """
 from typing import Dict
 
+from qgis.PyQt.QtCore import QVariant
 from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessing,
                        QgsProcessingParameterNumber,
@@ -36,6 +37,7 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsWkbTypes,
                        QgsFields,
                        QgsCoordinateReferenceSystem,
+                       QgsField
                        )
 
 from ORStools.common import PROFILES
@@ -99,8 +101,12 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
             feedback.reportError(msg)
             logger.log(msg)
 
+        sink_fields = QgsFields()
+        sink_fields.append(QgsField("NAME", QVariant.String))
+        sink_fields.append(QgsField("SNAPPED_DISTANCE", QVariant.Double))
+
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUT, context, QgsFields(), QgsWkbTypes.Type.Point, QgsCoordinateReferenceSystem.fromEpsgId(4326)
+            parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.Point, QgsCoordinateReferenceSystem.fromEpsgId(4326)
         )
 
         point_features = get_snapped_point_features(response)
