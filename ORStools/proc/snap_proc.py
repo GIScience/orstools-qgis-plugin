@@ -33,8 +33,15 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterNumber,
                        QgsProcessingContext,
                        QgsProcessingFeedback,
+                       QgsWkbTypes,
+                       QgsFields,
+                       QgsCoordinateReferenceSystem,
                        )
+
+from ORStools.common import PROFILES
+from ORStools.common.snap_core import get_snapped_point_features
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
+from ORStools.utils import exceptions, logger, transform
 
 
 # noinspection PyPep8Naming
@@ -42,6 +49,7 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
         self.ALGO_NAME: str = "snap_from_point_layer"
+        self.GROUP: str = "Snap"
         self.IN_POINTS = "IN_POINTS"
         self.RADIUS = "RADIUS"
         self.PARAMETERS: list = [
@@ -60,7 +68,48 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        pass
+        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+
+        # Get profile value
+        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+
+        # Get parameter values
+        source = self.parameterAsSource(parameters, self.IN_POINTS, context)
+        radius = self.parameterAsDouble(parameters, self.RADIUS, context)
+
+        sources_features = list(source.getFeatures())
+
+        x_former = transform.transformToWGS(source.sourceCrs())
+        sources_features_x_formed = [
+            x_former.transform(feat.geometry().asPoint()) for feat in sources_features
+        ]
+
+        params = {
+            "locations": [[point.x(), point.y()] for point in sources_features_x_formed],
+            "radius": radius
+        }
+
+        # Make request and catch ApiError
+        try:
+            response = ors_client.request("/v2/snap/" + profile, {}, post_json=params)
+            logger.log(str(response))
+
+        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
+            msg = f"{e.__class__.__name__}: {str(e)}"
+            feedback.reportError(msg)
+            logger.log(msg)
+
+        (sink, dest_id) = self.parameterAsSink(
+            parameters, self.OUT, context, QgsFields(), QgsWkbTypes.Type.Point, QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        )
+
+        point_features = get_snapped_point_features(response)
+
+        for feat in point_features:
+            sink.addFeature(feat)
+
+        return {self.OUT: dest_id}
+
 
     def displayName(self) -> str:
         """
