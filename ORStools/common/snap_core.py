@@ -36,7 +36,6 @@ def get_snapped_point_features(response: dict) -> list:
     feats = []
     for location in locations:
         coords = location['location']
-        logger.log(str(coords))
         name = location['name']
         snapped_distance = location['snapped_distance']
 
