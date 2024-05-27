@@ -6,6 +6,6 @@ Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung 
 
 <i>Eingabelayer</i>: nur Punkt-Layer zugelassen.
 
-<i>Radius</i>: Radius in welchem .
+<i>Radius</i>: Radius in welchem gesucht wird.
 
 Es gelten die <a href="https://openrouteservice.org/restrictions/">Restriktionen</a> der openrouteservice-API.
