@@ -295,7 +295,7 @@ def get_extra_info_features_directions(
             attr = extra[i]
             attrs.append(attr)
 
-        if to_from_values: # for directions from two point layers
+        if to_from_values:  # for directions from two point layers
             attrs = [to_from_values[0], to_from_values[1]] + attrs
         feat.setAttributes(attrs)
 

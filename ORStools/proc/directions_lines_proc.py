@@ -226,7 +226,9 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                     )
 
                     if extra_info:
-                        feats = directions_core.get_extra_info_features_directions(response, extra_info)
+                        feats = directions_core.get_extra_info_features_directions(
+                            response, extra_info
+                        )
                         for feat in feats:
                             sink.addFeature(feat)
                     else:
