@@ -43,7 +43,8 @@ RELEASING:
 ## Unreleased
 
 ### Fixed
-- Add csv_column parameter to request in points_layers_proc([#260](https://github.com/GIScience/orstools-qgis-plugin/issues/260))
+- Add csv\_column parameter to request made by points\_layers\_proc([#260](https://github.com/GIScience/orstools-qgis-plugin/issues/260))
+- make extra\_info work with two points layers
 
 ## [1.8.2] - 2024-05-20
 
