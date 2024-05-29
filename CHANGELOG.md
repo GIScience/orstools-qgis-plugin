@@ -40,7 +40,7 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## Unreleased
+## [1.8.3] - 2024-05-29
 
 ### Fixed
 - Add csv\_column parameter to request made by points\_layers\_proc([#260](https://github.com/GIScience/orstools-qgis-plugin/issues/260))
@@ -257,7 +257,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.2...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...HEAD
+[1.8.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.2...v1.8.3
 [1.8.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.1...v1.8.0
