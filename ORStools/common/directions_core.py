@@ -264,7 +264,7 @@ def build_default_parameters(
 
 
 def get_extra_info_features_directions(
-    response: dict, extra_info_order: list[str], to_from_values: list
+    response: dict, extra_info_order: list[str], to_from_values: Optional[list] = None
 ):
     extra_info_order = [
         key if key != "waytype" else "waytypes" for key in extra_info_order
@@ -294,7 +294,11 @@ def get_extra_info_features_directions(
             extra = extras_list[j]
             attr = extra[i]
             attrs.append(attr)
-        feat.setAttributes([to_from_values[0], to_from_values[1]] + attrs)
+
+        if to_from_values: # for directions from two point layers
+            attrs = [to_from_values[0], to_from_values[1]] + attrs
+        feat.setAttributes(attrs)
+
         feats.append(feat)
 
     return feats
