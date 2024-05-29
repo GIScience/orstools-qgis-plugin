@@ -40,6 +40,12 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+
+### Fixed
+- Add csv\_column parameter to request made by points\_layers\_proc([#260](https://github.com/GIScience/orstools-qgis-plugin/issues/260))
+- make extra\_info work with two points layers
+
 ## [1.8.2] - 2024-05-20
 
 ### Fixed
