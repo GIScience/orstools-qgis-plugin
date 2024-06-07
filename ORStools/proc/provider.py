@@ -39,7 +39,7 @@ from .export_proc import ORSExportAlgo
 from .isochrones_layer_proc import ORSIsochronesLayerAlgo
 from .isochrones_point_proc import ORSIsochronesPointAlgo
 from .matrix_proc import ORSMatrixAlgo
-from .snap_proc import ORSSnapAlgo
+from .snap_layer_proc import ORSSnapAlgo
 
 
 class ORStoolsProvider(QgsProcessingProvider):
