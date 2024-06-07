@@ -26,10 +26,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-from random import random
+import random
 from typing import Any, Generator
 
-from qgis._core import QgsMapLayer
 from qgis.core import (
     QgsPointXY,
     QgsFeature,
@@ -38,8 +37,12 @@ from qgis.core import (
     QgsGeometry,
     QgsSymbol,
     QgsSimpleFillSymbolLayer,
-    QgsRendererCategory,
+    QgsGraduatedSymbolRenderer,
     QgsCategorizedSymbolRenderer,
+    QgsMapLayer,
+    QgsStyle,
+    QgsClassificationEqualInterval,
+
 )
 
 from qgis.PyQt.QtCore import QVariant
@@ -184,44 +187,17 @@ class Isochrones:
         field = layer.fields().indexOf(self.field_dimension_name)
         unique_values = sorted(layer.uniqueValues(field))
 
-        colors = {
-            0: QColor("#2b83ba"),
-            1: QColor("#64abb0"),
-            2: QColor("#9dd3a7"),
-            3: QColor("#c7e9ad"),
-            4: QColor("#edf8b9"),
-            5: QColor("#ffedaa"),
-            6: QColor("#fec980"),
-            7: QColor("#f99e59"),
-            8: QColor("#e85b3a"),
-            9: QColor("#d7191c"),
-        }
 
-        categories = []
+        classification_method = QgsClassificationEqualInterval()
+        ramp_name = 'Spectral'
+        default_style = QgsStyle().defaultStyle()
+        color_ramp = default_style.colorRamp(ramp_name)
+        num_classes = len(unique_values)
 
-        for cid, unique_value in enumerate(unique_values):
-            # initialize the default symbol for this geometry type
-            symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-
-            # set color
-            color = colors[cid] if colors[cid] else QColor("%06x" % random.randint(0, 0xFFFFFF))
-
-            # configure a symbol layer
-            symbol_layer = QgsSimpleFillSymbolLayer(
-                color=color, strokeColor=QColor("#000000")
-            )
-
-            # replace default symbol layer with the configured one
-            if symbol_layer is not None:
-                symbol.changeSymbolLayer(0, symbol_layer)
-
-            # create renderer object
-            category = QgsRendererCategory(unique_value, symbol, str(unique_value) + legend_suffix)
-            # entry for the list of category items
-            categories.append(category)
-
-        # create renderer object
-        renderer = QgsCategorizedSymbolRenderer(self.field_dimension_name, categories)
+        renderer = QgsGraduatedSymbolRenderer(self.field_dimension_name)
+        renderer.setSourceColorRamp(color_ramp)
+        renderer.setClassificationMethod(classification_method)
+        renderer.updateClasses(layer, num_classes)
 
         # assign the created renderer to the layer
         if renderer is not None:
