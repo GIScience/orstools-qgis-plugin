@@ -1,0 +1,11 @@
+Der Snap-Algorithmus kann verwendet werden, um Punkte an den Rändern des Straßennetzes für ein bestimmtes Verkehrsmittel zu finden.
+
+Ein gültiger API-Key ('Web'-Menü > 'Dienst-Einstellungen') oder Registrierung unter <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a> wird benötigt.
+
+<i>Verkehrsmittel</i>: bestimmt das genutzte Reise-Profil
+
+<i>Eingabelayer</i>: Eingabepunkt
+
+<i>Radius</i>: Radius in welchem gesucht wird.
+
+Es gelten die <a href="https://openrouteservice.org/restrictions/">Restriktionen</a> der openrouteservice-API.
