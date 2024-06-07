@@ -36,15 +36,16 @@ def get_snapped_point_features(response: dict) -> list:
     locations = response["locations"]
     feats = []
     for location in locations:
-        coords = location["location"]
-        if "name" in location.keys():
-            name = location["name"]
-        snapped_distance = location["snapped_distance"]
-
         feat = QgsFeature()
-        feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
-        attr = [name, snapped_distance] if "name" in location.keys() else [snapped_distance]
-        feat.setAttributes(attr)
+        if location:
+            coords = location["location"]
+            if "name" in location.keys():
+                name = location["name"]
+            snapped_distance = location["snapped_distance"]
+            attr = [name, snapped_distance] if "name" in location.keys() else ["", snapped_distance]
+            feat.setAttributes(attr)
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
+
         feats.append(feat)
 
     return feats
