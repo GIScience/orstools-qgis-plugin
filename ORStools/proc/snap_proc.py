@@ -65,6 +65,7 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 name=self.RADIUS,
                 description=self.tr("Search Radius [m]"),
+                defaultValue=300,
             ),
         ]
 
