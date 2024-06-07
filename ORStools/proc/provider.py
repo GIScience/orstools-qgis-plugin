@@ -64,7 +64,7 @@ class ORStoolsProvider(QgsProcessingProvider):
         self.addAlgorithm(ORSIsochronesLayerAlgo())
         self.addAlgorithm(ORSIsochronesPointAlgo())
         self.addAlgorithm(ORSMatrixAlgo())
-        self.addAlgorithm(ORSSnapLayelAlgo())
+        self.addAlgorithm(ORSSnapLayerAlgo())
 
     @staticmethod
     def icon() -> QIcon:
