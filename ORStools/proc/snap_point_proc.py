@@ -31,7 +31,6 @@ from typing import Dict
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import (
-    QgsProcessingParameterFeatureSource,
     QgsProcessingParameterPoint,
     QgsProcessingParameterNumber,
     QgsProcessingContext,
@@ -45,7 +44,7 @@ from qgis.core import (
 from ORStools.common import PROFILES
 from ORStools.common.snap_core import get_snapped_point_features
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
-from ORStools.utils import exceptions, logger, transform
+from ORStools.utils import exceptions, logger
 
 
 # noinspection PyPep8Naming
@@ -70,6 +69,7 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=300,
             ),
         ]
+
     crs_out = QgsCoordinateReferenceSystem.fromEpsgId(4326)
 
     def processAlgorithm(
