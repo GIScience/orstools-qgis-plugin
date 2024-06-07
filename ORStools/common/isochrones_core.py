@@ -26,7 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-
+from random import random
 from typing import Any, Generator
 
 from qgis._core import QgsMapLayer
@@ -203,9 +203,12 @@ class Isochrones:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
 
+            # set color
+            color = colors[cid] if colors[cid] else QColor("%06x" % random.randint(0, 0xFFFFFF))
+
             # configure a symbol layer
             symbol_layer = QgsSimpleFillSymbolLayer(
-                color=colors[cid], strokeColor=QColor("#000000")
+                color=color, strokeColor=QColor("#000000")
             )
 
             # replace default symbol layer with the configured one
