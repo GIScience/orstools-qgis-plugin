@@ -94,15 +94,6 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
             "id": None,
         }
 
-        # Make request and catch ApiError
-        try:
-            response = ors_client.request("/v2/snap/" + profile, {}, post_json=params)
-
-        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            msg = f"{e.__class__.__name__}: {str(e)}"
-            feedback.reportError(msg)
-            logger.log(msg)
-
         sink_fields = QgsFields()
         sink_fields.append(QgsField("NAME", QVariant.String))
         sink_fields.append(QgsField("SNAPPED_DISTANCE", QVariant.Double))
@@ -116,10 +107,18 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
             QgsCoordinateReferenceSystem.fromEpsgId(4326),
         )
 
-        point_features = get_snapped_point_features(response)
+        # Make request and catch ApiError
+        try:
+            response = ors_client.request("/v2/snap/" + profile, {}, post_json=params)
+            point_features = get_snapped_point_features(response)
 
-        for feat in point_features:
-            sink.addFeature(feat)
+            for feat in point_features:
+                sink.addFeature(feat)
+
+        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
+            msg = f"{e.__class__.__name__}: {str(e)}"
+            feedback.reportError(msg)
+            logger.log(msg)
 
         return {self.OUT: dest_id}
 
