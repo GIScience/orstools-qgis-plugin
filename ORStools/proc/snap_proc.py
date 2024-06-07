@@ -90,6 +90,7 @@ class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
         params = {
             "locations": [[point.x(), point.y()] for point in sources_features_x_formed],
             "radius": radius,
+            "id": None,
         }
 
         # Make request and catch ApiError
