@@ -157,8 +157,11 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         options = self.parseOptions(parameters, context)
 
         csv_factor = self.parameterAsDouble(parameters, self.CSV_FACTOR, context)
+        csv_column = self.parameterAsString(parameters, self.CSV_COLUMN, context)
         if csv_factor > 0:
-            options["profile_params"] = {"weightings": {"csv_factor": csv_factor}}
+            options["profile_params"] = {
+                "weightings": {"csv_factor": csv_factor, "csv_column": csv_column}
+            }
 
         extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
         extra_info = [EXTRA_INFOS[i] for i in extra_info]
@@ -209,7 +212,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             field_types.update({"from_type": source_field.type()})
         if destination_field:
             field_types.update({"to_type": destination_field.type()})
-        sink_fields = directions_core.get_fields(**field_types, extra_info=extra_info)
+        sink_fields = directions_core.get_fields(
+            **field_types, extra_info=extra_info, two_layers=True
+        )
 
         (sink, dest_id) = self.parameterAsSink(
             parameters,
@@ -241,7 +246,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 continue
 
             if extra_info:
-                feats = directions_core.get_extra_info_features_directions(response)
+                feats = directions_core.get_extra_info_features_directions(
+                    response, extra_info, values
+                )
                 for feat in feats:
                     sink.addFeature(feat)
             else:

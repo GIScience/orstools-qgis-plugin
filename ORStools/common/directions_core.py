@@ -81,6 +81,7 @@ def get_fields(
     to_name: str = "TO_ID",
     line: bool = False,
     extra_info: list = [],
+    two_layers: bool = False,
 ) -> QgsFields:
     """
     Builds output fields for directions response layer.
@@ -114,6 +115,8 @@ def get_fields(
         fields.append(QgsField(from_name, from_type))
     if not line:
         fields.append(QgsField(to_name, to_type))
+    if two_layers:
+        fields.append(QgsField(from_name, from_type))
     for info in extra_info:
         field_type = QVariant.Int
         if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions", "steepness"]:
@@ -260,7 +263,9 @@ def build_default_parameters(
     return params
 
 
-def get_extra_info_features_directions(response: dict, extra_info_order: list[str]):
+def get_extra_info_features_directions(
+    response: dict, extra_info_order: list[str], to_from_values: Optional[list] = None
+):
     extra_info_order = [
         key if key != "waytype" else "waytypes" for key in extra_info_order
     ]  # inconsistency in API
@@ -268,7 +273,6 @@ def get_extra_info_features_directions(response: dict, extra_info_order: list[st
     coordinates = response_mini["geometry"]["coordinates"]
     feats = list()
     extra_info = response_mini["properties"]["extras"]
-    logger.log(str(extra_info))
     extras_list = {i: [] for i in extra_info_order}
     for key in extra_info_order:
         try:
@@ -290,7 +294,11 @@ def get_extra_info_features_directions(response: dict, extra_info_order: list[st
             extra = extras_list[j]
             attr = extra[i]
             attrs.append(attr)
+
+        if to_from_values:  # for directions from two point layers
+            attrs = [to_from_values[0], to_from_values[1]] + attrs
         feat.setAttributes(attrs)
+
         feats.append(feat)
 
     return feats
