@@ -26,7 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-import random
+
 from typing import Any, Generator
 
 from qgis.core import (
@@ -35,18 +35,13 @@ from qgis.core import (
     QgsField,
     QgsFields,
     QgsGeometry,
-    QgsSymbol,
-    QgsSimpleFillSymbolLayer,
     QgsGraduatedSymbolRenderer,
-    QgsCategorizedSymbolRenderer,
     QgsMapLayer,
     QgsStyle,
     QgsClassificationEqualInterval,
-
 )
 
 from qgis.PyQt.QtCore import QVariant
-from qgis.PyQt.QtGui import QColor
 
 
 # import processing
@@ -179,17 +174,11 @@ class Isochrones:
         :type layer: QgsMapLayer
         """
 
-        if self.dimension == "time":
-            legend_suffix = " min"
-        else:
-            legend_suffix = " m"
-
         field = layer.fields().indexOf(self.field_dimension_name)
         unique_values = sorted(layer.uniqueValues(field))
 
-
         classification_method = QgsClassificationEqualInterval()
-        ramp_name = 'Spectral'
+        ramp_name = "Spectral"
         default_style = QgsStyle().defaultStyle()
         color_ramp = default_style.colorRamp(ramp_name)
         num_classes = len(unique_values)
