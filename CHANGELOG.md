@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+### Fixed
+- Log the correct ApiError message in the isochrone processing algorithm with > 10 ranges ([#264](https://github.com/GIScience/orstools-qgis-plugin/issues/264))
+
 ## [1.8.3] - 2024-05-29
 
 ### Fixed
