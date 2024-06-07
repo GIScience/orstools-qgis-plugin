@@ -1,0 +1,11 @@
+The snapping endpoint can be used to snap points to the edges of the street network for a specific means of transportation.
+
+You need to have a valid API key ('Web' menu > 'Configuration') or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
+
+<i>Travel Mode</i>: determines the profile used.
+
+<i>Input layer</i>: select an input point from the canvas.
+
+<i>Radius</i>: Radius in which to search.
+
+Current <a href="https://openrouteservice.org/restrictions/">restriction limits</a> for the openrouteservice API apply.

@@ -40,6 +40,7 @@ from .isochrones_layer_proc import ORSIsochronesLayerAlgo
 from .isochrones_point_proc import ORSIsochronesPointAlgo
 from .matrix_proc import ORSMatrixAlgo
 from .snap_layer_proc import ORSSnapLayerAlgo
+from .snap_point_proc import ORSSnapPointAlgo
 
 
 class ORStoolsProvider(QgsProcessingProvider):
@@ -65,8 +66,9 @@ class ORStoolsProvider(QgsProcessingProvider):
         self.addAlgorithm(ORSIsochronesLayerAlgo())
         self.addAlgorithm(ORSIsochronesPointAlgo())
         self.addAlgorithm(ORSMatrixAlgo())
-        self.addAlgorithm(ORSSnapLayerAlgo())
         self.addAlgorithm(ORSExportAlgo())
+        self.addAlgorithm(ORSSnapLayerAlgo())
+        self.addAlgorithm(ORSSnapPointAlgo())
 
     @staticmethod
     def icon() -> QIcon:
