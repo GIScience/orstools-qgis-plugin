@@ -181,6 +181,7 @@ class Isochrones:
         ramp_name = "Spectral"
         default_style = QgsStyle().defaultStyle()
         color_ramp = default_style.colorRamp(ramp_name)
+        color_ramp.invert()
         num_classes = len(unique_values)
 
         renderer = QgsGraduatedSymbolRenderer(self.field_dimension_name)
