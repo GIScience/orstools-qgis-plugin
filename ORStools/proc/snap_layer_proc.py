@@ -49,7 +49,7 @@ from ORStools.utils import exceptions, logger, transform
 
 
 # noinspection PyPep8Naming
-class ORSSnapAlgo(ORSBaseProcessingAlgorithm):
+class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self) -> None:
         super().__init__()
         self.ALGO_NAME: str = "snap_from_point_layer"
