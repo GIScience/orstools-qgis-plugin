@@ -195,7 +195,6 @@ class Isochrones:
             7: QColor("#f99e59"),
             8: QColor("#e85b3a"),
             9: QColor("#d7191c"),
-            10: None,
         }
 
         categories = []
