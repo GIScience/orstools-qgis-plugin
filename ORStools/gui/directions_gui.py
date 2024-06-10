@@ -33,6 +33,8 @@ from qgis.PyQt.QtWidgets import QCheckBox
 
 from ORStools.utils import transform
 
+from qgis.core import QgsPointXY
+
 
 def _get_avoid_polygons(layer):
     """
@@ -84,12 +86,13 @@ def _get_avoid_options(avoid_boxes):
 class Directions:
     """Extended functionality for directions endpoint for GUI."""
 
-    def __init__(self, dlg):
+    def __init__(self, dlg, iface):
         """
         :param dlg: Main GUI dialog.
         :type dlg: QDialog
         """
         self.dlg = dlg
+        self.iface = iface
 
         self.options = dict()
 
@@ -100,15 +103,25 @@ class Directions:
         :returns: coordinate list of line
         :rtype: list
         """
+        map_crs = self.iface.mapCanvas().mapSettings().destinationCrs()
+        transformer = transform.transformToWGS(map_crs)
+
         coordinates = []
         layers_list = self.dlg.routing_fromline_list
         for idx in range(layers_list.count()):
             item = layers_list.item(idx).text()
             param, coords = item.split(":")
 
+
             coordinates.append([float(coord) for coord in coords.split(", ")])
 
-        return [[round(x, 6), round(y, 6)] for x, y in coordinates]
+        transformed_coordinates = []
+        for coord in coordinates:
+            point = QgsPointXY(coord[0], coord[1])
+            transformed_point = transformer.transform(point)
+            transformed_coordinates.append([transformed_point.x(), transformed_point.y()])
+
+        return [[round(x, 6), round(y, 6)] for x, y in transformed_coordinates]
 
     def get_parameters(self):
         """
