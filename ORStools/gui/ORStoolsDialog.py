@@ -77,7 +77,7 @@ from ORStools.common import (
     PREFERENCES,
 )
 from ORStools.gui import directions_gui
-from ORStools.utils import exceptions, maptools, logger, configmanager, transform
+from ORStools.utils import exceptions, maptools, logger, configmanager
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
@@ -269,16 +269,6 @@ class ORStoolsDialogMain:
         layer_out.loadNamedStyle(qml_path, True)
         layer_out.triggerRepaint()
 
-        # Associate annotations with map layer, so they get deleted when layer is deleted
-        for annotation in self.dlg.annotations:
-            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
-            # , you can change order after optimization
-            # Then in theory, when the layer is remove, the annotation is removed as well
-            # Doesn't work though, the annotations are still there when project is re-opened
-            # annotation.setMapLayer(layer_out)
-            self.project.annotationManager().removeAnnotation(annotation)
-        self.dlg.annotations = []
-
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()["providers"][provider_id]
 
@@ -315,7 +305,7 @@ class ORStoolsDialogMain:
         clnt = client.Client(provider, agent)
         clnt_msg = ""
 
-        directions = directions_gui.Directions(self.dlg)
+        directions = directions_gui.Directions(self.dlg, self.iface)
         params = None
         try:
             params = directions.get_parameters()
@@ -498,6 +488,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.item(x).text()
             for x in range(self.routing_fromline_list.count())
         ]
+        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
         if len(items) > 0:
             point_layer = QgsVectorLayer(
@@ -512,6 +503,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 feature.setAttributes([idx])
 
                 point_layer.dataProvider().addFeature(feature)
+                point_layer.setCrs(map_crs)
             QgsProject.instance().addMapLayer(point_layer)
             self._iface.mapCanvas().refresh()
 
@@ -540,7 +532,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         else:
             # else clear all items and annotations
             self.routing_fromline_list.clear()
-            self._clear_annotations()
+            self.clear_annotations()
 
         # Remove blue lines (rubber band)
         if self.line_tool:
@@ -567,7 +559,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         return QgsMapCanvasAnnotationItem(annotation, self.annotation_canvas).annotation()
 
-    def _clear_annotations(self) -> None:
+    def clear_annotations(self) -> None:
         """Clears annotations"""
         for annotation_item in self.annotation_canvas.annotationItems():
             annotation = annotation_item.annotation()
@@ -584,7 +576,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.hide()
         self.routing_fromline_list.clear()
         # Remove all annotations which were added (if any)
-        self._clear_annotations()
+        self.clear_annotations()
 
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
@@ -595,11 +587,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_linetool_map_click(self, point: QgsPointXY, idx: int) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
-
-        transformer = transform.transformToWGS(map_crs)
-        point_wgs = transformer.transform(point)
-        self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
+        self.routing_fromline_list.addItem(f"Point {idx}: {point.x():.6f}, {point.y():.6f}")
 
         annotation = self._linetool_annotate_point(point, idx)
         self.project.annotationManager().addAnnotation(annotation)
@@ -611,7 +599,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             for x in range(self.routing_fromline_list.count())
         ]
         self.routing_fromline_list.clear()
-        self._clear_annotations()
+        self.clear_annotations()
         crs = QgsCoordinateReferenceSystem(f"EPSG:{4326}")
         for idx, x in enumerate(items):
             coords = x.split(":")[1]
