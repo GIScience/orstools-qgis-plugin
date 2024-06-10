@@ -84,7 +84,7 @@ from ORStools.common import (
     PROFILES,
     PREFERENCES,
 )
-from ORStools.utils import maptools, configmanager, transform, gui, exceptions
+from ORStools.utils import maptools, configmanager, gui, exceptions
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
@@ -415,6 +415,9 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             lambda: self.color_duplicate_items(self.routing_fromline_list)
         )
 
+        self.last_crs = self.canvas.mapSettings().destinationCrs()
+        self.canvas.destinationCrsChanged.connect(self._on_crs_changed)
+
         self.load_provider_combo_state()
         self.provider_combo.activated.connect(self.save_selected_provider_state)
 
@@ -435,6 +438,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             self.routing_fromline_list.item(x).text()
             for x in range(self.routing_fromline_list.count())
         ]
+        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
         if len(items) > 0:
             timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
@@ -450,6 +454,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 feature.setAttributes([idx])
 
                 point_layer.dataProvider().addFeature(feature)
+                point_layer.setCrs(map_crs)
             QgsProject.instance().addMapLayer(point_layer)
             self.canvas.refresh()
 
@@ -530,11 +535,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
     def create_vertex(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self.canvas.mapSettings().destinationCrs()
-
-        transformer = transform.transformToWGS(map_crs)
-        point_wgs = transformer.transform(point)
-        self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
+        self.routing_fromline_list.addItem(f"Point {idx}: {point.x():.6f}, {point.y():.6f}")
 
         crs = self.canvas.mapSettings().destinationCrs()
         annotation = self._linetool_annotate_point(point, idx, crs)
@@ -549,17 +550,20 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         ]
         self.routing_fromline_list.clear()
         self._clear_annotations()
-        crs = QgsCoordinateReferenceSystem(f"EPSG:{4326}")
         project_crs = self.canvas.mapSettings().destinationCrs()
-        for idx, x in enumerate(items):
-            coords = x.split(":")[1]
-            item = f"Point {idx}:{coords}"
-            x, y = (float(i) for i in coords.split(", "))
+        for idx, origin in enumerate(items):
+            origin_coords = origin.split(":")[1]
+            x, y = (float(i) for i in origin_coords.split(", "))
             point = QgsPointXY(x, y)
 
-            self.routing_fromline_list.addItem(item)
-            transform = QgsCoordinateTransform(crs, project_crs, QgsProject.instance())
+            transform = QgsCoordinateTransform(self.last_crs, project_crs, QgsProject.instance())
+
             point = transform.transform(point)
+            
+            coords = f"{point.x():.6f}, {point.y():.6f}"
+            item = f"Point {idx}: {coords}"
+            self.routing_fromline_list.addItem(item)
+
             annotation = self._linetool_annotate_point(point, idx)
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
@@ -606,3 +610,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         """Load the saved state when the window is shown"""
         super().show()
         self.load_provider_combo_state()
+
+    def _on_crs_changed(self) -> None:
+        """Handle CRS change event."""  
+        self._reindex_list_items()
+        self.last_crs = self.canvas.mapSettings().destinationCrs()

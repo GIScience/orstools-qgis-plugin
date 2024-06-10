@@ -86,13 +86,12 @@ def _get_avoid_options(avoid_boxes):
 class Directions:
     """Extended functionality for directions endpoint for GUI."""
 
-    def __init__(self, dlg, iface):
+    def __init__(self, dlg):
         """
         :param dlg: Main GUI dialog.
         :type dlg: QDialog
         """
         self.dlg = dlg
-        self.iface = iface
 
         self.options = dict()
 
@@ -103,7 +102,7 @@ class Directions:
         :returns: coordinate list of line
         :rtype: list
         """
-        map_crs = self.iface.mapCanvas().mapSettings().destinationCrs()
+        map_crs = self.dlg.canvas.mapSettings().destinationCrs()
         transformer = transform.transformToWGS(map_crs)
 
         coordinates = []
