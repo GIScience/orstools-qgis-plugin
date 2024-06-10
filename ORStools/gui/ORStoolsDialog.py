@@ -315,7 +315,7 @@ class ORStoolsDialogMain:
         clnt = client.Client(provider, agent)
         clnt_msg = ""
 
-        directions = directions_gui.Directions(self.dlg)
+        directions = directions_gui.Directions(self.dlg, self.iface)
         params = None
         try:
             params = directions.get_parameters()
