@@ -72,7 +72,8 @@ from ORStools import (
     __version__,
     __email__,
     __web__,
-    __help__, ROUTE_COLOR,
+    __help__,
+    ROUTE_COLOR,
 )
 from ORStools.common import (
     client,
@@ -693,9 +694,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     for x in range(self.routing_fromline_list.count())
                 ]
                 backup = items.copy()
-                items[
-                    self.move_i
-                ] = f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
+                items[self.move_i] = (
+                    f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
+                )
                 self.moved_idxs += 1
 
                 self.routing_fromline_list.clear()
