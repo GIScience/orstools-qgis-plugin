@@ -48,6 +48,7 @@ def classFactory(iface):  # pylint: disable=invalid-name
 # Define plugin wide constants
 PLUGIN_NAME = "ORS Tools"
 DEFAULT_COLOR = "#a8b1f5"
+ROUTE_COLOR = "#c62828"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RESOURCE_PREFIX = ":plugins/ORStools/img/"
