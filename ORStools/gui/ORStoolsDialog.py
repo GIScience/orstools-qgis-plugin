@@ -269,16 +269,6 @@ class ORStoolsDialogMain:
         layer_out.loadNamedStyle(qml_path, True)
         layer_out.triggerRepaint()
 
-        # Associate annotations with map layer, so they get deleted when layer is deleted
-        for annotation in self.dlg.annotations:
-            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
-            # , you can change order after optimization
-            # Then in theory, when the layer is remove, the annotation is removed as well
-            # Doesn't work though, the annotations are still there when project is re-opened
-            # annotation.setMapLayer(layer_out)
-            self.project.annotationManager().removeAnnotation(annotation)
-        self.dlg.annotations = []
-
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()["providers"][provider_id]
 
