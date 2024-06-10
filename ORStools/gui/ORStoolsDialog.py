@@ -542,7 +542,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         else:
             # else clear all items and annotations
             self.routing_fromline_list.clear()
-            self._clear_annotations()
+            self.clear_annotations()
 
         # Remove blue lines (rubber band)
         if self.line_tool:
@@ -569,7 +569,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         return QgsMapCanvasAnnotationItem(annotation, self.annotation_canvas).annotation()
 
-    def _clear_annotations(self) -> None:
+    def clear_annotations(self) -> None:
         """Clears annotations"""
         for annotation_item in self.annotation_canvas.annotationItems():
             annotation = annotation_item.annotation()
@@ -586,7 +586,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.hide()
         self.routing_fromline_list.clear()
         # Remove all annotations which were added (if any)
-        self._clear_annotations()
+        self.clear_annotations()
 
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
@@ -609,7 +609,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             for x in range(self.routing_fromline_list.count())
         ]
         self.routing_fromline_list.clear()
-        self._clear_annotations()
+        self.clear_annotations()
         crs = QgsCoordinateReferenceSystem(f"EPSG:{4326}")
         for idx, x in enumerate(items):
             coords = x.split(":")[1]
