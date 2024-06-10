@@ -29,8 +29,6 @@
 
 from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
 
-from ORStools.utils import logger
-
 
 def get_snapped_point_features(response: dict) -> list:
     locations = response["locations"]
