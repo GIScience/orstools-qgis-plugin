@@ -498,6 +498,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.routing_fromline_list.item(x).text()
             for x in range(self.routing_fromline_list.count())
         ]
+        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
         if len(items) > 0:
             point_layer = QgsVectorLayer(
@@ -512,6 +513,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 feature.setAttributes([idx])
 
                 point_layer.dataProvider().addFeature(feature)
+                point_layer.setCrs(map_crs)
             QgsProject.instance().addMapLayer(point_layer)
             self._iface.mapCanvas().refresh()
 
@@ -595,11 +597,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_linetool_map_click(self, point: QgsPointXY, idx: int) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
-
-        transformer = transform.transformToWGS(map_crs)
-        point_wgs = transformer.transform(point)
-        self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
+        self.routing_fromline_list.addItem(f"Point {idx}: {point.x():.6f}, {point.y():.6f}")
 
         annotation = self._linetool_annotate_point(point, idx)
         self.project.annotationManager().addAnnotation(annotation)
