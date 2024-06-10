@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+### added
+- Show coordinates in point list in project crs ([#200](https://github.com/GIScience/orstools-qgis-plugin/issues/200))
+
 ## [1.8.3] - 2024-05-29
 
 ### Fixed
