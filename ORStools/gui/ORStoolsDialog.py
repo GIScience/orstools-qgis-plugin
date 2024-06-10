@@ -623,6 +623,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
+        if self.rubber_band:
+            self.rubber_band.reset()
 
     def _on_linetool_init(self) -> None:
         """Hides GUI dialog, inits line maptool and add items to line list box."""
