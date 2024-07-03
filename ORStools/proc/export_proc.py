@@ -139,12 +139,11 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: dest_id}
 
     @staticmethod
-    def get_fields(source_type=QVariant.Int, destination_type=QVariant.Int):
+    def get_fields():
         fields = QgsFields()
-        fields.append(QgsField("FROM_ID", source_type))
-        fields.append(QgsField("TO_ID", destination_type))
-        fields.append(QgsField("DURATION_H", QVariant.Double))
-        fields.append(QgsField("DIST_KM", QVariant.Double))
+        fields.append(QgsField("FROM_ID", QVariant.Double))
+        fields.append(QgsField("TO_ID", QVariant.Double))
+        fields.append(QgsField("WEIGHT", QVariant.Double))
 
         return fields
 
