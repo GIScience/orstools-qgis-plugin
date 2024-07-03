@@ -148,6 +148,25 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
 
         return fields
 
+    def get_location_by_id(self, node_id, nodes):
+        """
+        Get the location of a node by its ID.
+
+        Args:
+        node_id (int): The ID of the node.
+        nodes (list): The list of nodes.
+
+        Returns:
+        list: The location of the node, or None if the node ID is not found.
+        """
+        for node in nodes:
+            if node['nodeId'] == node_id:
+                return node['location']
+        return None
+
+
+
+
     def displayName(self) -> str:
         """
         Algorithm name shown in QGIS toolbox
