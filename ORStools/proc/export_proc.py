@@ -32,57 +32,39 @@ from typing import Dict
 from qgis.core import (
     QgsWkbTypes,
     QgsFeature,
-    QgsProcessing,
-    QgsFields,
     QgsField,
-    QgsProcessingException,
-    QgsProcessingParameterField,
-    QgsProcessingParameterFeatureSource,
+    QgsFields,
+    QgsProject,
+    QgsCoordinateTransform,
+    QgsCoordinateReferenceSystem,
+    QgsProcessingParameterExtent,
     QgsProcessingContext,
     QgsProcessingFeedback,
+    QgsPointXY,
+    QgsGeometry,
 )
 
 from qgis.PyQt.QtCore import QVariant
 
+from qgis.utils import iface
+
+
 from ORStools.common import PROFILES
-from ORStools.utils import transform, exceptions, logger
+from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
 # noinspection PyPep8Naming
-class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
+class ORSExportAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME: str = "matrix_from_layers"
-        self.GROUP: str = "Matrix"
-        self.IN_START: str = "INPUT_START_LAYER"
-        self.IN_START_FIELD: str = "INPUT_START_FIELD"
-        self.IN_END: str = "INPUT_END_LAYER"
-        self.IN_END_FIELD: str = "INPUT_END_FIELD"
+        self.ALGO_NAME: str = "export_from_map"
+        self.GROUP: str = "Export"
+        self.IN_EXPORT: str = "INPUT_EXPORT"
         self.PARAMETERS: list = [
-            QgsProcessingParameterFeatureSource(
-                name=self.IN_START,
-                description=self.tr("Input Start Point layer"),
-                types=[QgsProcessing.SourceType.TypeVectorPoint],
-            ),
-            QgsProcessingParameterField(
-                name=self.IN_START_FIELD,
-                description=self.tr("Start ID Field (can be used for joining)"),
-                parentLayerParameterName=self.IN_START,
-                defaultValue=None,
-                optional=True,
-            ),
-            QgsProcessingParameterFeatureSource(
-                name=self.IN_END,
-                description=self.tr("Input End Point layer"),
-                types=[QgsProcessing.SourceType.TypeVectorPoint],
-            ),
-            QgsProcessingParameterField(
-                name=self.IN_END_FIELD,
-                description=self.tr("End ID Field (can be used for joining)"),
-                parentLayerParameterName=self.IN_END,
-                defaultValue=None,
-                optional=True,
+            QgsProcessingParameterExtent(
+                name=self.IN_EXPORT,
+                description=self.tr("Input Extent"),
             ),
         ]
 
@@ -94,127 +76,68 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
-        # TODO: enable once core matrix is available
-        # options = self.parseOptions(parameters, context)
+        rect = self.parameterAsExtent(parameters, self.IN_EXPORT, context)
 
-        # Get parameter values
-        source = self.parameterAsSource(parameters, self.IN_START, context)
+        target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        source_crs = iface.mapCanvas().mapSettings().destinationCrs()
 
-        source_field_name = parameters[self.IN_START_FIELD]
-        source_field = source.fields().field(source_field_name) if source_field_name else None
+        transform = QgsCoordinateTransform(source_crs, target_crs, QgsProject.instance())
 
-        destination = self.parameterAsSource(parameters, self.IN_END, context)
-        destination_field_name = parameters[self.IN_END_FIELD]
-        destination_field = (
-            destination.fields().field(destination_field_name) if destination_field_name else None
-        )
+        bottom_left = transform.transform(rect.xMinimum(), rect.yMinimum())
+        top_right = transform.transform(rect.xMaximum(), rect.yMaximum())
 
-        # Abort when MultiPoint type
-        if (
-            QgsWkbTypes.flatType(source.wkbType()) or QgsWkbTypes.flatType(destination.wkbType())
-        ) == QgsWkbTypes.Type.MultiPoint:
-            raise QgsProcessingException(
-                "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer."
-            )
-
-        # Get source and destination features
-        sources_features = list(source.getFeatures())
-        destination_features = list(destination.getFeatures())
-        # Get feature amounts/counts
-        sources_amount = source.featureCount()
-        destinations_amount = destination.featureCount()
-
-        # Allow for 50 features in source if source == destination
-        source_equals_destination = parameters["INPUT_START_LAYER"] == parameters["INPUT_END_LAYER"]
-        if source_equals_destination:
-            features = sources_features
-            x_former = transform.transformToWGS(source.sourceCrs())
-            features_points = [x_former.transform(feat.geometry().asPoint()) for feat in features]
-        else:
-            x_former = transform.transformToWGS(source.sourceCrs())
-            sources_features_x_formed = [
-                x_former.transform(feat.geometry().asPoint()) for feat in sources_features
-            ]
-
-            x_former = transform.transformToWGS(destination.sourceCrs())
-            destination_features_x_formed = [
-                x_former.transform(feat.geometry().asPoint()) for feat in destination_features
-            ]
-
-            features_points = sources_features_x_formed + destination_features_x_formed
-
-        # Get IDs
-        sources_ids = (
-            list(range(sources_amount))
-            if source_equals_destination
-            else list(range(sources_amount))
-        )
-        destination_ids = (
-            list(range(sources_amount))
-            if source_equals_destination
-            else list(range(sources_amount, sources_amount + destinations_amount))
-        )
+        extent = [[bottom_left.x(), bottom_left.y()], [top_right.x(), top_right.y()]]
 
         params = {
-            "locations": [[point.x(), point.y()] for point in features_points],
-            "sources": sources_ids,
-            "destinations": destination_ids,
-            "metrics": ["duration", "distance"],
-            "id": "Matrix",
-            # 'options': options
+            "bbox": extent,
+            "id": "export_request",
         }
 
-        # get types of set ID fields
-        field_types = dict()
-        if source_field:
-            field_types.update({"source_type": source_field.type()})
-        if destination_field:
-            field_types.update({"destination_type": destination_field.type()})
+        sink_fields = self.get_fields()
 
-        sink_fields = self.get_fields(**field_types)
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUT,
+            context,
+            sink_fields,
+            QgsWkbTypes.Type.LineString,
+            QgsCoordinateReferenceSystem.fromEpsgId(4326),
+        )
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request("/v2/matrix/" + profile, {}, post_json=params)
+            response = ors_client.request("/v2/export/" + profile, {}, post_json=params)
+            edges = response["edges"]
+            for edge in edges:
+                from_id = edge["fromId"]
+                to_id = edge["toId"]
+                weight = edge["weight"]
+
+                to_coords = self.get_location_by_id(to_id, response["nodes"])
+                from_coords = self.get_location_by_id(from_id, response["nodes"])
+
+                geometry = QgsGeometry.fromPolylineXY([QgsPointXY(from_coords[0], from_coords[1]),
+                                                       QgsPointXY(to_coords[0], to_coords[1])])
+
+                feat = QgsFeature()
+                feat.setGeometry(geometry)
+                feat.setAttributes(
+                    [
+                        from_id,
+                        to_id,
+                        weight
+                    ]
+                )
+                sink.addFeature(feat)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 
-        (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.NoGeometry
-        )
-
-        sources_attributes = [
-            feat.attribute(source_field_name) if source_field_name else feat.id()
-            for feat in sources_features
-        ]
-        destinations_attributes = [
-            feat.attribute(destination_field_name) if destination_field_name else feat.id()
-            for feat in destination_features
-        ]
-
-        for s, source in enumerate(sources_attributes):
-            for d, destination in enumerate(destinations_attributes):
-                duration = response["durations"][s][d]
-                distance = response["distances"][s][d]
-                feat = QgsFeature()
-                feat.setAttributes(
-                    [
-                        source,
-                        destination,
-                        duration / 3600 if duration is not None else None,
-                        distance / 1000 if distance is not None else None,
-                    ]
-                )
-
-                sink.addFeature(feat)
 
         return {self.OUT: dest_id}
 
-    # TODO working source_type and destination_type differ in both name and type from get_fields in directions_core.
-    #  Change to be consistent
     @staticmethod
     def get_fields(source_type=QVariant.Int, destination_type=QVariant.Int):
         fields = QgsFields()
@@ -230,4 +153,4 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         Algorithm name shown in QGIS toolbox
         :return:
         """
-        return self.tr("Matrix from Layers")
+        return self.tr("Export from Map")
