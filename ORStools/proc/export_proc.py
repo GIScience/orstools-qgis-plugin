@@ -116,25 +116,22 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
                 to_coords = self.get_location_by_id(to_id, response["nodes"])
                 from_coords = self.get_location_by_id(from_id, response["nodes"])
 
-                geometry = QgsGeometry.fromPolylineXY([QgsPointXY(from_coords[0], from_coords[1]),
-                                                       QgsPointXY(to_coords[0], to_coords[1])])
+                geometry = QgsGeometry.fromPolylineXY(
+                    [
+                        QgsPointXY(from_coords[0], from_coords[1]),
+                        QgsPointXY(to_coords[0], to_coords[1]),
+                    ]
+                )
 
                 feat = QgsFeature()
                 feat.setGeometry(geometry)
-                feat.setAttributes(
-                    [
-                        from_id,
-                        to_id,
-                        weight
-                    ]
-                )
+                feat.setAttributes([from_id, to_id, weight])
                 sink.addFeature(feat)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
-
 
         return {self.OUT: dest_id}
 
@@ -159,12 +156,9 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         list: The location of the node, or None if the node ID is not found.
         """
         for node in nodes:
-            if node['nodeId'] == node_id:
-                return node['location']
+            if node["nodeId"] == node_id:
+                return node["location"]
         return None
-
-
-
 
     def displayName(self) -> str:
         """
