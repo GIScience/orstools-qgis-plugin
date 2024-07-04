@@ -58,7 +58,7 @@ from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 class ORSExportAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME: str = "export_from_map"
+        self.ALGO_NAME: str = "export_network_from_map"
         self.GROUP: str = "Export"
         self.IN_EXPORT: str = "INPUT_EXPORT"
         self.PARAMETERS: list = [
@@ -171,4 +171,4 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         Algorithm name shown in QGIS toolbox
         :return:
         """
-        return self.tr("Export from Map")
+        return self.tr("Export Network from Map")
