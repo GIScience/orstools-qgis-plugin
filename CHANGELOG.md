@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+### Added
+- Processing algorithms for the Network Export endpoint ([#210](https://github.com/GIScience/orstools-qgis-plugin/issues/210))
+
 ## [1.8.3] - 2024-05-29
 
 ### Fixed
