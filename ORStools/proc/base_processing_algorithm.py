@@ -241,10 +241,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
                 + [self.output_parameter()]
             )
         for param in parameters:
-            if param.name() in ADVANCED_PARAMETERS and self.ALGO_NAME not in [
-                "snap_from_point_layer",
-                "snap_from_point",
-            ]:
+            if param.name() in ADVANCED_PARAMETERS:
                 if self.GROUP == "Matrix":
                     param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagHidden)
                 else:
