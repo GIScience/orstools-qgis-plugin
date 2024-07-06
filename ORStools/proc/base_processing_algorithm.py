@@ -229,16 +229,16 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         if self.ALGO_NAME not in ["export_network_from_map"]:
             parameters = (
-            [self.provider_parameter(), self.profile_parameter()]
-            + self.PARAMETERS
-            + self.option_parameters()
-            + [self.output_parameter()]
-        )
+                [self.provider_parameter(), self.profile_parameter()]
+                + self.PARAMETERS
+                + self.option_parameters()
+                + [self.output_parameter()]
+            )
         else:
             parameters = (
-                    [self.provider_parameter(), self.profile_parameter()]
-                    + self.PARAMETERS
-                    + [self.output_parameter()]
+                [self.provider_parameter(), self.profile_parameter()]
+                + self.PARAMETERS
+                + [self.output_parameter()]
             )
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
