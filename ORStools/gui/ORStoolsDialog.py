@@ -28,6 +28,7 @@
 """
 
 import json
+import math
 import os
 from typing import Optional
 
@@ -63,7 +64,6 @@ from qgis.PyQt.QtWidgets import (
     QDialogButtonBox,
     QWidget,
 )
-from shapely import Point
 
 from ORStools import (
     RESOURCE_PREFIX,
@@ -650,16 +650,21 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 QApplication.restoreOverrideCursor()
 
     def check_annotation_hover(self, pos):
-        click = Point(pos.x(), pos.y())
+        click = [pos.x(), pos.y()]
         dists = {}
         for i, anno in enumerate(self.annotations):
             x, y = anno.mapPosition()
             mapcanvas = self._iface.mapCanvas()
             point = mapcanvas.getCoordinateTransform().transform(x, y)  # die ist es
-            p = Point(point.x(), point.y())
-            dist = click.distance(p)
-            if dist > 0:
-                dists[dist] = anno
+            p = [point.x(), point.y()]
+
+            distance = 0.0
+            for i in range(len(click)):
+                distance += (click[i] - p[i]) ** 2
+            distance = math.sqrt(distance)
+
+            if distance > 0:
+                dists[distance] = anno
         if dists and min(dists) < self.click_dist:
             idx = dists[min(dists)]
             return idx
