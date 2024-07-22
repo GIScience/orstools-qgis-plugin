@@ -128,7 +128,21 @@ where `<qgis_plugins_path>` is one of:
 The repository tests on the QGis Versions *3.16*, *3.22* and the *latest* version. 
 Until now, it's only possible to test one version at a time.
 
-To do local test runs you can use a [conda installation](https://github.com/opengisch/qgis-conda-builder) of the QGis version you want to test.
+#### Linux
+On linux machines you can run the tests with your local QGIS installation.
+
+1. Install QGIS and make sure it's available in your currently activated environment.
+
+You will need an ORS-API key. Either set it as an environment variable or do `export ORS_API_KEY=[Your API key here]` before you run the tests. 
+
+To run the tests do:
+```shell
+cd orstools-qgis-plugin
+pytest
+```
+
+#### Windows
+Do all the following steps in a [*WSL*](https://learn.microsoft.com/en-us/windows/wsl/install). To run tests locally you can use a [conda installation](https://github.com/opengisch/qgis-conda-builder) of the QGis version you want to test.
 You will also have to install *xvfb* to run the tests on involving an interface. 
 Lastly, we need [*Pytest*](https://docs.pytest.org/en/8.0.x/) to run tests in general. 
 
@@ -136,17 +150,19 @@ To do the above run use these commands:
 1. Install a version of anaconda, preferrably [*miniforge*](https://github.com/conda-forge/miniforge).
 
 2. Create and prepare the environment.
+
 ```shell
 # create environment
-mamba create --name qgis_test
-# activate envotonment
+conda create --name qgis_test
+# activate environment
 conda activate qgis_test
 # install pip
-mamba install qgis pip
+conda install pip
 ```
+
 3. Install QGis using mamba.
 ```shell
-mamba install -c conda-forge qgis=[3.16, 3.22, latest] # choose one
+conda install -c conda-forge qgis=[3.16, 3.22, latest] # choose one
 ```
 
 4. Install *xvfb*
