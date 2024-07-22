@@ -1,4 +1,4 @@
-from qgis._core import QgsPointXY
+from qgis.core import QgsPointXY
 from qgis.testing import unittest
 
 from ORStools.common import client, directions_core, isochrones_core

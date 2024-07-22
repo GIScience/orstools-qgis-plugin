@@ -1,4 +1,4 @@
-from qgis._core import (
+from qgis.core import (
     QgsPointXY,
     QgsProcessingFeedback,
     QgsProcessingContext,
