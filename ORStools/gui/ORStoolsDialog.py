@@ -32,7 +32,7 @@ import os
 
 try:
     import processing
-except:
+except ModuleNotFoundError:
     pass
 import webbrowser
 
