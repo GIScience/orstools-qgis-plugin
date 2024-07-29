@@ -29,7 +29,10 @@
 
 import json
 import os
-import processing
+try:
+    import processing
+except:
+    pass
 import webbrowser
 
 from qgis._core import Qgis
