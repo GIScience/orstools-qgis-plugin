@@ -96,7 +96,8 @@ class TestCommon(unittest.TestCase):
         clnt = client.Client(provider, agent)
         response = clnt.request("/v2/directions/" + profile + "/geojson", {}, post_json=params)
         self.assertAlmostEqual(
-            response["features"][0]["geometry"]["coordinates"][0][0], test_response["features"][0]["geometry"]["coordinates"][0][0]
+            response["features"][0]["geometry"]["coordinates"][0][0],
+            test_response["features"][0]["geometry"]["coordinates"][0][0],
         )
 
     def test_output_feature_directions(self):
