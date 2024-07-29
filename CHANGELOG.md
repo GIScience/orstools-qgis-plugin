@@ -40,6 +40,11 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## [1.8.4] - 2024-07-29
+
+### Fixed
+- issue with missing locale value for non-default user([#271](https://github.com/GIScience/orstools-qgis-plugin/issues/271))
+
 ## [1.8.3] - 2024-05-29
 
 ### Fixed
@@ -257,7 +262,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...HEAD
+[1.8.4]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.2...v1.8.3
 [1.8.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.0...v1.8.1
