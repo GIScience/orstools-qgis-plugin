@@ -5,7 +5,7 @@ description=openrouteservice routing, isochrones and matrix calculations for QGI
 
 version=1.8.3
 author=HeiGIT gGmbH
-email=support@openrouteservice.heigit.org
+email=support@smartmobility.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
