@@ -92,3 +92,11 @@ class GenericServerError(Exception):
             return self.status
         else:
             return f"{self.status} ({self.message})"
+
+
+class DuplicateError(Exception):
+    def __init__(self, message=None):
+        self.message = message
+
+    def __str__(self):
+        return self.message
