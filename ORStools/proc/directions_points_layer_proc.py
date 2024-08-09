@@ -218,6 +218,12 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
             try:
                 if optimization_mode is not None:
+                    # check for duplicate points
+                    if len(points) != len(set(points)):
+                        raise exceptions.DuplicateError(
+                            "There are duplicate points in the input layer, which need to be removed."
+                        )
+
                     params = get_params_optimize(points, profile, optimization_mode)
                     response = ors_client.request("/optimization", {}, post_json=params)
 
