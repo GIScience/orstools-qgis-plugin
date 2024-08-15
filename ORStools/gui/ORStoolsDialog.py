@@ -475,7 +475,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         # Set things around the custom map tool
         self.line_tool = None
-        self.last_maptool = self._iface.mapCanvas().mapTool()
+        self.canvas = self._iface.mapCanvas()
+        self.last_maptool = self.canvas.mapTool()
         self.annotations = []
         self.rubber_band = None
 
@@ -537,7 +538,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         )
 
         self.annotation_canvas = self._iface.mapCanvas()
-
         self.moving = None
         self.moved_idxs = 0
         self.error_idxs = 0
@@ -564,7 +564,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
                 point_layer.dataProvider().addFeature(feature)
             QgsProject.instance().addMapLayer(point_layer)
-            self._iface.mapCanvas().refresh()
+            self.canvas.refresh()
 
         self._iface.messageBar().pushMessage(
             self.tr("Success"), self.tr("Vertices saved to layer."), level=Qgis.MessageLevel.Success
@@ -600,7 +600,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
     ) -> QgsAnnotation:
         if not crs:
-            crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+            crs = self.canvas.mapSettings().destinationCrs()
 
         annotation = QgsTextAnnotation()
 
@@ -615,11 +615,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation.setMapPosition(point)
         annotation.setMapPositionCrs(crs)
 
-        return QgsMapCanvasAnnotationItem(annotation, self.annotation_canvas).annotation()
+        return QgsMapCanvasAnnotationItem(annotation, self.canvas).annotation()
 
     def _clear_annotations(self) -> None:
         """Clears annotations"""
-        for annotation_item in self.annotation_canvas.annotationItems():
+        for annotation_item in self.canvas.annotationItems():
             annotation = annotation_item.annotation()
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
@@ -632,8 +632,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.hide()
         self._clear_annotations()
         self.routing_fromline_list.clear()
-        self.line_tool = maptools.LineTool(self._iface.mapCanvas())
-        self._iface.mapCanvas().setMapTool(self.line_tool)
+        self.line_tool = maptools.LineTool(self.canvas)
+        self.canvas.setMapTool(self.line_tool)
         self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
         self.line_tool.pointReleased.connect(
             lambda point, idx: self._on_movetool_map_release(point, idx)
@@ -642,8 +642,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
     def change_cursor_on_hover(self, pos):
-        idx = self.check_annotation_hover(pos)
-        if idx:
+        hovering = self.check_annotation_hover(pos)
+        if hovering:
             QApplication.setOverrideCursor(Qt.OpenHandCursor)
         else:
             if not self.moving:
@@ -654,13 +654,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         dists = {}
         for i, anno in enumerate(self.annotations):
             x, y = anno.mapPosition()
-            mapcanvas = self._iface.mapCanvas()
-            point = mapcanvas.getCoordinateTransform().transform(x, y)  # die ist es
+            point = self.canvas.getCoordinateTransform().transform(x, y)  # die ist es
             p = [point.x(), point.y()]
 
             distance = 0.0
-            for i in range(len(click)):
-                distance += (click[i] - p[i]) ** 2
+            for j in range(len(click)):
+                distance += (click[j] - p[j]) ** 2
             distance = math.sqrt(distance)
 
             if distance > 0:
@@ -670,13 +669,13 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             return idx
 
     def _on_movetool_map_press(self, pos):
-        idx = self.check_annotation_hover(pos)
-        if idx:
+        hovering = self.check_annotation_hover(pos)
+        if hovering:
             self.line_tool.mouseMoved.disconnect()
             QApplication.setOverrideCursor(Qt.ClosedHandCursor)
             if self.rubber_band:
                 self.rubber_band.reset()
-            self.move_i = self.annotations.index(idx)
+            self.move_i = self.annotations.index(hovering)
             self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
             self.moving = True
 
@@ -685,7 +684,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             try:
                 self.moving = False
                 QApplication.restoreOverrideCursor()
-                crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+                crs = self.canvas.mapSettings().destinationCrs()
 
                 annotation = self._linetool_annotate_point(point, self.move_i, crs=crs)
                 self.annotations.insert(self.move_i, annotation)
@@ -758,9 +757,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
                     if num < 2:
                         self.routing_fromline_list.clear()
-                        for annotation in self.annotations:
-                            self.project.annotationManager().removeAnnotation(annotation)
-                        self.annotations = []
+                        self._clear_annotations()
                     else:
                         self.routing_fromline_list.takeItem(num)
                         self.create_rubber_band()
@@ -775,7 +772,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     def create_rubber_band(self):
         if self.rubber_band:
             self.rubber_band.reset()
-        self.rubber_band = QgsRubberBand(self._iface.mapCanvas(), QgsWkbTypes.LineGeometry)
+        self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
         color = QColor(ROUTE_COLOR)
         color.setAlpha(100)
         self.rubber_band.setStrokeColor(color)
@@ -786,11 +783,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 feature = next(route_layer.getFeatures())
                 self.rubber_band.addGeometry(feature.geometry(), route_layer)
                 self.rubber_band.show()
+                print("debug1")
             else:
                 self._clear_annotations()
                 self._on_clear_listwidget_click()
         else:
-            dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+            dest_crs = self.canvas.mapSettings().destinationCrs()
             original_crs = QgsCoordinateReferenceSystem("EPSG:4326")
             transform = QgsCoordinateTransform(original_crs, dest_crs, QgsProject.instance())
             items = [
@@ -809,20 +807,20 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def create_vertex(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        map_crs = self.canvas.mapSettings().destinationCrs()
 
         transformer = transform.transformToWGS(map_crs)
         point_wgs = transformer.transform(point)
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
-        crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        crs = self.canvas.mapSettings().destinationCrs()
         annotation = self._linetool_annotate_point(point, idx, crs)
         self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
 
     def _on_linetool_map_click(self, point: QgsPointXY, idx: int) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        map_crs = self.canvas.mapSettings().destinationCrs()
 
         transformer = transform.transformToWGS(map_crs)
         point_wgs = transformer.transform(point)
@@ -864,7 +862,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool.doubleClicked.disconnect()
         self.line_tool.pointReleased.disconnect()
         QApplication.restoreOverrideCursor()
-        self._iface.mapCanvas().setMapTool(self.last_maptool)
+        self.canvas.setMapTool(self.last_maptool)
         self.show()
 
     def color_duplicate_items(self, list_widget):
