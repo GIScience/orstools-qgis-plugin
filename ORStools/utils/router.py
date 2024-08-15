@@ -35,7 +35,7 @@ def route_as_layer(dlg):
             Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
             settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
         )
-        return
+        return False
 
     agent = "QGIS_ORStoolsDialog"
     clnt = client.Client(provider, agent)

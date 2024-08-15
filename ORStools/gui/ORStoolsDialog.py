@@ -786,6 +786,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 feature = next(route_layer.getFeatures())
                 self.rubber_band.addGeometry(feature.geometry(), route_layer)
                 self.rubber_band.show()
+            else:
+                self._clear_annotations()
+                self._on_clear_listwidget_click()
         else:
             dest_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
             original_crs = QgsCoordinateReferenceSystem("EPSG:4326")
