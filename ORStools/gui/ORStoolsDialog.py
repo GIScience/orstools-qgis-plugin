@@ -600,7 +600,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
     ) -> QgsAnnotation:
         if not crs:
-            crs = self.canvas.mapSettings().destinationCrs()
+            crs = QgsProject.instance().crs()
 
         annotation = QgsTextAnnotation()
 
@@ -612,8 +612,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         annotation.setFrameSizeMm(QSizeF(8, 5))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(1.3, 1.3))
-        annotation.setMapPosition(point)
         annotation.setMapPositionCrs(crs)
+        annotation.setMapPosition(point)
 
         return QgsMapCanvasAnnotationItem(annotation, self.canvas).annotation()
 
@@ -760,7 +760,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                         self._clear_annotations()
                     else:
                         self.routing_fromline_list.takeItem(num)
+                        self._reindex_list_items()
                         self.create_rubber_band()
+
                     QMessageBox.warning(
                         self,
                         "Please use a different point",
@@ -838,6 +840,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.clear()
         self._clear_annotations()
         crs = QgsCoordinateReferenceSystem(f"EPSG:{4326}")
+        project_crs = self.canvas.mapSettings().destinationCrs()
         for idx, x in enumerate(items):
             coords = x.split(":")[1]
             item = f"Point {idx}:{coords}"
@@ -845,7 +848,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             point = QgsPointXY(x, y)
 
             self.routing_fromline_list.addItem(item)
-            annotation = self._linetool_annotate_point(point, idx, crs)
+            transform = QgsCoordinateTransform(crs, project_crs, QgsProject.instance())
+            point = transform.transform(point)
+            annotation = self._linetool_annotate_point(point, idx)
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
         self.create_rubber_band()
