@@ -46,5 +46,3 @@ jobs:
         only-issue-labels: 'feedback'
         days-before-issue-stale: 30
         days-before-issue-close: 45
-
-        # operations-per-run: 1000
