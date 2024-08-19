@@ -1,0 +1,55 @@
+name: 👓 Handle stale issues
+on:
+  schedule:
+  - cron: "30 2 * * *"  # Runs every day at 2:30 AM UTC
+
+permissions:
+  contents: read
+
+jobs:
+  stale:
+    permissions:
+      issues: write  # for actions/stale to close stale issues
+    if: github.repository_owner == 'GIScience'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v9
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+        stale-pr-label: 'stale'
+        # exempt-pr-labels: 'Merge After Thaw,Frozen'
+        days-before-pr-stale: 14
+        days-before-pr-close: 7
+
+        stale-issue-message: >
+          The Openrouteservice project highly values your report and would love to see it addressed.
+          However, this issue has been left in feedback mode for the last 30 days and is
+          being automatically marked as "stale".
+
+          If you would like to continue with this issue, please provide any missing information
+          or answer any open questions. If you could resolve the issue yourself meanwhile,
+          please leave a note for future readers with the same problem and close the issue.
+
+          In case you should have any uncertainty, please leave a comment and we will be
+          happy to help you proceed with this issue.
+
+          If there is no further activity on this issue, it will be closed in two weeks.
+
+
+        close-issue-message: >
+          While we hate to see this happen, this issue has been automatically closed because
+          it has not had any activity in the last 45 days despite being marked as feedback.
+          If this issue should be reconsidered, please reopen this it.
+
+          Or, if you have any further questions, there are also
+          [further support channels](https://ask.openrouteservice.org/)
+          that can help you.
+
+
+        stale-issue-label: 'stale'
+        only-issue-labels: 'feedback'
+        days-before-issue-stale: 30
+        days-before-issue-close: 45
+
+        # operations-per-run: 1000
