@@ -32,7 +32,7 @@ from qgis.core import QgsMessageLog, Qgis
 from ORStools import PLUGIN_NAME
 
 
-def log(message, level_in=0):
+def log(message: str, level_in: int = 0):
     """
     Writes to QGIS inbuilt logger accessible through panel.
 
@@ -43,12 +43,12 @@ def log(message, level_in=0):
     :type level_in: int
     """
     if level_in == 0:
-        level = Qgis.Info
+        level = Qgis.MessageLevel.Info
     elif level_in == 1:
-        level = Qgis.Warning
+        level = Qgis.MessageLevel.Warning
     elif level_in == 2:
-        level = Qgis.Critical
+        level = Qgis.MessageLevel.Critical
     else:
-        level = Qgis.Info
+        level = Qgis.MessageLevel.Info
 
     QgsMessageLog.logMessage(message, PLUGIN_NAME.strip(), level)

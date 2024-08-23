@@ -19,6 +19,6 @@ You can optionally perform a <a href="https://en.wikipedia.org/wiki/Travelling_s
 
 Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be <b>fastest</b>
 
-<i>Advanced Parameters</i>: see <a href="https://giscience.github.io/openrouteservice/documentation/routing-options/Routing-Options.html">the documentation</a> for descriptions.
+<i>Advanced Parameters</i>: see the documentation on <a href="https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/routing-options">Routing Options</a> for descriptions. Also, see the documentation on <a href="https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/extra-info/">Extra Infos<a/>.
 
 <i>Output layer</i>: a LineString layer with multiple route attributes.

@@ -30,9 +30,9 @@
 from qgis.gui import QgsCollapsibleGroupBox
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QMetaObject
-from PyQt5.QtWidgets import QDialog, QInputDialog, QLineEdit
-from PyQt5.QtGui import QIntValidator
+from qgis.PyQt.QtCore import QMetaObject
+from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit, QDialogButtonBox
+from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
@@ -41,7 +41,7 @@ from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
 class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
     """Builds provider config dialog."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         """
         :param parent: Parent window for modality.
         :type parent: QDialog
@@ -59,7 +59,10 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.provider_add.clicked.connect(self._add_provider)
         self.provider_remove.clicked.connect(self._remove_provider)
 
-    def accept(self):
+        # Change OK to Save in config window
+        self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
+
+    def accept(self) -> None:
         """When the OK Button is clicked, in-memory temp_config is updated and written to config.yml"""
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
@@ -81,7 +84,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.close()
 
     @staticmethod
-    def _adjust_timeout_input(input_line_edit: QLineEdit):
+    def _adjust_timeout_input(input_line_edit: QLineEdit) -> None:
         """
         Corrects the value of the input to the top or bottom value of
         the specified range of the QIntValidator for the field.
@@ -97,7 +100,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         elif int(text) > val.top():
             input_line_edit.setText(str(val.top()))
 
-    def _build_ui(self):
+    def _build_ui(self) -> None:
         """Builds the UI on dialog startup."""
 
         for provider_entry in self.temp_config["providers"]:
@@ -116,7 +119,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-    def _add_provider(self):
+    def _add_provider(self) -> None:
         """Adds an empty provider box to be filled out by the user."""
 
         self._collapse_boxes()
@@ -127,7 +130,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         if ok:
             self._add_box(provider_name, "http://localhost:8082/ors", "", 60, new=True)
 
-    def _remove_provider(self):
+    def _remove_provider(self) -> None:
         """Remove list of providers from list."""
 
         providers = [provider["name"] for provider in self.temp_config["providers"]]
@@ -149,13 +152,13 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             provider_id = providers.index(provider)
             del self.temp_config["providers"][provider_id]
 
-    def _collapse_boxes(self):
+    def _collapse_boxes(self) -> None:
         """Collapse all QgsCollapsibleGroupBoxes."""
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
-    def _add_box(self, name, url, key, timeout, new=False):
+    def _add_box(self, name: str, url: str, key: str, timeout: int, new: bool = False) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
 

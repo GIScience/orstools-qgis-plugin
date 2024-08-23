@@ -27,7 +27,7 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtCore import QCoreApplication, QSettings
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
     QgsProcessing,
     QgsProcessingAlgorithm,
@@ -38,10 +38,11 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
     QgsProcessingFeedback,
+    QgsSettings,
 )
-from typing import Any
+from typing import Any, Dict
 
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
@@ -54,7 +55,7 @@ from ..gui.directions_gui import _get_avoid_polygons
 class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
     """Base algorithm class for ORS algorithms"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Default attributes used in all child classes
         """
@@ -91,16 +92,16 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         return self.ALGO_NAME
 
-    def shortHelpString(self):
+    def shortHelpString(self) -> str:
         """
         Displays the sidebar help in the algorithm window
         """
-        locale = QSettings().value("locale/userLocale")[0:2]
+        locale = QgsSettings().value("locale/userLocale")[0:2]
 
         return read_help_file(algorithm=self.ALGO_NAME, locale=locale)
 
     @staticmethod
-    def helpUrl():
+    def helpUrl() -> str:
         """
         Will be connected to the Help button in the Algorithm window
         """
@@ -173,7 +174,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 self.IN_AVOID_POLYGONS,
                 self.tr("Polygons to avoid", "ORSBaseProcessingAlgorithm"),
-                types=[QgsProcessing.TypeVectorPolygon],
+                types=[QgsProcessing.SourceType.TypeVectorPolygon],
                 optional=True,
             ),
         ]
@@ -221,7 +222,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         return options
 
     # noinspection PyUnusedLocal
-    def initAlgorithm(self, configuration):
+    def initAlgorithm(self, configuration: Dict) -> None:
         """
         Combines default and algorithm parameters and adds them in order to the
         algorithm dialog window.
@@ -235,14 +236,16 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
                 if self.GROUP == "Matrix":
-                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagHidden)
+                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagHidden)
                 else:
                     # flags() is a wrapper around an enum of ints for type-safety.
                     # Flags are added by or-ing values, much like the union operator would work
-                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+                    param.setFlags(
+                        param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced
+                    )
 
             self.addParameter(param)
 
-    def tr(self, string, context=None):
+    def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)

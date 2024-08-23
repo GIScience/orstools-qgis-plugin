@@ -27,6 +27,16 @@
  ***************************************************************************/
 """
 
+from typing import Dict, List
+
+
+from qgis._core import (
+    QgsVectorLayer,
+    QgsFeature,
+    QgsGeometry,
+    QgsProject,
+    QgsProcessingParameterBoolean,
+)
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -35,9 +45,13 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterEnum,
     QgsPointXY,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterString,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
-from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES
+from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
@@ -49,23 +63,27 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
 
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "directions_from_points_1_layer"
-        self.GROUP = "Directions"
-        self.IN_POINTS = "INPUT_POINT_LAYER"
-        self.IN_FIELD = "INPUT_LAYER_FIELD"
-        self.IN_PREFERENCE = "INPUT_PREFERENCE"
-        self.IN_OPTIMIZE = "INPUT_OPTIMIZE"
-        self.IN_MODE = "INPUT_MODE"
-        self.IN_SORTBY = "INPUT_SORTBY"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "directions_from_points_1_layer"
+        self.GROUP: str = "Directions"
+        self.IN_POINTS: str = "INPUT_POINT_LAYER"
+        self.IN_FIELD: str = "INPUT_LAYER_FIELD"
+        self.IN_PREFERENCE: str = "INPUT_PREFERENCE"
+        self.IN_OPTIMIZE: str = "INPUT_OPTIMIZE"
+        self.IN_MODE: str = "INPUT_MODE"
+        self.IN_SORTBY: str = "INPUT_SORTBY"
+        self.EXTRA_INFO: str = "EXTRA_INFO"
+        self.CSV_FACTOR: str = "CSV_FACTOR"
+        self.CSV_COLUMN: str = "CSV_COLUMN"
+        self.EXPORT_ORDER: str = "EXPORT_ORDER"
+        self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
                 description=self.tr("Input (Multi)Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_FIELD,
-                description=self.tr("Layer ID Field"),
+                description=self.tr("Layer ID Field (can be used for joining)"),
                 parentLayerParameterName=self.IN_POINTS,
                 defaultValue=None,
                 optional=True,
@@ -90,9 +108,33 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 defaultValue=None,
                 optional=True,
             ),
+            QgsProcessingParameterEnum(
+                self.EXTRA_INFO,
+                self.tr("Extra Info"),
+                options=EXTRA_INFOS,
+                allowMultiple=True,
+                optional=True,
+            ),
+            QgsProcessingParameterNumber(
+                self.CSV_FACTOR,
+                self.tr("Csv Factor (needs Csv Column and csv in Extra Info)"),
+                type=QgsProcessingParameterNumber.Double,
+                minValue=0,
+                maxValue=1,
+                defaultValue=None,
+                optional=True,
+            ),
+            QgsProcessingParameterString(
+                self.CSV_COLUMN,
+                self.tr("Csv Column (needs Csv Factor and csv in Extra Info)"),
+                optional=True,
+            ),
+            QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -102,6 +144,17 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         optimization_mode = parameters[self.IN_OPTIMIZE]
 
         options = self.parseOptions(parameters, context)
+
+        csv_column = self.parameterAsString(parameters, self.CSV_COLUMN, context)
+
+        csv_factor = self.parameterAsDouble(parameters, self.CSV_FACTOR, context)
+        if csv_factor > 0:
+            options["profile_params"] = {
+                "weightings": {"csv_factor": round(csv_factor, 2), "csv_column": csv_column}
+            }
+
+        extra_info = self.parameterAsEnums(parameters, self.EXTRA_INFO, context)
+        extra_info = [EXTRA_INFOS[i] for i in extra_info]
 
         # Get parameter values
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
@@ -114,14 +167,16 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                 from_name=source_field_name,
             )
 
-        sink_fields = directions_core.get_fields(**get_fields_options, line=True)
+        sink_fields = directions_core.get_fields(
+            **get_fields_options, line=True, extra_info=extra_info
+        )
 
         (sink, dest_id) = self.parameterAsSink(
             parameters,
             self.OUT,
             context,
             sink_fields,
-            QgsWkbTypes.LineString,
+            QgsWkbTypes.Type.LineString,
             QgsCoordinateReferenceSystem.fromEpsgId(4326),
         )
 
@@ -142,13 +197,13 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         from_values = list()
         x_former = transform.transformToWGS(source.sourceCrs())
 
-        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Point:
+        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Type.Point:
             points = list()
             for feat in sorted(source.getFeatures(), key=sort):
                 points.append(x_former.transform(QgsPointXY(feat.geometry().asPoint())))
             input_points.append(points)
             from_values.append(None)
-        elif QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.MultiPoint:
+        elif QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Type.MultiPoint:
             # loop through multipoint features
             for feat in sorted(source.getFeatures(), key=sort):
                 for point in feat.geometry().asMultiPoint():
@@ -171,19 +226,50 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                             response, profile, from_value=from_value
                         )
                     )
+
+                    # Export layer of points with optimization order
+                    export_value = self.parameterAsBool(parameters, self.EXPORT_ORDER, context)
+                    if export_value:
+                        items = list()
+                        for route in response["routes"]:
+                            for i, step in enumerate(route["steps"]):
+                                location = step["location"]
+                                items.append(location)
+
+                        point_layer = QgsVectorLayer(
+                            "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                        )
+
+                        point_layer.updateFields()
+                        for idx, coords in enumerate(items):
+                            x, y = coords
+                            feature = QgsFeature()
+                            feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                            feature.setAttributes([idx])
+
+                            point_layer.dataProvider().addFeature(feature)
+                        QgsProject.instance().addMapLayer(point_layer)
+
                 else:
                     params = directions_core.build_default_parameters(
-                        preference, point_list=points, options=options
+                        preference, point_list=points, options=options, extra_info=extra_info
                     )
                     response = ors_client.request(
                         "/v2/directions/" + profile + "/geojson", {}, post_json=params
                     )
 
-                    sink.addFeature(
-                        directions_core.get_output_feature_directions(
-                            response, profile, preference, from_value=from_value
+                    if extra_info:
+                        feats = directions_core.get_extra_info_features_directions(
+                            response, extra_info
                         )
-                    )
+                        for feat in feats:
+                            sink.addFeature(feat)
+                    else:
+                        sink.addFeature(
+                            directions_core.get_output_feature_directions(
+                                response, profile, preference, from_value=from_value
+                            )
+                        )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {from_value} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)

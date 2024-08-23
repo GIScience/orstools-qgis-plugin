@@ -27,6 +27,9 @@
  ***************************************************************************/
 """
 
+from typing import Any, Generator
+
+from qgis._core import QgsMapLayer
 from qgis.core import (
     QgsPointXY,
     QgsFeature,
@@ -39,8 +42,8 @@ from qgis.core import (
     QgsCategorizedSymbolRenderer,
 )
 
-from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QColor
 
 
 # import processing
@@ -49,7 +52,7 @@ from PyQt5.QtGui import QColor
 class Isochrones:
     """convenience class to build isochrones"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Will all be set in self.set_parameters(), bcs Processing Algo has to initialize this class before it
         # knows about its own parameters
         self.profile = None
@@ -60,8 +63,13 @@ class Isochrones:
         self.field_dimension_name = None
 
     def set_parameters(
-        self, profile, dimension, factor, id_field_type=QVariant.String, id_field_name="ID"
-    ):
+        self,
+        profile: str,
+        dimension: str,
+        factor: int,
+        id_field_type: QVariant.String = QVariant.String,
+        id_field_name: str = "ID",
+    ) -> None:
         """
         Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know
         its parameters yet.
@@ -89,7 +97,7 @@ class Isochrones:
 
         self.field_dimension_name = "AA_MINS" if self.dimension == "time" else "AA_METERS"
 
-    def get_fields(self):
+    def get_fields(self) -> QgsFields:
         """
         Set all fields for output isochrone layer.
 
@@ -106,7 +114,9 @@ class Isochrones:
 
         return fields
 
-    def get_features(self, response, id_field_value):
+    def get_features(
+        self, response: dict, id_field_value: Any
+    ) -> Generator[QgsFeature, None, None]:
         """
         Generator to return output isochrone features from response.
 
@@ -158,7 +168,7 @@ class Isochrones:
     #
     #     return dissolved
 
-    def stylePoly(self, layer):
+    def stylePoly(self, layer: QgsMapLayer) -> None:
         """
         Style isochrone polygon layer.
 
