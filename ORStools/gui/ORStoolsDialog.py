@@ -31,7 +31,11 @@ import json
 import os
 from typing import Optional
 
-import processing
+try:
+    import processing
+except ModuleNotFoundError:
+    pass
+
 import webbrowser
 
 from qgis._core import Qgis, QgsAnnotation

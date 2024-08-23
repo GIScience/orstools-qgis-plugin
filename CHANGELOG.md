@@ -82,6 +82,10 @@ RELEASING:
 - Improved type hints
 
 
+# Unreleased
+### Added
+- Unit- and e2e-testing
+
 ## [1.7.1] - 2024-01-15
 
 ### Added

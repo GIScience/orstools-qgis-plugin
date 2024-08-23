@@ -264,7 +264,7 @@ def build_default_parameters(
 
 
 def get_extra_info_features_directions(
-    response: dict, extra_info_order: list[str], to_from_values: Optional[list] = None
+    response: dict, extra_info_order: List[str], to_from_values: Optional[list] = None
 ):
     extra_info_order = [
         key if key != "waytype" else "waytypes" for key in extra_info_order
