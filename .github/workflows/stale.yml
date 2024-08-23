@@ -34,7 +34,7 @@ jobs:
 
         close-issue-message: >
           While we hate to see this happen, this issue has been automatically closed because
-          it has not had any activity in the last 45 days despite being marked as feedback.
+          it has not had any activity in the last 60 days despite being marked as feedback.
           If this issue should be reconsidered, please reopen this it.
 
           Or, if you have any further questions, there are also
