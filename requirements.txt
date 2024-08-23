@@ -1,1 +1,7 @@
+# developement
 ruff
+pytest
+
+# testing
+pyyaml
+pytest
