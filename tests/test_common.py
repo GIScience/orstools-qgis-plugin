@@ -277,6 +277,7 @@ class TestCommon(unittest.TestCase):
             "elevation": True,
             "id": None,
             "options": {},
+            "extra_info": None,
         }
 
         self.assertDictEqual(params, test_params)
