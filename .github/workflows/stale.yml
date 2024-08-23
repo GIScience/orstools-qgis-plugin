@@ -45,4 +45,4 @@ jobs:
         stale-issue-label: 'stale'
         only-issue-labels: 'feedback'
         days-before-issue-stale: 30
-        days-before-issue-close: 45
+        days-before-issue-close: 60
