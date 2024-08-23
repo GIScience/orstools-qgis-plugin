@@ -1,4 +1,4 @@
-name: 👓 Handle stale issues
+name: Handle stale issues
 on:
   schedule:
   - cron: "30 2 * * *"  # Runs every day at 2:30 AM UTC
