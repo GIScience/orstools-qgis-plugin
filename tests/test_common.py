@@ -279,7 +279,7 @@ class TestCommon(unittest.TestCase):
             "options": {},
         }
 
-        self.assertAlmostEqual(params, test_params)
+        self.assertDictEqual(params, test_params)
 
     def test_isochrones(self):
         response = {
