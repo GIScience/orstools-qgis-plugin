@@ -25,6 +25,10 @@ class TestGui(unittest.TestCase):
         CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
         CANVAS.setExtent(QgsRectangle(258889, 7430342, 509995, 7661955))
         CANVAS.setDestinationCrs(CRS)
+        CANVAS.setFrameStyle(0)
+        CANVAS.resize(600, 400)
+        self.assertEqual(CANVAS.width(), 600)
+        self.assertEqual(CANVAS.height(), 400)
 
         dlg = ORStoolsDialog(IFACE)
         dlg.open()
