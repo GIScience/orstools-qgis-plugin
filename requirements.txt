@@ -3,5 +3,5 @@ ruff
 pytest
 
 # testing
-pyaml
+pyyaml
 pytest
