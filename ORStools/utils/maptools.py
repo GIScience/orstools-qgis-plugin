@@ -92,6 +92,7 @@ class LineTool(QgsMapToolEmitPoint):
         # noinspection PyUnresolvedReferences
         self.doubleClicked.emit()
         self.canvas.scene().removeItem(self.rubberBand)
+        del self.rubberBand
 
     def deactivate(self):
         super(LineTool, self).deactivate()

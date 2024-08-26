@@ -40,6 +40,11 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+### Fixed
+#### Minor Fixes
+- Error with canvas scenes when deleting selected vertices in list ([#278](https://github.com/GIScience/orstools-qgis-plugin/pull/278))
+
 ## [1.8.4] - 2024-07-29
 
 ### Fixed
