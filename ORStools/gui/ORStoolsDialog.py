@@ -50,7 +50,7 @@ from qgis.core import (
 from qgis.gui import QgsMapCanvasAnnotationItem
 
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QTextDocument
+from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
 from qgis.PyQt.QtWidgets import (
     QAction,
     QDialog,
@@ -320,6 +320,22 @@ class ORStoolsDialogMain:
         try:
             params = directions.get_parameters()
             if self.dlg.optimization_group.isChecked():
+                # check for duplicate points
+                points = [
+                    self.dlg.routing_fromline_list.item(x).text()
+                    for x in range(self.dlg.routing_fromline_list.count())
+                ]
+                if len(points) != len(set(points)):
+                    QMessageBox.warning(
+                        self.dlg,
+                        "Duplicates",
+                        """There are duplicate points in the input layer, which need to be removed.""",
+                    )
+                    msg = "The request has been aborted!"
+                    logger.log(msg, 0)
+                    self.dlg.debug_text.setText(msg)
+                    return
+
                 if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
                     QMessageBox.critical(
                         self.dlg,
@@ -490,6 +506,14 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
+        # Connect signals to the color_duplicate_items function
+        self.routing_fromline_list.model().rowsRemoved.connect(
+            lambda: self.color_duplicate_items(self.routing_fromline_list)
+        )
+        self.routing_fromline_list.model().rowsInserted.connect(
+            lambda: self.color_duplicate_items(self.routing_fromline_list)
+        )
+
         self.annotation_canvas = self._iface.mapCanvas()
 
     def _save_vertices_to_layer(self) -> None:
@@ -633,3 +657,19 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()
+
+    def color_duplicate_items(self, list_widget):
+        item_dict = {}
+        for index in range(list_widget.count()):
+            item = list_widget.item(index)
+            text = item.text()
+            if text in item_dict:
+                item_dict[text].append(index)
+            else:
+                item_dict[text] = [index]
+
+        for indices in item_dict.values():
+            if len(indices) > 1:
+                for index in indices:
+                    item = list_widget.item(index)
+                    item.setBackground(QColor("lightsalmon"))
