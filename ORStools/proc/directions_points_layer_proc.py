@@ -221,7 +221,8 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     # check for duplicate points
                     if len(points) != len(set(points)):
                         raise exceptions.DuplicateError(
-                            "There are duplicate points in the input layer, which need to be removed."
+                            "There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
+                            Either remove the duplicates or deselect Traveling Salesman.                         
                         )
 
                     params = get_params_optimize(points, profile, optimization_mode)
