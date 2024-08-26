@@ -547,7 +547,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self._clear_annotations()
 
         # Remove blue lines (rubber band)
-        if self.line_tool:
+        if self.line_tool and hasattr(self.line_tool, 'rubberBand'):
             self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
 
     def _linetool_annotate_point(
