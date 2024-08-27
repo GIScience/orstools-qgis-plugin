@@ -336,7 +336,8 @@ class ORStoolsDialogMain:
                             """
                             There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
                             Either remove the duplicates or deselect Traveling Salesman.
-                            """),
+                            """
+                        ),
                     )
                     msg = self.tr("The request has been aborted!")
                     logger.log(msg, 0)
