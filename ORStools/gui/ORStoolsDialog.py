@@ -116,7 +116,7 @@ def on_about_click(parent: QWidget) -> None:
         'Web: <a href="{2}">{2}</a><br>'
         'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">'
         "github.com/GIScience/orstools-qgis-plugin</a><br>"
-        "Version: {3}",
+        "Version: {3}"
     ).format(DEFAULT_COLOR, __email__, __web__, __version__)
 
     QMessageBox.information(

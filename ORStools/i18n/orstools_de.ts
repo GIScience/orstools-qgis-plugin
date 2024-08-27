@@ -4,14 +4,14 @@
 <context>
     <name>@default</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="79"/>
-        <source>&lt;b&gt;ORS Tools&lt;/b&gt; provides access to &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; routing functionalities.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</source>
-        <translation type="obsolete">&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
-    </message>
-    <message>
         <location filename="../gui/ORStoolsDialog.py" line="122"/>
         <source>About {}</source>
         <translation>Über {}</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="105"/>
+        <source>&lt;b&gt;ORS Tools&lt;/b&gt; provides access to &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; routing functionalities.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</source>
+         <translation>&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
     </message>
 </context>
 <context>
@@ -79,7 +79,7 @@
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_lines_proc.py" line="286"/>
+        <location filename="../proc/directions_lines_proc.py" line="288"/>
         <source>Directions from 1 Polyline-Layer</source>
         <translation>Routenberechnung aus einem Polyline-Layer</translation>
     </message>
@@ -105,34 +105,6 @@
     </message>
 </context>
 <context>
-    <name>ORSDirectionsLinesAlgorithm</name>
-    <message>
-        <location filename="../proc/directions_lines_proc.py" line="60"/>
-        <source>Input Line layer</source>
-        <translation type="obsolete">Eingabelayer (Linien)</translation>
-    </message>
-    <message>
-        <location filename="../proc/directions_lines_proc.py" line="65"/>
-        <source>Layer ID Field</source>
-        <translation type="obsolete">ID-Attribut</translation>
-    </message>
-    <message>
-        <location filename="../proc/directions_lines_proc.py" line="72"/>
-        <source>Travel preference</source>
-        <translation type="obsolete">Routenpräferenz</translation>
-    </message>
-    <message>
-        <location filename="../proc/directions_lines_proc.py" line="78"/>
-        <source>Traveling Salesman (omits other configurations)</source>
-        <translation type="obsolete">Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
-    </message>
-    <message>
-        <location filename="../proc/directions_lines_proc.py" line="207"/>
-        <source>Directions from 1 Polyline-Layer</source>
-        <translation type="obsolete">Routenberechnung aus einem Polyline-Layer</translation>
-    </message>
-</context>
-<context>
     <name>ORSDirectionsPointsLayerAlgo</name>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="79"/>
@@ -155,7 +127,7 @@
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="289"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="297"/>
         <source>Directions from 1 Point-Layer</source>
         <translation>Routenberechnung aus einem Punkt-Layer</translation>
     </message>
@@ -165,7 +137,7 @@
         <translation>ID-Attribut (zum Beispiel für joins)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="133"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="132"/>
         <source>Export order of jobs</source>
         <translation>Reihenfolge exportieren</translation>
     </message>
@@ -175,14 +147,23 @@
         <translation>Extra Info</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="119"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="118"/>
         <source>Csv Factor (needs Csv Column and csv in Extra Info)</source>
         <translation>Csv Faktor (benötigt Csv Spalte und csv in Extra Info)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="128"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="127"/>
         <source>Csv Column (needs Csv Factor and csv in Extra Info)</source>
         <translation>Csv Spalte (benötigt Csv Faktor und csv in Extra Info)</translation>
+    </message>
+    <message>
+        <location filename="../proc/directions_points_layer_proc.py" line="223"/>
+        <source>
+                            There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
+                            Either remove the duplicates or deselect Traveling Salesman.
+                            </source>
+        <translation>Das Eingabelayer enthält duplizierte Punkte. Dies ist mit der Wegpunktoptimierung nicht erlaubt.
+Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     </message>
 </context>
 <context>
@@ -228,7 +209,7 @@
         <translation>Zuordnungs-Verfahren</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layers_proc.py" line="319"/>
+        <location filename="../proc/directions_points_layers_proc.py" line="326"/>
         <source>Directions from 2 Point-Layers</source>
         <translation>Routenberechnung aus zwei Punkt-Layern</translation>
     </message>
@@ -350,12 +331,12 @@
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="453"/>
+        <location filename="../gui/ORStoolsDialog.py" line="473"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="454"/>
+        <location filename="../gui/ORStoolsDialog.py" line="474"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -462,7 +443,7 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; padding: 10px; -qt-block-indent:0; text-indent:0px ; background-color:#e7f2fa; color: #999999&quot;&gt;&lt;img stype=&quot;margin: 10px&quot; src=&quot;:/plugins/ORStools/img/icon_about.png&quot; width=16 height=16 /&gt;  Sämtliche Einstellungen werden überschrieben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -728,6 +709,25 @@ p, li { white-space: pre-wrap; }
         <location filename="../gui/ORStoolsDialog.py" line="176"/>
         <source>About</source>
         <translation>Über</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="329"/>
+        <source>Duplicates</source>
+        <translation>Duplikate</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="329"/>
+        <source>
+                            There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
+                            Either remove the duplicates or deselect Traveling Salesman.
+                            </source>
+        <translation>Das Eingabelayer enthält duplizierte Punkte. Dies ist mit der Wegpunktoptimierung nicht erlaubt.
+Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="338"/>
+        <source>The request has been aborted!</source>
+        <translation>Die Anfrage wurde abgebrochen!</translation>
     </message>
 </context>
 </TS>
