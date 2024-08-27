@@ -328,10 +328,14 @@ class ORStoolsDialogMain:
                 if len(points) != len(set(points)):
                     QMessageBox.warning(
                         self.dlg,
-                        "Duplicates",
-                        """There are duplicate points in the input layer, which need to be removed.""",
+                        self.tr("Duplicates"),
+                        self.tr(
+                            """
+                            There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
+                            Either remove the duplicates or deselect Traveling Salesman.
+                            """),
                     )
-                    msg = "The request has been aborted!"
+                    msg = self.tr("The request has been aborted!")
                     logger.log(msg, 0)
                     self.dlg.debug_text.setText(msg)
                     return
