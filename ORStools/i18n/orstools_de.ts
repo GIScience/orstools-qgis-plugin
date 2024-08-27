@@ -11,7 +11,7 @@
     <message>
         <location filename="../gui/ORStoolsDialog.py" line="105"/>
         <source>&lt;b&gt;ORS Tools&lt;/b&gt; provides access to &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; routing functionalities.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</source>
-         <translation>&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
+        <translation>&lt;b&gt;ORS Tools&lt;/b&gt; bietet Zugriff auf &lt;a href=&quot;https://openrouteservice.org&quot; style=&quot;color: {0}&quot;&gt;openrouteservice&lt;/a&gt; Berechnungen.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;a href=&quot;https://heigit.org/de/willkommen&quot;&gt;&lt;img src=&quot;:/plugins/ORStools/img/logo_heigit_300.png&quot;/&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;&lt;/center&gt;Author: HeiGIT gGmbH&lt;br&gt;Email: &lt;a href=&quot;mailto:Openrouteservice &lt;{1}&gt;&quot;&gt;{1}&lt;/a&gt;&lt;br&gt;Web: &lt;a href=&quot;{2}&quot;&gt;{2}&lt;/a&gt;&lt;br&gt;Repo: &lt;a href=&quot;https://github.com/GIScience/orstools-qgis-plugin&quot;&gt;github.com/GIScience/orstools-qgis-plugin&lt;/a&gt;&lt;br&gt;Version: {3}</translation>
     </message>
 </context>
 <context>
@@ -127,7 +127,7 @@
         <translation>Wegpunktoptimierung (sonstige Konfiguration wird nicht berücksichtigt)</translation>
     </message>
     <message>
-        <location filename="../proc/directions_points_layer_proc.py" line="297"/>
+        <location filename="../proc/directions_points_layer_proc.py" line="298"/>
         <source>Directions from 1 Point-Layer</source>
         <translation>Routenberechnung aus einem Punkt-Layer</translation>
     </message>
