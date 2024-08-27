@@ -102,6 +102,8 @@ def on_help_click() -> None:
 def on_about_click(parent: QWidget) -> None:
     """Slot for click event of About button/menu entry."""
 
+    # ruff will add trailing comma to last string line which breaks pylupdate5
+    # fmt: off
     info = QCoreApplication.translate(
         "@default",
         '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org"'
@@ -118,6 +120,7 @@ def on_about_click(parent: QWidget) -> None:
         "github.com/GIScience/orstools-qgis-plugin</a><br>"
         "Version: {3}"
     ).format(DEFAULT_COLOR, __email__, __web__, __version__)
+    # fmt: on
 
     QMessageBox.information(
         parent, QCoreApplication.translate("@default", "About {}").format(PLUGIN_NAME), info
