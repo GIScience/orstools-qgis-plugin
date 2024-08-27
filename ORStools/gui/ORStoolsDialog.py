@@ -295,11 +295,12 @@ class ORStoolsDialogMain:
                 self.dlg,
                 self.tr("Missing Waypoints"),
                 self.tr(
-                """
+                    """
                 Did you forget to set routing waypoints?<br><br>
                 
                 Use the 'Add Waypoint' button to add up to 50 waypoints.
-                """),
+                """
+                ),
             )
             return
 
@@ -311,12 +312,13 @@ class ORStoolsDialogMain:
                 self.dlg,
                 self.tr("Missing API key"),
                 self.tr(
-                """
+                    """
                 Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
                 
                 If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
                 Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""
+                ),
             )
             return
 
@@ -401,10 +403,11 @@ Remember, the first and last location are not part of the optimization.
                         self.dlg,
                         self.tr("Empty layer"),
                         self.tr(
-                        """
+                            """
 The specified avoid polygon(s) layer does not contain any features.
 Please add polygons to the layer or uncheck avoid polygons.
-                        """),
+                        """
+                        ),
                     )
                     msg = self.tr("The request has been aborted!")
                     logger.log(msg, 0)
