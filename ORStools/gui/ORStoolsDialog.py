@@ -293,12 +293,13 @@ class ORStoolsDialogMain:
         if not self.dlg.routing_fromline_list.count():
             QMessageBox.critical(
                 self.dlg,
-                "Missing Waypoints",
+                self.tr("Missing Waypoints"),
+                self.tr(
                 """
                 Did you forget to set routing waypoints?<br><br>
                 
                 Use the 'Add Waypoint' button to add up to 50 waypoints.
-                """,
+                """),
             )
             return
 
@@ -308,13 +309,14 @@ class ORStoolsDialogMain:
         ):
             QMessageBox.critical(
                 self.dlg,
-                "Missing API key",
+                self.tr("Missing API key"),
+                self.tr(
                 """
                 Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
                 
                 If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
                 Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
             )
             return
 
@@ -351,11 +353,12 @@ class ORStoolsDialogMain:
                 if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
                     QMessageBox.critical(
                         self.dlg,
-                        "Wrong number of waypoints",
-                        """At least 3 or 4 waypoints are needed to perform routing optimization. 
+                        self.tr("Wrong number of waypoints"),
+                        self.tr("""
+                        At least 3 or 4 waypoints are needed to perform routing optimization. 
 
 Remember, the first and last location are not part of the optimization.
-                        """,
+                        """),
                     )
                     return
                 response = clnt.request("/optimization", {}, post_json=params)
@@ -396,13 +399,14 @@ Remember, the first and last location are not part of the optimization.
                 ):
                     QMessageBox.warning(
                         self.dlg,
-                        "Empty layer",
+                        self.tr("Empty layer"),
+                        self.tr(
                         """
 The specified avoid polygon(s) layer does not contain any features.
 Please add polygons to the layer or uncheck avoid polygons.
-                        """,
+                        """),
                     )
-                    msg = "The request has been aborted!"
+                    msg = self.tr("The request has been aborted!")
                     logger.log(msg, 0)
                     self.dlg.debug_text.setText(msg)
                     return
@@ -422,7 +426,7 @@ Please add polygons to the layer or uncheck avoid polygons.
             # if provider.get('ENV_VARS'):
             #     self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
         except exceptions.Timeout:
-            msg = "The connection has timed out!"
+            msg = self.tr("The connection has timed out!")
             logger.log(msg, 2)
             self.dlg.debug_text.setText(msg)
             return
@@ -552,7 +556,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self._iface.mapCanvas().refresh()
 
         self._iface.messageBar().pushMessage(
-            "Success", "Vertices saved to layer.", level=Qgis.MessageLevel.Success
+            self.tr("Success"), self.tr("Vertices saved to layer."), level=Qgis.MessageLevel.Success
         )
 
     def _on_prov_refresh_click(self) -> None:
