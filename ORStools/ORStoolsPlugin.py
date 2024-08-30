@@ -65,7 +65,7 @@ class ORStools:
             if qVersion() > "4.3.3":
                 QCoreApplication.installTranslator(self.translator)
 
-        self.add_default_provoder_to_settings()
+        self.add_default_provider_to_settings()
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
