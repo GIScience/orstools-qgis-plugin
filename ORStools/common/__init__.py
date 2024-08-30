@@ -55,6 +55,26 @@ ADVANCED_PARAMETERS = [
     "INPUT_AVOID_COUNTRIES",
     "INPUT_AVOID_POLYGONS",
     "INPUT_SMOOTHING",
+    "EXTRA_INFO",
+    "CSV_FACTOR",
+    "CSV_COLUMN",
 ]
 
 LOCATION_TYPES = ["start", "destination"]
+
+EXTRA_INFOS = [
+    "steepness",
+    "suitability",
+    "surface",
+    "waytype",
+    "waycategory",
+    "tollways",
+    "traildifficulty",
+    "osmid",
+    "roadaccessrestrictions",
+    "countryinfo",
+    "green",
+    "noise",
+    "csv",
+    "shadow",
+]

@@ -1,6 +1,6 @@
 <RCC>
   <qresource prefix="/plugins/ORStools">
-    <file>img/save_vertices.png</file>
+    <file>img/icon_save.png</file>
     <file>img/logo_heigit_300.png</file>
     <file>img/icon_add.png</file>
     <file>img/icon_refresh.png</file>

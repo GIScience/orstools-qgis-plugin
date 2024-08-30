@@ -29,7 +29,7 @@
 
 from qgis.core import QgsProcessingProvider
 
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
 from .directions_lines_proc import ORSDirectionsLinesAlgo
@@ -44,7 +44,7 @@ class ORStoolsProvider(QgsProcessingProvider):
     def __init__(self):
         QgsProcessingProvider.__init__(self)
 
-    def unload(self):
+    def unload(self) -> None:
         """
         Unloads the provider. Any tear-down steps required by the provider
         should be implemented here.
@@ -52,7 +52,7 @@ class ORStoolsProvider(QgsProcessingProvider):
         pass
 
     # noinspection PyPep8Naming
-    def loadAlgorithms(self):
+    def loadAlgorithms(self) -> None:
         """
         Loads all algorithms belonging to this provider.
         """
@@ -65,11 +65,11 @@ class ORStoolsProvider(QgsProcessingProvider):
         self.addAlgorithm(ORSMatrixAlgo())
 
     @staticmethod
-    def icon():
+    def icon() -> QIcon:
         return QIcon(RESOURCE_PREFIX + "icon_orstools.png")
 
     @staticmethod
-    def id():
+    def id() -> str:
         """
         Returns the unique provider id, used for identifying the provider. This
         string should be a unique, short, character only string, eg "qgis" or
@@ -78,7 +78,7 @@ class ORStoolsProvider(QgsProcessingProvider):
         return PLUGIN_NAME.strip()
 
     @staticmethod
-    def name():
+    def name() -> str:
         """
         Returns the provider name, which is used to describe the provider
         within the GUI.
@@ -89,7 +89,7 @@ class ORStoolsProvider(QgsProcessingProvider):
 
     # noinspection PyPep8Naming
     @staticmethod
-    def longName():
+    def longName() -> str:
         """
         Returns the a longer version of the provider name, which can include
         extra details such as version numbers. E.g. "Lastools LIDAR tools

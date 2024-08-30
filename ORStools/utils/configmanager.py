@@ -32,7 +32,7 @@ import os
 from qgis.core import QgsSettings
 
 
-def read_config():
+def read_config() -> dict:
     """
     Reads config.yml from file and returns the parsed dict.
 
@@ -45,7 +45,7 @@ def read_config():
     return config
 
 
-def write_config(new_config):
+def write_config(new_config: dict) -> None:
     """
     Dumps new config
 
@@ -56,7 +56,7 @@ def write_config(new_config):
     s.setValue("ORStools/config", new_config)
 
 
-def write_env_var(key, value):
+def write_env_var(key: str, value: str) -> None:
     """
     Update quota env variables
 

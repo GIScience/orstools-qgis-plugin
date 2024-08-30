@@ -153,7 +153,7 @@ class NetworkAccessManager(object):
         exception_class=None,
         debug=True,
         timeout=60,
-    ):
+    ) -> None:
         self.disable_ssl_certificate_validation = disable_ssl_certificate_validation
         self.authid = authid
         self.reply = None
@@ -175,17 +175,19 @@ class NetworkAccessManager(object):
         )
         self.timeout = timeout
 
-    def msg_log(self, msg):
+    def msg_log(self, msg: str) -> None:
         if self.debug:
             QgsMessageLog.logMessage(msg, "NetworkAccessManager")
 
-    def httpResult(self):
+    def httpResult(self) -> None:
         return self.http_call_result
 
-    def auth_manager(self):
+    def auth_manager(self) -> None:
         return QgsApplication.authManager()
 
-    def request(self, url, method="GET", body=None, headers=None, blocking=True):
+    def request(
+        self, url: str, method: str = "GET", body=None, headers=None, blocking: bool = True
+    ):
         """
         Make a network request by calling QgsNetworkAccessManager.
         redirections argument is ignored and is here only for httplib2 compatibility.
@@ -263,7 +265,7 @@ class NetworkAccessManager(object):
 
         # Catch all exceptions (and clean up requests)
         try:
-            self.el.exec_(QEventLoop.ExcludeUserInputEvents)
+            self.el.exec(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
         except Exception as e:
             raise e
 
@@ -279,22 +281,24 @@ class NetworkAccessManager(object):
 
         return self.http_call_result, self.http_call_result.content
 
-    def downloadProgress(self, bytesReceived, bytesTotal):
+    def downloadProgress(self, bytesReceived, bytesTotal) -> None:
         """Keep track of the download progress"""
         # self.msg_log("downloadProgress %s of %s ..." % (bytesReceived, bytesTotal))
         pass
 
     # noinspection PyUnusedLocal
-    def requestTimedOut(self, reply):
+    def requestTimedOut(self, reply) -> None:
         """Trap the timeout. In Async mode requestTimedOut is called after replyFinished"""
         # adapt http_call_result basing on receiving qgs timer timout signal
         self.exception_class = RequestsExceptionTimeout
         self.http_call_result.exception = RequestsExceptionTimeout("Timeout error")
 
-    def replyFinished(self):
+    def replyFinished(self) -> None:
         err = self.reply.error()
-        httpStatus = self.reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
-        httpStatusMessage = self.reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute)
+        httpStatus = self.reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
+        httpStatusMessage = self.reply.attribute(
+            QNetworkRequest.Attribute.HttpReasonPhraseAttribute
+        )
         self.http_call_result.status_code = httpStatus
         self.http_call_result.status = httpStatus
         self.http_call_result.status_message = httpStatusMessage
@@ -306,7 +310,7 @@ class NetworkAccessManager(object):
                 v.data(), encoding="utf-8"
             )
 
-        if err != QNetworkReply.NoError:
+        if err != QNetworkReply.NetworkError.NoError:
             # handle error
             # check if errorString is empty, if so, then set err string as
             # reply dump
@@ -326,13 +330,13 @@ class NetworkAccessManager(object):
             self.http_call_result.ok = False
             self.msg_log(msg)
             # set return exception
-            if err == QNetworkReply.TimeoutError:
+            if err == QNetworkReply.NetworkError.TimeoutError:
                 self.http_call_result.exception = RequestsExceptionTimeout(msg)
 
-            elif err == QNetworkReply.ConnectionRefusedError:
+            elif err == QNetworkReply.NetworkError.ConnectionRefusedError:
                 self.http_call_result.exception = RequestsExceptionConnectionError(msg)
 
-            elif err == QNetworkReply.OperationCanceledError:
+            elif err == QNetworkReply.NetworkError.OperationCanceledError:
                 # request abort by calling NAM.abort() => cancelled by the user
                 if self.on_abort:
                     self.http_call_result.exception = RequestsExceptionUserAbort(msg)
@@ -348,7 +352,9 @@ class NetworkAccessManager(object):
 
         else:
             # Handle redirections
-            redirectionUrl = self.reply.attribute(QNetworkRequest.RedirectionTargetAttribute)
+            redirectionUrl = self.reply.attribute(
+                QNetworkRequest.Attribute.RedirectionTargetAttribute
+            )
             if redirectionUrl is not None and redirectionUrl != self.reply.url():
                 if redirectionUrl.isRelative():
                     redirectionUrl = self.reply.url().resolved(redirectionUrl)
@@ -401,7 +407,7 @@ class NetworkAccessManager(object):
         else:
             self.msg_log("Reply was already deleted ...")
 
-    def sslErrors(self, ssl_errors):
+    def sslErrors(self, ssl_errors) -> None:
         """
         Handle SSL errors, logging them if debug is on and ignoring them
         if disable_ssl_certificate_validation is set.
@@ -412,7 +418,7 @@ class NetworkAccessManager(object):
         if self.disable_ssl_certificate_validation:
             self.reply.ignoreSslErrors()
 
-    def abort(self):
+    def abort(self) -> None:
         """
         Handle request to cancel HTTP call
         """

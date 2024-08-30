@@ -29,10 +29,17 @@
 
 import json
 import os
-import processing
+from typing import Optional
+
+try:
+    import processing
+except ModuleNotFoundError:
+    pass
+
 import webbrowser
 
-from qgis._core import Qgis
+from qgis._core import Qgis, QgsAnnotation
+from qgis._gui import QgisInterface
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -46,9 +53,17 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
 
-from PyQt5.QtCore import QSizeF, QPointF, QCoreApplication
-from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
+from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QDialog,
+    QApplication,
+    QMenu,
+    QMessageBox,
+    QDialogButtonBox,
+    QWidget,
+)
 
 from ORStools import (
     RESOURCE_PREFIX,
@@ -80,17 +95,19 @@ def on_config_click(parent):
     :type parent: QDialog
     """
     config_dlg = ORStoolsDialogConfigMain(parent=parent)
-    config_dlg.exec_()
+    config_dlg.exec()
 
 
-def on_help_click():
+def on_help_click() -> None:
     """Open help URL from button/menu entry."""
     webbrowser.open(__help__)
 
 
-def on_about_click(parent):
+def on_about_click(parent: QWidget) -> None:
     """Slot for click event of About button/menu entry."""
 
+    # ruff will add trailing comma to last string line which breaks pylupdate5
+    # fmt: off
     info = QCoreApplication.translate(
         "@default",
         '<b>ORS Tools</b> provides access to <a href="https://openrouteservice.org"'
@@ -105,8 +122,9 @@ def on_about_click(parent):
         'Web: <a href="{2}">{2}</a><br>'
         'Repo: <a href="https://github.com/GIScience/orstools-qgis-plugin">'
         "github.com/GIScience/orstools-qgis-plugin</a><br>"
-        "Version: {3}",
+        "Version: {3}"
     ).format(DEFAULT_COLOR, __email__, __web__, __version__)
+    # fmt: on
 
     QMessageBox.information(
         parent, QCoreApplication.translate("@default", "About {}").format(PLUGIN_NAME), info
@@ -116,7 +134,7 @@ def on_about_click(parent):
 class ORStoolsDialogMain:
     """Defines all mandatory QGIS things about dialog."""
 
-    def __init__(self, iface):
+    def __init__(self, iface: QgisInterface) -> None:
         """
 
         :param iface: the current QGIS interface
@@ -132,10 +150,10 @@ class ORStoolsDialogMain:
         self.actions = None
 
     # noinspection PyUnresolvedReferences
-    def initGui(self):
+    def initGui(self) -> None:
         """Called when plugin is activated (on QGIS startup or when activated in Plugin Manager)."""
 
-        def create_icon(f):
+        def create_icon(f: str) -> QIcon:
             """
             internal function to create action icons
 
@@ -187,7 +205,7 @@ class ORStoolsDialogMain:
         # Add keyboard shortcut
         self.iface.registerMainWindowAction(self.actions[0], "Ctrl+R")
 
-    def unload(self):
+    def unload(self) -> None:
         """Called when QGIS closes or plugin is deactivated in Plugin Manager"""
 
         self.iface.webMenu().removeAction(self.menu.menuAction())
@@ -214,7 +232,7 @@ class ORStoolsDialogMain:
     #         text.append(os.environ[var])
     #     return '/'.join(text)
 
-    def _init_gui_control(self):
+    def _init_gui_control(self) -> None:
         """Slot for main plugin button. Initializes the GUI and shows it."""
 
         # Only populate GUI if it's the first start of the plugin within the QGIS session
@@ -227,7 +245,7 @@ class ORStoolsDialogMain:
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
-            self.dlg.avoidpolygon_dropdown.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+            self.dlg.avoidpolygon_dropdown.setFilters(QgsMapLayerProxyModel.Filter.PolygonLayer)
 
         # Populate provider box on window startup, since can be changed from multiple menus/buttons
         providers = configmanager.read_config()["providers"]
@@ -237,7 +255,7 @@ class ORStoolsDialogMain:
 
         self.dlg.show()
 
-    def run_gui_control(self):
+    def run_gui_control(self) -> None:
         """Slot function for OK button of main dialog."""
 
         layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
@@ -309,6 +327,27 @@ class ORStoolsDialogMain:
         try:
             params = directions.get_parameters()
             if self.dlg.optimization_group.isChecked():
+                # check for duplicate points
+                points = [
+                    self.dlg.routing_fromline_list.item(x).text()
+                    for x in range(self.dlg.routing_fromline_list.count())
+                ]
+                if len(points) != len(set(points)):
+                    QMessageBox.warning(
+                        self.dlg,
+                        self.tr("Duplicates"),
+                        self.tr(
+                            """
+                            There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
+                            Either remove the duplicates or deselect Traveling Salesman.
+                            """
+                        ),
+                    )
+                    msg = self.tr("The request has been aborted!")
+                    logger.log(msg, 0)
+                    self.dlg.debug_text.setText(msg)
+                    return
+
                 if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
                     QMessageBox.critical(
                         self.dlg,
@@ -320,6 +359,29 @@ Remember, the first and last location are not part of the optimization.
                     )
                     return
                 response = clnt.request("/optimization", {}, post_json=params)
+
+                if self.dlg.export_jobs_order.isChecked():
+                    items = list()
+                    for route in response["routes"]:
+                        for i, step in enumerate(route["steps"]):
+                            location = step["location"]
+                            items.append(location)
+
+                    point_layer = QgsVectorLayer(
+                        "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
+                    )
+
+                    point_layer.updateFields()
+                    for idx, coords in enumerate(items):
+                        x, y = coords
+                        feature = QgsFeature()
+                        feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
+                        feature.setAttributes([idx])
+
+                        point_layer.dataProvider().addFeature(feature)
+                    QgsProject.instance().addMapLayer(point_layer)
+                    self.dlg._iface.mapCanvas().refresh()
+
                 feat = directions_core.get_output_features_optimization(
                     response, params["vehicles"][0]["profile"]
                 )
@@ -381,14 +443,14 @@ Please add polygons to the layer or uncheck avoid polygons.
                 clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
             self.dlg.debug_text.setHtml(clnt_msg)
 
-    def tr(self, string):
+    def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
 
 class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
     """Define the custom behaviour of Dialog"""
 
-    def __init__(self, iface, parent=None):
+    def __init__(self, iface: QgisInterface, parent=None) -> None:
         """
         :param iface: QGIS interface
         :type iface: QgisInterface
@@ -416,8 +478,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_preference_combo.addItems(PREFERENCES)
 
         # Change OK and Cancel button names
-        self.global_buttons.button(QDialogButtonBox.Ok).setText(self.tr("Apply"))
-        self.global_buttons.button(QDialogButtonBox.Cancel).setText(self.tr("Close"))
+        self.global_buttons.button(QDialogButtonBox.StandardButton.Ok).setText(self.tr("Apply"))
+        self.global_buttons.button(QDialogButtonBox.StandardButton.Cancel).setText(self.tr("Close"))
 
         # Set up signals/slots
 
@@ -456,7 +518,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
 
-    def _save_vertices_to_layer(self):
+        # Connect signals to the color_duplicate_items function
+        self.routing_fromline_list.model().rowsRemoved.connect(
+            lambda: self.color_duplicate_items(self.routing_fromline_list)
+        )
+        self.routing_fromline_list.model().rowsInserted.connect(
+            lambda: self.color_duplicate_items(self.routing_fromline_list)
+        )
+
+        self.annotation_canvas = self._iface.mapCanvas()
+
+    def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
         items = [
             self.routing_fromline_list.item(x).text()
@@ -480,10 +552,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self._iface.mapCanvas().refresh()
 
         self._iface.messageBar().pushMessage(
-            "Success", "Vertices saved to layer.", level=Qgis.Success
+            "Success", "Vertices saved to layer.", level=Qgis.MessageLevel.Success
         )
 
-    def _on_prov_refresh_click(self):
+    def _on_prov_refresh_click(self) -> None:
         """Populates provider dropdown with fresh list from config.yml"""
 
         providers = configmanager.read_config()["providers"]
@@ -491,7 +563,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         for provider in providers:
             self.provider_combo.addItem(provider["name"], provider)
 
-    def _on_clear_listwidget_click(self):
+    def _on_clear_listwidget_click(self) -> None:
         """Clears the contents of the QgsListWidget and the annotations."""
         items = self.routing_fromline_list.selectedItems()
         if items:
@@ -510,7 +582,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         if self.line_tool:
             self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
 
-    def _linetool_annotate_point(self, point, idx, crs=None):
+    def _linetool_annotate_point(
+        self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
+    ) -> QgsAnnotation:
         if not crs:
             crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
@@ -527,16 +601,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         annotation.setMapPosition(point)
         annotation.setMapPositionCrs(crs)
 
-        return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
+        return QgsMapCanvasAnnotationItem(annotation, self.annotation_canvas).annotation()
 
-    def _clear_annotations(self):
+    def _clear_annotations(self) -> None:
         """Clears annotations"""
-        for annotation in self.annotations:
+        for annotation_item in self.annotation_canvas.annotationItems():
+            annotation = annotation_item.annotation()
             if annotation in self.project.annotationManager().annotations():
                 self.project.annotationManager().removeAnnotation(annotation)
         self.annotations = []
 
-    def _on_linetool_init(self):
+    def _on_linetool_init(self) -> None:
         """Hides GUI dialog, inits line maptool and add items to line list box."""
         # Remove blue lines (rubber band)
         if self.line_tool:
@@ -554,7 +629,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         )
         self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
 
-    def _on_linetool_map_click(self, point, idx):
+    def _on_linetool_map_click(self, point: QgsPointXY, idx: int) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
         map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
 
@@ -563,10 +638,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
         annotation = self._linetool_annotate_point(point, idx)
-        self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
 
-    def _reindex_list_items(self):
+    def _reindex_list_items(self) -> None:
         """Resets the index when an item in the list is moved"""
         items = [
             self.routing_fromline_list.item(x).text()
@@ -583,10 +657,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
             self.routing_fromline_list.addItem(item)
             annotation = self._linetool_annotate_point(point, idx, crs)
-            self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
 
-    def _on_linetool_map_doubleclick(self):
+    def _on_linetool_map_doubleclick(self) -> None:
         """
         Populate line list widget with coordinates, end line drawing and show dialog again.
         """
@@ -596,3 +669,19 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()
+
+    def color_duplicate_items(self, list_widget):
+        item_dict = {}
+        for index in range(list_widget.count()):
+            item = list_widget.item(index)
+            text = item.text()
+            if text in item_dict:
+                item_dict[text].append(index)
+            else:
+                item_dict[text] = [index]
+
+        for indices in item_dict.values():
+            if len(indices) > 1:
+                for index in indices:
+                    item = list_widget.item(index)
+                    item.setBackground(QColor("lightsalmon"))

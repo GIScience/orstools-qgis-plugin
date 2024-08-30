@@ -31,9 +31,10 @@ import json
 import random
 import time
 from datetime import datetime, timedelta
+from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 from requests.utils import unquote_unreserved
 
 from ORStools import __version__
@@ -48,7 +49,7 @@ _USER_AGENT = f"ORSQGISClient@v{__version__}"
 class Client(QObject):
     """Performs requests to the ORS API services."""
 
-    def __init__(self, provider=None, agent=None):
+    def __init__(self, provider: Optional[dict] = None, agent: Optional[str] = None) -> None:
         """
         :param provider: A openrouteservice provider from config.yml
         :type provider: dict
@@ -87,7 +88,14 @@ class Client(QObject):
 
     overQueryLimit = pyqtSignal()
 
-    def request(self, url, params, first_request_time=None, retry_counter=0, post_json=None):
+    def request(
+        self,
+        url: str,
+        params: dict,
+        first_request_time: Optional[datetime.time] = None,
+        retry_counter: int = 0,
+        post_json: Optional[dict] = None,
+    ):
         """Performs HTTP GET/POST with credentials, returning the body as
         JSON.
 
@@ -194,7 +202,7 @@ class Client(QObject):
 
         return json.loads(content.decode("utf-8"))
 
-    def _check_status(self):
+    def _check_status(self) -> None:
         """
         Casts JSON response to dict
 
@@ -231,7 +239,7 @@ class Client(QObject):
         elif status_code != 200:
             raise exceptions.GenericServerError(str(status_code), message)
 
-    def _generate_auth_url(self, path, params):
+    def _generate_auth_url(self, path: str, params: Union[Dict, List]) -> str:
         """Returns the path and query string portion of the request URL, first
         adding any necessary parameters.
 
