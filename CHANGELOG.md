@@ -40,6 +40,11 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+
+### Changed
+- Use QgsSettings instead of config.yml file to avoid deletion of providers on update ([#108](https://github.com/GIScience/orstools-qgis-plugin/issues/108))
+
 ## [1.8.4] - 2024-07-29
 
 ### Fixed
