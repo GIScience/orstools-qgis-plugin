@@ -72,7 +72,7 @@ class ORStools:
                     QCoreApplication.installTranslator(self.translator)
         except TypeError:
             pass
-          
+
         self.add_default_provider_to_settings()
 
     def initGui(self) -> None:
