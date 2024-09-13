@@ -44,6 +44,14 @@ RELEASING:
 ### Added
 - Processing algorithms for the Network Export endpoint ([#210](https://github.com/GIScience/orstools-qgis-plugin/issues/210))
 
+### Changed
+- Use QgsSettings instead of config.yml file to avoid deletion of providers on update ([#108](https://github.com/GIScience/orstools-qgis-plugin/issues/108))
+
+## [1.8.4] - 2024-07-29
+
+### Fixed
+- issue with missing locale value for non-default user([#271](https://github.com/GIScience/orstools-qgis-plugin/issues/271))
+
 ## [1.8.3] - 2024-05-29
 
 ### Fixed
@@ -80,6 +88,10 @@ RELEASING:
 - Issue with MultiPoint-layers and optimization
 - Improved type hints
 
+
+# Unreleased
+### Added
+- Unit- and e2e-testing
 
 ## [1.7.1] - 2024-01-15
 
@@ -261,7 +273,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...HEAD
+[1.8.4]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.2...v1.8.3
 [1.8.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.0...v1.8.1

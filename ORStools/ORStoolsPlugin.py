@@ -29,7 +29,7 @@
 
 from qgis.gui import QgisInterface
 from qgis.core import QgsApplication, QgsSettings
-from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
 
 from .gui import ORStoolsDialog
@@ -56,15 +56,24 @@ class ORStools:
         self.plugin_dir = os.path.dirname(__file__)
 
         # initialize locale
-        locale = QgsSettings().value("locale/userLocale")[0:2]
-        locale_path = os.path.join(self.plugin_dir, "i18n", "orstools_{}.qm".format(locale))
+        try:
+            locale = QgsSettings().value("locale/userLocale")
+            if not locale:
+                locale = QLocale().name()
+            locale = locale[0:2]
 
-        if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
+            locale_path = os.path.join(self.plugin_dir, "i18n", "orstools_{}.qm".format(locale))
 
-            if qVersion() > "4.3.3":
-                QCoreApplication.installTranslator(self.translator)
+            if os.path.exists(locale_path):
+                self.translator = QTranslator()
+                self.translator.load(locale_path)
+
+                if qVersion() > "4.3.3":
+                    QCoreApplication.installTranslator(self.translator)
+        except TypeError:
+            pass
+
+        self.add_default_provider_to_settings()
 
     def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -76,3 +85,23 @@ class ORStools:
         """remove menu entry and toolbar icons"""
         QgsApplication.processingRegistry().removeProvider(self.provider)
         self.dialog.unload()
+
+    def add_default_provider_to_settings(self):
+        s = QgsSettings()
+        settings = s.value("ORStools/config")
+        if not settings:
+            def_settings = {
+                "providers": [
+                    {
+                        "ENV_VARS": {
+                            "ORS_QUOTA": "X-Ratelimit-Limit",
+                            "ORS_REMAINING": "X-Ratelimit-Remaining",
+                        },
+                        "base_url": "https://api.openrouteservice.org",
+                        "key": "",
+                        "name": "openrouteservice",
+                        "timeout": 60,
+                    }
+                ]
+            }
+            s.setValue("ORStools/config", def_settings)
