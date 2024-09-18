@@ -35,6 +35,7 @@ from ORStools import RESOURCE_PREFIX, PLUGIN_NAME, __version__
 from .directions_lines_proc import ORSDirectionsLinesAlgo
 from .directions_points_layer_proc import ORSDirectionsPointsLayerAlgo
 from .directions_points_layers_proc import ORSDirectionsPointsLayersAlgo
+from .export_proc import ORSExportAlgo
 from .isochrones_layer_proc import ORSIsochronesLayerAlgo
 from .isochrones_point_proc import ORSIsochronesPointAlgo
 from .matrix_proc import ORSMatrixAlgo
@@ -63,6 +64,7 @@ class ORStoolsProvider(QgsProcessingProvider):
         self.addAlgorithm(ORSIsochronesLayerAlgo())
         self.addAlgorithm(ORSIsochronesPointAlgo())
         self.addAlgorithm(ORSMatrixAlgo())
+        self.addAlgorithm(ORSExportAlgo())
 
     @staticmethod
     def icon() -> QIcon:
