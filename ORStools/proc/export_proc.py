@@ -38,6 +38,7 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsCoordinateReferenceSystem,
     QgsProcessingParameterExtent,
+    QgsProcessingParameterFeatureSink,
     QgsProcessingContext,
     QgsProcessingFeedback,
     QgsPointXY,
@@ -61,10 +62,15 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         self.ALGO_NAME: str = "export_network_from_map"
         self.GROUP: str = "Export"
         self.IN_EXPORT: str = "INPUT_EXPORT"
+        self.OUT_POINT = "OUTPUT_POINT"
         self.PARAMETERS: list = [
             QgsProcessingParameterExtent(
                 name=self.IN_EXPORT,
                 description=self.tr("Input Extent"),
+            ),
+            QgsProcessingParameterFeatureSink(
+                name=self.OUT_POINT,
+                description="Nodes Only Export",
             ),
         ]
 
@@ -93,14 +99,22 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
             "id": "export_request",
         }
 
-        sink_fields = self.get_fields()
 
-        (sink, dest_id) = self.parameterAsSink(
+        (sink_line, dest_id_line) = self.parameterAsSink(
             parameters,
             self.OUT,
             context,
-            sink_fields,
+            self.get_fields_line(),
             QgsWkbTypes.Type.LineString,
+            QgsCoordinateReferenceSystem.fromEpsgId(4326),
+        )
+
+        (sink_point, dest_id_point) = self.parameterAsSink(
+            parameters,
+            self.OUT_POINT,
+            context,
+            self.get_fields_point(),
+            QgsWkbTypes.Type.Point,
             QgsCoordinateReferenceSystem.fromEpsgId(4326),
         )
 
@@ -127,23 +141,43 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
                 feat = QgsFeature()
                 feat.setGeometry(geometry)
                 feat.setAttributes([from_id, to_id, weight])
-                sink.addFeature(feat)
+                sink_line.addFeature(feat)
+
+            unique_coordinates = {tuple(item['location']): item['nodeId'] for item in response["nodes"]}
+            points = [(coords, node_id) for coords, node_id in unique_coordinates.items()]
+            for item in points:
+                point = QgsPointXY(item[0][0], item[0][1])
+                point_geometry = QgsGeometry.fromPointXY(point)
+
+                point_feat = QgsFeature()
+                point_feat.setGeometry(point_geometry)
+                point_feat.setAttributes([item[1]])
+                sink_point.addFeature(point_feat)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 
-        return {self.OUT: dest_id}
+        return {self.OUT: dest_id_line,
+                self.OUT_POINT: dest_id_point}
 
     @staticmethod
-    def get_fields():
+    def get_fields_line():
         fields = QgsFields()
         fields.append(QgsField("FROM_ID", QVariant.Double))
         fields.append(QgsField("TO_ID", QVariant.Double))
         fields.append(QgsField("WEIGHT", QVariant.Double))
 
         return fields
+
+    @staticmethod
+    def get_fields_point():
+        fields = QgsFields()
+        fields.append(QgsField("ID", QVariant.Int))
+
+        return fields
+
 
     def displayName(self) -> str:
         """
