@@ -99,7 +99,6 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
             "id": "export_request",
         }
 
-
         (sink_line, dest_id_line) = self.parameterAsSink(
             parameters,
             self.OUT,
@@ -121,7 +120,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         # Make request and catch ApiError
         try:
             response = ors_client.request("/v2/export/" + profile, {}, post_json=params)
-            nodes_dict = {item['nodeId']: item['location'] for item in response["nodes"]}
+            nodes_dict = {item["nodeId"]: item["location"] for item in response["nodes"]}
             edges = response["edges"]
             for edge in edges:
                 from_id = edge["fromId"]
@@ -143,7 +142,9 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
                 feat.setAttributes([from_id, to_id, weight])
                 sink_line.addFeature(feat)
 
-            unique_coordinates = {tuple(item['location']): item['nodeId'] for item in response["nodes"]}
+            unique_coordinates = {
+                tuple(item["location"]): item["nodeId"] for item in response["nodes"]
+            }
             points = [(coords, node_id) for coords, node_id in unique_coordinates.items()]
             for item in points:
                 point = QgsPointXY(item[0][0], item[0][1])
@@ -159,8 +160,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
             feedback.reportError(msg)
             logger.log(msg)
 
-        return {self.OUT: dest_id_line,
-                self.OUT_POINT: dest_id_point}
+        return {self.OUT: dest_id_line, self.OUT_POINT: dest_id_point}
 
     @staticmethod
     def get_fields_line():
@@ -177,7 +177,6 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         fields.append(QgsField("ID", QVariant.Int))
 
         return fields
-
 
     def displayName(self) -> str:
         """
