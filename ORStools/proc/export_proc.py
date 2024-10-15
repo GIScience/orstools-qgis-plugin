@@ -107,14 +107,15 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         # Make request and catch ApiError
         try:
             response = ors_client.request("/v2/export/" + profile, {}, post_json=params)
+            nodes_dict = {item['nodeId']: item['location'] for item in response["nodes"]}
             edges = response["edges"]
             for edge in edges:
                 from_id = edge["fromId"]
                 to_id = edge["toId"]
                 weight = edge["weight"]
 
-                to_coords = self.get_location_by_id(to_id, response["nodes"])
-                from_coords = self.get_location_by_id(from_id, response["nodes"])
+                to_coords = nodes_dict[to_id]
+                from_coords = nodes_dict[from_id]
 
                 geometry = QgsGeometry.fromPolylineXY(
                     [
@@ -143,22 +144,6 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         fields.append(QgsField("WEIGHT", QVariant.Double))
 
         return fields
-
-    def get_location_by_id(self, node_id, nodes):
-        """
-        Get the location of a node by its ID.
-
-        Args:
-        node_id (int): The ID of the node.
-        nodes (list): The list of nodes.
-
-        Returns:
-        list: The location of the node, or None if the node ID is not found.
-        """
-        for node in nodes:
-            if node["nodeId"] == node_id:
-                return node["location"]
-        return None
 
     def displayName(self) -> str:
         """
