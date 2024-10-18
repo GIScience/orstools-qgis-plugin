@@ -6,6 +6,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsFeature,
     QgsGeometry,
+    QgsRectangle,
 )
 from qgis.testing import unittest
 
@@ -15,6 +16,7 @@ from ORStools.proc.directions_points_layers_proc import ORSDirectionsPointsLayer
 from ORStools.proc.isochrones_layer_proc import ORSIsochronesLayerAlgo
 from ORStools.proc.isochrones_point_proc import ORSIsochronesPointAlgo
 from ORStools.proc.matrix_proc import ORSMatrixAlgo
+from ORStools.proc.export_proc import ORSExportAlgo
 
 
 class TestProc(unittest.TestCase):
@@ -42,7 +44,9 @@ class TestProc(unittest.TestCase):
         feature.setGeometry(line_geometry)
         cls.line_layer.dataProvider().addFeatures([feature])
 
-        cls.bbox = None
+        lower_left = QgsPointXY(8.45, 48.85)
+        upper_right = QgsPointXY(8.46, 48.86)
+        cls.bbox = QgsRectangle(lower_left, upper_right)
 
         cls.feedback = QgsProcessingFeedback()
         cls.context = QgsProcessingContext()
@@ -181,10 +185,12 @@ class TestProc(unittest.TestCase):
 
     def test_export(self):
         parameters = {
-                "INPUT_EXPORT": self.bbox,
-                "OUTPUT_POINT": None,
-
-                }
+            "INPUT_PROVIDER": 0,
+            "INPUT_PROFILE": 0,
+            "INPUT_EXPORT": self.bbox,
+            "OUTPUT_POINT": "TEMPORARY_OUTPUT",
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        }
 
         export = ORSExportAlgo().create()
         dest_id = export.processAlgorithm(parameters, self.context, self.feedback)
