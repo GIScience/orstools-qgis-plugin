@@ -42,6 +42,8 @@ class TestProc(unittest.TestCase):
         feature.setGeometry(line_geometry)
         cls.line_layer.dataProvider().addFeatures([feature])
 
+        cls.bbox = None
+
         cls.feedback = QgsProcessingFeedback()
         cls.context = QgsProcessingContext()
 
@@ -176,3 +178,18 @@ class TestProc(unittest.TestCase):
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
 
         self.assertEqual(type(processed_layer), QgsVectorLayer)
+
+    def test_export(self):
+        parameters = {
+                "INPUT_EXPORT": self.bbox,
+                "OUTPUT_POINT": None,
+
+                }
+
+        export = ORSExportAlgo().create()
+        dest_id = export.processAlgorithm(parameters, self.context, self.feedback)
+        processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
+        processed_nodes = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT_POINT"], self.context)
+
+        self.assertEqual(type(processed_layer), QgsVectorLayer)
+        self.assertEqual(type(processed_nodes), QgsVectorLayer)
