@@ -70,7 +70,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
             ),
             QgsProcessingParameterFeatureSink(
                 name=self.OUT_POINT,
-                description="Nodes Only Export",
+                description="Node Export",
             ),
         ]
 
