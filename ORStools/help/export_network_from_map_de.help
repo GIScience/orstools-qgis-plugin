@@ -1,0 +1,7 @@
+Das Basisgraph für verschiedene Verkehrsmittel exportieren.
+
+Ein gültiger API-Schlüssel ist erforderlich ('Web'-Menü ► 'ORS Tools' ► 'Konfiguration') oder eine Anmeldung unter <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>. Aktuelle <a href="https://openrouteservice.org/restrictions/">Beschränkungslimits</a> für die openrouteservice API gelten.
+
+<i>Verkehrsmittel</i>: bestimmt das genutzte Reise-Profil
+
+<i>Input-Extent</i>: Es ist ein Bereich auszuwählen, dessen Inhalt exportiert wird.
