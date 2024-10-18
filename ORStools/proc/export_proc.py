@@ -34,8 +34,6 @@ from qgis.core import (
     QgsFeature,
     QgsField,
     QgsFields,
-    QgsProject,
-    QgsCoordinateTransform,
     QgsCoordinateReferenceSystem,
     QgsProcessingParameterExtent,
     QgsProcessingParameterFeatureSink,
@@ -47,7 +45,6 @@ from qgis.core import (
 
 from qgis.PyQt.QtCore import QVariant
 
-from qgis.utils import iface
 
 
 from ORStools.common import PROFILES
