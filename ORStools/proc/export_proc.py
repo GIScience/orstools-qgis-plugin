@@ -82,17 +82,10 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
-        rect = self.parameterAsExtent(parameters, self.IN_EXPORT, context)
-
         target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
-        source_crs = iface.mapCanvas().mapSettings().destinationCrs()
+        rect = self.parameterAsExtent(parameters, self.IN_EXPORT, context, crs=target_crs)
 
-        transform = QgsCoordinateTransform(source_crs, target_crs, QgsProject.instance())
-
-        bottom_left = transform.transform(rect.xMinimum(), rect.yMinimum())
-        top_right = transform.transform(rect.xMaximum(), rect.yMaximum())
-
-        extent = [[bottom_left.x(), bottom_left.y()], [top_right.x(), top_right.y()]]
+        extent = [[rect.xMinimum(), rect.yMinimum()], [rect.xMaximum(), rect.yMaximum()]]
 
         params = {
             "bbox": extent,
