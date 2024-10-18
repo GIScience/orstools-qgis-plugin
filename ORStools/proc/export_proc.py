@@ -46,7 +46,6 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QVariant
 
 
-
 from ORStools.common import PROFILES
 from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
