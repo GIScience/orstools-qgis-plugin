@@ -12,6 +12,7 @@ ORStools(IFACE).add_default_provider_to_settings()
 s = QgsSettings()
 data = s.value("ORStools/config")
 
+
 def pytest_sessionstart(session):
     """
     Called after the Session object has been created and
