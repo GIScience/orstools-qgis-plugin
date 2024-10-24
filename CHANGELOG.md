@@ -41,6 +41,7 @@ RELEASING:
  -->
 
 ## Unreleased
+- Also test correctness of processing algorithm output ([#283](https://github.com/GIScience/orstools-qgis-plugin/issues/283))
 
 ### Changed
 - Use QgsSettings instead of config.yml file to avoid deletion of providers on update ([#108](https://github.com/GIScience/orstools-qgis-plugin/issues/108))

@@ -22,25 +22,27 @@ class TestProc(unittest.TestCase):
     def setUpClass(cls) -> None:
         uri = "point?crs=epsg:4326"
         cls.point_layer_1 = QgsVectorLayer(uri, "Scratch point layer", "memory")
-        points_of_interest = [QgsPointXY(-118.2394, 34.0739), QgsPointXY(-118.3215, 34.1399)]
+        points_of_interest = [QgsPointXY(8.6724, 49.3988), QgsPointXY(8.6908, 49.4094)]
         for point in points_of_interest:
             feature = QgsFeature()
             feature.setGeometry(QgsGeometry.fromPointXY(point))
-            cls.point_layer_1.dataProvider().addFeatures([feature])
+            cls.point_layer_1.dataProvider().addFeature(feature)
 
         cls.point_layer_2 = QgsVectorLayer(uri, "Scratch point layer", "memory")
-        points_of_interest = [QgsPointXY(-118.5, 34.2), QgsPointXY(-118.5, 34.3)]
+        points_of_interest = [QgsPointXY(8.4660, 49.4875), QgsPointXY(8.4796, 49.4978)]
         for point in points_of_interest:
             feature = QgsFeature()
             feature.setGeometry(QgsGeometry.fromPointXY(point))
-            cls.point_layer_2.dataProvider().addFeatures([feature])
+            cls.point_layer_2.dataProvider().addFeature(feature)
 
+        uri = "linestring?crs=epsg:4326"
         cls.line_layer = QgsVectorLayer(uri, "Scratch point layer", "memory")
-        vertices = [(-118.2394, 34.0739), (-118.3215, 34.1341), (-118.4961, 34.5)]
+        vertices = [(8.6724, 49.3988), (8.7165, 49.4106), (8.6947, 49.4178)]
         line_geometry = QgsGeometry.fromPolylineXY([QgsPointXY(x, y) for x, y in vertices])
         feature = QgsFeature()
         feature.setGeometry(line_geometry)
-        cls.line_layer.dataProvider().addFeatures([feature])
+        cls.line_layer.dataProvider().addFeature(feature)
+        print(line_geometry)
 
         cls.feedback = QgsProcessingFeedback()
         cls.context = QgsProcessingContext()
@@ -57,8 +59,6 @@ class TestProc(unittest.TestCase):
             "INPUT_PREFERENCE": 0,
             "INPUT_PROFILE": 0,
             "INPUT_PROVIDER": 0,
-            "INPUT_METRIC": 0,
-            "LOCATION_TYPE": 0,
             "OUTPUT": "TEMPORARY_OUTPUT",
         }
 
@@ -67,6 +67,9 @@ class TestProc(unittest.TestCase):
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
 
         self.assertEqual(type(processed_layer), QgsVectorLayer)
+
+        feat_length = next(processed_layer.getFeatures()).geometry().length()
+        self.assertTrue(feat_length > 0)
 
     def test_directions_points_layer(self):
         parameters = {
@@ -89,6 +92,9 @@ class TestProc(unittest.TestCase):
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
 
         self.assertEqual(type(processed_layer), QgsVectorLayer)
+
+        feat_length = next(processed_layer.getFeatures()).geometry().length()
+        self.assertTrue(feat_length > 0)
 
     def test_directions_points_layers(self):
         parameters = {
@@ -115,6 +121,9 @@ class TestProc(unittest.TestCase):
 
         self.assertEqual(type(processed_layer), QgsVectorLayer)
 
+        feat_length = next(processed_layer.getFeatures()).geometry().length()
+        self.assertTrue(feat_length > 0)
+
     def test_isochrones_layer(self):
         parameters = {
             "INPUT_AVOID_BORDERS": None,
@@ -138,6 +147,9 @@ class TestProc(unittest.TestCase):
 
         self.assertEqual(type(processed_layer), QgsVectorLayer)
 
+        feat_area = next(processed_layer.getFeatures()).geometry().area()
+        self.assertTrue(feat_area > 0)
+
     def test_isochrones_point(self):
         parameters = {
             "INPUT_AVOID_BORDERS": None,
@@ -160,6 +172,12 @@ class TestProc(unittest.TestCase):
 
         self.assertEqual(type(processed_layer), QgsVectorLayer)
 
+        feats = processed_layer.getFeatures()
+        feat_areas = [feat.geometry().area() for feat in feats]
+        self.assertTrue(feat_areas[0] > 0)
+        # TODO: This is the wrong way around, because polygon order in isochrones is inverted.
+        self.assertTrue(feat_areas[0] > feat_areas[1])
+
     def test_matrix(self):
         parameters = {
             "INPUT_END_FIELD": None,
@@ -176,3 +194,6 @@ class TestProc(unittest.TestCase):
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
 
         self.assertEqual(type(processed_layer), QgsVectorLayer)
+
+        feat = next(processed_layer.getFeatures())
+        self.assertTrue(feat.attributes()[2] > 0)
