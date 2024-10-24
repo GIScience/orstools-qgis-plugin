@@ -63,6 +63,4 @@ class TestGui(unittest.TestCase):
         dlg.line_tool.canvasDoubleClickEvent(map_dclick)
 
         self.assertTrue(dlg.isVisible())
-        self.assertEqual(
-            dlg.routing_fromline_list.item(0).text(), "Point 0: -0.187575, 56.516620"
-        )
+        self.assertEqual(dlg.routing_fromline_list.item(0).text(), "Point 0: -0.187575, 56.516620")
