@@ -44,8 +44,7 @@ class TestProc(unittest.TestCase):
         feature = QgsFeature()
         feature.setGeometry(line_geometry)
         cls.line_layer.dataProvider().addFeature(feature)
-        print(line_geometry)
-
+        
         lower_left = QgsPointXY(8.45, 48.85)
         upper_right = QgsPointXY(8.46, 48.86)
         cls.bbox = QgsRectangle(lower_left, upper_right)
