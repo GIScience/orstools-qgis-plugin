@@ -1,0 +1,9 @@
+Export the base graph for different modes of transport.
+
+You need to have a valid API key ('Web' menu ► 'ORS Tools' ► 'Configuration') or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
+Current <a href="https://openrouteservice.org/restrictions/">restriction limits</a> for the openrouteservice API apply.
+
+<i>Travel Mode</i>: determines the profile used.
+
+<i>Input Extent</i>: Choose an extent, the content of which will be exported.
+

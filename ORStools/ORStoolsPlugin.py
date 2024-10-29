@@ -73,6 +73,8 @@ class ORStools:
         except TypeError:
             pass
 
+        self.add_default_provider_to_settings()
+
     def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -83,3 +85,23 @@ class ORStools:
         """remove menu entry and toolbar icons"""
         QgsApplication.processingRegistry().removeProvider(self.provider)
         self.dialog.unload()
+
+    def add_default_provider_to_settings(self):
+        s = QgsSettings()
+        settings = s.value("ORStools/config")
+        if not settings:
+            def_settings = {
+                "providers": [
+                    {
+                        "ENV_VARS": {
+                            "ORS_QUOTA": "X-Ratelimit-Limit",
+                            "ORS_REMAINING": "X-Ratelimit-Remaining",
+                        },
+                        "base_url": "https://api.openrouteservice.org",
+                        "key": "",
+                        "name": "openrouteservice",
+                        "timeout": 60,
+                    }
+                ]
+            }
+            s.setValue("ORStools/config", def_settings)

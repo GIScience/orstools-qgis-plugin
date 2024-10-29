@@ -230,6 +230,19 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     </message>
 </context>
 <context>
+    <name>ORSExportAlgo</name>
+    <message>
+        <location filename="../proc/export_proc.py" line="67"/>
+        <source>Input Extent</source>
+        <translation>Ausdehnung</translation>
+    </message>
+    <message>
+        <location filename="../proc/export_proc.py" line="179"/>
+        <source>Export Network from Map</source>
+        <translation>Netzwerk von Karte exportieren</translation>
+    </message>
+</context>
+<context>
     <name>ORSIsochronesLayerAlgo</name>
     <message>
         <location filename="../proc/isochrones_layer_proc.py" line="69"/>
@@ -331,12 +344,12 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="488"/>
+        <location filename="../gui/ORStoolsDialog.py" line="481"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="489"/>
+        <location filename="../gui/ORStoolsDialog.py" line="482"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -721,12 +734,12 @@ p, li { white-space: pre-wrap; }
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="340"/>
+        <location filename="../gui/ORStoolsDialog.py" line="336"/>
         <source>Duplicates</source>
         <translation>Duplikate</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="340"/>
+        <location filename="../gui/ORStoolsDialog.py" line="336"/>
         <source>
                             There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
                             Either remove the duplicates or deselect Traveling Salesman.
@@ -735,7 +748,7 @@ p, li { white-space: pre-wrap; }
 Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="412"/>
+        <location filename="../gui/ORStoolsDialog.py" line="346"/>
         <source>The request has been aborted!</source>
         <translation>Die Anfrage wurde abgebrochen!</translation>
     </message>
