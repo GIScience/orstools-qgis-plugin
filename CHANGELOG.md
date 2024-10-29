@@ -41,6 +41,10 @@ RELEASING:
  -->
 
 ## Unreleased
+
+### Fixed
+- Error with canvas scenes when deleting selected vertices in list ([#278](https://github.com/GIScience/orstools-qgis-plugin/pull/278))
+- 
 ### Added
 - Processing algorithms for the Network Export endpoint ([#210](https://github.com/GIScience/orstools-qgis-plugin/issues/210))
 
