@@ -29,9 +29,7 @@
 
 import os
 
-import yaml
-
-from ORStools import CONFIG_PATH
+from qgis.core import QgsSettings
 
 
 def read_config() -> dict:
@@ -41,10 +39,10 @@ def read_config() -> dict:
     :returns: Parsed settings dictionary.
     :rtype: dict
     """
-    with open(CONFIG_PATH) as f:
-        doc = yaml.safe_load(f)
+    s = QgsSettings()
+    config = s.value("ORStools/config")
 
-    return doc
+    return config
 
 
 def write_config(new_config: dict) -> None:
@@ -54,8 +52,8 @@ def write_config(new_config: dict) -> None:
     :param new_config: new provider settings after altering in dialog.
     :type new_config: dict
     """
-    with open(CONFIG_PATH, "w") as f:
-        yaml.safe_dump(new_config, f)
+    s = QgsSettings()
+    s.setValue("ORStools/config", new_config)
 
 
 def write_env_var(key: str, value: str) -> None:

@@ -41,9 +41,15 @@ RELEASING:
  -->
 
 ## Unreleased
+
 ### Fixed
-#### Minor Fixes
 - Error with canvas scenes when deleting selected vertices in list ([#278](https://github.com/GIScience/orstools-qgis-plugin/pull/278))
+- 
+### Added
+- Processing algorithms for the Network Export endpoint ([#210](https://github.com/GIScience/orstools-qgis-plugin/issues/210))
+
+### Changed
+- Use QgsSettings instead of config.yml file to avoid deletion of providers on update ([#108](https://github.com/GIScience/orstools-qgis-plugin/issues/108))
 
 ## [1.8.4] - 2024-07-29
 
