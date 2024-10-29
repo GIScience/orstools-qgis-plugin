@@ -42,11 +42,14 @@ RELEASING:
 
 ## Unreleased
 
+## [1.9.0] - 2024-10-29
+
 ### Fixed
 - Error with canvas scenes when deleting selected vertices in list ([#278](https://github.com/GIScience/orstools-qgis-plugin/pull/278))
-- 
+
 ### Added
-- Processing algorithms for the Network Export endpoint ([#210](https://github.com/GIScience/orstools-qgis-plugin/issues/210))
+- Processing algorithm for the Export endpoint ([#210](https://github.com/GIScience/orstools-qgis-plugin/issues/210))
+- Updates to german translation ([#280](https://github.com/GIScience/orstools-qgis-plugin/pull/280))
 
 ### Changed
 - Use QgsSettings instead of config.yml file to avoid deletion of providers on update ([#108](https://github.com/GIScience/orstools-qgis-plugin/issues/108))
@@ -277,7 +280,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...v1.9.0
 [1.8.4]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.2...v1.8.3
 [1.8.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.1...v1.8.2
