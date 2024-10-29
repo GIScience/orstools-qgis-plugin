@@ -353,6 +353,16 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="561"/>
+        <source>Success</source>
+        <translation>Erfolg</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="561"/>
+        <source>Vertices saved to layer.</source>
+        <translation>Punkte in Layer gespeichert.</translation>
+    </message>
 </context>
 <context>
     <name>ORStoolsDialogBase</name>
@@ -741,6 +751,74 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
         <location filename="../gui/ORStoolsDialog.py" line="346"/>
         <source>The request has been aborted!</source>
         <translation>Die Anfrage wurde abgebrochen!</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="294"/>
+        <source>Missing Waypoints</source>
+        <translation>Fehlende Wegpunkte</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="294"/>
+        <source>
+                Did you forget to set routing waypoints?&lt;br&gt;&lt;br&gt;
+                
+                Use the &apos;Add Waypoint&apos; button to add up to 50 waypoints.
+                </source>
+        <translation>Haben Sie vergessen, Wegpunkte zu setzen?&lt;br&gt;&lt;br&gt; Nutzen Sie den &quot;Wegpunkt hinzufügen&quot;-Knopf um bis zu 50 Wegpunkte hinzuzufügen.</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="311"/>
+        <source>Missing API key</source>
+        <translation>Fehlender API-Key</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="311"/>
+        <source>
+                Did you forget to set an &lt;b&gt;API key&lt;/b&gt; for openrouteservice?&lt;br&gt;&lt;br&gt;
+                
+                If you don&apos;t have an API key, please visit https://openrouteservice.org/sign-up to get one. &lt;br&gt;&lt;br&gt; 
+                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown.</source>
+        <translation>Haben Sie einen &lt;b&gt;API-Key&lt;/b&gt; für den openrouteservice gesetzt?&lt;br&gt;&lt;br&gt;
+
+Wenn Sie keinen API-Key haben, besuchen Sie https://openrouteservice.org/sign-up für einen Key.&lt;br&gt;&lt;br&gt;
+Geben Sie den API-Key dann unter Web ► ORS Tools ► Provider Settings für den openrouteservice ein oder 
+nutzen Sie das Einstellungen-Symbol in der Oberfläche der ORS Tools, neben der Anbieter-Auswahl.</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="356"/>
+        <source>Wrong number of waypoints</source>
+        <translation>Falsche Anzahl an Wegpunkten</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="356"/>
+        <source>
+                        At least 3 or 4 waypoints are needed to perform routing optimization. 
+
+Remember, the first and last location are not part of the optimization.
+                        </source>
+        <translation>Mindestens 3 bis 4 Wegpunkte werden für die Wegpunktoptimierung benötigt.
+
+Achtung, der erste und letzte Wegpunkt ist kein Teil der Optimierung.</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="402"/>
+        <source>Empty layer</source>
+        <translation>Leerer Layer</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="402"/>
+        <source>
+The specified avoid polygon(s) layer does not contain any features.
+Please add polygons to the layer or uncheck avoid polygons.
+                        </source>
+        <translation>Der angegebene Polygon-Layer enthalten keine Features.
+Bitte fügen Sie den Layern Polygone hinzu oder &quot;Avoid Polygons&quot; abwählen.</translation>
+    </message>
+    <message>
+        <location filename="../gui/ORStoolsDialog.py" line="432"/>
+        <source>The connection has timed out!</source>
+        <translation>Zeitüberschreitung der Verbindung!</translation>
     </message>
 </context>
 </TS>
