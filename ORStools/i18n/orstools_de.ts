@@ -232,12 +232,12 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
 <context>
     <name>ORSExportAlgo</name>
     <message>
-        <location filename="../proc/export_proc.py" line="67"/>
+        <location filename="../proc/export_proc.py" line="63"/>
         <source>Input Extent</source>
         <translation>Ausdehnung</translation>
     </message>
     <message>
-        <location filename="../proc/export_proc.py" line="179"/>
+        <location filename="../proc/export_proc.py" line="175"/>
         <source>Export Network from Map</source>
         <translation>Netzwerk von Karte exportieren</translation>
     </message>
@@ -344,12 +344,12 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
 <context>
     <name>ORStoolsDialog</name>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="481"/>
+        <location filename="../gui/ORStoolsDialog.py" line="488"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="482"/>
+        <location filename="../gui/ORStoolsDialog.py" line="489"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -466,7 +466,7 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; padding: 10px; -qt-block-indent:0; text-indent:0px ; background-color:#e7f2fa; color: #999999&quot;&gt;&lt;img stype=&quot;margin: 10px&quot; src=&quot;:/plugins/ORStools/img/icon_about.png&quot; width=16 height=16 /&gt;  Sämtliche Einstellungen werden überschrieben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -734,12 +734,12 @@ p, li { white-space: pre-wrap; }
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="336"/>
+        <location filename="../gui/ORStoolsDialog.py" line="340"/>
         <source>Duplicates</source>
         <translation>Duplikate</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="336"/>
+        <location filename="../gui/ORStoolsDialog.py" line="340"/>
         <source>
                             There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
                             Either remove the duplicates or deselect Traveling Salesman.
@@ -748,7 +748,7 @@ p, li { white-space: pre-wrap; }
 Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     </message>
     <message>
-        <location filename="../gui/ORStoolsDialog.py" line="346"/>
+        <location filename="../gui/ORStoolsDialog.py" line="412"/>
         <source>The request has been aborted!</source>
         <translation>Die Anfrage wurde abgebrochen!</translation>
     </message>
@@ -776,7 +776,7 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
         <source>
                 Did you forget to set an &lt;b&gt;API key&lt;/b&gt; for openrouteservice?&lt;br&gt;&lt;br&gt;
                 
-                If you don&apos;t have an API key, please visit https://openrouteservice.org/sign-up to get one. &lt;br&gt;&lt;br&gt; 
+                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. &lt;br&gt;&lt;br&gt; 
                 Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
                 settings symbol in the main ORS Tools GUI, next to the provider dropdown.</source>
         <translation>Haben Sie einen &lt;b&gt;API-Key&lt;/b&gt; für den openrouteservice gesetzt?&lt;br&gt;&lt;br&gt;
