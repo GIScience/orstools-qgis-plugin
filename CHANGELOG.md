@@ -42,6 +42,9 @@ RELEASING:
 
 ## Unreleased
 
+### Added
+- Exit digitization on right click or Escape key press ([#285](https://github.com/GIScience/orstools-qgis-plugin/issues/285)) 
+
 ## [1.9.0] - 2024-10-29
 
 ### Fixed
