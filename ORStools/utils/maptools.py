@@ -66,6 +66,11 @@ class LineTool(QgsMapToolEmitPoint):
 
     pointDrawn = pyqtSignal(["QgsPointXY", "int"])
 
+    def keyPressEvent(self, event) -> None:
+        # Check if the pressed key is the Escape key
+        if event.key() == Qt.Key_Escape:
+            self.end_digitization()
+
     def canvasReleaseEvent(self, e):
         """Add marker to canvas and shows line."""
         if e.button() == Qt.RightButton:
