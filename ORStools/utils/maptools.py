@@ -69,9 +69,6 @@ class LineTool(QgsMapToolEmitPoint):
         """Ends line drawing and deletes rubber band and markers from map canvas."""
         # noinspection PyUnresolvedReferences
         self.doubleClicked.emit()
-        self.canvas.scene().removeItem(self.rubberBand)
-        del self.rubberBand
-        # self.canvas.scene().removeItem(self.rubberBand)
 
     doubleClicked = pyqtSignal()
 

@@ -537,6 +537,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             lambda: self.color_duplicate_items(self.routing_fromline_list)
         )
 
+        # connect live preview button to reload rubber band
+        self.toggle_preview.toggled.connect(self._toggle_preview)
+
         self.annotation_canvas = self._iface.mapCanvas()
         self.moving = None
         self.moved_idxs = 0
@@ -785,7 +788,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 feature = next(route_layer.getFeatures())
                 self.rubber_band.addGeometry(feature.geometry(), route_layer)
                 self.rubber_band.show()
-                print("debug1")
             else:
                 self._clear_annotations()
                 self._on_clear_listwidget_click()
@@ -885,3 +887,24 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 for index in indices:
                     item = list_widget.item(index)
                     item.setBackground(QColor("lightsalmon"))
+
+    def _toggle_preview(self):
+        state = self.toggle_preview.isChecked()
+        try:
+            self.create_rubber_band()
+        except ApiError as e:
+            json_start_index = e.message.find("{")
+            json_end_index = e.message.rfind("}") + 1
+            json_str = e.message[json_start_index:json_end_index]
+            error_dict = json.loads(json_str)
+            error_code = error_dict["error"]["code"]
+            print(error_code == 2010)
+            if error_code == 2010:
+                QMessageBox.warning(
+                    self,
+                    "Please use a different point",
+                    """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+                )
+                self.toggle_preview.setChecked(not state)
+            else:
+                raise e
