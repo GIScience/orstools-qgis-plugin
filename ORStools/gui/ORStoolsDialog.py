@@ -871,15 +871,16 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     item.setBackground(QColor("lightsalmon"))
 
     def _toggle_preview(self):
-        state = self.toggle_preview.isChecked()
-        try:
-            self.create_rubber_band()
-        except ApiError as e:
-            self.toggle_preview.setChecked(not state)
-            if self.get_error_code(e) == 2010:
-                self.radius_message_box()
-            else:
-                raise e
+        if self.routing_fromline_list.count() > 0:
+            state = self.toggle_preview.isChecked()
+            try:
+                self.create_rubber_band()
+            except ApiError as e:
+                self.toggle_preview.setChecked(not state)
+                if self.get_error_code(e) == 2010:
+                    self.radius_message_box()
+                else:
+                    raise e
 
     def get_error_code(self, e):
         json_start_index = e.message.find("{")
