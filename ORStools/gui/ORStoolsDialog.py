@@ -40,7 +40,7 @@ except ModuleNotFoundError:
 import webbrowser
 
 from qgis._core import Qgis, QgsAnnotation, QgsCoordinateTransform, QgsWkbTypes
-from qgis._gui import QgisInterface, QgsRubberBand
+from qgis._gui import QgisInterface, QgsRubberBand, QgsMessageBar
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -715,7 +715,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
             except ApiError as e:
-
                 if self.get_error_code(e) == 2010:
                     self.error_idxs += 1
                     self.moving = False
@@ -876,9 +875,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         try:
             self.create_rubber_band()
         except ApiError as e:
+            self.toggle_preview.setChecked(not state)
             if self.get_error_code(e) == 2010:
                 self.radius_message_box()
-                self.toggle_preview.setChecked(not state)
             else:
                 raise e
 
@@ -890,8 +889,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         return error_dict["error"]["code"]
 
     def radius_message_box(self):
-        QMessageBox.warning(
-            self,
-            "Please use a different point",
-            """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
-        )
+        self._iface.messageBar().pushMessage("Please use a different point",
+            """Could not find routable point within a radius of 350.0 meters of specified coordinate. 
+            Use a different point closer to a road.""", level=Qgis.MessageLevel.Warning, duration=3)
