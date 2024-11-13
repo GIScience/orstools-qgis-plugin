@@ -715,12 +715,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
             except ApiError as e:
-                json_start_index = e.message.find("{")
-                json_end_index = e.message.rfind("}") + 1
-                json_str = e.message[json_start_index:json_end_index]
-                error_dict = json.loads(json_str)
-                error_code = error_dict["error"]["code"]
-                if error_code == 2010:
+
+                if self.get_error_code(e) == 2010:
                     self.error_idxs += 1
                     self.moving = False
                     self.routing_fromline_list.clear()
@@ -729,11 +725,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                         item = f"Point {i}:{coords}"
                         self.routing_fromline_list.addItem(item)
                     self._reindex_list_items()
-                    QMessageBox.warning(
-                        self,
-                        "Please use a different point",
-                        """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
-                    )
+                    self.radius_message_box()
                     self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
                     self.moved_idxs -= 1
                 else:
@@ -749,12 +741,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     self.create_rubber_band()
                     self.moving = False
             except ApiError as e:
-                json_start_index = e.message.find("{")
-                json_end_index = e.message.rfind("}") + 1
-                json_str = e.message[json_start_index:json_end_index]
-                error_dict = json.loads(json_str)
-                error_code = error_dict["error"]["code"]
-                if error_code == 2010:
+                if self.get_error_code(e) == 2010:
                     self.error_idxs += 1
                     num = len(self.routing_fromline_list) - 1
 
@@ -766,11 +753,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                         self._reindex_list_items()
                         self.create_rubber_band()
 
-                    QMessageBox.warning(
-                        self,
-                        "Please use a different point",
-                        """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
-                    )
+                    self.radius_message_box()
                 else:
                     raise e
 
@@ -893,18 +876,22 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         try:
             self.create_rubber_band()
         except ApiError as e:
-            json_start_index = e.message.find("{")
-            json_end_index = e.message.rfind("}") + 1
-            json_str = e.message[json_start_index:json_end_index]
-            error_dict = json.loads(json_str)
-            error_code = error_dict["error"]["code"]
-            print(error_code == 2010)
-            if error_code == 2010:
-                QMessageBox.warning(
-                    self,
-                    "Please use a different point",
-                    """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
-                )
+            if self.get_error_code(e) == 2010:
+                self.radius_message_box()
                 self.toggle_preview.setChecked(not state)
             else:
                 raise e
+
+    def get_error_code(self, e):
+        json_start_index = e.message.find("{")
+        json_end_index = e.message.rfind("}") + 1
+        json_str = e.message[json_start_index:json_end_index]
+        error_dict = json.loads(json_str)
+        return error_dict["error"]["code"]
+
+    def radius_message_box(self):
+        QMessageBox.warning(
+            self,
+            "Please use a different point",
+            """Could not find routable point within a radius of 350.0 meters of specified coordinate. Use a different point closer to a road.""",
+        )
