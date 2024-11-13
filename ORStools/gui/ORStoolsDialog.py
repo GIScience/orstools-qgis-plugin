@@ -40,7 +40,7 @@ except ModuleNotFoundError:
 import webbrowser
 
 from qgis._core import Qgis, QgsAnnotation, QgsCoordinateTransform, QgsWkbTypes
-from qgis._gui import QgisInterface, QgsRubberBand, QgsMessageBar
+from qgis._gui import QgisInterface, QgsRubberBand
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -890,6 +890,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         return error_dict["error"]["code"]
 
     def radius_message_box(self):
-        self._iface.messageBar().pushMessage("Please use a different point",
+        self._iface.messageBar().pushMessage(
+            "Please use a different point",
             """Could not find routable point within a radius of 350.0 meters of specified coordinate. 
-            Use a different point closer to a road.""", level=Qgis.MessageLevel.Warning, duration=3)
+            Use a different point closer to a road.""",
+            level=Qgis.MessageLevel.Warning,
+            duration=3,
+        )
