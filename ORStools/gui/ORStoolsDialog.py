@@ -729,6 +729,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     self.moved_idxs -= 1
                 else:
                     raise e
+            except Exception as e:
+                if "Connection refused" in str(e):
+                    self.api_key_message_bar()
+                else:
+                    raise e
 
         else:
             try:
@@ -753,6 +758,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                         self.create_rubber_band()
 
                     self.radius_message_box()
+                else:
+                    raise e
+            except Exception as e:
+                if "Connection refused" in str(e):
+                    self.api_key_message_bar()
                 else:
                     raise e
 
@@ -881,6 +891,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                     self.radius_message_box()
                 else:
                     raise e
+            except Exception as e:
+                self.toggle_preview.setChecked(not state)
+                if "Connection refused" in str(e):
+                    self.api_key_message_bar()
+                else:
+                    raise e
 
     def get_error_code(self, e):
         json_start_index = e.message.find("{")
@@ -894,6 +910,14 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             "Please use a different point",
             """Could not find routable point within a radius of 350.0 meters of specified coordinate. 
             Use a different point closer to a road.""",
+            level=Qgis.MessageLevel.Warning,
+            duration=3,
+        )
+
+    def api_key_message_bar(self):
+        self._iface.messageBar().pushMessage(
+            "Connection refused",
+            """Are your provider settings correct and the provider ready?""",
             level=Qgis.MessageLevel.Warning,
             duration=3,
         )
