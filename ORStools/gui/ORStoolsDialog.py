@@ -847,7 +847,13 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             annotation = self._linetool_annotate_point(point, idx)
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
-        self.create_rubber_band()
+        try:
+            self.create_rubber_band()
+        except Exception as e:
+            if "Connection refused" in str(e):
+                self.api_key_message_bar()
+            else:
+                raise e
 
     def _on_line_tool_map_doubleclick(self):
         """
