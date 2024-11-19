@@ -675,6 +675,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool.doubleClicked.disconnect()
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
+        self.line_tool = None
         self.show()
 
     def color_duplicate_items(self, list_widget):
