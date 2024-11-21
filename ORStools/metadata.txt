@@ -3,22 +3,18 @@ name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.9.0
+version=1.10.0
 author=HeiGIT gGmbH
 email=support@smartmobility.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2024/10/29 v1.9.0
+changelog=2024/11/21 v1.10.0
     Fixed
-    - error with canvas when deleting vertices in list
+    - Error with adding waypoints after calculating routes ([#288](https://github.com/GIScience/orstools-qgis-plugin/issues/288))
 
     Added
-    - processing algorithm for the export endpoint
-    - updates to german translation
-
-    Changed
-    - remove config.yml for QgsSettings to avoid deletion of providers on update
+    - Exit digitization on right click or Escape key press ([#285](https://github.com/GIScience/orstools-qgis-plugin/issues/285))
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki

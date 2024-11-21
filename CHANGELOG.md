@@ -40,10 +40,15 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## Unreleased
+## [Unreleased]
+
+## [1.10.0] - 2024-11-21
 
 ### Added
-- Exit digitization on right click or Escape key press ([#285](https://github.com/GIScience/orstools-qgis-plugin/issues/285)) 
+- Exit digitization on right click or Escape key press ([#285](https://github.com/GIScience/orstools-qgis-plugin/issues/285))
+
+### Fixed:
+- Error with adding waypoints after calculating routes ([#288](https://github.com/GIScience/orstools-qgis-plugin/issues/288))
 
 ## [1.9.0] - 2024-10-29
 
@@ -283,7 +288,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...v1.9.0
 [1.8.4]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.2...v1.8.3
