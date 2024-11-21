@@ -428,8 +428,8 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="276"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wegpunkte aus Kartenansicht hinzufügen&lt;/p&gt;&lt;p&gt;Doppelklick beendet die Wegpunkt-Auswahl&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;The Escape key, right- or double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wegpunkte aus Kartenansicht hinzufügen&lt;/p&gt;&lt;p&gt;Escape, Rechts-  oder Doppelklick beendeen die Wegpunkt-Auswahl.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="296"/>
@@ -466,7 +466,7 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; padding: 10px; -qt-block-indent:0; text-indent:0px ; background-color:#e7f2fa; color: #999999&quot;&gt;&lt;img stype=&quot;margin: 10px&quot; src=&quot;:/plugins/ORStools/img/icon_about.png&quot; width=16 height=16 /&gt;  Sämtliche Einstellungen werden überschrieben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -776,7 +776,7 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
         <source>
                 Did you forget to set an &lt;b&gt;API key&lt;/b&gt; for openrouteservice?&lt;br&gt;&lt;br&gt;
                 
-                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. &lt;br&gt;&lt;br&gt; 
+                If you don&apos;t have an API key, please visit https://openrouteservice.org/sign-up to get one. &lt;br&gt;&lt;br&gt; 
                 Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
                 settings symbol in the main ORS Tools GUI, next to the provider dropdown.</source>
         <translation>Haben Sie einen &lt;b&gt;API-Key&lt;/b&gt; für den openrouteservice gesetzt?&lt;br&gt;&lt;br&gt;

@@ -634,7 +634,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.line_tool.pointDrawn.connect(
             lambda point, idx: self._on_linetool_map_click(point, idx)
         )
-        self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
+        self.line_tool.digitizationEnded.connect(self._on_linetool_digitization_ended)
 
     def _on_linetool_map_click(self, point: QgsPointXY, idx: int) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
@@ -666,16 +666,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             annotation = self._linetool_annotate_point(point, idx, crs)
             self.project.annotationManager().addAnnotation(annotation)
 
-    def _on_linetool_map_doubleclick(self) -> None:
+    def _on_linetool_digitization_ended(self) -> None:
         """
         Populate line list widget with coordinates, end line drawing and show dialog again.
         """
 
         self.line_tool.pointDrawn.disconnect()
-        self.line_tool.doubleClicked.disconnect()
+        self.line_tool.digitizationEnded.disconnect()
+        self.line_tool = None
+
         QApplication.restoreOverrideCursor()
         self._iface.mapCanvas().setMapTool(self.last_maptool)
-        self.line_tool = None
         self.show()
 
     def color_duplicate_items(self, list_widget):

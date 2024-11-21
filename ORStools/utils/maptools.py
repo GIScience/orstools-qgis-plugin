@@ -30,7 +30,7 @@
 from qgis.core import QgsWkbTypes
 from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis.PyQt.QtGui import QColor
 
 from ORStools import DEFAULT_COLOR
@@ -66,14 +66,22 @@ class LineTool(QgsMapToolEmitPoint):
 
     pointDrawn = pyqtSignal(["QgsPointXY", "int"])
 
+    def keyPressEvent(self, event) -> None:
+        # Check if the pressed key is the Escape key
+        if event.key() == Qt.Key_Escape:
+            self.end_digitization()
+
     def canvasReleaseEvent(self, e):
         """Add marker to canvas and shows line."""
-        new_point = self.toMapCoordinates(e.pos())
-        self.points.append(new_point)
+        if e.button() == Qt.RightButton:
+            self.end_digitization()
+        else:
+            new_point = self.toMapCoordinates(e.pos())
+            self.points.append(new_point)
 
-        # noinspection PyUnresolvedReferences
-        self.pointDrawn.emit(new_point, self.points.index(new_point))
-        self.showLine()
+            # noinspection PyUnresolvedReferences
+            self.pointDrawn.emit(new_point, self.points.index(new_point))
+            self.showLine()
 
     def showLine(self):
         """Builds rubber band from all points and adds it to the map canvas."""
@@ -84,16 +92,19 @@ class LineTool(QgsMapToolEmitPoint):
             self.rubberBand.addPoint(point, False)
         self.rubberBand.show()
 
-    doubleClicked = pyqtSignal()
+    digitizationEnded = pyqtSignal()
 
     # noinspection PyUnusedLocal
     def canvasDoubleClickEvent(self, e):
         """Ends line drawing and deletes rubber band and markers from map canvas."""
         # noinspection PyUnresolvedReferences
-        self.doubleClicked.emit()
-        self.canvas.scene().removeItem(self.rubberBand)
-        del self.rubberBand
+        self.end_digitization()
 
     def deactivate(self):
         super(LineTool, self).deactivate()
         self.deactivated.emit()
+
+    def end_digitization(self):
+        self.digitizationEnded.emit()
+        self.canvas.scene().removeItem(self.rubberBand)
+        del self.rubberBand
