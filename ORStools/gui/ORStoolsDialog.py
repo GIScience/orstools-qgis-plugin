@@ -913,17 +913,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def radius_message_box(self):
         self._iface.messageBar().pushMessage(
-            "Please use a different point",
-            """Could not find routable point within a radius of 350.0 meters of specified coordinate. 
-            Use a different point closer to a road.""",
+            self.tr("Please use a different point"),
+            self.tr("""Could not find routable point within a radius of 350.0 meters of specified coordinate. 
+            Use a different point closer to a road."""),
             level=Qgis.MessageLevel.Warning,
             duration=3,
         )
 
     def api_key_message_bar(self):
         self._iface.messageBar().pushMessage(
-            "Connection refused",
-            """Are your provider settings correct and the provider ready?""",
+            self.tr("Connection refused"),
+            self.tr("""Are your provider settings correct and the provider ready?"""),
             level=Qgis.MessageLevel.Warning,
             duration=3,
         )
