@@ -54,7 +54,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.points = []
         # self.rubberBand.reset(geometryType=QgsWkbTypes.LineGeometry)
 
-    pointReleased = pyqtSignal(["QgsPointXY", "int"])
+    pointReleased = pyqtSignal(["QEvent", "int"])
 
     def canvasReleaseEvent(self, e):
         """Add marker to canvas and shows line."""
@@ -62,7 +62,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.points.append(new_point)
 
         # noinspection PyUnresolvedReferences
-        self.pointReleased.emit(new_point, self.points.index(new_point))
+        self.pointReleased.emit(e, self.points.index(new_point))
 
     # noinspection PyUnusedLocal
     def canvasDoubleClickEvent(self, e):

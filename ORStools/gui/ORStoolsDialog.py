@@ -598,9 +598,18 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             # else clear all items and annotations
             self.routing_fromline_list.clear()
             self._clear_annotations()
-        # Remove blue lines (rubber band)
-        if self.line_tool and hasattr(self.line_tool, "rubberBand"):
-            self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
+            QApplication.restoreOverrideCursor()
+            self.canvas.setMapTool(self.last_maptool)
+            # Remove blue lines (rubber band)
+            if self.line_tool and hasattr(self.line_tool, "rubberBand"):
+                self.moved_idxs = 0
+                self.error_idxs = 0
+                self.line_tool.mouseMoved.disconnect()
+                self.line_tool.pointPressed.disconnect()
+                self.line_tool.doubleClicked.disconnect()
+                self.line_tool.pointReleased.disconnect()
+
+                self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
 
     def _linetool_annotate_point(
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
@@ -635,6 +644,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_linetool_init(self) -> None:
         """Hides GUI dialog, inits line maptool and add items to line list box."""
+        self.moved_idxs = 0
+        self.error_idxs = 0
+
         self.hide()
         self._clear_annotations()
         self.routing_fromline_list.clear()
@@ -642,7 +654,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.canvas.setMapTool(self.line_tool)
         self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
         self.line_tool.pointReleased.connect(
-            lambda point, idx: self._on_movetool_map_release(point, idx)
+            lambda event, idx: self._on_movetool_map_release(event, idx)
         )
         self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
         self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
@@ -685,7 +697,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
             self.moving = True
 
-    def _on_movetool_map_release(self, point, idx):
+    def _on_movetool_map_release(self, event, idx):
+        point = self.line_tool.toMapCoordinates(event.pos())
+        if event.button() == Qt.RightButton or event.button() == Qt.Key_Escape:
+            self._on_clear_listwidget_click()
+            return
         if self.moving:
             try:
                 self.moving = False
@@ -862,15 +878,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         """
         Populate line list widget with coordinates, end point moving and show dialog again.
         """
-        self.moved_idxs = 0
-        self.error_idxs = 0
-        self._reindex_list_items()
-        self.line_tool.mouseMoved.disconnect()
-        self.line_tool.pointPressed.disconnect()
-        self.line_tool.doubleClicked.disconnect()
-        self.line_tool.pointReleased.disconnect()
-        QApplication.restoreOverrideCursor()
-        self.canvas.setMapTool(self.last_maptool)
+        self.routing_fromline_list.takeItem(self.routing_fromline_list.count() - 1)
         self.show()
 
     def color_duplicate_items(self, list_widget):
