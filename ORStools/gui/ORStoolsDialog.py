@@ -891,17 +891,17 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _toggle_preview(self):
         if self.routing_fromline_list.count() > 0:
-            state = self.toggle_preview.isChecked()
+            state = not self.toggle_preview.isChecked()
             try:
                 self.create_rubber_band()
             except ApiError as e:
-                self.toggle_preview.setChecked(not state)
+                self.toggle_preview.setChecked(state)
                 if self.get_error_code(e) == 2010:
                     self.radius_message_box()
                 else:
                     raise e
             except Exception as e:
-                self.toggle_preview.setChecked(not state)
+                self.toggle_preview.setChecked(state)
                 if "Connection refused" in str(e):
                     self.api_key_message_bar()
                 else:
