@@ -544,7 +544,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.routing_preference_combo.currentIndexChanged.connect(self._toggle_preview)
         self.routing_travel_combo.currentIndexChanged.connect(self._toggle_preview)
 
-        self.annotation_canvas = self._iface.mapCanvas()
         self.moving = None
         self.moved_idxs = 0
         self.error_idxs = 0
