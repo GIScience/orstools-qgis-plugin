@@ -540,6 +540,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # connect live preview button to reload rubber band
         self.toggle_preview.toggled.connect(self._toggle_preview)
 
+        # connect profile enums to reload rubber band
+        self.routing_preference_combo.currentIndexChanged.connect(self._toggle_preview)
+        self.routing_travel_combo.currentIndexChanged.connect(self._toggle_preview)
+
         self.annotation_canvas = self._iface.mapCanvas()
         self.moving = None
         self.moved_idxs = 0
