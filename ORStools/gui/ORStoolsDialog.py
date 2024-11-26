@@ -28,7 +28,6 @@
 """
 
 import json
-import math
 import os
 from typing import Optional
 
@@ -39,8 +38,8 @@ except ModuleNotFoundError:
 
 import webbrowser
 
-from qgis._core import Qgis, QgsAnnotation, QgsCoordinateTransform, QgsWkbTypes
-from qgis._gui import QgisInterface, QgsRubberBand
+from qgis._core import Qgis, QgsAnnotation, QgsCoordinateTransform
+from qgis._gui import QgisInterface
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -53,7 +52,7 @@ from qgis.core import (
     QgsSettings,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem
-from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication, Qt
+from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
 from qgis.PyQt.QtWidgets import (
     QAction,
@@ -73,7 +72,6 @@ from ORStools import (
     __email__,
     __web__,
     __help__,
-    ROUTE_COLOR,
 )
 from ORStools.common import (
     client,
@@ -82,12 +80,11 @@ from ORStools.common import (
     PREFERENCES,
 )
 from ORStools.gui import directions_gui
-from ORStools.utils import exceptions, maptools, logger, configmanager, transform, router
+from ORStools.utils import exceptions, maptools, logger, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
 from . import resources_rc  # noqa: F401
-from ..utils.exceptions import ApiError
 
 
 def on_config_click(parent):
@@ -287,6 +284,7 @@ class ORStoolsDialogMain:
             # annotation.setMapLayer(layer_out)
             self.project.annotationManager().removeAnnotation(annotation)
         self.dlg.annotations = []
+        self.dlg.rubber_band.reset()
 
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()["providers"][provider_id]
@@ -427,6 +425,9 @@ Please add polygons to the layer or uncheck avoid polygons.
             layer_out.updateExtents()
             self.project.addMapLayer(layer_out)
 
+            self.dlg._clear_listwidget()
+            self.dlg.line_tool = maptools.LineTool(self.dlg)
+
             # Update quota; handled in client module after successful request
             # if provider.get('ENV_VARS'):
             #     self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
@@ -478,7 +479,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         self.canvas = self._iface.mapCanvas()
         self.last_maptool = self.canvas.mapTool()
         self.annotations = []
-        self.rubber_band = None
 
         # Set up env variables for remaining quota
         os.environ["ORS_QUOTA"] = "None"
@@ -502,7 +502,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
-        self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+        self.routing_fromline_clear.clicked.connect(self._clear_listwidget)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
         # Batch
@@ -537,17 +537,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             lambda: self.color_duplicate_items(self.routing_fromline_list)
         )
 
-        # connect live preview button to reload rubber band
-        self.toggle_preview.toggled.connect(self._toggle_preview)
-
-        # connect profile enums to reload rubber band
-        self.routing_preference_combo.currentIndexChanged.connect(self._toggle_preview)
-        self.routing_travel_combo.currentIndexChanged.connect(self._toggle_preview)
-
-        self.moving = None
-        self.moved_idxs = 0
-        self.error_idxs = 0
-        self.click_dist = 10
+        self.rubber_band = None
 
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
@@ -584,7 +574,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         for provider in providers:
             self.provider_combo.addItem(provider["name"], provider)
 
-    def _on_clear_listwidget_click(self) -> None:
+    def _clear_listwidget(self) -> None:
         """Clears the contents of the QgsListWidget and the annotations."""
         items = self.routing_fromline_list.selectedItems()
         if items:
@@ -601,15 +591,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             QApplication.restoreOverrideCursor()
             self.canvas.setMapTool(self.last_maptool)
             # Remove blue lines (rubber band)
-            if self.line_tool and hasattr(self.line_tool, "rubberBand"):
-                self.moved_idxs = 0
-                self.error_idxs = 0
-                self.line_tool.mouseMoved.disconnect()
-                self.line_tool.pointPressed.disconnect()
-                self.line_tool.doubleClicked.disconnect()
-                self.line_tool.pointReleased.disconnect()
-
-                self.line_tool.canvas.scene().removeItem(self.line_tool.rubberBand)
+            if self.rubber_band:
+                self.rubber_band.reset()
+            self.line_tool = maptools.LineTool(self)
 
     def _linetool_annotate_point(
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
@@ -644,181 +628,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def _on_linetool_init(self) -> None:
         """Hides GUI dialog, inits line maptool and add items to line list box."""
-        self.moved_idxs = 0
-        self.error_idxs = 0
-
         self.hide()
-        self._clear_annotations()
-        self.routing_fromline_list.clear()
-        self.line_tool = maptools.LineTool(self.canvas)
-        self.canvas.setMapTool(self.line_tool)
-        self.line_tool.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.line_tool.pointReleased.connect(
-            lambda event, idx: self._on_movetool_map_release(event, idx)
-        )
-        self.line_tool.doubleClicked.connect(self._on_line_tool_map_doubleclick)
-        self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-
-    def change_cursor_on_hover(self, pos):
-        hovering = self.check_annotation_hover(pos)
-        if hovering:
-            QApplication.setOverrideCursor(Qt.OpenHandCursor)
+        if self.line_tool:
+            self.canvas.setMapTool(self.line_tool)
         else:
-            if not self.moving:
-                QApplication.restoreOverrideCursor()
-
-    def check_annotation_hover(self, pos):
-        click = [pos.x(), pos.y()]
-        dists = {}
-        for i, anno in enumerate(self.annotations):
-            x, y = anno.mapPosition()
-            point = self.canvas.getCoordinateTransform().transform(x, y)  # die ist es
-            p = [point.x(), point.y()]
-
-            distance = 0.0
-            for j in range(len(click)):
-                distance += (click[j] - p[j]) ** 2
-            distance = math.sqrt(distance)
-
-            if distance > 0:
-                dists[distance] = anno
-        if dists and min(dists) < self.click_dist:
-            idx = dists[min(dists)]
-            return idx
-
-    def _on_movetool_map_press(self, pos):
-        hovering = self.check_annotation_hover(pos)
-        if hovering:
-            self.line_tool.mouseMoved.disconnect()
-            QApplication.setOverrideCursor(Qt.ClosedHandCursor)
-            if self.rubber_band:
-                self.rubber_band.reset()
-            self.move_i = self.annotations.index(hovering)
-            self.project.annotationManager().removeAnnotation(self.annotations.pop(self.move_i))
-            self.moving = True
-
-    def _on_movetool_map_release(self, event, idx):
-        point = self.line_tool.toMapCoordinates(event.pos())
-        if event.button() == Qt.RightButton or event.button() == Qt.Key_Escape:
-            self._on_clear_listwidget_click()
-            return
-        if self.moving:
-            try:
-                self.moving = False
-                QApplication.restoreOverrideCursor()
-                crs = self.canvas.mapSettings().destinationCrs()
-
-                annotation = self._linetool_annotate_point(point, self.move_i, crs=crs)
-                self.annotations.insert(self.move_i, annotation)
-                self.project.annotationManager().addAnnotation(annotation)
-
-                transformer = transform.transformToWGS(crs)
-                point_wgs = transformer.transform(point)
-
-                items = [
-                    self.routing_fromline_list.item(x).text()
-                    for x in range(self.routing_fromline_list.count())
-                ]
-                backup = items.copy()
-                items[self.move_i] = (
-                    f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
-                )
-                self.moved_idxs += 1
-
-                self.routing_fromline_list.clear()
-                for i, x in enumerate(items):
-                    coords = x.split(":")[1]
-                    item = f"Point {i}:{coords}"
-                    self.routing_fromline_list.addItem(item)
-                self.create_rubber_band()
-                self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-
-            except ApiError as e:
-                if self.get_error_code(e) == 2010:
-                    self.error_idxs += 1
-                    self.moving = False
-                    self.routing_fromline_list.clear()
-                    for i, x in enumerate(backup):
-                        coords = x.split(":")[1]
-                        item = f"Point {i}:{coords}"
-                        self.routing_fromline_list.addItem(item)
-                    self._reindex_list_items()
-                    self.radius_message_box()
-                    self.line_tool.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-                    self.moved_idxs -= 1
-                else:
-                    raise e
-            except Exception as e:
-                if "Connection refused" in str(e):
-                    self.api_key_message_bar()
-                else:
-                    raise e
-
-        else:
-            try:
-                idx -= self.moved_idxs
-                idx -= self.error_idxs
-                self.create_vertex(point, idx)
-
-                if self.routing_fromline_list.count() > 1:
-                    self.create_rubber_band()
-                    self.moving = False
-            except ApiError as e:
-                if self.get_error_code(e) == 2010:
-                    self.error_idxs += 1
-                    num = len(self.routing_fromline_list) - 1
-
-                    if num < 2:
-                        self.routing_fromline_list.clear()
-                        self._clear_annotations()
-                    else:
-                        self.routing_fromline_list.takeItem(num)
-                        self._reindex_list_items()
-                        self.create_rubber_band()
-
-                    self.radius_message_box()
-                else:
-                    raise e
-            except Exception as e:
-                if "Connection refused" in str(e):
-                    self.api_key_message_bar()
-                else:
-                    raise e
-
-    def create_rubber_band(self):
-        if self.rubber_band:
-            self.rubber_band.reset()
-        self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
-        color = QColor(ROUTE_COLOR)
-        color.setAlpha(100)
-        self.rubber_band.setStrokeColor(color)
-        self.rubber_band.setWidth(5)
-        if self.toggle_preview.isChecked():
-            route_layer = router.route_as_layer(self)
-            if route_layer:
-                feature = next(route_layer.getFeatures())
-                self.rubber_band.addGeometry(feature.geometry(), route_layer)
-                self.rubber_band.show()
-            else:
-                self._clear_annotations()
-                self._on_clear_listwidget_click()
-        else:
-            dest_crs = self.canvas.mapSettings().destinationCrs()
-            original_crs = QgsCoordinateReferenceSystem("EPSG:4326")
-            transform = QgsCoordinateTransform(original_crs, dest_crs, QgsProject.instance())
-            items = [
-                self.routing_fromline_list.item(x).text()
-                for x in range(self.routing_fromline_list.count())
-            ]
-            split = [x.split(":")[1] for x in items]
-            coords = [tuple(map(float, coord.split(", "))) for coord in split]
-            points_xy = [QgsPointXY(x, y) for x, y in coords]
-            reprojected_point = [transform.transform(point) for point in points_xy]
-            for point in reprojected_point:
-                if point == reprojected_point[-1]:
-                    self.rubber_band.addPoint(point, True)
-                self.rubber_band.addPoint(point, False)
-            self.rubber_band.show()
+            self.line_tool = maptools.LineTool(self)
+            self.canvas.setMapTool(self.line_tool)
 
     def create_vertex(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
@@ -831,17 +646,6 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         crs = self.canvas.mapSettings().destinationCrs()
         annotation = self._linetool_annotate_point(point, idx, crs)
         self.annotations.append(annotation)
-        self.project.annotationManager().addAnnotation(annotation)
-
-    def _on_linetool_map_click(self, point: QgsPointXY, idx: int) -> None:
-        """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self.canvas.mapSettings().destinationCrs()
-
-        transformer = transform.transformToWGS(map_crs)
-        point_wgs = transformer.transform(point)
-        self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
-
-        annotation = self._linetool_annotate_point(point, idx)
         self.project.annotationManager().addAnnotation(annotation)
 
     def _reindex_list_items(self) -> None:
@@ -867,19 +671,12 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
         try:
-            self.create_rubber_band()
+            self.line_tool.create_rubber_band()
         except Exception as e:
             if "Connection refused" in str(e):
                 self.api_key_message_bar()
             else:
                 raise e
-
-    def _on_line_tool_map_doubleclick(self):
-        """
-        Populate line list widget with coordinates, end point moving and show dialog again.
-        """
-        self.routing_fromline_list.takeItem(self.routing_fromline_list.count() - 1)
-        self.show()
 
     def color_duplicate_items(self, list_widget):
         item_dict = {}
@@ -896,45 +693,3 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 for index in indices:
                     item = list_widget.item(index)
                     item.setBackground(QColor("lightsalmon"))
-
-    def _toggle_preview(self):
-        if self.routing_fromline_list.count() > 0:
-            state = not self.toggle_preview.isChecked()
-            try:
-                self.create_rubber_band()
-            except ApiError as e:
-                self.toggle_preview.setChecked(state)
-                if self.get_error_code(e) == 2010:
-                    self.radius_message_box()
-                else:
-                    raise e
-            except Exception as e:
-                self.toggle_preview.setChecked(state)
-                if "Connection refused" in str(e):
-                    self.api_key_message_bar()
-                else:
-                    raise e
-
-    def get_error_code(self, e):
-        json_start_index = e.message.find("{")
-        json_end_index = e.message.rfind("}") + 1
-        json_str = e.message[json_start_index:json_end_index]
-        error_dict = json.loads(json_str)
-        return error_dict["error"]["code"]
-
-    def radius_message_box(self):
-        self._iface.messageBar().pushMessage(
-            self.tr("Please use a different point"),
-            self.tr("""Could not find routable point within a radius of 350.0 meters of specified coordinate. 
-            Use a different point closer to a road."""),
-            level=Qgis.MessageLevel.Warning,
-            duration=3,
-        )
-
-    def api_key_message_bar(self):
-        self._iface.messageBar().pushMessage(
-            self.tr("Connection refused"),
-            self.tr("""Are your provider settings correct and the provider ready?"""),
-            level=Qgis.MessageLevel.Warning,
-            duration=3,
-        )
