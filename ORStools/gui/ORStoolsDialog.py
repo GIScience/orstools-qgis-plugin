@@ -40,6 +40,7 @@ import webbrowser
 
 from qgis._core import Qgis, QgsAnnotation
 from qgis._gui import QgisInterface
+from qgis.PyQt import uic
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -54,7 +55,7 @@ from qgis.core import (
 from qgis.gui import QgsMapCanvasAnnotationItem
 
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
+from qgis.PyQt.QtGui import QTextDocument, QColor
 from qgis.PyQt.QtWidgets import (
     QAction,
     QDialog,
@@ -66,7 +67,6 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ORStools import (
-    RESOURCE_PREFIX,
     PLUGIN_NAME,
     DEFAULT_COLOR,
     __version__,
@@ -81,11 +81,8 @@ from ORStools.common import (
     PREFERENCES,
 )
 from ORStools.gui import directions_gui
-from ORStools.utils import exceptions, maptools, logger, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
-from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
-
-from . import resources_rc  # noqa: F401
+from ORStools.utils import exceptions, maptools, logger, configmanager, transform, gui
 
 
 def on_config_click(parent):
@@ -153,19 +150,7 @@ class ORStoolsDialogMain:
     def initGui(self) -> None:
         """Called when plugin is activated (on QGIS startup or when activated in Plugin Manager)."""
 
-        def create_icon(f: str) -> QIcon:
-            """
-            internal function to create action icons
-
-            :param f: file name of icon.
-            :type f: str
-
-            :returns: icon object to insert to QAction
-            :rtype: QIcon
-            """
-            return QIcon(RESOURCE_PREFIX + f)
-
-        icon_plugin = create_icon("icon_orstools.png")
+        icon_plugin = gui.GuiUtils.get_icon("icon_orstools.png")
 
         self.actions = [
             QAction(
@@ -175,14 +160,18 @@ class ORStoolsDialogMain:
             ),
             # Config dialog
             QAction(
-                create_icon("icon_settings.png"),
+                gui.GuiUtils.get_icon("icon_settings.png"),
                 self.tr("Provider Settings"),
                 self.iface.mainWindow(),
             ),
             # About dialog
-            QAction(create_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()
+            ),
             # Help page
-            QAction(create_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()
+            ),
         ]
 
         # Create menu
@@ -454,7 +443,10 @@ Please add polygons to the layer or uncheck avoid polygons.
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
 
-class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
+MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
+
+
+class ORStoolsDialog(QDialog, MAIN_WIDGET):
     """Define the custom behaviour of Dialog"""
 
     def __init__(self, iface: QgisInterface, parent=None) -> None:
@@ -534,6 +526,15 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         )
 
         self.annotation_canvas = self._iface.mapCanvas()
+
+        # Add icons to buttons
+        self.routing_fromline_map.setIcon(gui.GuiUtils.get_icon("icon_add.png"))
+        self.routing_fromline_clear.setIcon(gui.GuiUtils.get_icon("icon_clear.png"))
+        self.save_vertices.setIcon(gui.GuiUtils.get_icon("save_vertices.png"))
+        self.provider_refresh.setIcon(gui.GuiUtils.get_icon("icon_refresh.png"))
+        self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
+        self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
+        self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
 
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
