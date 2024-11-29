@@ -280,7 +280,8 @@ class LineTool(QgsMapToolEmitPoint):
             for point in reprojected_point:
                 if point == reprojected_point[-1]:
                     self.dlg.rubber_band.addPoint(point, True)
-                self.dlg.rubber_band.addPoint(point, False)
+                else:
+                    self.dlg.rubber_band.addPoint(point, False)
             self.dlg.rubber_band.show()
 
     def get_error_code(self, e):
