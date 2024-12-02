@@ -31,6 +31,8 @@ import json
 import os
 from typing import Optional
 
+from ..utils.router import route_as_layer
+
 try:
     import processing
 except ModuleNotFoundError:
@@ -256,11 +258,6 @@ class ORStoolsDialogMain:
 
     def run_gui_control(self) -> None:
         """Slot function for OK button of main dialog."""
-
-        layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
-        layer_out.dataProvider().addAttributes(directions_core.get_fields())
-        layer_out.updateFields()
-
         basepath = os.path.dirname(__file__)
 
         # add ors svg path
@@ -270,10 +267,7 @@ class ORStoolsDialogMain:
             svg_paths.append(my_new_path)
             QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
 
-        # style output layer
-        qml_path = os.path.join(basepath, "linestyle.qml")
-        layer_out.loadNamedStyle(qml_path, True)
-        layer_out.triggerRepaint()
+
 
         # Associate annotations with map layer, so they get deleted when layer is deleted
         for annotation in self.dlg.annotations:
@@ -286,172 +280,17 @@ class ORStoolsDialogMain:
         self.dlg.annotations = []
         self.dlg.rubber_band.reset()
 
-        provider_id = self.dlg.provider_combo.currentIndex()
-        provider = configmanager.read_config()["providers"][provider_id]
+        layer_out = route_as_layer(self.dlg)
 
-        # if there are no coordinates, throw an error message
-        if not self.dlg.routing_fromline_list.count():
-            QMessageBox.critical(
-                self.dlg,
-                self.tr("Missing Waypoints"),
-                self.tr(
-                    """
-                Did you forget to set routing waypoints?<br><br>
-                
-                Use the 'Add Waypoint' button to add up to 50 waypoints.
-                """
-                ),
-            )
-            return
+        # style output layer
+        qml_path = os.path.join(basepath, "linestyle.qml")
+        layer_out.loadNamedStyle(qml_path, True)
+        layer_out.triggerRepaint()
 
-        # if no API key is present, when ORS is selected, throw an error message
-        if not provider["key"] and provider["base_url"].startswith(
-            "https://api.openrouteservice.org"
-        ):
-            QMessageBox.critical(
-                self.dlg,
-                self.tr("Missing API key"),
-                self.tr(
-                    """
-                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
-                
-                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
-                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""
-                ),
-            )
-            return
+        self.project.addMapLayer(layer_out)
 
-        agent = "QGIS_ORStoolsDialog"
-        clnt = client.Client(provider, agent)
-        clnt_msg = ""
-
-        directions = directions_gui.Directions(self.dlg)
-        params = None
-        try:
-            params = directions.get_parameters()
-            if self.dlg.optimization_group.isChecked():
-                # check for duplicate points
-                points = [
-                    self.dlg.routing_fromline_list.item(x).text()
-                    for x in range(self.dlg.routing_fromline_list.count())
-                ]
-                if len(points) != len(set(points)):
-                    QMessageBox.warning(
-                        self.dlg,
-                        self.tr("Duplicates"),
-                        self.tr(
-                            """
-                            There are duplicate points in the input layer. Traveling Salesman Optimization does not allow this.
-                            Either remove the duplicates or deselect Traveling Salesman.
-                            """
-                        ),
-                    )
-                    msg = self.tr("The request has been aborted!")
-                    logger.log(msg, 0)
-                    self.dlg.debug_text.setText(msg)
-                    return
-
-                if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
-                    QMessageBox.critical(
-                        self.dlg,
-                        self.tr("Wrong number of waypoints"),
-                        self.tr("""
-                        At least 3 or 4 waypoints are needed to perform routing optimization. 
-
-Remember, the first and last location are not part of the optimization.
-                        """),
-                    )
-                    return
-                response = clnt.request("/optimization", {}, post_json=params)
-
-                if self.dlg.export_jobs_order.isChecked():
-                    items = list()
-                    for route in response["routes"]:
-                        for i, step in enumerate(route["steps"]):
-                            location = step["location"]
-                            items.append(location)
-
-                    point_layer = QgsVectorLayer(
-                        "point?crs=epsg:4326&field=ID:integer", "Steps", "memory"
-                    )
-
-                    point_layer.updateFields()
-                    for idx, coords in enumerate(items):
-                        x, y = coords
-                        feature = QgsFeature()
-                        feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x, y)))
-                        feature.setAttributes([idx])
-
-                        point_layer.dataProvider().addFeature(feature)
-                    QgsProject.instance().addMapLayer(point_layer)
-                    self.dlg._iface.mapCanvas().refresh()
-
-                feat = directions_core.get_output_features_optimization(
-                    response, params["vehicles"][0]["profile"]
-                )
-            else:
-                params["coordinates"] = directions.get_request_line_feature()
-                profile = self.dlg.routing_travel_combo.currentText()
-                # abort on empty avoid polygons layer
-                if (
-                    "options" in params
-                    and "avoid_polygons" in params["options"]
-                    and params["options"]["avoid_polygons"] == {}
-                ):
-                    QMessageBox.warning(
-                        self.dlg,
-                        self.tr("Empty layer"),
-                        self.tr(
-                            """
-The specified avoid polygon(s) layer does not contain any features.
-Please add polygons to the layer or uncheck avoid polygons.
-                        """
-                        ),
-                    )
-                    msg = self.tr("The request has been aborted!")
-                    logger.log(msg, 0)
-                    self.dlg.debug_text.setText(msg)
-                    return
-                response = clnt.request(
-                    "/v2/directions/" + profile + "/geojson", {}, post_json=params
-                )
-                feat = directions_core.get_output_feature_directions(
-                    response, profile, params["preference"], directions.options
-                )
-
-            layer_out.dataProvider().addFeature(feat)
-
-            layer_out.updateExtents()
-            self.project.addMapLayer(layer_out)
-
-            self.dlg._clear_listwidget()
-            self.dlg.line_tool = maptools.LineTool(self.dlg)
-
-            # Update quota; handled in client module after successful request
-            # if provider.get('ENV_VARS'):
-            #     self.dlg.quota_text.setText(self.get_quota(provider) + ' calls')
-        except exceptions.Timeout:
-            msg = self.tr("The connection has timed out!")
-            logger.log(msg, 2)
-            self.dlg.debug_text.setText(msg)
-            return
-
-        except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
-            clnt_msg += f"<b>{e.__class__.__name__}</b>: ({str(e)})<br>"
-            raise
-
-        except Exception as e:
-            logger.log(f"{e.__class__.__name__}: {str(e)}", 2)
-            clnt_msg += f"<b>{e.__class__.__name__}</b>: {str(e)}<br>"
-            raise
-
-        finally:
-            # Set URL in debug window
-            if params:
-                clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
-            self.dlg.debug_text.setHtml(clnt_msg)
+        self.dlg._clear_listwidget()
+        self.dlg.line_tool = maptools.LineTool(self.dlg)
 
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
