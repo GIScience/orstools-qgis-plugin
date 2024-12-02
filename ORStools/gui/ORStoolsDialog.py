@@ -27,7 +27,6 @@
  ***************************************************************************/
 """
 
-import json
 import os
 from typing import Optional
 
@@ -76,13 +75,10 @@ from ORStools import (
     __help__,
 )
 from ORStools.common import (
-    client,
-    directions_core,
     PROFILES,
     PREFERENCES,
 )
-from ORStools.gui import directions_gui
-from ORStools.utils import exceptions, maptools, logger, configmanager, transform
+from ORStools.utils import maptools, configmanager, transform
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
@@ -266,8 +262,6 @@ class ORStoolsDialogMain:
         if my_new_path not in svg_paths:
             svg_paths.append(my_new_path)
             QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
-
-
 
         # Associate annotations with map layer, so they get deleted when layer is deleted
         for annotation in self.dlg.annotations:
