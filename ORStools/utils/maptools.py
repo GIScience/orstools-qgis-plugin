@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import json
 import math
 
@@ -44,7 +45,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QApplication,
-
 )
 
 from ORStools import ROUTE_COLOR
@@ -76,9 +76,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.dlg.routing_travel_combo.currentIndexChanged.connect(self._toggle_preview)
 
         self.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.pointReleased.connect(
-            lambda event, idx: self._on_movetool_map_release(event, idx)
-        )
+        self.pointReleased.connect(lambda event, idx: self._on_movetool_map_release(event, idx))
         self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
         self.last_click = "single-click"
@@ -145,7 +143,9 @@ class LineTool(QgsMapToolEmitPoint):
             if self.dlg.rubber_band:
                 self.dlg.rubber_band.reset()
             self.move_i = self.dlg.annotations.index(hovering)
-            self.dlg.project.annotationManager().removeAnnotation(self.dlg.annotations.pop(self.move_i))
+            self.dlg.project.annotationManager().removeAnnotation(
+                self.dlg.annotations.pop(self.move_i)
+            )
             self.moving = True
 
     def canvasReleaseEvent(self, event):
@@ -307,6 +307,7 @@ class LineTool(QgsMapToolEmitPoint):
             level=Qgis.MessageLevel.Warning,
             duration=3,
         )
+
     def _toggle_preview(self):
         if self.dlg.routing_fromline_list.count() > 0:
             state = not self.dlg.toggle_preview.isChecked()
