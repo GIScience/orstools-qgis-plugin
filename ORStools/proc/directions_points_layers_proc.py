@@ -45,7 +45,7 @@ from qgis.core import (
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, EXTRA_INFOS
-from ORStools.utils import transform, exceptions, logger, configmanager
+from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
@@ -236,7 +236,9 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             )
 
             try:
-                endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])["directions"]
+                endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                    "directions"
+                ]
                 response = ors_client.request(
                     f"/v2/{endpoint}/" + profile + "/geojson", {}, post_json=params
                 )

@@ -46,7 +46,7 @@ from qgis.core import (
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
-from ORStools.utils import transform, exceptions, logger, configmanager
+from ORStools.utils import transform, exceptions, logger
 
 
 # noinspection PyPep8Naming
@@ -194,7 +194,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])["isochrones"]
+                endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                    "isochrones"
+                ]
                 response = ors_client.request(f"/v2/{endpoint}/" + profile, {}, post_json=params)
 
                 for isochrone in self.isochrones.get_features(response, params["id"]):

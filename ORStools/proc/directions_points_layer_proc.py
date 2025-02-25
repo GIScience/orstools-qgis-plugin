@@ -52,7 +52,7 @@ from qgis.core import (
 )
 
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
-from ORStools.utils import transform, exceptions, logger, configmanager
+from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
 
@@ -228,7 +228,9 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                         )
 
                     params = get_params_optimize(points, profile, optimization_mode)
-                    endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])["optimization"]
+                    endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                        "optimization"
+                    ]
                     response = ors_client.request(f"{endpoint}/", {}, post_json=params)
 
                     sink.addFeature(
@@ -264,7 +266,9 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     params = directions_core.build_default_parameters(
                         preference, point_list=points, options=options, extra_info=extra_info
                     )
-                    endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])["directions"]
+                    endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                        "directions"
+                    ]
                     response = ors_client.request(
                         f"/v2/{endpoint}/" + profile + "/geojson", {}, post_json=params
                     )
