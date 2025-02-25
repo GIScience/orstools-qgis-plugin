@@ -89,6 +89,20 @@ class ORStools:
     def add_default_provider_to_settings(self):
         s = QgsSettings()
         settings = s.value("ORStools/config")
+
+        settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
+
+        # Add any new settings here for backwards compatibility
+        changed = False
+        for i, provider in enumerate(settings["providers"]):
+            if any([i in provider for i in settings_keys]):
+                changed = True
+                # Here, like the endpoints
+                provider["endpoints"] = ENDPOINTS
+                settings["providers"][i] = provider
+        if changed:
+            s.setValue("ORStools/config", settings)
+
         if not settings:
             def_settings = {
                 "providers": [
@@ -101,7 +115,7 @@ class ORStools:
                         "key": "",
                         "name": "openrouteservice",
                         "timeout": 60,
-                        "endpoints": ENDPOINTS
+                        "endpoints": ENDPOINTS,
                     }
                 ]
             }
