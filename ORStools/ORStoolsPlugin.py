@@ -33,7 +33,7 @@ from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
 
 from .gui import ORStoolsDialog
-from .proc import provider
+from .proc import provider, ENDPOINTS
 
 
 class ORStools:
@@ -101,6 +101,7 @@ class ORStools:
                         "key": "",
                         "name": "openrouteservice",
                         "timeout": 60,
+                        "endpoints": ENDPOINTS
                     }
                 ]
             }
