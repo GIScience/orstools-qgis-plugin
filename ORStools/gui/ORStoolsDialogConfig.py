@@ -158,7 +158,9 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
-    def _add_box(self, name: str, url: str, key: str, timeout: int, new: bool = False) -> None:
+    def _add_box(
+        self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
+    ) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
 
@@ -176,7 +178,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         """
         if new:
             self.temp_config["providers"].append(
-                dict(name=name, base_url=url, key=key, timeout=timeout)
+                dict(name=name, base_url=url, key=key, timeout=timeout, endpoints=endpoints)
             )
 
         provider = QgsCollapsibleGroupBox(self.providers)
@@ -184,32 +186,115 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         provider.setTitle(name)
         gridLayout_3 = QtWidgets.QGridLayout(provider)
         gridLayout_3.setObjectName(name + "_grid")
+
+        # API Key section
         key_label = QtWidgets.QLabel(provider)
         key_label.setObjectName(name + "_key_label")
         key_label.setText(self.tr("API Key"))
         gridLayout_3.addWidget(key_label, 0, 0, 1, 1)
+
         key_text = QtWidgets.QLineEdit(provider)
         key_text.setObjectName(name + "_key_text")
         key_text.setText(key)
         gridLayout_3.addWidget(key_text, 1, 0, 1, 4)
+
+        # Base URL section
         base_url_label = QtWidgets.QLabel(provider)
         base_url_label.setObjectName("base_url_label")
         base_url_label.setText(self.tr("Base URL"))
         gridLayout_3.addWidget(base_url_label, 2, 0, 1, 1)
+
         base_url_text = QtWidgets.QLineEdit(provider)
         base_url_text.setObjectName(name + "_base_url_text")
         base_url_text.setText(url)
         gridLayout_3.addWidget(base_url_text, 3, 0, 1, 4)
 
+        # Timeout section
         timeout_label = QtWidgets.QLabel(provider)
         timeout_label.setObjectName("timeout_label")
         timeout_label.setText(self.tr("Request timeout in seconds (1 - 3600)"))
         gridLayout_3.addWidget(timeout_label, 4, 0, 1, 1)
+
         timeout_text = QtWidgets.QLineEdit(provider)
         timeout_text.setObjectName(name + "_timeout_text")
         timeout_text.setText(str(timeout))
         timeout_text.setValidator(QIntValidator(1, 3600, timeout_text))
         gridLayout_3.addWidget(timeout_text, 5, 0, 1, 4)
+
+        # Service Endpoints title (bold)
+        title_label = QtWidgets.QLabel(provider)
+        title_label.setObjectName(name + "_service_endpoints_label")
+        title_label.setText(self.tr("Service Endpoints"))
+        font = title_label.font()
+        font.setBold(True)
+        title_label.setFont(font)
+        gridLayout_3.addWidget(title_label, 6, 0, 1, 4)
+
+        # Directions endpoint
+        directions_label = QtWidgets.QLabel(provider)
+        directions_label.setObjectName(name + "_directions_label")
+        directions_label.setText(self.tr("Directions"))
+        gridLayout_3.addWidget(directions_label, 7, 0, 1, 1)
+
+        directions_lineedit = QtWidgets.QLineEdit(provider)
+        directions_lineedit.setObjectName(name + "_directions_lineedit")
+        directions_lineedit.setText(endpoints["directions"])
+        gridLayout_3.addWidget(directions_lineedit, 7, 1, 1, 3)
+
+        # Isochrones endpoint
+        isochrones_label = QtWidgets.QLabel(provider)
+        isochrones_label.setObjectName(name + "_isochrones_label")
+        isochrones_label.setText(self.tr("Isochrones"))
+        gridLayout_3.addWidget(isochrones_label, 8, 0, 1, 1)
+
+        isochrones_lineedit = QtWidgets.QLineEdit(provider)
+        isochrones_lineedit.setObjectName(name + "_isochrones_lineedit")
+        isochrones_lineedit.setText(endpoints["isochrones"])
+        gridLayout_3.addWidget(isochrones_lineedit, 8, 1, 1, 3)
+
+        # Matrix endpoint
+        matrix_label = QtWidgets.QLabel(provider)
+        matrix_label.setObjectName(name + "_matrix_label")
+        matrix_label.setText(self.tr("Matrix"))
+        gridLayout_3.addWidget(matrix_label, 9, 0, 1, 1)
+
+        matrix_lineedit = QtWidgets.QLineEdit(provider)
+        matrix_lineedit.setObjectName(name + "_matrix_lineedit")
+        matrix_lineedit.setText(endpoints["matrix"])
+        gridLayout_3.addWidget(matrix_lineedit, 9, 1, 1, 3)
+
+        # Optimization endpoint
+        optimization_label = QtWidgets.QLabel(provider)
+        optimization_label.setObjectName(name + "_optimization_label")
+        optimization_label.setText(self.tr("Optimization"))
+        gridLayout_3.addWidget(optimization_label, 10, 0, 1, 1)
+
+        optimization_lineedit = QtWidgets.QLineEdit(provider)
+        optimization_lineedit.setObjectName(name + "_optimization_lineedit")
+        optimization_lineedit.setText(endpoints["optimization"])
+        gridLayout_3.addWidget(optimization_lineedit, 10, 1, 1, 3)
+
+        # Export endpoint
+        export_label = QtWidgets.QLabel(provider)
+        export_label.setObjectName(name + "_export_label")
+        export_label.setText(self.tr("Export"))
+        gridLayout_3.addWidget(export_label, 11, 0, 1, 1)
+
+        export_lineedit = QtWidgets.QLineEdit(provider)
+        export_lineedit.setObjectName(name + "_export_lineedit")
+        export_lineedit.setText(endpoints["export"])
+        gridLayout_3.addWidget(export_lineedit, 11, 1, 1, 3)
+
+        # Snapping endpoint
+        snapping_label = QtWidgets.QLabel(provider)
+        snapping_label.setObjectName(name + "_snapping_label")
+        snapping_label.setText(self.tr("Snapping"))
+        gridLayout_3.addWidget(snapping_label, 12, 0, 1, 1)
+
+        snapping_lineedit = QtWidgets.QLineEdit(provider)
+        snapping_lineedit.setObjectName(name + "_snapping_lineedit")
+        snapping_lineedit.setText(endpoints["snapping"])
+        gridLayout_3.addWidget(snapping_lineedit, 12, 1, 1, 3)
 
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
