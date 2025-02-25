@@ -36,6 +36,7 @@ from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
+from ..proc import ENDPOINTS
 
 
 class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
@@ -63,22 +64,48 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
 
     def accept(self) -> None:
-        """When the OK Button is clicked, in-memory temp_config is updated and written to config.yml"""
+        """When the OK Button is clicked, in-memory temp_config is updated and written to settings"""
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for idx, box in enumerate(collapsible_boxes):
             current_provider = self.temp_config["providers"][idx]
+
             current_provider["key"] = box.findChild(
                 QtWidgets.QLineEdit, box.title() + "_key_text"
             ).text()
+
             current_provider["base_url"] = box.findChild(
                 QtWidgets.QLineEdit, box.title() + "_base_url_text"
             ).text()
+
             timeout_input = box.findChild(QtWidgets.QLineEdit, box.title() + "_timeout_text")
             # https://doc.qt.io/qt-5/qvalidator.html#State-enum
+
             if timeout_input.validator().State() != 2:
                 self._adjust_timeout_input(timeout_input)
+
             current_provider["timeout"] = int(timeout_input.text())
+
+            current_provider["endpoints"] = {
+                "directions": box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_directions_lineedit"
+                ).text(),
+                "isochrones": box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_isochrones_lineedit"
+                ).text(),
+                "matrix": box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_matrix_lineedit"
+                ).text(),
+                "optimization": box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_optimization_lineedit"
+                ).text(),
+                "export": box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_export_lineedit"
+                ).text(),
+                "snapping": box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_snapping_lineedit"
+                ).text(),
+            }
 
         configmanager.write_config(self.temp_config)
         self.close()
@@ -109,6 +136,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                 provider_entry["base_url"],
                 provider_entry["key"],
                 provider_entry["timeout"],
+                provider_entry["endpoints"],
                 new=False,
             )
 
@@ -128,7 +156,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             self, self.tr("New ORS provider"), self.tr("Enter a name for the provider")
         )
         if ok:
-            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, new=True)
+            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, new=True)
 
     def _remove_provider(self) -> None:
         """Remove list of providers from list."""
