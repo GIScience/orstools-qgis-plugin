@@ -47,7 +47,7 @@ from qgis.PyQt.QtCore import QVariant
 
 
 from ORStools.common import PROFILES
-from ORStools.utils import exceptions, logger
+from ORStools.utils import exceptions, logger, configmanager
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
@@ -108,7 +108,8 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request("/v2/export/" + profile, {}, post_json=params)
+            endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])["export"]
+            response = ors_client.request(f"/v2/{endpoint}/" + profile, {}, post_json=params)
             nodes_dict = {item["nodeId"]: item["location"] for item in response["nodes"]}
             edges = response["edges"]
             for edge in edges:
