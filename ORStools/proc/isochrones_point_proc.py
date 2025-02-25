@@ -42,7 +42,7 @@ from qgis.core import (
 )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
-from ORStools.utils import exceptions, logger, configmanager
+from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 
@@ -151,7 +151,9 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         )
 
         try:
-            endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])["isochrones"]
+            endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                "isochrones"
+            ]
             response = ors_client.request(f"/v2/{endpoint}/" + profile, {}, post_json=params)
 
             # Populate features from response

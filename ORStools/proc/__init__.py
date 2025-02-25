@@ -26,7 +26,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-ENDPOINTS =  {
+
+ENDPOINTS = {
     "directions": "directions",
     "isochrones": "isochrones",
     "matrix": "matrix",

@@ -29,7 +29,6 @@
 
 from typing import Dict
 
-from numpy.matrixlib.defmatrix import matrix
 from qgis.core import (
     QgsWkbTypes,
     QgsFeature,
@@ -46,7 +45,7 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QVariant
 
 from ORStools.common import PROFILES
-from ORStools.utils import transform, exceptions, logger, configmanager
+from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
 

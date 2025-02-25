@@ -94,12 +94,12 @@ class ORStools:
 
         # Add any new settings here for backwards compatibility
         changed = False
-        for i, provider in enumerate(settings["providers"]):
-            if any([i in provider for i in settings_keys]):
+        for i, prov in enumerate(settings["providers"]):
+            if any([i in prov for i in settings_keys]):
                 changed = True
                 # Here, like the endpoints
-                provider["endpoints"] = ENDPOINTS
-                settings["providers"][i] = provider
+                prov["endpoints"] = ENDPOINTS
+                settings["providers"][i] = prov
         if changed:
             s.setValue("ORStools/config", settings)
 
