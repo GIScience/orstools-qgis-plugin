@@ -30,18 +30,13 @@
 import json
 import math
 
-from qgis.gui import QgsMapToolEmitPoint
-
-from PyQt5.QtCore import pyqtSignal
-
-from qgis._core import Qgis, QgsCoordinateTransform, QgsWkbTypes
-from qgis._gui import QgsRubberBand
+from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 from qgis.core import (
     QgsProject,
     QgsPointXY,
-    QgsCoordinateReferenceSystem,
+    QgsCoordinateReferenceSystem, Qgis, QgsCoordinateTransform, QgsWkbTypes, QgsAnnotation, QgsMarkerSymbol
 )
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QApplication,
@@ -66,6 +61,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.crsSrc = self.dlg.canvas.mapSettings().destinationCrs()
         self.previous_point = None
         self.points = []
+        self.last_point = None
         self.reset()
 
         # connect live preview button to reload rubber band
@@ -89,7 +85,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     def reset(self):
         """reset rubber band and captured points."""
-
+        self.last_point = None
         self.points = []
 
     pointReleased = pyqtSignal(["QEvent", "int"])
@@ -134,6 +130,17 @@ class LineTool(QgsMapToolEmitPoint):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.dlg._clear_listwidget()
+        elif event.key() == Qt.Key_D:
+            if self.last_point:
+                index = int(self.last_point["annotation"].document().toPlainText())
+                if self.dlg.annotations:
+                    self.dlg.project.annotationManager().removeAnnotation(self.dlg.annotations.pop(index))
+                    self.dlg.routing_fromline_list.takeItem(index)
+                    self.dlg._reindex_list_items()
+                    self.last_point = None
+            if self.dlg.routing_fromline_list.count() < 1:
+                self.dlg._clear_listwidget()
+
 
     def canvasPressEvent(self, event):
         hovering = self.check_annotation_hover(event.pos())
@@ -185,6 +192,7 @@ class LineTool(QgsMapToolEmitPoint):
                         item = f"Point {i}:{coords}"
                         self.dlg.routing_fromline_list.addItem(item)
                     self.create_rubber_band()
+                    self.save_last_point(point, annotation)
                     self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
 
                 except ApiError as e:
@@ -325,3 +333,17 @@ class LineTool(QgsMapToolEmitPoint):
                     self.api_key_message_bar()
                 else:
                     raise e
+
+    def save_last_point(self, point: QgsPointXY, annotation: QgsAnnotation) -> None:
+        """Saves tha last point and makes it deletable."""
+        self.last_point = {"point": point, "annotation": annotation}
+
+        for old_annotation in self.dlg.annotations:
+            color = old_annotation.markerSymbol().symbolLayer(0).color().name()
+            if color == "#ffff00":
+                symbol = QgsMarkerSymbol.createSimple({'color': 'red'})
+                old_annotation.setMarkerSymbol(symbol)
+
+        symbol = QgsMarkerSymbol.createSimple({'color': 'yellow'})
+        annotation.setMarkerSymbol(symbol)
+
