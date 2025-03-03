@@ -37,17 +37,17 @@ ENDPOINTS = {
 }
 
 DEFAULT_SETTINGS = {
-                "providers": [
-                    {
-                        "ENV_VARS": {
-                            "ORS_QUOTA": "X-Ratelimit-Limit",
-                            "ORS_REMAINING": "X-Ratelimit-Remaining",
-                        },
-                        "base_url": "https://api.openrouteservice.org",
-                        "key": "",
-                        "name": "openrouteservice",
-                        "timeout": 60,
-                        "endpoints": ENDPOINTS,
-                    }
-                ]
-            }
+    "providers": [
+        {
+            "ENV_VARS": {
+                "ORS_QUOTA": "X-Ratelimit-Limit",
+                "ORS_REMAINING": "X-Ratelimit-Remaining",
+            },
+            "base_url": "https://api.openrouteservice.org",
+            "key": "",
+            "name": "openrouteservice",
+            "timeout": 60,
+            "endpoints": ENDPOINTS,
+        }
+    ]
+}
