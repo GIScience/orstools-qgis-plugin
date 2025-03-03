@@ -28,9 +28,9 @@
 """
 from qgis.gui import QgsCollapsibleGroupBox
 
-from PyQt5 import QtWidgets
+from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QMetaObject
-from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit, QDialogButtonBox
+from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit, QDialogButtonBox, QMessageBox, QWidget
 from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
@@ -58,6 +58,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         self.provider_add.clicked.connect(self._add_provider)
         self.provider_remove.clicked.connect(self._remove_provider)
+        self.providers_reset.clicked.connect(self._reset_all_providers)
 
         # Change OK to Save in config window
         self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
@@ -66,9 +67,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         """When the OK Button is clicked, in-memory temp_config is updated and written to settings"""
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
+        collapsible_boxes = [i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName()]
         for idx, box in enumerate(collapsible_boxes):
-            if "_provider_endpoints" in box.objectName():
-                continue
             current_provider = self.temp_config["providers"][idx]
 
             current_provider["key"] = box.findChild(
@@ -187,6 +187,49 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for box in collapsible_boxes:
             box.setCollapsed(True)
+
+    def _reset_all_providers(self) -> None:
+        """Reset all providers."""
+
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setWindowTitle("Confirm Reset")
+        msg_box.setText("Are you sure you want to delete all providers? This action cannot be undone.")
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+        result = msg_box.exec()
+        if result == QMessageBox.Yes:
+            print("yes")
+            for box_remove in self.providers.findChildren(QWidget):
+                print("Removing " + box_remove.objectName())
+                if "_provider_endpoints" in box_remove.objectName():
+                    continue
+                self.verticalLayout.removeWidget(box_remove)
+                box_remove.setParent(None)
+                box_remove.deleteLater()
+
+            def_settings = {
+                "providers": [
+                    {
+                        "ENV_VARS": {
+                            "ORS_QUOTA": "X-Ratelimit-Limit",
+                            "ORS_REMAINING": "X-Ratelimit-Remaining",
+                        },
+                        "base_url": "https://api.openrouteservice.org",
+                        "key": "",
+                        "name": "openrouteservice",
+                        "timeout": 60,
+                        "endpoints": ENDPOINTS,
+                    }
+                ]
+            }
+            configmanager.write_config(def_settings)
+
+            self.temp_config = configmanager.read_config()
+            self._build_ui()
+
+        else:
+            pass
 
     def _add_box(
             self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
