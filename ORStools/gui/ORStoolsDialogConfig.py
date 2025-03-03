@@ -26,7 +26,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-
 from qgis.gui import QgsCollapsibleGroupBox
 
 from PyQt5 import QtWidgets
@@ -68,6 +67,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for idx, box in enumerate(collapsible_boxes):
+            if "_provider_endpoints" in box.objectName():
+                continue
             current_provider = self.temp_config["providers"][idx]
 
             current_provider["key"] = box.findChild(
@@ -86,23 +87,24 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
             current_provider["timeout"] = int(timeout_input.text())
 
+            endpoint_box = box.findChild(QgsCollapsibleGroupBox, f"{box.title()}_provider_endpoints")
             current_provider["endpoints"] = {
-                "directions": box.findChild(
+                "directions": endpoint_box.findChild(
                     QtWidgets.QLineEdit, box.title() + "_directions_lineedit"
                 ).text(),
-                "isochrones": box.findChild(
+                "isochrones": endpoint_box.findChild(
                     QtWidgets.QLineEdit, box.title() + "_isochrones_lineedit"
                 ).text(),
-                "matrix": box.findChild(
+                "matrix": endpoint_box.findChild(
                     QtWidgets.QLineEdit, box.title() + "_matrix_lineedit"
                 ).text(),
-                "optimization": box.findChild(
+                "optimization": endpoint_box.findChild(
                     QtWidgets.QLineEdit, box.title() + "_optimization_lineedit"
                 ).text(),
-                "export": box.findChild(
+                "export": endpoint_box.findChild(
                     QtWidgets.QLineEdit, box.title() + "_export_lineedit"
                 ).text(),
-                "snapping": box.findChild(
+                "snapping": endpoint_box.findChild(
                     QtWidgets.QLineEdit, box.title() + "_snapping_lineedit"
                 ).text(),
             }
@@ -187,22 +189,10 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             box.setCollapsed(True)
 
     def _add_box(
-        self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
+            self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
     ) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
-
-        :param name: provider name
-        :type name: str
-
-        :param url: provider's base url
-        :type url: str
-
-        :param key: user's API key
-        :type key: str
-
-        :param new: Specifies whether user wants to insert provider or the GUI is being built.
-        :type new: boolean
         """
         if new:
             self.temp_config["providers"].append(
@@ -249,80 +239,26 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         timeout_text.setValidator(QIntValidator(1, 3600, timeout_text))
         gridLayout_3.addWidget(timeout_text, 5, 0, 1, 4)
 
-        # Service Endpoints title (bold)
-        title_label = QtWidgets.QLabel(provider)
-        title_label.setObjectName(name + "_service_endpoints_label")
-        title_label.setText(self.tr("Service Endpoints"))
-        font = title_label.font()
-        font.setBold(True)
-        title_label.setFont(font)
-        gridLayout_3.addWidget(title_label, 6, 0, 1, 4)
+        # Service Endpoints section
+        endpoint_box = QgsCollapsibleGroupBox(provider)
+        endpoint_box.setObjectName(name + "_provider_endpoints")
+        endpoint_box.setTitle(self.tr("Service Endpoints"))
+        endpoint_layout = QtWidgets.QGridLayout(endpoint_box)
+        gridLayout_3.addWidget(endpoint_box, 6, 0, 1, 4)
 
-        # Directions endpoint
-        directions_label = QtWidgets.QLabel(provider)
-        directions_label.setObjectName(name + "_directions_label")
-        directions_label.setText(self.tr("Directions"))
-        gridLayout_3.addWidget(directions_label, 7, 0, 1, 1)
+        row = 0
+        for endpoint_name, endpoint_value in endpoints.items():
+            endpoint_label = QtWidgets.QLabel(endpoint_box)
+            endpoint_label.setText(self.tr(endpoint_name.capitalize()))
+            endpoint_layout.addWidget(endpoint_label, row, 0, 1, 1)
 
-        directions_lineedit = QtWidgets.QLineEdit(provider)
-        directions_lineedit.setObjectName(name + "_directions_lineedit")
-        directions_lineedit.setText(endpoints["directions"])
-        gridLayout_3.addWidget(directions_lineedit, 7, 1, 1, 3)
+            endpoint_lineedit = QtWidgets.QLineEdit(endpoint_box)
+            endpoint_lineedit.setText(endpoint_value)
+            endpoint_lineedit.setObjectName(f"{name}_{endpoint_name}_lineedit")
 
-        # Isochrones endpoint
-        isochrones_label = QtWidgets.QLabel(provider)
-        isochrones_label.setObjectName(name + "_isochrones_label")
-        isochrones_label.setText(self.tr("Isochrones"))
-        gridLayout_3.addWidget(isochrones_label, 8, 0, 1, 1)
+            endpoint_layout.addWidget(endpoint_lineedit, row, 1, 1, 3)
 
-        isochrones_lineedit = QtWidgets.QLineEdit(provider)
-        isochrones_lineedit.setObjectName(name + "_isochrones_lineedit")
-        isochrones_lineedit.setText(endpoints["isochrones"])
-        gridLayout_3.addWidget(isochrones_lineedit, 8, 1, 1, 3)
-
-        # Matrix endpoint
-        matrix_label = QtWidgets.QLabel(provider)
-        matrix_label.setObjectName(name + "_matrix_label")
-        matrix_label.setText(self.tr("Matrix"))
-        gridLayout_3.addWidget(matrix_label, 9, 0, 1, 1)
-
-        matrix_lineedit = QtWidgets.QLineEdit(provider)
-        matrix_lineedit.setObjectName(name + "_matrix_lineedit")
-        matrix_lineedit.setText(endpoints["matrix"])
-        gridLayout_3.addWidget(matrix_lineedit, 9, 1, 1, 3)
-
-        # Optimization endpoint
-        optimization_label = QtWidgets.QLabel(provider)
-        optimization_label.setObjectName(name + "_optimization_label")
-        optimization_label.setText(self.tr("Optimization"))
-        gridLayout_3.addWidget(optimization_label, 10, 0, 1, 1)
-
-        optimization_lineedit = QtWidgets.QLineEdit(provider)
-        optimization_lineedit.setObjectName(name + "_optimization_lineedit")
-        optimization_lineedit.setText(endpoints["optimization"])
-        gridLayout_3.addWidget(optimization_lineedit, 10, 1, 1, 3)
-
-        # Export endpoint
-        export_label = QtWidgets.QLabel(provider)
-        export_label.setObjectName(name + "_export_label")
-        export_label.setText(self.tr("Export"))
-        gridLayout_3.addWidget(export_label, 11, 0, 1, 1)
-
-        export_lineedit = QtWidgets.QLineEdit(provider)
-        export_lineedit.setObjectName(name + "_export_lineedit")
-        export_lineedit.setText(endpoints["export"])
-        gridLayout_3.addWidget(export_lineedit, 11, 1, 1, 3)
-
-        # Snapping endpoint
-        snapping_label = QtWidgets.QLabel(provider)
-        snapping_label.setObjectName(name + "_snapping_label")
-        snapping_label.setText(self.tr("Snapping"))
-        gridLayout_3.addWidget(snapping_label, 12, 0, 1, 1)
-
-        snapping_lineedit = QtWidgets.QLineEdit(provider)
-        snapping_lineedit.setObjectName(name + "_snapping_lineedit")
-        snapping_lineedit.setText(endpoints["snapping"])
-        gridLayout_3.addWidget(snapping_lineedit, 12, 1, 1, 3)
+            row += 1
 
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)

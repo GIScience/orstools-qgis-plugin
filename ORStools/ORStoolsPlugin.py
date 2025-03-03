@@ -93,17 +93,17 @@ class ORStools:
         settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
 
         # Add any new settings here for backwards compatibility
-        changed = False
-        for i, prov in enumerate(settings["providers"]):
-            if any([i in prov for i in settings_keys]):
-                changed = True
-                # Here, like the endpoints
-                prov["endpoints"] = ENDPOINTS
-                settings["providers"][i] = prov
-        if changed:
-            s.setValue("ORStools/config", settings)
-
-        if not settings:
+        if settings:
+            changed = False
+            for i, prov in enumerate(settings["providers"]):
+                if any([i in prov for i in settings_keys]):
+                    changed = True
+                    # Add here, like the endpoints
+                    prov["endpoints"] = ENDPOINTS
+                    settings["providers"][i] = prov
+            if changed:
+                s.setValue("ORStools/config", settings)
+        else:
             def_settings = {
                 "providers": [
                     {
