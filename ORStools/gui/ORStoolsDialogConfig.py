@@ -26,11 +26,19 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from qgis.gui import QgsCollapsibleGroupBox
 
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QMetaObject
-from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit, QDialogButtonBox, QMessageBox, QWidget
+from qgis.PyQt.QtWidgets import (
+    QDialog,
+    QInputDialog,
+    QLineEdit,
+    QDialogButtonBox,
+    QMessageBox,
+    QWidget,
+)
 from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
@@ -67,7 +75,9 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         """When the OK Button is clicked, in-memory temp_config is updated and written to settings"""
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
-        collapsible_boxes = [i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName()]
+        collapsible_boxes = [
+            i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName()
+        ]
         for idx, box in enumerate(collapsible_boxes):
             current_provider = self.temp_config["providers"][idx]
 
@@ -87,7 +97,9 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
             current_provider["timeout"] = int(timeout_input.text())
 
-            endpoint_box = box.findChild(QgsCollapsibleGroupBox, f"{box.title()}_provider_endpoints")
+            endpoint_box = box.findChild(
+                QgsCollapsibleGroupBox, f"{box.title()}_provider_endpoints"
+            )
             current_provider["endpoints"] = {
                 "directions": endpoint_box.findChild(
                     QtWidgets.QLineEdit, box.title() + "_directions_lineedit"
@@ -194,14 +206,14 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.setWindowTitle("Confirm Reset")
-        msg_box.setText("Are you sure you want to delete all providers? This action cannot be undone.")
+        msg_box.setText(
+            "Are you sure you want to delete all providers? This action cannot be undone."
+        )
         msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
 
         result = msg_box.exec()
         if result == QMessageBox.Yes:
-            print("yes")
             for box_remove in self.providers.findChildren(QWidget):
-                print("Removing " + box_remove.objectName())
                 if "_provider_endpoints" in box_remove.objectName():
                     continue
                 self.verticalLayout.removeWidget(box_remove)
@@ -232,7 +244,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             pass
 
     def _add_box(
-            self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
+        self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
     ) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
