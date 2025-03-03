@@ -43,7 +43,7 @@ from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
-from ..proc import ENDPOINTS
+from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
 
 class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
@@ -220,22 +220,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                 box_remove.setParent(None)
                 box_remove.deleteLater()
 
-            def_settings = {
-                "providers": [
-                    {
-                        "ENV_VARS": {
-                            "ORS_QUOTA": "X-Ratelimit-Limit",
-                            "ORS_REMAINING": "X-Ratelimit-Remaining",
-                        },
-                        "base_url": "https://api.openrouteservice.org",
-                        "key": "",
-                        "name": "openrouteservice",
-                        "timeout": 60,
-                        "endpoints": ENDPOINTS,
-                    }
-                ]
-            }
-            configmanager.write_config(def_settings)
+
+            configmanager.write_config(DEFAULT_SETTINGS)
 
             self.temp_config = configmanager.read_config()
             self._build_ui()
