@@ -220,7 +220,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                 box_remove.setParent(None)
                 box_remove.deleteLater()
 
-
             configmanager.write_config(DEFAULT_SETTINGS)
 
             self.temp_config = configmanager.read_config()
