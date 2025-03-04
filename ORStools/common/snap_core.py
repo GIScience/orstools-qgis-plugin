@@ -34,8 +34,8 @@ def get_snapped_point_features(response: dict) -> list:
     locations = response["locations"]
     feats = []
     for location in locations:
-        feat = QgsFeature()
         if location:
+            feat = QgsFeature()
             coords = location["location"]
             if "name" in location.keys():
                 name = location["name"]
@@ -43,7 +43,6 @@ def get_snapped_point_features(response: dict) -> list:
             attr = [name, snapped_distance] if "name" in location.keys() else ["", snapped_distance]
             feat.setAttributes(attr)
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
-
-        feats.append(feat)
+            feats.append(feat)
 
     return feats
