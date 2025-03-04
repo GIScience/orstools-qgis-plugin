@@ -227,7 +227,11 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Combines default and algorithm parameters and adds them in order to the
         algorithm dialog window.
         """
-        if self.ALGO_NAME not in ["snap_from_point_layer", "snap_from_point", "export_network_from_map"]:
+        if self.ALGO_NAME not in [
+            "snap_from_point_layer",
+            "snap_from_point",
+            "export_network_from_map",
+        ]:
             parameters = (
                 [self.provider_parameter(), self.profile_parameter()]
                 + self.PARAMETERS
@@ -236,10 +240,10 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             )
         else:
             parameters = (
-                    [self.provider_parameter(), self.profile_parameter()]
-                    + self.PARAMETERS
-                    + [self.output_parameter()]
-                    )
+                [self.provider_parameter(), self.profile_parameter()]
+                + self.PARAMETERS
+                + [self.output_parameter()]
+            )
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
                 if self.GROUP == "Matrix":
