@@ -42,7 +42,7 @@ from qgis.core import (
 )
 
 from ORStools.common import PROFILES
-from ORStools.common.snap_core import get_snapped_point_features
+from ORStools.utils.processing import get_snapped_point_features
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ORStools.utils import exceptions, logger
 

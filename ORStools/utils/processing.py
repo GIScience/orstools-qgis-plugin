@@ -28,12 +28,13 @@
 """
 
 import os
-from qgis.core import QgsPointXY
 
 from typing import List
 
 from ORStools import BASE_DIR
 from ORStools.common import OPTIMIZATION_MODES
+
+from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
 
 
 def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: int) -> dict:
@@ -92,3 +93,21 @@ def read_help_file(algorithm: str, locale: str = ""):
     with open(file, encoding="utf-8") as help_file:
         msg = help_file.read()
     return msg
+
+
+def get_snapped_point_features(response: dict) -> list:
+    locations = response["locations"]
+    feats = []
+    for location in locations:
+        if location:
+            feat = QgsFeature()
+            coords = location["location"]
+            if "name" in location.keys():
+                name = location["name"]
+            snapped_distance = location["snapped_distance"]
+            attr = [name, snapped_distance] if "name" in location.keys() else ["", snapped_distance]
+            feat.setAttributes(attr)
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
+            feats.append(feat)
+
+    return feats
