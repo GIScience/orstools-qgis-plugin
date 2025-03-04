@@ -34,7 +34,12 @@ from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 from qgis.core import (
     QgsProject,
     QgsPointXY,
-    QgsCoordinateReferenceSystem, Qgis, QgsCoordinateTransform, QgsWkbTypes, QgsAnnotation, QgsMarkerSymbol
+    QgsCoordinateReferenceSystem,
+    Qgis,
+    QgsCoordinateTransform,
+    QgsWkbTypes,
+    QgsAnnotation,
+    QgsMarkerSymbol,
 )
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
@@ -134,13 +139,14 @@ class LineTool(QgsMapToolEmitPoint):
             if self.last_point:
                 index = int(self.last_point["annotation"].document().toPlainText())
                 if self.dlg.annotations:
-                    self.dlg.project.annotationManager().removeAnnotation(self.dlg.annotations.pop(index))
+                    self.dlg.project.annotationManager().removeAnnotation(
+                        self.dlg.annotations.pop(index)
+                    )
                     self.dlg.routing_fromline_list.takeItem(index)
                     self.dlg._reindex_list_items()
                     self.last_point = None
             if self.dlg.routing_fromline_list.count() < 1:
                 self.dlg._clear_listwidget()
-
 
     def canvasPressEvent(self, event):
         hovering = self.check_annotation_hover(event.pos())
@@ -341,9 +347,8 @@ class LineTool(QgsMapToolEmitPoint):
         for old_annotation in self.dlg.annotations:
             color = old_annotation.markerSymbol().symbolLayer(0).color().name()
             if color == "#ffff00":
-                symbol = QgsMarkerSymbol.createSimple({'color': 'red'})
+                symbol = QgsMarkerSymbol.createSimple({"color": "red"})
                 old_annotation.setMarkerSymbol(symbol)
 
-        symbol = QgsMarkerSymbol.createSimple({'color': 'yellow'})
+        symbol = QgsMarkerSymbol.createSimple({"color": "yellow"})
         annotation.setMarkerSymbol(symbol)
-

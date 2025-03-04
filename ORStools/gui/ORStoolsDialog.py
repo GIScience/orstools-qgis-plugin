@@ -39,8 +39,6 @@ except ModuleNotFoundError:
 
 import webbrowser
 
-from qgis._core import Qgis, QgsAnnotation, QgsCoordinateTransform
-from qgis._gui import QgisInterface
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -50,9 +48,9 @@ from qgis.core import (
     QgsPointXY,
     QgsGeometry,
     QgsCoordinateReferenceSystem,
-    QgsSettings,
+    QgsSettings, Qgis, QgsAnnotation, QgsCoordinateTransform,
 )
-from qgis.gui import QgsMapCanvasAnnotationItem
+from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInterface
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
 from qgis.PyQt.QtWidgets import (
@@ -370,6 +368,10 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             lambda: self.color_duplicate_items(self.routing_fromline_list)
         )
 
+        advanced_boxes = self.advances_group.findChildren(QgsCollapsibleGroupBox)
+        for box in advanced_boxes:
+            box.collapsedStateChanged.connect(self.reload_rubber_band)
+
         self.rubber_band = None
 
     def _save_vertices_to_layer(self) -> None:
@@ -526,3 +528,8 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 for index in indices:
                     item = list_widget.item(index)
                     item.setBackground(QColor("lightsalmon"))
+
+    def reload_rubber_band(self) -> None:
+        """Reloads the rubber band of the linetool."""
+        if self.line_tool is not None:
+            self.line_tool.create_rubber_band()
