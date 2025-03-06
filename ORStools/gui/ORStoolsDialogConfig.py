@@ -341,5 +341,11 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
+    def add_profile_button_clicked(self):
+        dlg = QgsNewNameDialog("Enter profile name", "New Profile")
+        if dlg.exec_():
+            profile_name = dlg.name()
+            if profile_name:
+                self.list_widget.addItem(profile_name)
 
 
