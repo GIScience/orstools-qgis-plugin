@@ -315,8 +315,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         profile_box.setTitle(self.tr("Profiles"))
         profile_layout = QHBoxLayout(profile_box)
 
-        self.list_widget = QListWidget(profile_box)
-        profile_layout.addWidget(self.list_widget)
+        self.list_widget_profiles = QListWidget(profile_box)
+        profile_layout.addWidget(self.list_widget_profiles)
 
         button_layout = QVBoxLayout()
         add_profile_button = QPushButton(self.tr("+"), profile_box)
@@ -346,8 +346,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         if dlg.exec_():
             profile_name = dlg.name()
             if profile_name:
-                self.list_widget.addItem(profile_name)
+                self.list_widget_profiles.addItem(profile_name)
 
     def remove_profile_button_clicked(self):
-        for item in self.list_widget.selectedItems():
-            self.list_widget.takeItem(self.list_widget.row(item))
+        for item in self.list_widget_profiles.selectedItems():
+            self.list_widget_profiles.takeItem(self.list_widget_profiles.row(item))
