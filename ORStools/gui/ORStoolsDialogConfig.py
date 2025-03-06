@@ -26,7 +26,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-
 from qgis.gui import QgsCollapsibleGroupBox
 
 from qgis.PyQt import QtWidgets, uic
@@ -36,7 +35,12 @@ from qgis.PyQt.QtWidgets import (
     QInputDialog,
     QLineEdit,
     QDialogButtonBox,
-    QMessageBox
+    QMessageBox,
+    QWidget,
+    QListWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
 )
 from qgis.PyQt.QtGui import QIntValidator
 
@@ -310,8 +314,30 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         # Profile Section
         profile_box = QgsCollapsibleGroupBox(provider)
         profile_box.setObjectName(name + "_provider_profiles")
-        profile_box.setTitle(self.tr("Custom profiles"))
-        profile_layout = QtWidgets.QGridLayout(profile_box)
+        profile_box.setTitle(self.tr("Profiles"))
+        profile_layout = QHBoxLayout(profile_box)
+
+        self.list_widget = QListWidget(profile_box)
+        profile_layout.addWidget(self.list_widget)
+
+        button_layout = QVBoxLayout()
+        add_profile_button = QPushButton(self.tr("+"), profile_box)
+        remove_profile_button = QPushButton(self.tr("-"), profile_box)
+        load_profiles_button = QPushButton(self.tr("Load profiles"), profile_box)
+
+        add_profile_button.clicked.connect(
+            self.add_profile_button_clicked
+        )
+        remove_profile_button.clicked.connect(
+            self.remove_profile_button_clicked
+        )
+
+        button_layout.addWidget(add_profile_button)
+        button_layout.addWidget(remove_profile_button)
+        button_layout.addWidget(load_profiles_button)
+
+        profile_layout.addLayout(button_layout)
+
         gridLayout_3.addWidget(profile_box, 7, 0, 1, 4)
 
         row = 0
