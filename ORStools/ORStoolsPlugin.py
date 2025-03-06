@@ -33,7 +33,7 @@ from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
 
 from .gui import ORStoolsDialog
-from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS
+from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS, PROFILES
 
 
 class ORStools:
@@ -100,6 +100,8 @@ class ORStools:
                     changed = True
                     # Add here, like the endpoints
                     prov["endpoints"] = ENDPOINTS
+                    settings["providers"][i] = prov
+                    prov["profiles"] = PROFILES
                     settings["providers"][i] = prov
             if changed:
                 s.setValue("ORStools/config", settings)
