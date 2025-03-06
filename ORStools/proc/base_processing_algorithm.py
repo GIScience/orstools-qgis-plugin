@@ -74,6 +74,12 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.OUT_NAME = "ORSTOOLS_OUTPUT"
         self.PARAMETERS = None
 
+        self.providers = configmanager.read_config()["providers"]
+        profiles_list = [
+            provider["profiles"] for provider in self.providers
+        ]
+        self.profiles = list(set(element for sublist in profiles_list for element in sublist))
+
     def createInstance(self) -> Any:
         """
         Returns instance of any child class
@@ -120,7 +126,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for provider, used in all child classes
         """
-        providers = [provider["name"] for provider in configmanager.read_config()["providers"]]
+        providers = [provider["name"] for provider in self.providers]
         return QgsProcessingParameterEnum(
             self.IN_PROVIDER,
             self.tr("Provider", "ORSBaseProcessingAlgorithm"),
@@ -132,15 +138,12 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for profile, used in all child classes
         """
-        profiles_list = [
-            provider["profiles"] for provider in configmanager.read_config()["providers"]
-        ]
-        profiles = list(set(element for sublist in profiles_list for element in sublist))
+
         return QgsProcessingParameterEnum(
             self.IN_PROFILE,
             self.tr("Travel mode", "ORSBaseProcessingAlgorithm"),
-            profiles,
-            defaultValue=profiles[0],
+            self.profiles,
+            defaultValue=self.profiles[0],
         )
 
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:
