@@ -26,6 +26,11 @@
  *                                                                         *
  ***************************************************************************/
 """
+import json
+
+from PyQt5.QtCore import QUrl
+from PyQt5.QtNetwork import QNetworkRequest
+from qgis._core import QgsBlockingNetworkRequest
 from qgis.gui import QgsCollapsibleGroupBox, QgsNewNameDialog
 
 from qgis.PyQt import QtWidgets, uic
@@ -329,7 +334,10 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             lambda: self.add_profile_button_clicked(add_profile_button)
         )
         remove_profile_button.clicked.connect(
-            lambda: self.remove_profile_button_clicked(add_profile_button)
+            lambda: self.remove_profile_button_clicked(remove_profile_button)
+        )
+        load_profiles_button.clicked.connect(
+            lambda: self.load_profiles_button_clicked(load_profiles_button)
         )
 
         button_layout.addWidget(add_profile_button)
@@ -385,8 +393,34 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
 
     def remove_profile_button_clicked(self, button: QPushButton) -> None:
         list_widget = button.parent().findChild(QListWidget)
-        for item in list_widget.selectedItems():
-            list_widget.takeItem(list_widget.row(item))
+        selected = list_widget.selectedItems()
+        if selected:
+            for item in selected:
+                list_widget.takeItem(list_widget.row(item))
+        else:
+            list_widget.takeItem(0)
+
+
+    def load_profiles_button_clicked(self, button: QPushButton) -> None:
+        list_widget = button.parent().findChild(QListWidget)
+        grand_parent = button.parent().parent()
+        base_url = None
+        for child in grand_parent.findChildren(QLineEdit):
+            if "_base_url_text" in child.objectName():
+                base_url = child.text()
+
+        url = f"{base_url}/v2/status"
+        request = QgsBlockingNetworkRequest()
+        error_code = request.get(QNetworkRequest(QUrl(url)))
+
+        if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+            reply = request.reply()
+            content = json.loads(reply.content().data().decode('utf-8'))
+            list_widget.addItems(
+                [i for i in content["profiles"].keys()]
+            )
+        else:
+            QMessageBox.warning(self, "Unable to load profiles", "There was an error loading the profiles.")
 
     def _reset_endpoints(self) -> None:
         """Resets the endpoints to their original values."""
