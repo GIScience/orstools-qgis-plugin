@@ -96,7 +96,7 @@ class ORStools:
         if settings:
             changed = False
             for i, prov in enumerate(settings["providers"]):
-                if any([i in prov for i in settings_keys]):
+                if any([i not in prov for i in settings_keys]):
                     changed = True
                     # Add here, like the endpoints
                     prov["endpoints"] = ENDPOINTS
