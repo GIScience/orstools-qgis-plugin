@@ -130,14 +130,16 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
                     QtWidgets.QLineEdit, box.title() + "_snapping_endpoint"
                 ).text(),
             }
-            provider_box = box.findChild(
+            profile_box = box.findChild(
                 QgsCollapsibleGroupBox, f"{box.title()}_provider_profiles"
             )
 
-            current_provider["profiles"] = [profile.text() for profile in provider_box.findChildren(QLineEdit)]
+            list_widget = profile_box.findChild(QListWidget)
+            current_provider["profiles"] = [list_widget.item(i).text() for i in range(list_widget.count())]
 
         configmanager.write_config(self.temp_config)
         self.close()
+
 
     @staticmethod
     def _adjust_timeout_input(input_line_edit: QLineEdit) -> None:
@@ -323,12 +325,14 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         profile_layout = QHBoxLayout(profile_box)
 
         list_widget_profiles = QListWidget(profile_box)
+        list_widget_profiles.addItems(profiles)
         profile_layout.addWidget(list_widget_profiles)
 
         button_layout = QVBoxLayout()
         add_profile_button = QPushButton(self.tr("+"), profile_box)
         remove_profile_button = QPushButton(self.tr("-"), profile_box)
         load_profiles_button = QPushButton(self.tr("Load profiles"), profile_box)
+        restore_defaults_button = QPushButton(self.tr("Restore defaults"), profile_box)
 
         add_profile_button.clicked.connect(
             lambda: self.add_profile_button_clicked(add_profile_button)
@@ -339,10 +343,14 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         load_profiles_button.clicked.connect(
             lambda: self.load_profiles_button_clicked(load_profiles_button)
         )
+        restore_defaults_button.clicked.connect(
+            lambda: self.restore_defaults_button_clicked(restore_defaults_button)
+        )
 
         button_layout.addWidget(add_profile_button)
         button_layout.addWidget(remove_profile_button)
         button_layout.addWidget(load_profiles_button)
+        button_layout.addWidget(restore_defaults_button)
 
         profile_layout.addLayout(button_layout)
 
@@ -421,6 +429,11 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             )
         else:
             QMessageBox.warning(self, "Unable to load profiles", "There was an error loading the profiles.")
+
+    def restore_defaults_button_clicked(self, button: QPushButton) -> None:
+        list_widget = button.parent().findChild(QListWidget)
+        list_widget.clear()
+        list_widget.addItems(PROFILES)
 
     def _reset_endpoints(self) -> None:
         """Resets the endpoints to their original values."""
