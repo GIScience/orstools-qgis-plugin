@@ -53,7 +53,8 @@ from ORStools.utils import configmanager, gui
 from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
-from ..proc import ENDPOINTS, DEFAULT_SETTINGS, PROFILES
+from ..common import PROFILES
+from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
 CONFIG_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogConfigUI.ui"))
 
