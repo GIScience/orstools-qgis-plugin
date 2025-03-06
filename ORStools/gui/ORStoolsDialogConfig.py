@@ -220,7 +220,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         result = msg_box.exec()
         if result == QMessageBox.Yes:
             for box_remove in self.providers.findChildren(QWidget):
-                if "_provider_endpoints" in box_remove.objectName():
+                if box_remove.objectName() in ["_provider_endpoints", "_provider_profiles"]:
                     continue
                 self.verticalLayout.removeWidget(box_remove)
                 box_remove.setParent(None)
