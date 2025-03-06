@@ -36,6 +36,19 @@ ENDPOINTS = {
     "export": "export",
 }
 
+PROFILES = [
+    "driving-car",
+    "driving-hgv",
+    "cycling-regular",
+    "cycling-mountain",
+    "cycling-road",
+    "cycling-electric",
+    "foot-walking",
+    "foot-hiking",
+    "wheelchair",
+    # "public-transport"
+]
+
 DEFAULT_SETTINGS = {
     "providers": [
         {
