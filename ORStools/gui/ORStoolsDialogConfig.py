@@ -348,4 +348,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             if profile_name:
                 self.list_widget.addItem(profile_name)
 
-
+    def remove_profile_button_clicked(self):
+        for item in self.list_widget.selectedItems():
+            self.list_widget.takeItem(self.list_widget.row(item))
