@@ -69,7 +69,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         # Temp storage for config dict
         self.temp_config = configmanager.read_config()
-        QgsNewNameDialog
         self._build_ui()
         self._collapse_boxes()
 
