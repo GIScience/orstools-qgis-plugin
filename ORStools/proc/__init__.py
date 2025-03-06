@@ -61,6 +61,7 @@ DEFAULT_SETTINGS = {
             "name": "openrouteservice",
             "timeout": 60,
             "endpoints": ENDPOINTS,
+            "profiles": PROFILES,
         }
     ]
 }

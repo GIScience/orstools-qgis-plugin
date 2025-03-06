@@ -36,6 +36,7 @@ from qgis.PyQt.QtWidgets import (
     QInputDialog,
     QLineEdit,
     QDialogButtonBox,
+    QMessageBox
 )
 from qgis.PyQt.QtGui import QIntValidator
 
@@ -205,6 +206,34 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for box in collapsible_boxes:
             box.setCollapsed(True)
+
+    def _reset_all_providers(self) -> None:
+        """Reset all providers."""
+
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setWindowTitle("Confirm Reset")
+        msg_box.setText(
+            "Are you sure you want to delete all providers? This action cannot be undone."
+        )
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+        result = msg_box.exec()
+        if result == QMessageBox.Yes:
+            for box_remove in self.providers.findChildren(QWidget):
+                if box_remove.objectName() in ["_provider_endpoints", "_provider_profiles"]:
+                    continue
+                self.verticalLayout.removeWidget(box_remove)
+                box_remove.setParent(None)
+                box_remove.deleteLater()
+
+            configmanager.write_config(DEFAULT_SETTINGS)
+
+            self.temp_config = configmanager.read_config()
+            self._build_ui()
+
+        else:
+            pass
 
     def _add_box(
         self, name: str, url: str, key: str, timeout: int, endpoints: dict, profiles: dict, new: bool = False
