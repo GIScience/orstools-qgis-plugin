@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import json
 
 from PyQt5.QtCore import QUrl
@@ -88,7 +89,10 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         collapsible_boxes = [
-            i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName() and "_provider_profiles" not in i.objectName()
+            i
+            for i in collapsible_boxes
+            if "_provider_endpoints" not in i.objectName()
+            and "_provider_profiles" not in i.objectName()
         ]
         for idx, box in enumerate(collapsible_boxes):
             current_provider = self.temp_config["providers"][idx]
@@ -131,16 +135,15 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
                     QtWidgets.QLineEdit, box.title() + "_snapping_endpoint"
                 ).text(),
             }
-            profile_box = box.findChild(
-                QgsCollapsibleGroupBox, f"{box.title()}_provider_profiles"
-            )
+            profile_box = box.findChild(QgsCollapsibleGroupBox, f"{box.title()}_provider_profiles")
 
             list_widget = profile_box.findChild(QListWidget)
-            current_provider["profiles"] = [list_widget.item(i).text() for i in range(list_widget.count())]
+            current_provider["profiles"] = [
+                list_widget.item(i).text() for i in range(list_widget.count())
+            ]
 
         configmanager.write_config(self.temp_config)
         self.close()
-
 
     @staticmethod
     def _adjust_timeout_input(input_line_edit: QLineEdit) -> None:
@@ -189,7 +192,9 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             self, self.tr("New ORS provider"), self.tr("Enter a name for the provider")
         )
         if ok:
-            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, PROFILES, new=True)
+            self._add_box(
+                provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, PROFILES, new=True
+            )
 
     def _remove_provider(self) -> None:
         """Remove list of providers from list."""
@@ -248,14 +253,28 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             pass
 
     def _add_box(
-        self, name: str, url: str, key: str, timeout: int, endpoints: dict, profiles: dict, new: bool = False
+        self,
+        name: str,
+        url: str,
+        key: str,
+        timeout: int,
+        endpoints: dict,
+        profiles: dict,
+        new: bool = False,
     ) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
         """
         if new:
             self.temp_config["providers"].append(
-                dict(name=name, base_url=url, key=key, timeout=timeout, endpoints=endpoints, profiles=profiles)
+                dict(
+                    name=name,
+                    base_url=url,
+                    key=key,
+                    timeout=timeout,
+                    endpoints=endpoints,
+                    profiles=profiles,
+                )
             )
 
         provider = QgsCollapsibleGroupBox(self.providers)
@@ -409,7 +428,6 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         else:
             list_widget.takeItem(0)
 
-
     def load_profiles_button_clicked(self, button: QPushButton) -> None:
         list_widget = button.parent().findChild(QListWidget)
         grand_parent = button.parent().parent()
@@ -424,12 +442,12 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
 
         if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
             reply = request.reply()
-            content = json.loads(reply.content().data().decode('utf-8'))
-            list_widget.addItems(
-                [i for i in content["profiles"].keys()]
-            )
+            content = json.loads(reply.content().data().decode("utf-8"))
+            list_widget.addItems([i for i in content["profiles"].keys()])
         else:
-            QMessageBox.warning(self, "Unable to load profiles", "There was an error loading the profiles.")
+            QMessageBox.warning(
+                self, "Unable to load profiles", "There was an error loading the profiles."
+            )
 
     def restore_defaults_button_clicked(self, button: QPushButton) -> None:
         list_widget = button.parent().findChild(QListWidget)

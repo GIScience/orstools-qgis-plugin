@@ -48,7 +48,7 @@ from qgis.PyQt.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
-from ..common import client, PROFILES, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
+from ..common import client, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
 from ..utils.processing import read_help_file
 from ..gui.directions_gui import _get_avoid_polygons
 
@@ -132,7 +132,9 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for profile, used in all child classes
         """
-        profiles_list = [provider["profiles"] for provider in configmanager.read_config()["providers"]]
+        profiles_list = [
+            provider["profiles"] for provider in configmanager.read_config()["providers"]
+        ]
         profiles = list(set(element for sublist in profiles_list for element in sublist))
         return QgsProcessingParameterEnum(
             self.IN_PROFILE,
