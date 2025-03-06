@@ -26,7 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.gui import QgsCollapsibleGroupBox
+from qgis.gui import QgsCollapsibleGroupBox, QgsNewNameDialog
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QMetaObject
@@ -373,6 +373,14 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         gridLayout_3.addLayout(button_layout, 7, 0, 1, 4)
 
         self.verticalLayout.addWidget(provider)
+        provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+
+    def add_profile_button_clicked(self):
+        dlg = QgsNewNameDialog("Enter profile name", "New Profile")
+        if dlg.exec_():
+            profile_name = dlg.name()
+            if profile_name:
+                self.list_widget.addItem(profile_name)
 
     def _reset_endpoints(self) -> None:
         """Resets the endpoints to their original values."""
