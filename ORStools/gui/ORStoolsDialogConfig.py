@@ -51,7 +51,8 @@ from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
-from ..proc import ENDPOINTS, DEFAULT_SETTINGS, PROFILES
+from ..common import PROFILES
+from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
 
 class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
