@@ -90,7 +90,7 @@ class ORStools:
         s = QgsSettings()
         settings = s.value("ORStools/config")
 
-        settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
+        settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints", "profiles"]
 
         # Add any new settings here for backwards compatibility
         if settings:
