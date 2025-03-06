@@ -43,7 +43,7 @@ from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
-from ..proc import ENDPOINTS, DEFAULT_SETTINGS
+from ..proc import ENDPOINTS, DEFAULT_SETTINGS, PROFILES
 
 
 class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
@@ -76,7 +76,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         collapsible_boxes = [
-            i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName()
+            i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName() and "_provider_profiles" not in i.objectName()
         ]
         for idx, box in enumerate(collapsible_boxes):
             current_provider = self.temp_config["providers"][idx]
@@ -120,6 +120,11 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                     QtWidgets.QLineEdit, box.title() + "_snapping_lineedit"
                 ).text(),
             }
+            provider_box = box.findChild(
+                QgsCollapsibleGroupBox, f"{box.title()}_provider_profiles"
+            )
+
+            current_provider["profiles"] = [profile.text() for profile in provider_box.findChildren(QLineEdit)]
 
         configmanager.write_config(self.temp_config)
         self.close()
@@ -151,6 +156,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                 provider_entry["key"],
                 provider_entry["timeout"],
                 provider_entry["endpoints"],
+                provider_entry["profiles"],
                 new=False,
             )
 
@@ -170,7 +176,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             self, self.tr("New ORS provider"), self.tr("Enter a name for the provider")
         )
         if ok:
-            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, new=True)
+            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, PROFILES, new=True)
 
     def _remove_provider(self) -> None:
         """Remove list of providers from list."""
@@ -229,7 +235,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             pass
 
     def _add_box(
-        self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
+        self, name: str, url: str, key: str, timeout: int, endpoints: dict, profiles: dict, new: bool = False
     ) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
@@ -299,6 +305,28 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             endpoint_layout.addWidget(endpoint_lineedit, row, 1, 1, 3)
 
             row += 1
+        
+        # Profile Section
+        profile_box = QgsCollapsibleGroupBox(provider)
+        profile_box.setObjectName(name + "_provider_profiles")
+        profile_box.setTitle(self.tr("Custom profiles"))
+        profile_layout = QtWidgets.QGridLayout(profile_box)
+        gridLayout_3.addWidget(profile_box, 7, 0, 1, 4)
+        
+        row = 0
+        for profile_name in profiles:
+            profile_label = QtWidgets.QLabel(profile_box)
+            profile_label.setText(self.tr(profile_name.capitalize()))
+            profile_layout.addWidget(profile_label, row, 0, 1, 1)
+
+            profile_lineedit = QtWidgets.QLineEdit(profile_box)
+            profile_lineedit.setText(profile_name)
+            profile_lineedit.setObjectName(f"{name}_{profile_name}_lineedit")
+
+            profile_layout.addWidget(profile_lineedit, row, 1, 1, 3)
+
+            row += 1
+        
 
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
