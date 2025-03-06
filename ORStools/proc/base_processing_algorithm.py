@@ -132,11 +132,13 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for profile, used in all child classes
         """
+        profiles_list = [provider["profiles"] for provider in configmanager.read_config()["providers"]]
+        profiles = list(set(element for sublist in profiles_list for element in sublist))
         return QgsProcessingParameterEnum(
             self.IN_PROFILE,
             self.tr("Travel mode", "ORSBaseProcessingAlgorithm"),
-            PROFILES,
-            defaultValue=PROFILES[0],
+            profiles,
+            defaultValue=profiles[0],
         )
 
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:
