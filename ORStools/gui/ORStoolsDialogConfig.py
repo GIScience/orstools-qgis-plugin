@@ -242,7 +242,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         """
         if new:
             self.temp_config["providers"].append(
-                dict(name=name, base_url=url, key=key, timeout=timeout, endpoints=endpoints)
+                dict(name=name, base_url=url, key=key, timeout=timeout, endpoints=endpoints, profiles=profiles)
             )
 
         provider = QgsCollapsibleGroupBox(self.providers)
