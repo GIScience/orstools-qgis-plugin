@@ -315,8 +315,8 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         profile_box.setTitle(self.tr("Profiles"))
         profile_layout = QHBoxLayout(profile_box)
 
-        self.list_widget_profiles = QListWidget(profile_box)
-        profile_layout.addWidget(self.list_widget_profiles)
+        list_widget_profiles = QListWidget(profile_box)
+        profile_layout.addWidget(list_widget_profiles)
 
         button_layout = QVBoxLayout()
         add_profile_button = QPushButton(self.tr("+"), profile_box)
@@ -324,10 +324,10 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         load_profiles_button = QPushButton(self.tr("Load profiles"), profile_box)
 
         add_profile_button.clicked.connect(
-            self.add_profile_button_clicked
+            lambda: self.add_profile_button_clicked(add_profile_button)
         )
         remove_profile_button.clicked.connect(
-            self.remove_profile_button_clicked
+            lambda: self.remove_profile_button_clicked(add_profile_button)
         )
 
         button_layout.addWidget(add_profile_button)
@@ -341,13 +341,15 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
-    def add_profile_button_clicked(self):
+    def add_profile_button_clicked(self, button: QPushButton) -> None:
         dlg = QgsNewNameDialog("Enter profile name", "New Profile")
+        list_widget = button.parent().findChild(QListWidget)
         if dlg.exec_():
             profile_name = dlg.name()
             if profile_name:
-                self.list_widget_profiles.addItem(profile_name)
+                list_widget.addItem(profile_name)
 
-    def remove_profile_button_clicked(self):
-        for item in self.list_widget_profiles.selectedItems():
-            self.list_widget_profiles.takeItem(self.list_widget_profiles.row(item))
+    def remove_profile_button_clicked(self, button: QPushButton) -> None:
+        list_widget = button.parent().findChild(QListWidget)
+        for item in list_widget.selectedItems():
+            list_widget.takeItem(list_widget.row(item))
