@@ -48,7 +48,10 @@ from qgis.core import (
     QgsPointXY,
     QgsGeometry,
     QgsCoordinateReferenceSystem,
-    QgsSettings, Qgis, QgsAnnotation, QgsCoordinateTransform,
+    QgsSettings,
+    Qgis,
+    QgsAnnotation,
+    QgsCoordinateTransform,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInterface
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
