@@ -30,6 +30,10 @@
 import os
 from typing import Optional
 
+from PyQt5.QtWidgets import QCheckBox
+from qgis._core import QgsMapLayer
+from qgis._gui import QgsMapLayerComboBox
+
 from ..utils.router import route_as_layer
 
 try:
@@ -64,6 +68,7 @@ from qgis.PyQt.QtWidgets import (
     QMessageBox,
     QDialogButtonBox,
     QWidget,
+    QRadioButton,
 )
 
 from ORStools import (
@@ -374,6 +379,11 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         advanced_boxes = self.advances_group.findChildren(QgsCollapsibleGroupBox)
         for box in advanced_boxes:
             box.collapsedStateChanged.connect(self.reload_rubber_band)
+            for child in box.findChildren((QRadioButton, QCheckBox)):
+                if isinstance(child, QCheckBox) and not child.objectName() == "export_jobs_order":
+                    child.stateChanged.connect(self.reload_rubber_band)
+                elif isinstance(child, QRadioButton):
+                    child.toggled.connect(self.reload_rubber_band)
 
         self.rubber_band = None
 
