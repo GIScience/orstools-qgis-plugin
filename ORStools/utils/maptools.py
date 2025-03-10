@@ -145,6 +145,7 @@ class LineTool(QgsMapToolEmitPoint):
                     self.dlg.routing_fromline_list.takeItem(index)
                     self.dlg._reindex_list_items()
                     self.last_point = None
+                    self.error_idxs += 1
             if self.dlg.routing_fromline_list.count() < 1:
                 self.dlg._clear_listwidget()
 
