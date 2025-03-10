@@ -41,8 +41,8 @@ from qgis.core import (
     QgsAnnotation,
     QgsMarkerSymbol,
 )
-from qgis.PyQt.QtCore import Qt, pyqtSignal
-from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtCore import Qt, pyqtSignal, QEvent
+from qgis.PyQt.QtGui import QColor, QMouseEvent
 from qgis.PyQt.QtWidgets import (
     QApplication,
 )
@@ -105,7 +105,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     mouseMoved = pyqtSignal(["QPoint"])
 
-    def canvasMoveEvent(self, e):
+    def canvasMoveEvent(self, e: QEvent) -> None:
         hovering = self.check_annotation_hover(e.pos())
         if hovering:
             QApplication.setOverrideCursor(Qt.OpenHandCursor)
@@ -113,7 +113,7 @@ class LineTool(QgsMapToolEmitPoint):
             if not self.moving:
                 QApplication.restoreOverrideCursor()
 
-    def check_annotation_hover(self, pos):
+    def check_annotation_hover(self, pos: QMouseEvent) -> int:
         click = [pos.x(), pos.y()]
         dists = {}
         for i, anno in enumerate(self.dlg.annotations):
@@ -132,7 +132,7 @@ class LineTool(QgsMapToolEmitPoint):
             idx = dists[min(dists)]
             return idx
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QEvent) -> None:
         if event.key() == Qt.Key_Escape:
             self.dlg._clear_listwidget()
         elif event.key() == Qt.Key_D:
@@ -147,11 +147,13 @@ class LineTool(QgsMapToolEmitPoint):
                     self.last_point = None
                     self.error_idxs += 1
                     if self.dlg.annotations and self.points:
-                        self.save_last_point(self.points[index-1], self.dlg.annotations[index-1])
+                        self.save_last_point(
+                            self.points[index - 1], self.dlg.annotations[index - 1]
+                        )
             if self.dlg.routing_fromline_list.count() < 1:
                 self.dlg._clear_listwidget()
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event: QEvent) -> None:
         hovering = self.check_annotation_hover(event.pos())
         if hovering:
             self.mouseMoved.disconnect()
@@ -164,7 +166,7 @@ class LineTool(QgsMapToolEmitPoint):
             )
             self.moving = True
 
-    def canvasReleaseEvent(self, event):
+    def canvasReleaseEvent(self, event: QEvent) -> None:
         if event.button() == Qt.RightButton:
             self.dlg.show()
             return
@@ -258,14 +260,14 @@ class LineTool(QgsMapToolEmitPoint):
 
         self.last_click = "single-click"
 
-    def canvasDoubleClickEvent(self, e):
+    def canvasDoubleClickEvent(self, e: QEvent) -> None:
         """
         Populate line list widget with coordinates, end point moving and show dialog again.
         """
         self.dlg.show()
         self.last_click = "double-click"
 
-    def create_rubber_band(self):
+    def create_rubber_band(self) -> None:
         if self.dlg.rubber_band:
             self.dlg.rubber_band.reset()
         else:
@@ -301,14 +303,14 @@ class LineTool(QgsMapToolEmitPoint):
                     self.dlg.rubber_band.addPoint(point, False)
             self.dlg.rubber_band.show()
 
-    def get_error_code(self, e):
+    def get_error_code(self, e: QEvent) -> int:
         json_start_index = e.message.find("{")
         json_end_index = e.message.rfind("}") + 1
         json_str = e.message[json_start_index:json_end_index]
         error_dict = json.loads(json_str)
         return error_dict["error"]["code"]
 
-    def radius_message_box(self):
+    def radius_message_box(self) -> None:
         self.dlg._iface.messageBar().pushMessage(
             self.tr("Please use a different point"),
             self.tr("""Could not find routable point within a radius of 350.0 meters of specified coordinate. 
@@ -317,7 +319,7 @@ class LineTool(QgsMapToolEmitPoint):
             duration=3,
         )
 
-    def api_key_message_bar(self):
+    def api_key_message_bar(self) -> None:
         self.dlg._iface.messageBar().pushMessage(
             self.tr("Connection refused"),
             self.tr("""Are your provider settings correct and the provider ready?"""),
@@ -325,7 +327,7 @@ class LineTool(QgsMapToolEmitPoint):
             duration=3,
         )
 
-    def _toggle_preview(self):
+    def _toggle_preview(self) -> None:
         if self.dlg.routing_fromline_list.count() > 0:
             state = not self.dlg.toggle_preview.isChecked()
             try:
