@@ -533,6 +533,9 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
             lambda: self.color_duplicate_items(self.routing_fromline_list)
         )
 
+        self.load_provider_combo_state()
+        self.provider_combo.activated.connect(self.save_selected_provider_state)
+
         self.annotation_canvas = self._iface.mapCanvas()
 
     def _save_vertices_to_layer(self) -> None:
@@ -694,3 +697,20 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 for index in indices:
                     item = list_widget.item(index)
                     item.setBackground(QColor("lightsalmon"))
+
+    def save_selected_provider_state(self) -> None:
+        s = QgsSettings()
+        s.setValue(
+            "ORSTools/gui/provider_combo", self.provider_combo.currentIndex()
+        )
+
+    def load_provider_combo_state(self):
+        s = QgsSettings()
+        index = s.value("ORSTools/gui/provider_combo")
+        if index:
+            self.provider_combo.setCurrentIndex(index)
+
+    def show(self):
+        """Load the saved state when the window is shown"""
+        super().show()
+        self.load_provider_combo_state()
