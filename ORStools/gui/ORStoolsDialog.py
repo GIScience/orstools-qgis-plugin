@@ -31,8 +31,6 @@ import os
 from typing import Optional
 
 from PyQt5.QtWidgets import QCheckBox
-from qgis._core import QgsMapLayer
-from qgis._gui import QgsMapLayerComboBox
 
 from ..utils.router import route_as_layer
 
