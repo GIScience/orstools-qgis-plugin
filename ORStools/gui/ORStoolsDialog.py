@@ -700,9 +700,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
 
     def save_selected_provider_state(self) -> None:
         s = QgsSettings()
-        s.setValue(
-            "ORSTools/gui/provider_combo", self.provider_combo.currentIndex()
-        )
+        s.setValue("ORSTools/gui/provider_combo", self.provider_combo.currentIndex())
 
     def load_provider_combo_state(self):
         s = QgsSettings()
