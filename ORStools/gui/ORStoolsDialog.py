@@ -706,7 +706,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         s = QgsSettings()
         index = s.value("ORSTools/gui/provider_combo")
         if index:
-            self.provider_combo.setCurrentIndex(index)
+            self.provider_combo.setCurrentIndex(int(index))
 
     def show(self):
         """Load the saved state when the window is shown"""
