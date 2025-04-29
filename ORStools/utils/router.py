@@ -27,13 +27,13 @@ def route_as_layer(dlg):
     if not provider["key"] and provider["base_url"].startswith("https://api.openrouteservice.org"):
         QMessageBox.critical(
             dlg,
-            "Missing API key",
-            """
+            tr("Missing API key"),
+            tr("""
             Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
 
             If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
             Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-            settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+            settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
         )
         return False
 
@@ -49,11 +49,11 @@ def route_as_layer(dlg):
             if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
                 QMessageBox.critical(
                     dlg,
-                    "Wrong number of waypoints",
-                    """At least 3 or 4 waypoints are needed to perform routing optimization. 
+                    tr("Wrong number of waypoints"),
+                    tr("""At least 3 or 4 waypoints are needed to perform routing optimization. 
 
 Remember, the first and last location are not part of the optimization.
-                    """,
+                    """),
                 )
                 return
             response = clnt.request("/optimization", {}, post_json=params)
@@ -71,11 +71,11 @@ Remember, the first and last location are not part of the optimization.
             ):
                 QMessageBox.warning(
                     dlg,
-                    "Empty layer",
-                    """
+                    tr("Empty layer"),
+                    tr("""
 The specified avoid polygon(s) layer does not contain any features.
 Please add polygons to the layer or uncheck avoid polygons.
-                    """,
+                    """),
                 )
                 msg = "The request has been aborted!"
                 logger.log(msg, 0)
@@ -116,3 +116,6 @@ Please add polygons to the layer or uncheck avoid polygons.
         if params:
             clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
         dlg.debug_text.setHtml(clnt_msg)
+
+def tr(self, string: str) -> str:
+    return QCoreApplication.translate(str(self.__class__.__name__), string)
