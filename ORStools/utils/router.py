@@ -117,5 +117,6 @@ Please add polygons to the layer or uncheck avoid polygons.
             clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
         dlg.debug_text.setHtml(clnt_msg)
 
+
 def tr(self, string: str) -> str:
     return QCoreApplication.translate(str(self.__class__.__name__), string)
