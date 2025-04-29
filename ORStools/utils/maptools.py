@@ -276,7 +276,7 @@ class LineTool(QgsMapToolEmitPoint):
         color.setAlpha(100)
         self.dlg.rubber_band.setStrokeColor(color)
         self.dlg.rubber_band.setWidth(5)
-        if self.dlg.toggle_preview.isChecked():
+        if self.dlg.toggle_preview.isChecked() and self.dlg.routing_fromline_list.count() > 1:
             route_layer = router.route_as_layer(self.dlg)
             if route_layer:
                 feature = next(route_layer.getFeatures())
