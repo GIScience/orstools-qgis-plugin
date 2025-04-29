@@ -14,6 +14,8 @@ from ORStools.common import (
 from ORStools.gui import directions_gui
 from ORStools.utils import exceptions, logger, configmanager
 
+from qgis.PyQt.QtCore import QCoreApplication
+
 
 def route_as_layer(dlg):
     layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
