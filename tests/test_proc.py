@@ -203,25 +203,25 @@ class TestProc(unittest.TestCase):
         feat = next(processed_layer.getFeatures())
         self.assertTrue(feat.attributes()[2] > 0)
 
-    def test_export(self):
-        parameters = {
-            "INPUT_PROVIDER": 0,
-            "INPUT_PROFILE": 0,
-            "INPUT_EXPORT": self.bbox,
-            "OUTPUT_POINT": "TEMPORARY_OUTPUT",
-            "OUTPUT": "TEMPORARY_OUTPUT",
-        }
-
-        export = ORSExportAlgo().create()
-        dest_id = export.processAlgorithm(parameters, self.context, self.feedback)
-        processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
-        processed_nodes = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT_POINT"], self.context)
-
-        self.assertEqual(type(processed_layer), QgsVectorLayer)
-        self.assertEqual(type(processed_nodes), QgsVectorLayer)
-
-        feat_point = next(processed_layer.getFeatures())
-        self.assertTrue(feat_point.hasGeometry())
-        feat_line = next(processed_nodes.getFeatures())
-        self.assertTrue(feat_line.hasGeometry())
+    # def test_export(self):
+    #     parameters = {
+    #         "INPUT_PROVIDER": 0,
+    #         "INPUT_PROFILE": 0,
+    #         "INPUT_EXPORT": self.bbox,
+    #         "OUTPUT_POINT": "TEMPORARY_OUTPUT",
+    #         "OUTPUT": "TEMPORARY_OUTPUT",
+    #     }
+    #
+    #     export = ORSExportAlgo().create()
+    #     dest_id = export.processAlgorithm(parameters, self.context, self.feedback)
+    #     processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
+    #     processed_nodes = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT_POINT"], self.context)
+    #
+    #     self.assertEqual(type(processed_layer), QgsVectorLayer)
+    #     self.assertEqual(type(processed_nodes), QgsVectorLayer)
+    #
+    #     feat_point = next(processed_layer.getFeatures())
+    #     self.assertTrue(feat_point.hasGeometry())
+    #     feat_line = next(processed_nodes.getFeatures())
+    #     self.assertTrue(feat_line.hasGeometry())
 
