@@ -123,7 +123,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             defaultValue=providers[0],
         )
 
-        self.setToolTip(parameter, "Select the provider that should be used.")
+        self.setToolTip(parameter, self.tr("Select the provider that should be used."))
 
         return parameter
 
@@ -150,7 +150,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             name=self.OUT,
             description=self.GROUP,
         )
-        self.setToolTip(parameter, "Select where the output should be saved.")
+        self.setToolTip(parameter, self.tr("Select where the output should be saved."))
 
         return parameter
 
@@ -188,10 +188,10 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
-        self.setToolTip(parameters[0], "Select features that should be avoided by the algorithm.")
-        self.setToolTip(parameters[1], "Select borders that should be avoided by the algorithm.")
-        self.setToolTip(parameters[2], "Select countries that should be avoided by the algorithm.")
-        self.setToolTip(parameters[3], "Select polygons that should be avoided by the algorithm.")
+        self.setToolTip(parameters[0], self.tr("Select features that should be avoided by the algorithm."))
+        self.setToolTip(parameters[1], self.tr("Select borders that should be avoided by the algorithm."))
+        self.setToolTip(parameters[2], self.tr("Select countries that should be avoided by the algorithm."))
+        self.setToolTip(parameters[3], self.tr("Select polygons that should be avoided by the algorithm."))
 
         return parameters
 

@@ -82,15 +82,15 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-        self.setToolTip(self.PARAMETERS[0], "Only Point layers are allowed, not MultiPoint.")
+        self.setToolTip(self.PARAMETERS[0], self.tr("Only Point layers are allowed, not MultiPoint."))
         self.setToolTip(
             self.PARAMETERS[1],
-            "Values will transfer to the output layer and can be used to join layers or group features afterwards.",
+            self.tr("Values will transfer to the output layer and can be used to join layers or group features afterwards."),
         )
         self.setToolTip(self.PARAMETERS[2], "Only Point layers are allowed, not MultiPoint.")
         self.setToolTip(
             self.PARAMETERS[3],
-            "Values will transfer to the output layer and can be used to join layers or group features afterwards.",
+            self.tr("Values will transfer to the output layer and can be used to join layers or group features afterwards."),
         )
 
     def processAlgorithm(self, parameters, context, feedback):
