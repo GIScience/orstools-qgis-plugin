@@ -87,14 +87,19 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         self.setToolTip(self.PARAMETERS[0], "LineString or MultiLineString layer.")
         self.setToolTip(
             self.PARAMETERS[1],
-            self.tr("Values will transfer to the output layer and can be used to join layers or group features afterwards."),
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
         )
         self.setToolTip(
-            self.PARAMETERS[2], self.tr("Dictates the cost. For longer routes don't use Shortest Path.")
+            self.PARAMETERS[2],
+            self.tr("Dictates the cost. For longer routes don't use Shortest Path."),
         )
         self.setToolTip(
             self.PARAMETERS[3],
-            self.tr("You can optionally perform a Traveling Salesman on the waypoints of each MultiPoint feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest Advanced Parameters: see the documentation for descriptions."),
+            self.tr(
+                "You can optionally perform a Traveling Salesman on the waypoints of each MultiPoint feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest Advanced Parameters: see the documentation for descriptions."
+            ),
         )
 
     def processAlgorithm(self, parameters, context, feedback):

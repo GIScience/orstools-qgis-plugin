@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from PyQt5.QtCore import QCoreApplication, QSettings
 from qgis.core import (
     QgsProcessing,
@@ -188,10 +189,18 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
-        self.setToolTip(parameters[0], self.tr("Select features that should be avoided by the algorithm."))
-        self.setToolTip(parameters[1], self.tr("Select borders that should be avoided by the algorithm."))
-        self.setToolTip(parameters[2], self.tr("Select countries that should be avoided by the algorithm."))
-        self.setToolTip(parameters[3], self.tr("Select polygons that should be avoided by the algorithm."))
+        self.setToolTip(
+            parameters[0], self.tr("Select features that should be avoided by the algorithm.")
+        )
+        self.setToolTip(
+            parameters[1], self.tr("Select borders that should be avoided by the algorithm.")
+        )
+        self.setToolTip(
+            parameters[2], self.tr("Select countries that should be avoided by the algorithm.")
+        )
+        self.setToolTip(
+            parameters[3], self.tr("Select polygons that should be avoided by the algorithm.")
+        )
 
         return parameters
 

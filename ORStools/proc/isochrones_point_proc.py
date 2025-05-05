@@ -93,11 +93,15 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         self.setToolTip(self.PARAMETERS[0], self.tr("Choose a Point from the map."))
         self.setToolTip(
             self.PARAMETERS[2],
-            self.tr("Parameter needs to be a comma-separated list of integer values, no decimal points."),
+            self.tr(
+                "Parameter needs to be a comma-separated list of integer values, no decimal points."
+            ),
         )
         self.setToolTip(
             self.PARAMETERS[3],
-            self.tr("Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100."),
+            self.tr(
+                "Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100."
+            ),
         )
         self.setToolTip(
             self.PARAMETERS[4],

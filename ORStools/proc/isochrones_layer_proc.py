@@ -104,18 +104,26 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-        self.setToolTip(self.PARAMETERS[0], self.tr("Only Point layers are allowed, not MultiPoint."))
+        self.setToolTip(
+            self.PARAMETERS[0], self.tr("Only Point layers are allowed, not MultiPoint.")
+        )
         self.setToolTip(
             self.PARAMETERS[1],
-            self.tr("Values will transfer to the output layer and can be used to join layers or group features afterwards."),
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
         )
         self.setToolTip(
             self.PARAMETERS[3],
-            self.tr("Parameter needs to be a comma-separated list of integer values, no decimal points."),
+            self.tr(
+                "Parameter needs to be a comma-separated list of integer values, no decimal points."
+            ),
         )
         self.setToolTip(
             self.PARAMETERS[4],
-            self.tr("Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100."),
+            self.tr(
+                "Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100."
+            ),
         )
         self.setToolTip(
             self.PARAMETERS[5],
