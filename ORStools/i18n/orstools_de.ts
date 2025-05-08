@@ -428,7 +428,7 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="276"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;The Escape key, right- or double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add waypoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;The Escape key, right- or double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wegpunkte aus Kartenansicht hinzufügen&lt;/p&gt;&lt;p&gt;Escape, Rechts-  oder Doppelklick beendeen die Wegpunkt-Auswahl.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
