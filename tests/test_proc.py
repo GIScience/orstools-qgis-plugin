@@ -232,20 +232,36 @@ class TestProc(unittest.TestCase):
     #     self.assertTrue(feat_line.hasGeometry())
 
     def test_snapping(self):
-        parameters = { 'INPUT_PROFILE' : 0, 'INPUT_PROVIDER' : 0, 'IN_POINT' : '-11867882.765490,4161830.530990 [EPSG:3857]', 'OUTPUT' : 'TEMPORARY_OUTPUT', 'RADIUS' : 300 }
+        parameters = {
+            "INPUT_PROFILE": 0,
+            "INPUT_PROVIDER": 0,
+            "IN_POINT": "-11867882.765490,4161830.530990 [EPSG:3857]",
+            "OUTPUT": "TEMPORARY_OUTPUT",
+            "RADIUS": 300,
+        }
 
         snap_point = ORSSnapPointAlgo().create()
         dest_id = snap_point.processAlgorithm(parameters, self.context, self.feedback)
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
         new_feat = next(processed_layer.getFeatures())
-        self.assertEqual(new_feat.geometry().asWkt(), 'Point (-106.61225600000000213 34.98548300000000211)')
+        self.assertEqual(
+            new_feat.geometry().asWkt(), "Point (-106.61225600000000213 34.98548300000000211)"
+        )
 
-        parameters = { 'INPUT_PROFILE' : 0, 'INPUT_PROVIDER' : 0, 'IN_POINTS' : self.point_layer_2, 'OUTPUT' : 'TEMPORARY_OUTPUT', 'RADIUS' : 300 }
+        parameters = {
+            "INPUT_PROFILE": 0,
+            "INPUT_PROVIDER": 0,
+            "IN_POINTS": self.point_layer_2,
+            "OUTPUT": "TEMPORARY_OUTPUT",
+            "RADIUS": 300,
+        }
 
         snap_points = ORSSnapLayerAlgo().create()
         dest_id = snap_points.processAlgorithm(parameters, self.context, self.feedback)
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
         new_feat = next(processed_layer.getFeatures())
 
-        self.assertEqual(new_feat.geometry().asWkt(), "Point (-118.5000349999999969 34.20000000000000284)")
+        self.assertEqual(
+            new_feat.geometry().asWkt(), "Point (-118.5000349999999969 34.20000000000000284)"
+        )
         self.assertEqual(len([i for i in processed_layer.getFeatures()]), 2)
