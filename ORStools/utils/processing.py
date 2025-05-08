@@ -33,6 +33,7 @@ from typing import List
 
 from ORStools import BASE_DIR
 from ORStools.common import OPTIMIZATION_MODES
+from ORStools.utils import logger
 
 from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
 
@@ -100,11 +101,15 @@ def get_snapped_point_features(response: dict) -> list:
     feats = []
     for location in locations:
         if location:
+            logger.log(str(location))
             feat = QgsFeature()
             coords = location["location"]
             if "name" in location.keys():
                 name = location["name"]
-            snapped_distance = location["snapped_distance"]
+            if "snapped_distance" in location.keys():
+                snapped_distance = location["snapped_distance"]
+            else:
+                snapped_distance = 0
             attr = [name, snapped_distance] if "name" in location.keys() else ["", snapped_distance]
             feat.setAttributes(attr)
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
