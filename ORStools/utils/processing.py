@@ -111,4 +111,9 @@ def get_snapped_point_features(response: dict, og_features, feedback) -> list:
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
             feats.append(feat)
 
+        else:
+            f = og_features[i]
+            x, y = f.geometry().asPoint().x(), f.geometry().asPoint().y()
+            feedback.pushWarning(f"Point {i+1}: ({x}, {y}) could not be snapped and will be ignored in the output.")
+
     return feats
