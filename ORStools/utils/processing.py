@@ -97,21 +97,15 @@ def read_help_file(algorithm: str, locale: str = ""):
 
 
 def get_snapped_point_features(response: dict) -> list:
-    locations = response["locations"]
+    locations = response.get("locations", [])
     feats = []
     for location in locations:
         if location:
-            logger.log(str(location))
             feat = QgsFeature()
             coords = location["location"]
-            if "name" in location.keys():
-                name = location["name"]
-            if "snapped_distance" in location.keys():
-                snapped_distance = location["snapped_distance"]
-            else:
-                snapped_distance = 0
-            attr = [name, snapped_distance] if "name" in location.keys() else ["", snapped_distance]
-            feat.setAttributes(attr)
+            name = location.get("name", "")
+            snapped_distance = location.get("snapped_distance", 0)
+            feat.setAttributes([name, snapped_distance])
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
             feats.append(feat)
 
