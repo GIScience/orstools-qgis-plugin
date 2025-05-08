@@ -487,7 +487,7 @@ class Ui_ORStoolsDialogBase(object):
         self.routing_travel_label.setText(_translate("ORStoolsDialogBase", "Go with"))
         self.routing_travel_combo.setToolTip(_translate("ORStoolsDialogBase", "Mode of travel"))
         self.routing_preference_combo.setToolTip(_translate("ORStoolsDialogBase", "Preference"))
-        self.routing_fromline_map.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Add wayoints interactively from the map canvas.</p><p>Right- or double-click will pause waypoint selection, drag and drop will still be enabled. Another click on the green + button will continue the selection process. The ESC-button will terminate it and delete all waypoints.</p></body></html>"))
+        self.routing_fromline_map.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Add waypoints interactively from the map canvas.</p><p>Right- or double-click will pause waypoint selection, drag and drop will still be enabled. Another click on the green + button will continue the selection process. The ESC-button will terminate it and delete all waypoints.</p></body></html>"))
         self.routing_fromline_clear.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.</p></body></html>"))
         self.routing_fromline_list.setToolTip(_translate("ORStoolsDialogBase", "Select waypoints from the map!"))
         self.save_vertices.setToolTip(_translate("ORStoolsDialogBase", "<html><head/><body><p>Save points in list to layer. Use the processing algorithms (batch jobs) to work with points from layers.</p></body></html>"))
