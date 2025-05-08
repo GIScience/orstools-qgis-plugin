@@ -98,6 +98,10 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         sink_fields.append(QgsField("NAME", QVariant.String))
         sink_fields.append(QgsField("SNAPPED_DISTANCE", QVariant.Double))
 
+        source_fields = [field for field in source.fields()]
+        for field in source_fields:
+            sink_fields.append(field)
+
         (sink, dest_id) = self.parameterAsSink(
             parameters,
             self.OUT,
@@ -110,7 +114,7 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         # Make request and catch ApiError
         try:
             response = ors_client.request("/v2/snap/" + profile, {}, post_json=params)
-            point_features = get_snapped_point_features(response)
+            point_features = get_snapped_point_features(response, sources_features, feedback)
 
             for feat in point_features:
                 sink.addFeature(feat)

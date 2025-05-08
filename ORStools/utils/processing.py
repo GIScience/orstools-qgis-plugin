@@ -96,16 +96,18 @@ def read_help_file(algorithm: str, locale: str = ""):
     return msg
 
 
-def get_snapped_point_features(response: dict) -> list:
+def get_snapped_point_features(response: dict, og_features, feedback) -> list:
     locations = response.get("locations", [])
     feats = []
-    for location in locations:
+    for i, location in enumerate(locations):
         if location:
             feat = QgsFeature()
             coords = location["location"]
             name = location.get("name", "")
             snapped_distance = location.get("snapped_distance", 0)
-            feat.setAttributes([name, snapped_distance])
+            og_attributes = og_features[i].attributes()
+
+            feat.setAttributes([name, snapped_distance] + og_attributes)
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
             feats.append(feat)
 
