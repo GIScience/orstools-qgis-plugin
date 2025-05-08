@@ -84,7 +84,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.moving = None
         self.moved_idxs = 0
         self.error_idxs = 0
-        self.click_dist = 10
+        self.click_dist = 25
         self.move_i = 0
         self.idx = 0
 
