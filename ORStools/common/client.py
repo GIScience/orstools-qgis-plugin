@@ -183,10 +183,7 @@ class Client(QObject):
                 logger.log(f"{e.__class__.__name__}: {str(e)}", 1)
 
                 iface.messageBar().pushMessage(
-                    "ORSTools",
-                    "Rate limit exceeded, retrying...",
-                    level=Qgis.Warning,
-                    duration=2
+                    "ORSTools", "Rate limit exceeded, retrying...", level=Qgis.Warning, duration=2
                 )
 
                 return self.request(url, params, first_request_time, retry_counter + 1, post_json)
