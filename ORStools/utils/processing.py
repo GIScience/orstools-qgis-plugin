@@ -33,7 +33,6 @@ from typing import List
 
 from ORStools import BASE_DIR
 from ORStools.common import OPTIMIZATION_MODES
-from ORStools.utils import logger
 
 from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
 
@@ -114,6 +113,8 @@ def get_snapped_point_features(response: dict, og_features, feedback) -> list:
         else:
             f = og_features[i]
             x, y = f.geometry().asPoint().x(), f.geometry().asPoint().y()
-            feedback.pushWarning(f"Point {i+1}: ({x}, {y}) could not be snapped and will be ignored in the output.")
+            feedback.pushWarning(
+                f"Point {i + 1}: ({x}, {y}) could not be snapped and will be ignored in the output."
+            )
 
     return feats
