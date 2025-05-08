@@ -430,6 +430,7 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
                 if self.annotations:
                     self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
                 self.routing_fromline_list.takeItem(row)
+                self.line_tool.error_idxs += 1
         else:
             # else clear all items and annotations
             self.routing_fromline_list.clear()
