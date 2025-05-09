@@ -1,3 +1,6 @@
+from qgis.PyQt.QtWidgets import QLineEdit
+from qgis._core import QgsSettings
+from qgis.gui import QgsCollapsibleGroupBox
 from qgis.testing import unittest
 
 from qgis.PyQt.QtTest import QTest
@@ -10,6 +13,7 @@ from qgis.core import (
 )
 import pytest
 
+from .test_proc import TestProc
 from tests.utils.utilities import get_qgis_app
 
 CANVAS: QgsMapCanvas
@@ -20,6 +24,7 @@ QGISAPP, CANVAS, IFACE, PARENT = get_qgis_app()
 class TestGui(unittest.TestCase):
     def test_without_live_preview(self):
         from ORStools.gui.ORStoolsDialog import ORStoolsDialog
+        from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
         from ORStools.utils import maptools
 
         CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
@@ -29,6 +34,13 @@ class TestGui(unittest.TestCase):
         CANVAS.resize(600, 400)
         self.assertEqual(CANVAS.width(), 600)
         self.assertEqual(CANVAS.height(), 400)
+
+        # Set and reset config to test whether the reset works
+        dlg_config = ORStoolsDialogConfigMain()
+        provider = dlg_config.providers.findChildren(QgsCollapsibleGroupBox)[0]
+
+        line_edit = provider.findChild(QLineEdit, "openrouteservice_directions_endpoint")
+        line_edit.setText("thisisnotanendpoint")
 
         dlg = ORStoolsDialog(IFACE)
         dlg.open()
@@ -244,4 +256,105 @@ class TestGui(unittest.TestCase):
             side,
             side,
             Qt.NoModifier,
+        )
+
+    def test_ORStoolsDialogConfig_endpoints(self):
+        from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
+
+        CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
+        CANVAS.setExtent(QgsRectangle(258889, 7430342, 509995, 7661955))
+        CANVAS.setDestinationCrs(CRS)
+        CANVAS.setFrameStyle(0)
+        CANVAS.resize(600, 400)
+        self.assertEqual(CANVAS.width(), 600)
+        self.assertEqual(CANVAS.height(), 400)
+
+        # Set and reset config to test whether the reset works
+        dlg_config = ORStoolsDialogConfigMain()
+        provider = dlg_config.providers.findChildren(QgsCollapsibleGroupBox)[0]
+
+        # set endpoint of directions to non-existent value
+        line_edit = provider.findChild(QLineEdit, "openrouteservice_directions_endpoint")
+        line_edit.setText("thisisnotanendpoint")
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "endpoints"
+        ]["directions"]
+
+        self.assertEqual(settings_directions_endpoint, "thisisnotanendpoint")
+
+        proc = TestProc()
+        proc.setUpClass()
+
+        self.assertRaises(StopIteration, proc.test_directions_points_layer)
+
+        # reset endpoints
+        dlg_config._reset_endpoints()
+
+        dlg_config._reset_endpoints()
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "endpoints"
+        ]["directions"]
+
+        self.assertEqual(settings_directions_endpoint, "directions")
+
+        layer = proc.test_directions_points_layer()
+
+        self.assertEqual(
+            "POINT(8.67251100000000008 49.39887900000000087)",
+            next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
+        )
+
+    def test_ORStoolsDialogConfig_url(self):
+        from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
+
+        CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
+        CANVAS.setExtent(QgsRectangle(258889, 7430342, 509995, 7661955))
+        CANVAS.setDestinationCrs(CRS)
+        CANVAS.setFrameStyle(0)
+        CANVAS.resize(600, 400)
+        self.assertEqual(CANVAS.width(), 600)
+        self.assertEqual(CANVAS.height(), 400)
+
+        # Set and reset config to test whether the reset works
+        dlg_config = ORStoolsDialogConfigMain()
+        provider = dlg_config.providers.findChildren(QgsCollapsibleGroupBox)[0]
+
+        # set endpoint of directions to non-existent value
+        line_edit = provider.findChild(QLineEdit, "openrouteservice_base_url_text")
+        line_edit.setText("thisisnotaurl")
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "base_url"
+        ]
+
+        self.assertEqual(settings_directions_endpoint, "thisisnotaurl")
+
+        proc = TestProc()
+        proc.setUpClass()
+
+        self.assertRaises(Exception, proc.test_directions_points_layer)
+
+        # reset url
+        url_reset_button = dlg_config.findChild(QPushButton, "openrouteservice_reset_url_button")
+        url_reset_button.clicked.emit()
+
+        dlg_config._reset_endpoints()
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "endpoints"
+        ]["directions"]
+
+        self.assertEqual(settings_directions_endpoint, "directions")
+
+        layer = proc.test_directions_points_layer()
+
+        self.assertEqual(
+            "POINT(8.67251100000000008 49.39887900000000087)",
+            next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )

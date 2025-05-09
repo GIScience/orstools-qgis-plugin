@@ -33,7 +33,7 @@ from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
 
 from .gui import ORStoolsDialog
-from .proc import provider
+from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS
 
 
 class ORStools:
@@ -89,19 +89,19 @@ class ORStools:
     def add_default_provider_to_settings(self):
         s = QgsSettings()
         settings = s.value("ORStools/config")
-        if not settings:
-            def_settings = {
-                "providers": [
-                    {
-                        "ENV_VARS": {
-                            "ORS_QUOTA": "X-Ratelimit-Limit",
-                            "ORS_REMAINING": "X-Ratelimit-Remaining",
-                        },
-                        "base_url": "https://api.openrouteservice.org",
-                        "key": "",
-                        "name": "openrouteservice",
-                        "timeout": 60,
-                    }
-                ]
-            }
-            s.setValue("ORStools/config", def_settings)
+
+        settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
+
+        # Add any new settings here for backwards compatibility
+        if settings:
+            changed = False
+            for i, prov in enumerate(settings["providers"]):
+                if any([i not in prov for i in settings_keys]):
+                    changed = True
+                    # Add here, like the endpoints
+                    prov["endpoints"] = ENDPOINTS
+                    settings["providers"][i] = prov
+            if changed:
+                s.setValue("ORStools/config", settings)
+        else:
+            s.setValue("ORStools/config", DEFAULT_SETTINGS)

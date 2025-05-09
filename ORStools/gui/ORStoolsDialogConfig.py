@@ -29,13 +29,19 @@
 
 from qgis.gui import QgsCollapsibleGroupBox
 
-from PyQt5 import QtWidgets
+from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QMetaObject
-from qgis.PyQt.QtWidgets import QDialog, QInputDialog, QLineEdit, QDialogButtonBox
+from qgis.PyQt.QtWidgets import (
+    QDialog,
+    QInputDialog,
+    QLineEdit,
+    QDialogButtonBox,
+)
 from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager
 from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
+from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
 
 class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
@@ -63,22 +69,54 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
 
     def accept(self) -> None:
-        """When the OK Button is clicked, in-memory temp_config is updated and written to config.yml"""
+        """When the OK Button is clicked, in-memory temp_config is updated and written to settings"""
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
+        collapsible_boxes = [
+            i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName()
+        ]
         for idx, box in enumerate(collapsible_boxes):
             current_provider = self.temp_config["providers"][idx]
+
             current_provider["key"] = box.findChild(
                 QtWidgets.QLineEdit, box.title() + "_key_text"
             ).text()
+
             current_provider["base_url"] = box.findChild(
                 QtWidgets.QLineEdit, box.title() + "_base_url_text"
             ).text()
+
             timeout_input = box.findChild(QtWidgets.QLineEdit, box.title() + "_timeout_text")
             # https://doc.qt.io/qt-5/qvalidator.html#State-enum
+
             if timeout_input.validator().State() != 2:
                 self._adjust_timeout_input(timeout_input)
+
             current_provider["timeout"] = int(timeout_input.text())
+
+            endpoint_box = box.findChild(
+                QgsCollapsibleGroupBox, f"{box.title()}_provider_endpoints"
+            )
+            current_provider["endpoints"] = {
+                "directions": endpoint_box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_directions_endpoint"
+                ).text(),
+                "isochrones": endpoint_box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_isochrones_endpoint"
+                ).text(),
+                "matrix": endpoint_box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_matrix_endpoint"
+                ).text(),
+                "optimization": endpoint_box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_optimization_endpoint"
+                ).text(),
+                "export": endpoint_box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_export_endpoint"
+                ).text(),
+                "snapping": endpoint_box.findChild(
+                    QtWidgets.QLineEdit, box.title() + "_snapping_endpoint"
+                ).text(),
+            }
 
         configmanager.write_config(self.temp_config)
         self.close()
@@ -109,6 +147,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
                 provider_entry["base_url"],
                 provider_entry["key"],
                 provider_entry["timeout"],
+                provider_entry["endpoints"],
                 new=False,
             )
 
@@ -128,7 +167,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             self, self.tr("New ORS provider"), self.tr("Enter a name for the provider")
         )
         if ok:
-            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, new=True)
+            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, new=True)
 
     def _remove_provider(self) -> None:
         """Remove list of providers from list."""
@@ -158,25 +197,15 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
-    def _add_box(self, name: str, url: str, key: str, timeout: int, new: bool = False) -> None:
+    def _add_box(
+        self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
+    ) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
-
-        :param name: provider name
-        :type name: str
-
-        :param url: provider's base url
-        :type url: str
-
-        :param key: user's API key
-        :type key: str
-
-        :param new: Specifies whether user wants to insert provider or the GUI is being built.
-        :type new: boolean
         """
         if new:
             self.temp_config["providers"].append(
-                dict(name=name, base_url=url, key=key, timeout=timeout)
+                dict(name=name, base_url=url, key=key, timeout=timeout, endpoints=endpoints)
             )
 
         provider = QgsCollapsibleGroupBox(self.providers)
@@ -184,32 +213,87 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         provider.setTitle(name)
         gridLayout_3 = QtWidgets.QGridLayout(provider)
         gridLayout_3.setObjectName(name + "_grid")
+
+        # API Key section
         key_label = QtWidgets.QLabel(provider)
         key_label.setObjectName(name + "_key_label")
         key_label.setText(self.tr("API Key"))
         gridLayout_3.addWidget(key_label, 0, 0, 1, 1)
+
         key_text = QtWidgets.QLineEdit(provider)
         key_text.setObjectName(name + "_key_text")
         key_text.setText(key)
         gridLayout_3.addWidget(key_text, 1, 0, 1, 4)
+
+        # Base URL section
         base_url_label = QtWidgets.QLabel(provider)
         base_url_label.setObjectName("base_url_label")
         base_url_label.setText(self.tr("Base URL"))
         gridLayout_3.addWidget(base_url_label, 2, 0, 1, 1)
+
         base_url_text = QtWidgets.QLineEdit(provider)
         base_url_text.setObjectName(name + "_base_url_text")
         base_url_text.setText(url)
         gridLayout_3.addWidget(base_url_text, 3, 0, 1, 4)
 
+        # Timeout section
         timeout_label = QtWidgets.QLabel(provider)
         timeout_label.setObjectName("timeout_label")
         timeout_label.setText(self.tr("Request timeout in seconds (1 - 3600)"))
         gridLayout_3.addWidget(timeout_label, 4, 0, 1, 1)
+
         timeout_text = QtWidgets.QLineEdit(provider)
         timeout_text.setObjectName(name + "_timeout_text")
         timeout_text.setText(str(timeout))
         timeout_text.setValidator(QIntValidator(1, 3600, timeout_text))
         gridLayout_3.addWidget(timeout_text, 5, 0, 1, 4)
 
+        # Service Endpoints section
+        endpoint_box = QgsCollapsibleGroupBox(provider)
+        endpoint_box.setObjectName(name + "_provider_endpoints")
+        endpoint_box.setTitle(self.tr("Service Endpoints"))
+        endpoint_layout = QtWidgets.QGridLayout(endpoint_box)
+        gridLayout_3.addWidget(endpoint_box, 6, 0, 1, 4)
+
+        row = 0
+        for endpoint_name, endpoint_value in endpoints.items():
+            endpoint_label = QtWidgets.QLabel(endpoint_box)
+            endpoint_label.setText(self.tr(endpoint_name.capitalize()))
+            endpoint_layout.addWidget(endpoint_label, row, 0, 1, 1)
+
+            endpoint_lineedit = QtWidgets.QLineEdit(endpoint_box)
+            endpoint_lineedit.setText(endpoint_value)
+            endpoint_lineedit.setObjectName(f"{name}_{endpoint_name}_endpoint")
+
+            endpoint_layout.addWidget(endpoint_lineedit, row, 1, 1, 3)
+
+            row += 1
+
+        # Add reset buttons at the bottom
+        button_layout = QtWidgets.QHBoxLayout()
+
+        reset_url_button = QtWidgets.QPushButton(self.tr("Reset URL"), provider)
+        reset_url_button.setObjectName(name + "_reset_url_button")
+        reset_url_button.clicked.connect(
+            lambda _, t=base_url_text: t.setText(DEFAULT_SETTINGS["providers"][0]["base_url"])
+        )
+        button_layout.addWidget(reset_url_button)
+
+        reset_endpoints_button = QtWidgets.QPushButton(self.tr("Reset Endpoints"), provider)
+        reset_endpoints_button.setObjectName(name + "_reset_endpoints_button")
+        reset_endpoints_button.clicked.connect(self._reset_endpoints)
+        button_layout.addWidget(reset_endpoints_button)
+
+        gridLayout_3.addLayout(button_layout, 7, 0, 1, 4)
+
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+
+    def _reset_endpoints(self) -> None:
+        """Resets the endpoints to their original values."""
+        for line_edit_remove in self.providers.findChildren(QLineEdit):
+            name = line_edit_remove.objectName()
+            if name.endswith("endpoint"):
+                endpoint_name = name.split("_")[1]
+                endpoint_value = ENDPOINTS[endpoint_name]
+                line_edit_remove.setText(endpoint_value)
