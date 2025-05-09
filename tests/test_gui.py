@@ -308,7 +308,7 @@ class TestGui(unittest.TestCase):
             next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )
 
-    def test_ORStoolsDialogConfig_endpoints(self):
+    def test_ORStoolsDialogConfig_url(self):
         from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
         CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
@@ -358,4 +358,3 @@ class TestGui(unittest.TestCase):
             "POINT(8.67251100000000008 49.39887900000000087)",
             next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )
-

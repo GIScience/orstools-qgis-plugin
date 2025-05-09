@@ -16,7 +16,6 @@ from ORStools.proc.directions_points_layers_proc import ORSDirectionsPointsLayer
 from ORStools.proc.isochrones_layer_proc import ORSIsochronesLayerAlgo
 from ORStools.proc.isochrones_point_proc import ORSIsochronesPointAlgo
 from ORStools.proc.matrix_proc import ORSMatrixAlgo
-from ORStools.proc.export_proc import ORSExportAlgo
 
 
 class TestProc(unittest.TestCase):

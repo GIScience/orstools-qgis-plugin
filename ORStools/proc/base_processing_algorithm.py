@@ -179,7 +179,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
-    def get_edpoint_names_from_provider(self, provider: str) -> dict:
+    def get_endpoint_names_from_provider(self, provider: str) -> dict:
         providers = configmanager.read_config()["providers"]
         ors_provider = providers[provider]
         return ors_provider["endpoints"]
