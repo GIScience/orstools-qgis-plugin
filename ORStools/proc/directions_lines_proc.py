@@ -228,7 +228,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                         "directions"
                     ]
                     response = ors_client.request(
-                        f"/v2/{endpoint}/" + profile + "/geojson", {}, post_json=params
+                        f"/v2/{endpoint}/{profile}/geojson", {}, post_json=params
                     )
 
                     if extra_info:

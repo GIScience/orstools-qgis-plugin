@@ -240,7 +240,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                     "directions"
                 ]
                 response = ors_client.request(
-                    f"/v2/{endpoint}/" + profile + "/geojson", {}, post_json=params
+                    f"/v2/{endpoint}/{profile}/geojson", {}, post_json=params
                 )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Route from {values[0]} to {values[1]} caused a {e.__class__.__name__}:\n{str(e)}"
