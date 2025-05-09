@@ -97,6 +97,9 @@ class TestGui(unittest.TestCase):
         dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.LeftButton))
         # click on canvas at [5, 5]
         dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 0, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 0, Qt.LeftButton))
 
         self.assertEqual(
             dlg.routing_fromline_list.item(0).text(), "Point 0: -123.384059, 48.448463"
@@ -111,22 +114,39 @@ class TestGui(unittest.TestCase):
         dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.RightButton))
         self.assertTrue(dlg.isVisible())
         # Test that right click doesn't create a point
-        self.assertEqual(dlg.routing_fromline_list.count(), 2)
+        self.assertEqual(dlg.routing_fromline_list.count(), 5)
 
         # click on canvas at [10, 10]
         # Check that the click with an open dlg doesn't create an entry
         dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.LeftButton))
-        self.assertEqual(dlg.routing_fromline_list.count(), 2)
+        self.assertEqual(dlg.routing_fromline_list.count(), 5)
+
+        # test whether point order remains valid when selected points are deleted from QListWidget
+        dlg.routing_fromline_list.setCurrentRow(1)
+        dlg.routing_fromline_clear.clicked.emit()
+
+        # click again after deletion
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        self.assertFalse(dlg.isVisible())
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.LeftButton))
+
+        # Right click and thus show dlg
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.RightButton))
+        self.assertTrue(dlg.isVisible())
+
+        self.assertEqual(dlg.routing_fromline_list.count(), 5)
+        numbers = [int(i.document().toPlainText()) for i in dlg.annotations]
+        self.assertTrue(numbers == list(range(numbers[0], numbers[0] + len(numbers))))
 
         # Disable live preview
         dlg.toggle_preview.toggle()
         self.assertFalse(dlg.toggle_preview.isChecked())
 
-        # Check rubber band has only 2 vertices
-        self.assertEqual(dlg.routing_fromline_list.count(), 2)
+        # Check rubber band has only 5 vertices
+        self.assertEqual(dlg.routing_fromline_list.count(), 5)
         self.assertEqual(type(dlg.rubber_band), QgsRubberBand)
         len_rubber_band = len(dlg.rubber_band.asGeometry().asPolyline())
-        self.assertEqual(len_rubber_band, 2)
+        self.assertEqual(len_rubber_band, 5)
 
         # Click Add Vertices again
         QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
@@ -135,7 +155,7 @@ class TestGui(unittest.TestCase):
         # continue digitization
         # click on canvas at [10, 5]
         dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.LeftButton))
-        self.assertEqual(dlg.routing_fromline_list.count(), 3)
+        self.assertEqual(dlg.routing_fromline_list.count(), 6)
 
         # Double click and thus show dlg
         dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(0, 5, Qt.LeftButton))
