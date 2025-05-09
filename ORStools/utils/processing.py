@@ -35,6 +35,7 @@ from ORStools import BASE_DIR
 from ORStools.common import OPTIMIZATION_MODES
 
 from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
+from qgis.PyQt.QtCore import QCoreApplication
 
 
 def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: int) -> dict:
@@ -114,7 +115,11 @@ def get_snapped_point_features(response: dict, og_features=None, feedback=None) 
             f = og_features[i]
             x, y = f.geometry().asPoint().x(), f.geometry().asPoint().y()
             feedback.pushWarning(
-                f"Point {i + 1}: ({x}, {y}) could not be snapped and will be ignored in the output."
+                tr(f"Point {i + 1}: ({x}, {y}) could not be snapped and will be ignored in the output.")
             )
 
     return feats
+
+def tr(self, string: str, context=None) -> str:
+    context = context or self.__class__.__name__
+    return QCoreApplication.translate(context, string)
