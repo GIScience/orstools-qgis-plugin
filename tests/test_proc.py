@@ -10,7 +10,7 @@ from qgis.core import (
     QgsField,
 )
 from qgis.testing import unittest
-from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QVariant
 
 from ORStools.proc.directions_lines_proc import ORSDirectionsLinesAlgo
 from ORStools.proc.directions_points_layer_proc import ORSDirectionsPointsLayerAlgo
@@ -268,7 +268,7 @@ class TestProc(unittest.TestCase):
         self.assertEqual(len([i for i in processed_layer.getFeatures()]), 2)
 
         # test with "SNAPPED_NAME" being present in layer fields
-        new_field = QgsField("SNAPPED_NAME", QMetaType.QString)
+        new_field = QgsField("SNAPPED_NAME", QVariant.String)
         self.point_layer_2.dataProvider().addAttributes([new_field])
         self.point_layer_2.updateFields()
 
