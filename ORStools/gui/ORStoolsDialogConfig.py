@@ -36,8 +36,6 @@ from qgis.PyQt.QtWidgets import (
     QInputDialog,
     QLineEdit,
     QDialogButtonBox,
-    QMessageBox,
-    QWidget,
 )
 from qgis.PyQt.QtGui import QIntValidator
 
@@ -66,7 +64,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
         self.provider_add.clicked.connect(self._add_provider)
         self.provider_remove.clicked.connect(self._remove_provider)
-        self.providers_reset.clicked.connect(self._reset_all_providers)
 
         # Change OK to Save in config window
         self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
@@ -102,22 +99,22 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
             )
             current_provider["endpoints"] = {
                 "directions": endpoint_box.findChild(
-                    QtWidgets.QLineEdit, box.title() + "_directions_lineedit"
+                    QtWidgets.QLineEdit, box.title() + "_directions_endpoint"
                 ).text(),
                 "isochrones": endpoint_box.findChild(
-                    QtWidgets.QLineEdit, box.title() + "_isochrones_lineedit"
+                    QtWidgets.QLineEdit, box.title() + "_isochrones_endpoint"
                 ).text(),
                 "matrix": endpoint_box.findChild(
-                    QtWidgets.QLineEdit, box.title() + "_matrix_lineedit"
+                    QtWidgets.QLineEdit, box.title() + "_matrix_endpoint"
                 ).text(),
                 "optimization": endpoint_box.findChild(
-                    QtWidgets.QLineEdit, box.title() + "_optimization_lineedit"
+                    QtWidgets.QLineEdit, box.title() + "_optimization_endpoint"
                 ).text(),
                 "export": endpoint_box.findChild(
-                    QtWidgets.QLineEdit, box.title() + "_export_lineedit"
+                    QtWidgets.QLineEdit, box.title() + "_export_endpoint"
                 ).text(),
                 "snapping": endpoint_box.findChild(
-                    QtWidgets.QLineEdit, box.title() + "_snapping_lineedit"
+                    QtWidgets.QLineEdit, box.title() + "_snapping_endpoint"
                 ).text(),
             }
 
@@ -200,34 +197,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
-    def _reset_all_providers(self) -> None:
-        """Reset all providers."""
-
-        msg_box = QMessageBox()
-        msg_box.setIcon(QMessageBox.Warning)
-        msg_box.setWindowTitle("Confirm Reset")
-        msg_box.setText(
-            "Are you sure you want to delete all providers? This action cannot be undone."
-        )
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-
-        result = msg_box.exec()
-        if result == QMessageBox.Yes:
-            for box_remove in self.providers.findChildren(QWidget):
-                if "_provider_endpoints" in box_remove.objectName():
-                    continue
-                self.verticalLayout.removeWidget(box_remove)
-                box_remove.setParent(None)
-                box_remove.deleteLater()
-
-            configmanager.write_config(DEFAULT_SETTINGS)
-
-            self.temp_config = configmanager.read_config()
-            self._build_ui()
-
-        else:
-            pass
-
     def _add_box(
         self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
     ) -> None:
@@ -294,11 +263,37 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
             endpoint_lineedit = QtWidgets.QLineEdit(endpoint_box)
             endpoint_lineedit.setText(endpoint_value)
-            endpoint_lineedit.setObjectName(f"{name}_{endpoint_name}_lineedit")
+            endpoint_lineedit.setObjectName(f"{name}_{endpoint_name}_endpoint")
 
             endpoint_layout.addWidget(endpoint_lineedit, row, 1, 1, 3)
 
             row += 1
 
+        # Add reset buttons at the bottom
+        button_layout = QtWidgets.QHBoxLayout()
+
+        reset_url_button = QtWidgets.QPushButton(self.tr("Reset URL"), provider)
+        reset_url_button.setObjectName(name + "_reset_url_button")
+        reset_url_button.clicked.connect(
+            lambda _, t=base_url_text: t.setText(DEFAULT_SETTINGS["providers"][0]["base_url"])
+        )
+        button_layout.addWidget(reset_url_button)
+
+        reset_endpoints_button = QtWidgets.QPushButton(self.tr("Reset Endpoints"), provider)
+        reset_endpoints_button.setObjectName(name + "_reset_endpoints_button")
+        reset_endpoints_button.clicked.connect(self._reset_endpoints)
+        button_layout.addWidget(reset_endpoints_button)
+
+        gridLayout_3.addLayout(button_layout, 7, 0, 1, 4)
+
         self.verticalLayout.addWidget(provider)
         provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+
+    def _reset_endpoints(self) -> None:
+        """Resets the endpoints to their original values."""
+        for line_edit_remove in self.providers.findChildren(QLineEdit):
+            name = line_edit_remove.objectName()
+            if name.endswith("endpoint"):
+                endpoint_name = name.split("_")[1]
+                endpoint_value = ENDPOINTS[endpoint_name]
+                line_edit_remove.setText(endpoint_value)
