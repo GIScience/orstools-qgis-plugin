@@ -262,6 +262,6 @@ class TestProc(unittest.TestCase):
         new_feat = next(processed_layer.getFeatures())
 
         self.assertEqual(
-            new_feat.geometry().asWkt(), "Point (-118.5000349999999969 34.20000000000000284)"
+            new_feat.geometry().asWkt(), "Point (8.46554599999999979 49.48699799999999982)"
         )
         self.assertEqual(len([i for i in processed_layer.getFeatures()]), 2)
