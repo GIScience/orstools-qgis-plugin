@@ -99,7 +99,14 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         sink_fields.append(QgsField("SNAPPED_DISTANCE", QVariant.Double))
 
         source_fields = [field for field in source.fields()]
+
         for field in source_fields:
+            if field.name() in ["SNAPPED_DISTANCE", "SNAPPED_NAME"]:
+                raise Exception(
+                    self.tr(
+                        'Source layer may not contain field names "SNAPPED_DISTANCE" or "SNAPPED_NAME"'
+                    )
+                )
             sink_fields.append(field)
 
         (sink, dest_id) = self.parameterAsSink(

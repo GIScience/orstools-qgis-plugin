@@ -7,8 +7,10 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsRectangle,
+    QgsField,
 )
 from qgis.testing import unittest
+from qgis.PyQt.QtCore import QMetaType
 
 from ORStools.proc.directions_lines_proc import ORSDirectionsLinesAlgo
 from ORStools.proc.directions_points_layer_proc import ORSDirectionsPointsLayerAlgo
@@ -16,7 +18,6 @@ from ORStools.proc.directions_points_layers_proc import ORSDirectionsPointsLayer
 from ORStools.proc.isochrones_layer_proc import ORSIsochronesLayerAlgo
 from ORStools.proc.isochrones_point_proc import ORSIsochronesPointAlgo
 from ORStools.proc.matrix_proc import ORSMatrixAlgo
-from ORStools.proc.export_proc import ORSExportAlgo
 from ORStools.proc.snap_layer_proc import ORSSnapLayerAlgo
 from ORStools.proc.snap_point_proc import ORSSnapPointAlgo
 
@@ -265,3 +266,12 @@ class TestProc(unittest.TestCase):
             new_feat.geometry().asWkt(), "Point (8.46554599999999979 49.48699799999999982)"
         )
         self.assertEqual(len([i for i in processed_layer.getFeatures()]), 2)
+
+        # test with "SNAPPED_NAME" being present in layer fields
+        new_field = QgsField("SNAPPED_NAME", QMetaType.QString)
+        self.point_layer_2.dataProvider().addAttributes([new_field])
+        self.point_layer_2.updateFields()
+
+        self.assertRaises(
+            Exception, lambda: snap_points.processAlgorithm(parameters, self.context, self.feedback)
+        )
