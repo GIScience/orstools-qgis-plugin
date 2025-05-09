@@ -41,6 +41,8 @@ RELEASING:
  -->
 
 ## [Unreleased]
+### Added
+- Support for Snap endpoint ([#262](https://github.com/GIScience/orstools-qgis-plugin/issues/262))
 - Make vertex marker on map drag and droppable, add live preview ([#204](https://github.com/GIScience/orstools-qgis-plugin/issues/204))
 
 ### Added
