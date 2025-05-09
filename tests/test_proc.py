@@ -215,7 +215,9 @@ class TestProc(unittest.TestCase):
     #     export = ORSExportAlgo().create()
     #     dest_id = export.processAlgorithm(parameters, self.context, self.feedback)
     #     processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
-    #     processed_nodes = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT_POINT"], self.context)
+    #     processed_nodes = QgsProcessingUtils.mapLayerFromString(
+    #         dest_id["OUTPUT_POINT"], self.context)
+    #     )
     #
     #     self.assertEqual(type(processed_layer), QgsVectorLayer)
     #     self.assertEqual(type(processed_nodes), QgsVectorLayer)
@@ -224,4 +226,4 @@ class TestProc(unittest.TestCase):
     #     self.assertTrue(feat_point.hasGeometry())
     #     feat_line = next(processed_nodes.getFeatures())
     #     self.assertTrue(feat_line.hasGeometry())
-
+    

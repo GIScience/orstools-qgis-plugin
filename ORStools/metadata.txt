@@ -3,46 +3,18 @@ name=ORS Tools
 qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=1.8.4
+version=1.10.0
 author=HeiGIT gGmbH
 email=support@smartmobility.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2024/07/29 v1.8.4
+changelog=2024/11/21 v1.10.0
     Fixed
-    - issue with missing locale value
+    - Error with adding waypoints after calculating routes ([#288](https://github.com/GIScience/orstools-qgis-plugin/issues/288))
 
-    2024/05/29 v1.8.3
-    Fixed
-    - issues with extra_info in polylines/two point layer algorithms
-
-    2024/05/20 v1.8.2
-    Fixed
-    - use python 3.9-compatible type hint
-
-    2024/05/17 v1.8.1
-    Fixed
-    - remove structural pattern matching for compatibility with python<3.10
-
-    2024/05/17 v1.8.0
     Added
-    - Add support for decimal ranges with isochrones
-    - Add hint for joining with `Layer ID Field`
-    - Add option to export order of optimization route points
-    - Add `extra_info` parameter to directions processing algorithms
-
-    Changed
-    - Rename `Ok` button in configuration window to `Save` for clarification
-    - Replace PyQt5 imports with qgis.PyQt imports to prepare for Qt6-QGis builds
-
-    Fixed
-    - QGis crashes when selecting more than two vertices for deletion
-    - Vertices on canvas not depicted fully with n having more than one digit in length
-    - Replace qt QSettings with QgsSettings for centralized configuration management
-    - Point Annotations stay after saving project and not deleting them manually
-    - Issue with MultiPoint-layers and optimization
-    - Improved type hints
+    - Exit digitization on right click or Escape key press ([#285](https://github.com/GIScience/orstools-qgis-plugin/issues/285))
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki

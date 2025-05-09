@@ -1,7 +1,7 @@
 # ORS Tools QGIS plugin
 
-![Testing](https://github.com/GIScience/orstools-qgis-plugin/actions/workflows/test.yml/badge.svg)
-![Ruff](https://github.com/GIScience/orstools-qgis-plugin/actions/workflows/ruff.yml/badge.svg)
+![Testing](https://github.com/GIScience/orstools-qgis-plugin/actions/workflows/test.yml/badge.svg?branch=main)
+![Ruff](https://github.com/GIScience/orstools-qgis-plugin/actions/workflows/ruff.yml/badge.svg?branch=main)
 
 ![ORS Tools](https://user-images.githubusercontent.com/23240110/122937401-3ee72400-d372-11eb-8e3b-6c435d1dd964.png)
 
