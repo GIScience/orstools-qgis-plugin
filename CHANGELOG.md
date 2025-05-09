@@ -42,6 +42,9 @@ RELEASING:
 
 ## [Unreleased]
 
+### Added
+- test correctness of processing algorithm output ([#283](https://github.com/GIScience/orstools-qgis-plugin/issues/283))
+
 ## [1.10.0] - 2024-11-21
 
 ### Added
