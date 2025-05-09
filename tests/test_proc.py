@@ -44,7 +44,7 @@ class TestProc(unittest.TestCase):
         feature = QgsFeature()
         feature.setGeometry(line_geometry)
         cls.line_layer.dataProvider().addFeature(feature)
-        
+
         lower_left = QgsPointXY(8.45, 48.85)
         upper_right = QgsPointXY(8.46, 48.86)
         cls.bbox = QgsRectangle(lower_left, upper_right)
@@ -100,6 +100,8 @@ class TestProc(unittest.TestCase):
 
         feat_length = next(processed_layer.getFeatures()).geometry().length()
         self.assertTrue(feat_length > 0)
+
+        return processed_layer
 
     def test_directions_points_layers(self):
         parameters = {
@@ -226,4 +228,3 @@ class TestProc(unittest.TestCase):
     #     self.assertTrue(feat_point.hasGeometry())
     #     feat_line = next(processed_nodes.getFeatures())
     #     self.assertTrue(feat_line.hasGeometry())
-    
