@@ -115,10 +115,13 @@ def get_snapped_point_features(response: dict, og_features=None, feedback=None) 
             f = og_features[i]
             x, y = f.geometry().asPoint().x(), f.geometry().asPoint().y()
             feedback.pushWarning(
-                tr(f"Point {i + 1}: ({x}, {y}) could not be snapped and will be ignored in the output.")
+                tr(
+                    f"Point {i + 1}: ({x}, {y}) could not be snapped and will be ignored in the output."
+                )
             )
 
     return feats
+
 
 def tr(self, string: str, context=None) -> str:
     context = context or self.__class__.__name__
