@@ -91,7 +91,7 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
         }
 
         sink_fields = QgsFields()
-        sink_fields.append(QgsField("NAME", QVariant.String))
+        sink_fields.append(QgsField("SNAPPED_NAME", QVariant.String))
         sink_fields.append(QgsField("SNAPPED_DISTANCE", QVariant.Double))
 
         (sink, dest_id) = self.parameterAsSink(
