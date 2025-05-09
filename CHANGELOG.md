@@ -41,6 +41,7 @@ RELEASING:
  -->
 
 ## [Unreleased]
+- Make vertex marker on map drag and droppable, add live preview ([#204](https://github.com/GIScience/orstools-qgis-plugin/issues/204))
 
 ### Added
 - test correctness of processing algorithm output ([#283](https://github.com/GIScience/orstools-qgis-plugin/issues/283))

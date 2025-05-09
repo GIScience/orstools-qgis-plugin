@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>412</width>
+    <width>439</width>
     <height>868</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="sizeConstraint">
-    <enum>QLayout::SetMinAndMaxSize</enum>
+    <enum>QLayout::SizeConstraint::SetMinAndMaxSize</enum>
    </property>
    <item>
     <widget class="QGroupBox" name="resources_group">
@@ -36,7 +36,6 @@
      </property>
      <property name="font">
       <font>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -44,17 +43,16 @@
       <string>Resources</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
      <property name="flat">
       <bool>false</bool>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item alignment="Qt::AlignHCenter">
+      <item alignment="Qt::AlignmentFlag::AlignHCenter">
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
-          <weight>50</weight>
           <bold>false</bold>
          </font>
         </property>
@@ -66,11 +64,10 @@
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignHCenter">
+      <item alignment="Qt::AlignmentFlag::AlignHCenter">
        <widget class="QLabel" name="label_2">
         <property name="font">
          <font>
-          <weight>50</weight>
           <bold>false</bold>
          </font>
         </property>
@@ -82,11 +79,10 @@
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignHCenter">
+      <item alignment="Qt::AlignmentFlag::AlignHCenter">
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
-          <weight>50</weight>
           <bold>false</bold>
          </font>
         </property>
@@ -208,13 +204,13 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QWidget" name="routing_travel_group" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <item>
            <widget class="QLabel" name="routing_travel_label">
@@ -262,7 +258,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <item row="0" column="0">
            <widget class="QPushButton" name="routing_fromline_map">
@@ -273,7 +269,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;The Escape key, right- or double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add waypoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Right- or double-click will pause waypoint selection, drag and drop will still be enabled. Another click on the green + button will continue the selection process. The ESC-button will terminate it and delete all waypoints.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
@@ -304,8 +300,35 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="save_vertices">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer. Use the processing algorithms (batch jobs) to work with points from layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/plugins/ORStools/img/icon_save.png</normaloff>:/plugins/ORStools/img/icon_save.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="toggle_preview">
+            <property name="text">
+             <string>LivePreview</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1" rowspan="4">
-           <widget class="QListWidget" name="routing_fromline_list">
+           <widget class="QTableWidget" name="routing_fromline_list">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -328,36 +351,13 @@
              <string>Select waypoints from the map!</string>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Sunken</enum>
+             <enum>QFrame::Shadow::Sunken</enum>
             </property>
             <property name="dragDropMode">
-             <enum>QAbstractItemView::InternalMove</enum>
+             <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
             </property>
             <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
-            </property>
-            <property name="resizeMode">
-             <enum>QListView::Fixed</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="save_vertices">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer. Use the processing algorithms (batch jobs) to work with points from layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/plugins/ORStools/img/icon_save.png</normaloff>:/plugins/ORStools/img/icon_save.png</iconset>
+             <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
             </property>
            </widget>
           </item>
@@ -387,15 +387,15 @@
          <property name="checked">
           <bool>false</bool>
          </property>
-         <property name="collapsed">
+         <property name="collapsed" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="saveCollapsedState">
+         <property name="saveCollapsedState" stdset="0">
           <bool>false</bool>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <item>
            <widget class="QgsCollapsibleGroupBox" name="optimization_group">
@@ -429,15 +429,15 @@
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0">
              <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
              </property>
              <item row="2" column="3">
               <widget class="QRadioButton" name="fix_both">
@@ -469,7 +469,7 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="3" alignment="Qt::AlignHCenter">
+             <item row="1" column="0" colspan="3" alignment="Qt::AlignmentFlag::AlignHCenter">
               <widget class="QLabel" name="label_5">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Other Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -551,15 +551,15 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
              <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
              </property>
              <item row="0" column="0">
               <widget class="QCheckBox" name="routing_avoid_highways_3">
@@ -625,10 +625,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -637,7 +637,7 @@ p, li { white-space: pre-wrap; }
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid countries based on ISO 3166 Alpha-2 or Alpha-3 codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
-               <property name="qgisRelation">
+               <property name="qgisRelation" stdset="0">
                 <string notr="true"/>
                </property>
               </widget>
@@ -671,10 +671,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -683,7 +683,7 @@ p, li { white-space: pre-wrap; }
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid areas by specifying a (Multi-)Polygon layer. &lt;/p&gt;&lt;p&gt;Does &lt;span style=&quot; font-weight:600;&quot;&gt;not work&lt;/span&gt; for memory (scratch) Polygon layers!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;, only the first feature of the layer will be respected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
-               <property name="showCrs">
+               <property name="showCrs" stdset="0">
                 <bool>false</bool>
                </property>
               </widget>
@@ -791,9 +791,9 @@ p, li { white-space: pre-wrap; }
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
-         <property name="sizeHint">
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -831,15 +831,15 @@ p, li { white-space: pre-wrap; }
      <property name="flat">
       <bool>true</bool>
      </property>
-     <property name="collapsed">
+     <property name="collapsed" stdset="0">
       <bool>true</bool>
      </property>
-     <property name="saveCollapsedState">
+     <property name="saveCollapsedState" stdset="0">
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+       <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
       </property>
       <item>
        <widget class="QTextBrowser" name="debug_text">
@@ -862,16 +862,16 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
         <property name="autoFormatting">
-         <set>QTextEdit::AutoBulletList</set>
-        </property>
-        <property name="tabStopWidth">
-         <number>80</number>
+         <set>QTextEdit::AutoFormattingFlag::AutoBulletList</set>
         </property>
         <property name="placeholderText">
          <string>Queries and errors will be printed here.</string>
         </property>
         <property name="openExternalLinks">
          <bool>true</bool>
+        </property>
+        <property name="tabStopWidth" stdset="0">
+         <number>80</number>
         </property>
        </widget>
       </item>
@@ -918,10 +918,10 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QDialogButtonBox" name="global_buttons">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+         <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
         </property>
        </widget>
       </item>
