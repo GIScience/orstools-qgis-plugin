@@ -151,7 +151,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         )
 
         try:
-            endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+            endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                 "isochrones"
             ]
             response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)

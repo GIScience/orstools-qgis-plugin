@@ -228,7 +228,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                         )
 
                     params = get_params_optimize(points, profile, optimization_mode)
-                    endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                    endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                         "optimization"
                     ]
                     response = ors_client.request(f"{endpoint}/", {}, post_json=params)
@@ -266,7 +266,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     params = directions_core.build_default_parameters(
                         preference, point_list=points, options=options, extra_info=extra_info
                     )
-                    endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                    endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                         "directions"
                     ]
                     response = ors_client.request(

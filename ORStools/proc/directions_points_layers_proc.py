@@ -236,7 +236,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             )
 
             try:
-                endpoint = self.get_edpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                     "directions"
                 ]
                 response = ors_client.request(
