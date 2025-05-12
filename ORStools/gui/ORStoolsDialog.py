@@ -30,7 +30,7 @@
 import os
 from typing import Optional
 
-from PyQt5.QtWidgets import QCheckBox
+from qgis.PyQt.QtWidgets import QCheckBox
 
 from ..utils.router import route_as_layer
 

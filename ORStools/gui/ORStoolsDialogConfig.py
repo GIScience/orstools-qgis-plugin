@@ -66,7 +66,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.provider_remove.clicked.connect(self._remove_provider)
 
         # Change OK to Save in config window
-        self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText(self.tr("Save"))
 
     def accept(self) -> None:
         """When the OK Button is clicked, in-memory temp_config is updated and written to settings"""

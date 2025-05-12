@@ -118,7 +118,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 self.CSV_FACTOR,
                 self.tr("Csv Factor (needs Csv Column and csv in Extra Info)"),
-                type=QgsProcessingParameterNumber.Double,
+                type=QgsProcessingParameterNumber.Type.Double,
                 minValue=0,
                 maxValue=1,
                 defaultValue=None,
