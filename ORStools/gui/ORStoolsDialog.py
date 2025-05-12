@@ -370,7 +370,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
         self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
 
-    def _save_vertices_to_layer(self):
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(
             lambda: self.color_duplicate_items(self.routing_fromline_list)
