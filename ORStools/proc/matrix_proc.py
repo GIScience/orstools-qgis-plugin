@@ -42,7 +42,7 @@ from qgis.core import (
     QgsProcessingFeedback,
 )
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 
 from ORStools.common import PROFILES
 from ORStools.utils import transform, exceptions, logger
@@ -217,12 +217,12 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     # TODO working source_type and destination_type differ in both name and type from get_fields in directions_core.
     #  Change to be consistent
     @staticmethod
-    def get_fields(source_type=QVariant.Int, destination_type=QVariant.Int):
+    def get_fields(source_type=QMetaType.Type.Int, destination_type=QMetaType.Type.Int):
         fields = QgsFields()
         fields.append(QgsField("FROM_ID", source_type))
         fields.append(QgsField("TO_ID", destination_type))
-        fields.append(QgsField("DURATION_H", QVariant.Double))
-        fields.append(QgsField("DIST_KM", QVariant.Double))
+        fields.append(QgsField("DURATION_H", QMetaType.Type.Double))
+        fields.append(QgsField("DIST_KM", QMetaType.Type.Double))
 
         return fields
 

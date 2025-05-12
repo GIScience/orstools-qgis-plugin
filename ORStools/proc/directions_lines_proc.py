@@ -147,7 +147,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         # Get parameter values
         source = self.parameterAsSource(parameters, self.IN_LINES, context)
 
-        # parameters[self.IN_FIELD] returns a PyQt5.QtCore.QVariant with "NULL" as content
+        # parameters[self.IN_FIELD] returns a PyQt5.QtCore.QMetaType with "NULL" as content
         # in case of absence of self.IN_FIELD.
         # qgis overwrites this type's __bool__ in
         # https://github.com/qgis/QGIS/blob/master/python/PyQt/PyQt5/QtCore.py:

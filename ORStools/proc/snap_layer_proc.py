@@ -29,7 +29,7 @@
 
 from typing import Dict
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import (
     QgsProcessingParameterFeatureSource,
     QgsProcessing,
@@ -95,8 +95,8 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         }
 
         sink_fields = QgsFields()
-        sink_fields.append(QgsField("NAME", QVariant.String))
-        sink_fields.append(QgsField("SNAPPED_DISTANCE", QVariant.Double))
+        sink_fields.append(QgsField("NAME", QMetaType.Type.QString))
+        sink_fields.append(QgsField("SNAPPED_DISTANCE", QMetaType.Type.Double))
 
         source_fields = [field for field in source.fields()]
 

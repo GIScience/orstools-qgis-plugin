@@ -43,7 +43,7 @@ from qgis.core import (
     QgsGeometry,
 )
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 
 
 from ORStools.common import PROFILES
@@ -155,16 +155,16 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
     @staticmethod
     def get_fields_line():
         fields = QgsFields()
-        fields.append(QgsField("FROM_ID", QVariant.Double))
-        fields.append(QgsField("TO_ID", QVariant.Double))
-        fields.append(QgsField("WEIGHT", QVariant.Double))
+        fields.append(QgsField("FROM_ID", QMetaType.Type.Double))
+        fields.append(QgsField("TO_ID", QMetaType.Type.Double))
+        fields.append(QgsField("WEIGHT", QMetaType.Type.Double))
 
         return fields
 
     @staticmethod
     def get_fields_point():
         fields = QgsFields()
-        fields.append(QgsField("ID", QVariant.Int))
+        fields.append(QgsField("ID", QMetaType.Type.Int))
 
         return fields
 
