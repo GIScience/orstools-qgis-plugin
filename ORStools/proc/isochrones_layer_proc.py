@@ -194,7 +194,10 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                response = ors_client.request("/v2/isochrones/" + profile, {}, post_json=params)
+                endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                    "isochrones"
+                ]
+                response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
 
                 for isochrone in self.isochrones.get_features(response, params["id"]):
                     sink.addFeature(isochrone)
