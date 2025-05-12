@@ -30,7 +30,10 @@
 from qgis.PyQt.QtCore import QMetaType, QVariant
 from qgis.core import QgsField, Qgis
 
-def create_qgs_field(name: str, type_enum, length: int = 0, precision: int = 0, comment: str = '', subtype_enum=None) -> QgsField:
+
+def create_qgs_field(
+    name: str, type_enum, length: int = 0, precision: int = 0, comment: str = "", subtype_enum=None
+) -> QgsField:
     """
     Creates a QgsField instance compatible with the current QGIS version.
 
@@ -51,11 +54,21 @@ def create_qgs_field(name: str, type_enum, length: int = 0, precision: int = 0, 
             type_enum = QMetaType.Type(type_enum)
         if subtype_enum and isinstance(subtype_enum, QVariant.Type):
             subtype_enum = QMetaType.Type(subtype_enum)
-        return QgsField(name, type_enum, '', length, precision, comment, subtype_enum or QMetaType.Type.UnknownType)
+        return QgsField(
+            name,
+            type_enum,
+            "",
+            length,
+            precision,
+            comment,
+            subtype_enum or QMetaType.Type.UnknownType,
+        )
     else:
         # Ensure type_enum is of type QVariant.Type
         if isinstance(type_enum, QMetaType.Type):
             type_enum = QVariant.Type(type_enum)
         if subtype_enum and isinstance(subtype_enum, QMetaType.Type):
             subtype_enum = QVariant.Type(subtype_enum)
-        return QgsField(name, type_enum, '', length, precision, comment, subtype_enum or QVariant.Invalid)
+        return QgsField(
+            name, type_enum, "", length, precision, comment, subtype_enum or QVariant.Invalid
+        )

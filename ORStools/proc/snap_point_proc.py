@@ -47,6 +47,7 @@ from ORStools.utils import exceptions, logger
 
 from ORStools.utils.wrapper import create_qgs_field
 
+
 # noinspection PyPep8Naming
 class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self) -> None:

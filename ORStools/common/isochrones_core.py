@@ -108,7 +108,9 @@ class Isochrones:
         fields.append(create_qgs_field(self.id_field_name, self.id_field_type))  # ID field
         fields.append(create_qgs_field("CENTER_LON", QMetaType.Type.QString))
         fields.append(create_qgs_field("CENTER_LAT", QMetaType.Type.QString))
-        fields.append(create_qgs_field(self.field_dimension_name, QMetaType.Type.Int))  # Dimension field
+        fields.append(
+            create_qgs_field(self.field_dimension_name, QMetaType.Type.Int)
+        )  # Dimension field
         fields.append(create_qgs_field("AA_MODE", QMetaType.Type.QString))
         fields.append(create_qgs_field("TOTAL_POP", QMetaType.Type.QString))
 
