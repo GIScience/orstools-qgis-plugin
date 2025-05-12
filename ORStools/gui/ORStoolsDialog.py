@@ -358,7 +358,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         # Add icons to buttons
         self.routing_fromline_map.setIcon(gui.GuiUtils.get_icon("icon_add.png"))
         self.routing_fromline_clear.setIcon(gui.GuiUtils.get_icon("icon_clear.png"))
-        self.save_vertices.setIcon(gui.GuiUtils.get_icon("save_vertices.png"))
+        self.save_vertices.setIcon(gui.GuiUtils.get_icon("icon_save.png"))
         self.provider_refresh.setIcon(gui.GuiUtils.get_icon("icon_refresh.png"))
         self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
         self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
