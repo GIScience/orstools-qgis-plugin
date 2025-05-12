@@ -41,6 +41,7 @@ from qgis.core import (
     QgsAnnotation,
     QgsMarkerSymbol,
 )
+from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QEvent
 from qgis.PyQt.QtGui import QColor, QMouseEvent
 from qgis.PyQt.QtWidgets import (
@@ -167,7 +168,7 @@ class LineTool(QgsMapToolEmitPoint):
             self.moving = True
 
     def canvasReleaseEvent(self, event: QEvent) -> None:
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.dlg.show()
             return
 
