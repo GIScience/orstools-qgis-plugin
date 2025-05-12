@@ -28,12 +28,14 @@
 """
 
 import os
-from qgis.core import QgsPointXY
 
 from typing import List
 
 from ORStools import BASE_DIR
 from ORStools.common import OPTIMIZATION_MODES
+
+from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
+from qgis.PyQt.QtCore import QCoreApplication
 
 
 def get_params_optimize(point_list: List[QgsPointXY], ors_profile: str, mode: int) -> dict:
@@ -92,3 +94,35 @@ def read_help_file(algorithm: str, locale: str = ""):
     with open(file, encoding="utf-8") as help_file:
         msg = help_file.read()
     return msg
+
+
+def get_snapped_point_features(response: dict, og_features=None, feedback=None) -> list:
+    locations = response.get("locations", [])
+    feats = []
+    for i, location in enumerate(locations):
+        if location:
+            feat = QgsFeature()
+            coords = location["location"]
+            name = location.get("name", "")
+            snapped_distance = location.get("snapped_distance", 0)
+            og_attributes = og_features[i].attributes() if og_features else []
+
+            feat.setAttributes([name, snapped_distance] + og_attributes)
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(coords[0], coords[1])))
+            feats.append(feat)
+
+        else:
+            f = og_features[i]
+            x, y = f.geometry().asPoint().x(), f.geometry().asPoint().y()
+            feedback.pushWarning(
+                tr(
+                    f"Point {i + 1}: ({x}, {y}) could not be snapped and will be ignored in the output."
+                )
+            )
+
+    return feats
+
+
+def tr(self, string: str, context=None) -> str:
+    context = context or self.__class__.__name__
+    return QCoreApplication.translate(context, string)
