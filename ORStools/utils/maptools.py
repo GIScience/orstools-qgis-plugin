@@ -108,7 +108,7 @@ class LineTool(QgsMapToolEmitPoint):
     def canvasMoveEvent(self, e: QEvent) -> None:
         hovering = self.check_annotation_hover(e.pos())
         if hovering:
-            QApplication.setOverrideCursor(Qt.OpenHandCursor)
+            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.OpenHandCursor)
         else:
             if not self.moving:
                 QApplication.restoreOverrideCursor()
@@ -157,7 +157,7 @@ class LineTool(QgsMapToolEmitPoint):
         hovering = self.check_annotation_hover(event.pos())
         if hovering:
             self.mouseMoved.disconnect()
-            QApplication.setOverrideCursor(Qt.ClosedHandCursor)
+            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
             if self.dlg.rubber_band:
                 self.dlg.rubber_band.reset()
             self.move_i = self.dlg.annotations.index(hovering)
