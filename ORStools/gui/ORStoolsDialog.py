@@ -87,8 +87,7 @@ from ORStools.common import (
     PROFILES,
     PREFERENCES,
 )
-from ORStools.utils import maptools, configmanager, transform
-from ORStools.gui import directions_gui
+from ORStools.utils import maptools, configmanager, transform, gui
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
