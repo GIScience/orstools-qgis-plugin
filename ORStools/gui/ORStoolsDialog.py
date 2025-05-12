@@ -538,8 +538,13 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             else:
                 item_dict[text] = [index]
 
-        self.line_tool.pointDrawn.disconnect()
-        self.line_tool.doubleClicked.disconnect()
-        QApplication.restoreOverrideCursor()
-        self._iface.mapCanvas().setMapTool(self.last_maptool)
-        self.show()
+        for indices in item_dict.values():
+            if len(indices) > 1:
+                for index in indices:
+                    item = list_widget.item(index)
+                    item.setBackground(QColor("lightsalmon"))
+
+    def reload_rubber_band(self) -> None:
+        """Reloads the rubber band of the linetool."""
+        if self.line_tool is not None:
+            self.line_tool.create_rubber_band()
