@@ -34,13 +34,14 @@ from qgis.core import (
     QgsFeature,
     QgsProcessing,
     QgsFields,
-    QgsField,
     QgsProcessingException,
     QgsProcessingParameterField,
     QgsProcessingParameterFeatureSource,
     QgsProcessingContext,
     QgsProcessingFeedback,
 )
+
+from ORStools.utils.wrapper import create_qgs_field
 
 from qgis.PyQt.QtCore import QMetaType
 
@@ -219,10 +220,10 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     @staticmethod
     def get_fields(source_type=QMetaType.Type.Int, destination_type=QMetaType.Type.Int):
         fields = QgsFields()
-        fields.append(QgsField("FROM_ID", source_type))
-        fields.append(QgsField("TO_ID", destination_type))
-        fields.append(QgsField("DURATION_H", QMetaType.Type.Double))
-        fields.append(QgsField("DIST_KM", QMetaType.Type.Double))
+        fields.append(create_qgs_field("FROM_ID", source_type))
+        fields.append(create_qgs_field("TO_ID", destination_type))
+        fields.append(create_qgs_field("DURATION_H", QMetaType.Type.Double))
+        fields.append(create_qgs_field("DIST_KM", QMetaType.Type.Double))
 
         return fields
 

@@ -39,7 +39,6 @@ from qgis.core import (
     QgsWkbTypes,
     QgsFields,
     QgsCoordinateReferenceSystem,
-    QgsField,
 )
 
 from ORStools.common import PROFILES
@@ -47,6 +46,7 @@ from ORStools.utils.processing import get_snapped_point_features
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ORStools.utils import exceptions, logger, transform
 
+from ORStools.utils.wrapper import create_qgs_field
 
 # noinspection PyPep8Naming
 class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
@@ -95,8 +95,8 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         }
 
         sink_fields = QgsFields()
-        sink_fields.append(QgsField("NAME", QMetaType.Type.QString))
-        sink_fields.append(QgsField("SNAPPED_DISTANCE", QMetaType.Type.Double))
+        sink_fields.append(create_qgs_field("NAME", QMetaType.Type.QString))
+        sink_fields.append(create_qgs_field("SNAPPED_DISTANCE", QMetaType.Type.Double))
 
         source_fields = [field for field in source.fields()]
 

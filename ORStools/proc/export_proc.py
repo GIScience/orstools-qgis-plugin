@@ -32,7 +32,6 @@ from typing import Dict
 from qgis.core import (
     QgsWkbTypes,
     QgsFeature,
-    QgsField,
     QgsFields,
     QgsCoordinateReferenceSystem,
     QgsProcessingParameterExtent,
@@ -44,6 +43,7 @@ from qgis.core import (
 )
 
 from qgis.PyQt.QtCore import QMetaType
+from ..utils.wrapper import create_qgs_field
 
 
 from ORStools.common import PROFILES
@@ -155,16 +155,16 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
     @staticmethod
     def get_fields_line():
         fields = QgsFields()
-        fields.append(QgsField("FROM_ID", QMetaType.Type.Double))
-        fields.append(QgsField("TO_ID", QMetaType.Type.Double))
-        fields.append(QgsField("WEIGHT", QMetaType.Type.Double))
+        fields.append(create_qgs_field("FROM_ID", QMetaType.Type.Double))
+        fields.append(create_qgs_field("TO_ID", QMetaType.Type.Double))
+        fields.append(create_qgs_field("WEIGHT", QMetaType.Type.Double))
 
         return fields
 
     @staticmethod
     def get_fields_point():
         fields = QgsFields()
-        fields.append(QgsField("ID", QMetaType.Type.Int))
+        fields.append(create_qgs_field("ID", QMetaType.Type.Int))
 
         return fields
 

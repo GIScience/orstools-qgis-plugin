@@ -33,7 +33,6 @@ from qgis._core import QgsMapLayer
 from qgis.core import (
     QgsPointXY,
     QgsFeature,
-    QgsField,
     QgsFields,
     QgsGeometry,
     QgsSymbol,
@@ -45,6 +44,7 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtGui import QColor
 
+from ORStools.utils.wrapper import create_qgs_field
 
 # import processing
 
@@ -105,12 +105,12 @@ class Isochrones:
         :rtype: QgsFields
         """
         fields = QgsFields()
-        fields.append(QgsField(self.id_field_name, self.id_field_type))  # ID field
-        fields.append(QgsField("CENTER_LON", QMetaType.Type.QString))
-        fields.append(QgsField("CENTER_LAT", QMetaType.Type.QString))
-        fields.append(QgsField(self.field_dimension_name, QMetaType.Type.Int))  # Dimension field
-        fields.append(QgsField("AA_MODE", QMetaType.Type.QString))
-        fields.append(QgsField("TOTAL_POP", QMetaType.Type.QString))
+        fields.append(create_qgs_field(self.id_field_name, self.id_field_type))  # ID field
+        fields.append(create_qgs_field("CENTER_LON", QMetaType.Type.QString))
+        fields.append(create_qgs_field("CENTER_LAT", QMetaType.Type.QString))
+        fields.append(create_qgs_field(self.field_dimension_name, QMetaType.Type.Int))  # Dimension field
+        fields.append(create_qgs_field("AA_MODE", QMetaType.Type.QString))
+        fields.append(create_qgs_field("TOTAL_POP", QMetaType.Type.QString))
 
         return fields
 

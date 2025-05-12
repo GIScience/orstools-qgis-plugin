@@ -34,6 +34,7 @@ from typing import List, Generator, Tuple, Any, Optional
 from qgis.PyQt.QtCore import QMetaType
 
 from ORStools.utils import convert, logger
+from ORStools.utils.wrapper import create_qgs_field
 
 
 def get_request_point_features(route_dict: dict, row_by_row: str) -> Generator[List, Tuple, None]:
@@ -82,7 +83,7 @@ def get_fields(
     line: bool = False,
     extra_info: list = [],
     two_layers: bool = False,
-) -> QgsFields:
+) -> QgsField:
     """
     Builds output fields for directions response layer.
 
@@ -107,21 +108,21 @@ def get_fields(
 
     fields = QgsFields()
     if not extra_info:
-        fields.append(QgsField("DIST_KM", QMetaType.Type.Double))
-        fields.append(QgsField("DURATION_H", QMetaType.Type.Double))
-        fields.append(QgsField("PROFILE", QMetaType.Type.QString))
-        fields.append(QgsField("PREF", QMetaType.Type.QString))
-        fields.append(QgsField("OPTIONS", QMetaType.Type.QString))
-        fields.append(QgsField(from_name, from_type))
+        fields.append(create_qgs_field("DIST_KM", QMetaType.Type.Double))
+        fields.append(create_qgs_field("DURATION_H", QMetaType.Type.Double))
+        fields.append(create_qgs_field("PROFILE", QMetaType.Type.QString))
+        fields.append(create_qgs_field("PREF", QMetaType.Type.QString))
+        fields.append(create_qgs_field("OPTIONS", QMetaType.Type.QString))
+        fields.append(create_qgs_field(from_name, from_type))
     if not line:
-        fields.append(QgsField(to_name, to_type))
+        fields.append(create_qgs_field(to_name, to_type))
     if two_layers:
-        fields.append(QgsField(from_name, from_type))
+        fields.append(create_qgs_field(from_name, from_type))
     for info in extra_info:
         field_type = QMetaType.Type.Int
         if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions", "steepness"]:
             field_type = QMetaType.Type.QString
-        fields.append(QgsField(info.upper(), field_type))
+        fields.append(create_qgs_field(info.upper(), field_type))
 
     return fields
 
