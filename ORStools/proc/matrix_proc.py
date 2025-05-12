@@ -175,7 +175,8 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request("/v2/matrix/" + profile, {}, post_json=params)
+            endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])["matrix"]
+            response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"{e.__class__.__name__}: {str(e)}"

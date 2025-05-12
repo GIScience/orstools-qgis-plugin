@@ -106,6 +106,8 @@ class TestProc(unittest.TestCase):
         feat_length = next(processed_layer.getFeatures()).geometry().length()
         self.assertTrue(feat_length > 0)
 
+        return processed_layer
+
     def test_directions_points_layers(self):
         parameters = {
             "INPUT_AVOID_BORDERS": None,

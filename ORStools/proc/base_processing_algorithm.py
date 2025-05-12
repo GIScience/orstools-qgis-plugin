@@ -179,6 +179,11 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
+    def get_endpoint_names_from_provider(self, provider: str) -> dict:
+        providers = configmanager.read_config()["providers"]
+        ors_provider = providers[provider]
+        return ors_provider["endpoints"]
+
     @classmethod
     def _get_ors_client_from_provider(
         cls, provider: str, feedback: QgsProcessingFeedback
