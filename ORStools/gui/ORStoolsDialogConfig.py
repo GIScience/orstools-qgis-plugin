@@ -40,7 +40,6 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager, gui
-from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
 from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
 CONFIG_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogConfigUI.ui"))
@@ -91,7 +90,6 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             timeout_input = box.findChild(QtWidgets.QLineEdit, box.title() + "_timeout_text")
             # https://doc.qt.io/qt-5/qvalidator.html#State-enum
             if timeout_input.validator().State != 2:
-
                 self._adjust_timeout_input(timeout_input)
 
             current_provider["timeout"] = int(timeout_input.text())

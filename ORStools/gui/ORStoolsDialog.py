@@ -27,7 +27,6 @@
  ***************************************************************************/
 """
 
-import json
 import os
 from typing import Optional
 
@@ -54,7 +53,7 @@ from qgis.core import (
     QgsGeometry,
     QgsCoordinateReferenceSystem,
     QgsSettings,
-    Qgis,
+    Qgis,  # noqa: F811
     QgsAnnotation,
     QgsCoordinateTransform,
 )
@@ -62,20 +61,13 @@ from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInt
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
 from qgis.PyQt.QtGui import QTextDocument
 from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
-from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
-    QAction,
-    QDialog,
-    QApplication,
-    QMenu,
-    QMessageBox,
-    QDialogButtonBox,
     QWidget,
     QRadioButton,
 )
 
 from ORStools import (
-    RESOURCE_PREFIX,
     PLUGIN_NAME,
     DEFAULT_COLOR,
     __version__,
@@ -89,9 +81,6 @@ from ORStools.common import (
 )
 from ORStools.utils import maptools, configmanager, transform, gui
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
-from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
-
-from . import resources_rc  # noqa: F401
 
 
 def on_config_click(parent):
@@ -174,9 +163,13 @@ class ORStoolsDialogMain:
                 self.iface.mainWindow(),
             ),
             # About dialog
-            QAction(gui.GuiUtils.get_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()
+            ),
             # Help page
-            QAction(gui.GuiUtils.get_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()
+            ),
         ]
 
         # Create menu
@@ -286,7 +279,9 @@ class ORStoolsDialogMain:
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
-MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path('ORStoolsDialogUI.ui'))
+
+MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
+
 
 class ORStoolsDialog(QDialog, MAIN_WIDGET):
     """Define the custom behaviour of Dialog"""

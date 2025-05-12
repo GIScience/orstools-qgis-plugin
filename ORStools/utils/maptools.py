@@ -272,7 +272,9 @@ class LineTool(QgsMapToolEmitPoint):
         if self.dlg.rubber_band:
             self.dlg.rubber_band.reset()
         else:
-            self.dlg.rubber_band = QgsRubberBand(self.dlg.canvas, QgsWkbTypes.GeometryType.LineGeometry)
+            self.dlg.rubber_band = QgsRubberBand(
+                self.dlg.canvas, QgsWkbTypes.GeometryType.LineGeometry
+            )
         color = QColor(ROUTE_COLOR)
         color.setAlpha(100)
         self.dlg.rubber_band.setStrokeColor(color)
