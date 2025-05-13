@@ -19,8 +19,6 @@ from qgis.PyQt.QtGui import (
     QIcon,
 )
 
-from ORStools.utils import logger
-
 
 class GuiUtils:
     """
