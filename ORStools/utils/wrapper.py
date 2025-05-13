@@ -27,6 +27,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from typing import Union, Optional
 
 from qgis.PyQt.QtCore import QMetaType, QVariant
@@ -95,7 +96,4 @@ def create_qgs_field(
             name, type_enum, length, precision, comment, subtype_enum
         )
     else:
-        return create_field_legacy_qgis(
-            name, type_enum, length, precision, comment, subtype_enum
-        )
-
+        return create_field_legacy_qgis(name, type_enum, length, precision, comment, subtype_enum)

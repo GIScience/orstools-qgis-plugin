@@ -84,6 +84,7 @@ from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
 
+
 def on_config_click(parent):
     """Pop up provider config window. Outside of classes because it's accessed by multiple dialogs.
 
