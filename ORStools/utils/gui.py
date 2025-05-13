@@ -12,6 +12,7 @@ __date__ = "20/04/2018"
 __copyright__ = "Copyright 2018, North Road"
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = "$Format:%H$"
+__source__ = "https://github.com/felt/qgis-plugin/blob/main/felt/gui/gui_utils.py"
 
 import os
 
