@@ -34,25 +34,11 @@ class GuiUtils:
         :param icon: icon name (svg file name)
         :return: QIcon
         """
-        path = GuiUtils.get_icon_svg(icon)
-        if not path:
+        path = os.path.join(os.path.dirname(__file__), "..", "gui/img", icon)
+        if not os.path.exists(path):
             return QIcon()
 
         return QIcon(path)
-
-    @staticmethod
-    def get_icon_svg(icon: str) -> str:
-        """
-        Returns a plugin icon's SVG file path
-        :param icon: icon name (svg file name)
-        :return: icon svg path
-        """
-        path = os.path.join(os.path.dirname(__file__), "..", "gui/img", icon)
-        logger.log(path)
-        if not os.path.exists(path):
-            return ""
-
-        return path
 
     @staticmethod
     def get_ui_file_path(file: str) -> str:
