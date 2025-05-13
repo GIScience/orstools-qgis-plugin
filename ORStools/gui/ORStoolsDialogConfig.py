@@ -191,7 +191,7 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             provider_id = providers.index(provider)
             del self.temp_config["providers"][provider_id]
 
-    def _collapse_boxes(self):
+    def _collapse_boxes(self) -> None:
         """Collapse all QgsCollapsibleGroupBoxes."""
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         for box in collapsible_boxes:
