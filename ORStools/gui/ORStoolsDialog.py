@@ -82,6 +82,7 @@ from ORStools.common import (
 from ORStools.utils import maptools, configmanager, transform, gui
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
+MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
 
 def on_config_click(parent):
     """Pop up provider config window. Outside of classes because it's accessed by multiple dialogs.
@@ -278,9 +279,6 @@ class ORStoolsDialogMain:
 
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
-
-
-MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
 
 
 class ORStoolsDialog(QDialog, MAIN_WIDGET):
