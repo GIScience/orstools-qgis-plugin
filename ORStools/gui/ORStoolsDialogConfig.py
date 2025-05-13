@@ -287,7 +287,6 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         gridLayout_3.addLayout(button_layout, 7, 0, 1, 4)
 
         self.verticalLayout.addWidget(provider)
-        provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
     def _reset_endpoints(self) -> None:
         """Resets the endpoints to their original values."""
