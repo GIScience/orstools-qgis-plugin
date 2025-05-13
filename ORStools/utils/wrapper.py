@@ -9,6 +9,7 @@
         git sha              : $Format:%H$
         copyright            : (C) 2025 by HeiGIT gGmbH
         email                : support@openrouteservice.heigit.org
+        author:              : Till Frankenbach
  ***************************************************************************/
 
  This plugin provides access to openrouteservice API functionalities
