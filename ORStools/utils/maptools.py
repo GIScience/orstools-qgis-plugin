@@ -134,9 +134,9 @@ class LineTool(QgsMapToolEmitPoint):
             return idx
 
     def keyPressEvent(self, event: QEvent) -> None:
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.dlg._clear_listwidget()
-        elif event.key() == Qt.Key_D:
+        elif event.key() == Qt.Key.Key_D:
             if self.last_point:
                 index = int(self.last_point["annotation"].document().toPlainText())
                 if self.dlg.annotations:
