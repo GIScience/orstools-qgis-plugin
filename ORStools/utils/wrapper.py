@@ -27,49 +27,75 @@
  *                                                                         *
  ***************************************************************************/
 """
+from typing import Union, Optional
 
 from qgis.PyQt.QtCore import QMetaType, QVariant
 from qgis.core import QgsField, Qgis
+
+
+def create_field_qgis_3_38_plus(
+    name: str,
+    type_enum: Union[QMetaType.Type, QVariant],
+    length: int,
+    precision: int,
+    comment: str,
+    subtype_enum: Optional[Union[QMetaType.Type, QVariant]] = None,
+) -> QgsField:
+    """Create a QgsField for QGIS ≥ 3.38 using QMetaType.Type enums."""
+    # Normalize QVariant → QMetaType.Type
+    if isinstance(type_enum, QVariant):
+        type_enum = QMetaType.Type(type_enum)
+    if subtype_enum and isinstance(subtype_enum, QVariant):
+        subtype_enum = QMetaType.Type(subtype_enum)
+    return QgsField(
+        name,
+        type_enum,
+        "",  # default type editor
+        length,
+        precision,
+        comment,
+        subtype_enum or QMetaType.Type.UnknownType,
+    )
+
+
+def create_field_legacy_qgis(
+    name: str,
+    type_enum: Union[QMetaType.Type, QVariant],
+    length: int,
+    precision: int,
+    comment: str,
+    subtype_enum: Optional[Union[QMetaType.Type, QVariant]] = None,
+) -> QgsField:
+    """Create a QgsField for QGIS < 3.38 using QVariant.Type enums."""
+    # Normalize QMetaType.Type → QVariant.Type
+    if isinstance(type_enum, QMetaType.Type):
+        type_enum = QVariant.Type(type_enum)
+    if subtype_enum and isinstance(subtype_enum, QMetaType.Type):
+        subtype_enum = QVariant.Type(subtype_enum)
+    return QgsField(
+        name,
+        type_enum,
+        "",  # default type editor
+        length,
+        precision,
+        comment,
+        subtype_enum or QVariant.Invalid,
+    )
 
 
 def create_qgs_field(
     name: str, type_enum, length: int = 0, precision: int = 0, comment: str = "", subtype_enum=None
 ) -> QgsField:
     """
-    Creates a QgsField instance compatible with the current QGIS version.
-
-    Parameters:
-        name (str): The name of the field.
-        type_enum: The field type, either QMetaType.Type or QVariant.Type.
-        length (int): The length of the field.
-        precision (int): The precision of the field.
-        comment (str): A comment for the field.
-        subtype_enum: The subtype of the field, either QMetaType.Type or QVariant.Type.
-
-    Returns:
-        QgsField: An instance of QgsField configured appropriately.
+    Factory that picks the correct QgsField constructor
+    based on the QGIS version.
     """
     if Qgis.versionInt() >= 33800:  # QGIS 3.38 or newer
-        # Ensure type_enum is of type QMetaType.Type
-        if isinstance(type_enum, QVariant):
-            type_enum = QMetaType.Type(type_enum)
-        if subtype_enum and isinstance(subtype_enum, QVariant):
-            subtype_enum = QMetaType.Type(subtype_enum)
-        return QgsField(
-            name,
-            type_enum,
-            "",
-            length,
-            precision,
-            comment,
-            subtype_enum or QMetaType.Type.UnknownType,
+        return create_field_qgis_3_38_plus(
+            name, type_enum, length, precision, comment, subtype_enum
         )
     else:
-        # Ensure type_enum is of type QVariant.Type
-        if isinstance(type_enum, QMetaType.Type):
-            type_enum = QVariant.Type(type_enum)
-        if subtype_enum and isinstance(subtype_enum, QMetaType.Type):
-            subtype_enum = QVariant.Type(subtype_enum)
-        return QgsField(
-            name, type_enum, "", length, precision, comment, subtype_enum or QVariant.Invalid
+        return create_field_legacy_qgis(
+            name, type_enum, length, precision, comment, subtype_enum
         )
+
