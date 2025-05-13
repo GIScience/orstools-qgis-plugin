@@ -36,26 +36,29 @@ from qgis.core import QgsField, Qgis
 
 def create_field_qgis_3_38_plus(
     name: str,
-    type_enum: Union[QMetaType.Type, QVariant],
+    type_enum: Union[QMetaType.Type, QVariant.Type],
     length: int,
     precision: int,
     comment: str,
-    subtype_enum: Optional[Union[QMetaType.Type, QVariant]] = None,
+    subtype_enum: Optional[Union[QMetaType.Type, QVariant.Type]] = None,
 ) -> QgsField:
     """Create a QgsField for QGIS ≥ 3.38 using QMetaType.Type enums."""
-    # Normalize QVariant → QMetaType.Type
-    if isinstance(type_enum, QVariant):
+    if isinstance(type_enum, QVariant.Type):
         type_enum = QMetaType.Type(type_enum)
-    if subtype_enum and isinstance(subtype_enum, QVariant):
+    if subtype_enum and isinstance(subtype_enum, QVariant.Type):
         subtype_enum = QMetaType.Type(subtype_enum)
+
+    type_enum = QVariant.Type(type_enum)
+    subtype_enum = QVariant.Type(subtype_enum) if subtype_enum is not None else QVariant.Invalid
+
     return QgsField(
         name,
         type_enum,
-        "",  # default type editor
+        "",
         length,
         precision,
         comment,
-        subtype_enum or QMetaType.Type.UnknownType,
+        subtype_enum,
     )
 
 
