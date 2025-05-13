@@ -48,11 +48,11 @@ def create_qgs_field(
     Returns:
         QgsField: An instance of QgsField configured appropriately.
     """
-    if Qgis.versionInt() >= 303800:  # QGIS 3.38 or newer
+    if Qgis.versionInt() >= 33800:  # QGIS 3.38 or newer
         # Ensure type_enum is of type QMetaType.Type
-        if isinstance(type_enum, QVariant.Type):
+        if isinstance(type_enum, QVariant):
             type_enum = QMetaType.Type(type_enum)
-        if subtype_enum and isinstance(subtype_enum, QVariant.Type):
+        if subtype_enum and isinstance(subtype_enum, QVariant):
             subtype_enum = QMetaType.Type(subtype_enum)
         return QgsField(
             name,

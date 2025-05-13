@@ -342,7 +342,7 @@ class LineTool(QgsMapToolEmitPoint):
                 else:
                     raise e
             except Exception as e:
-                self.toggle_preview.setChecked(state)
+                self.dlg.toggle_preview.setChecked(state)
                 if "Connection refused" in str(e):
                     self.api_key_message_bar()
                 else:
