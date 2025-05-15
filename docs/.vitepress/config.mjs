@@ -8,10 +8,17 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'General', link: '/general/provider_settings' },
       { text: 'Algorithms', link: '/processing_algorithms/directions_from_points_1_layer' }
     ],
 
     sidebar: [
+      {
+          text: 'General',
+          items: [
+            { text: 'Provider Settings', link: '/general/provider_settings'}
+          ]
+      },
       {
         text: 'Algorithms',
         items: [

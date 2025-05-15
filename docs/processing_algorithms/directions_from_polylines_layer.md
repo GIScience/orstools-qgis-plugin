@@ -6,11 +6,7 @@ This algorithm calculates least-cost routes for multiple waypoints along one or 
 ## Parameters
 
 ### Provider
-First, you'll have to [sign-up](https://openrouteservice.org/sign-up) and register your API key in your [dashboard](https://openrouteservice.org/dev/#/home).
-
-In the configuration window (`Web` > `ORS Tools` > `Configuration`) you have set up the API key, which will be saved locally in a configuration file and will automatically be used across all tools. Here you can also set the base URL in case you're using a self-hosted ORS version and the requests per minute you're allocated (usually set to 40).
-
-![ORS Tools configuration](/wiki/img/wiki_orstools_config.png)
+Select the [openrouteservice provider](../general/provider_settings.md) you want to use.
 
 ### Travel mode
 Select mode of travel.
