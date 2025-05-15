@@ -8,15 +8,19 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Algorithms', link: '/processing_algorithms/directions_from_points_1_layer' }
     ],
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Algorithms',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Directions from Points (1)', link: '/processing_algorithms/directions_from_points_1_layer' },
+          { text: 'Directions from Points (2)', link: '/processing_algorithms/directions_from_points_2_layers' },
+          { text: 'Directions from Polylines Layer', link: '/processing_algorithms/directions_from_polylines_layer' },
+          { text: 'Isochrones from Layer', link: '/processing_algorithms/isochrones_from_layer' },
+          { text: 'Isochrones from Point', link: '/processing_algorithms/isochrones_from_point' },
+          { text: 'Matrix from Layers', link: '/processing_algorithms/matrix_from_layers' }
         ]
       }
     ],
