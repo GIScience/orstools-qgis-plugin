@@ -29,7 +29,7 @@
 
 from qgis.gui import QgsCollapsibleGroupBox
 
-from qgis.PyQt import QtWidgets
+from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QMetaObject
 from qgis.PyQt.QtWidgets import (
     QDialog,
@@ -39,12 +39,13 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtGui import QIntValidator
 
-from ORStools.utils import configmanager
-from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
+from ORStools.utils import configmanager, gui
 from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
+CONFIG_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogConfigUI.ui"))
 
-class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
+
+class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
     """Builds provider config dialog."""
 
     def __init__(self, parent=None) -> None:
@@ -66,7 +67,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         self.provider_remove.clicked.connect(self._remove_provider)
 
         # Change OK to Save in config window
-        self.buttonBox.button(QDialogButtonBox.Ok).setText(self.tr("Save"))
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText(self.tr("Save"))
 
     def accept(self) -> None:
         """When the OK Button is clicked, in-memory temp_config is updated and written to settings"""
@@ -88,8 +89,7 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
 
             timeout_input = box.findChild(QtWidgets.QLineEdit, box.title() + "_timeout_text")
             # https://doc.qt.io/qt-5/qvalidator.html#State-enum
-
-            if timeout_input.validator().State() != 2:
+            if timeout_input.validator().State != 2:
                 self._adjust_timeout_input(timeout_input)
 
             current_provider["timeout"] = int(timeout_input.text())
@@ -287,7 +287,6 @@ class ORStoolsDialogConfigMain(QDialog, Ui_ORStoolsDialogConfigBase):
         gridLayout_3.addLayout(button_layout, 7, 0, 1, 4)
 
         self.verticalLayout.addWidget(provider)
-        provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
     def _reset_endpoints(self) -> None:
         """Resets the endpoints to their original values."""

@@ -31,9 +31,10 @@ from itertools import product
 from qgis.core import QgsPoint, QgsPointXY, QgsGeometry, QgsFeature, QgsFields, QgsField
 from typing import List, Generator, Tuple, Any, Optional
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 
 from ORStools.utils import convert, logger
+from ORStools.utils.wrapper import create_qgs_field
 
 
 def get_request_point_features(route_dict: dict, row_by_row: str) -> Generator[List, Tuple, None]:
@@ -75,22 +76,22 @@ def get_request_point_features(route_dict: dict, row_by_row: str) -> Generator[L
 
 
 def get_fields(
-    from_type: QVariant.Type = QVariant.String,
-    to_type: QVariant.Type = QVariant.String,
+    from_type: QMetaType.Type = QMetaType.Type.QString,
+    to_type: QMetaType.Type = QMetaType.Type.QString,
     from_name: str = "FROM_ID",
     to_name: str = "TO_ID",
     line: bool = False,
     extra_info: list = [],
     two_layers: bool = False,
-) -> QgsFields:
+) -> QgsField:
     """
     Builds output fields for directions response layer.
 
     :param from_type: field type for 'FROM_ID' field
-    :type from_type: QVariant enum
+    :type from_type: QMetaType enum
 
     :param to_type: field type for 'TO_ID' field
-    :type to_type: QVariant enum
+    :type to_type: QMetaType enum
 
     :param from_name: field name for 'FROM_ID' field
     :type from_name: str
@@ -107,21 +108,21 @@ def get_fields(
 
     fields = QgsFields()
     if not extra_info:
-        fields.append(QgsField("DIST_KM", QVariant.Double))
-        fields.append(QgsField("DURATION_H", QVariant.Double))
-        fields.append(QgsField("PROFILE", QVariant.String))
-        fields.append(QgsField("PREF", QVariant.String))
-        fields.append(QgsField("OPTIONS", QVariant.String))
-        fields.append(QgsField(from_name, from_type))
+        fields.append(create_qgs_field("DIST_KM", QMetaType.Type.Double))
+        fields.append(create_qgs_field("DURATION_H", QMetaType.Type.Double))
+        fields.append(create_qgs_field("PROFILE", QMetaType.Type.QString))
+        fields.append(create_qgs_field("PREF", QMetaType.Type.QString))
+        fields.append(create_qgs_field("OPTIONS", QMetaType.Type.QString))
+        fields.append(create_qgs_field(from_name, from_type))
     if not line:
-        fields.append(QgsField(to_name, to_type))
+        fields.append(create_qgs_field(to_name, to_type))
     if two_layers:
-        fields.append(QgsField(from_name, from_type))
+        fields.append(create_qgs_field(from_name, from_type))
     for info in extra_info:
-        field_type = QVariant.Int
+        field_type = QMetaType.Type.Int
         if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions", "steepness"]:
-            field_type = QVariant.String
-        fields.append(QgsField(info.upper(), field_type))
+            field_type = QMetaType.Type.QString
+        fields.append(create_qgs_field(info.upper(), field_type))
 
     return fields
 

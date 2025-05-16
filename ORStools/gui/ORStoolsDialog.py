@@ -30,7 +30,7 @@
 import os
 from typing import Optional
 
-from PyQt5.QtWidgets import QCheckBox
+from qgis.PyQt.QtWidgets import QCheckBox
 
 from ..utils.router import route_as_layer
 
@@ -41,6 +41,8 @@ except ModuleNotFoundError:
 
 import webbrowser
 
+from qgis.PyQt import uic
+from qgis._core import Qgis
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -51,26 +53,21 @@ from qgis.core import (
     QgsGeometry,
     QgsCoordinateReferenceSystem,
     QgsSettings,
-    Qgis,
+    Qgis,  # noqa: F811
     QgsAnnotation,
     QgsCoordinateTransform,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInterface
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QTextDocument, QColor
+from qgis.PyQt.QtGui import QTextDocument
+from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
-    QAction,
-    QDialog,
-    QApplication,
-    QMenu,
-    QMessageBox,
-    QDialogButtonBox,
     QWidget,
     QRadioButton,
 )
 
 from ORStools import (
-    RESOURCE_PREFIX,
     PLUGIN_NAME,
     DEFAULT_COLOR,
     __version__,
@@ -82,11 +79,10 @@ from ORStools.common import (
     PROFILES,
     PREFERENCES,
 )
-from ORStools.utils import maptools, configmanager, transform
+from ORStools.utils import maptools, configmanager, transform, gui
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
-from .ORStoolsDialogUI import Ui_ORStoolsDialogBase
 
-from . import resources_rc  # noqa: F401
+MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
 
 
 def on_config_click(parent):
@@ -154,19 +150,7 @@ class ORStoolsDialogMain:
     def initGui(self) -> None:
         """Called when plugin is activated (on QGIS startup or when activated in Plugin Manager)."""
 
-        def create_icon(f: str) -> QIcon:
-            """
-            internal function to create action icons
-
-            :param f: file name of icon.
-            :type f: str
-
-            :returns: icon object to insert to QAction
-            :rtype: QIcon
-            """
-            return QIcon(RESOURCE_PREFIX + f)
-
-        icon_plugin = create_icon("icon_orstools.png")
+        icon_plugin = gui.GuiUtils.get_icon("icon_orstools.png")
 
         self.actions = [
             QAction(
@@ -176,14 +160,18 @@ class ORStoolsDialogMain:
             ),
             # Config dialog
             QAction(
-                create_icon("icon_settings.png"),
+                gui.GuiUtils.get_icon("icon_settings.png"),
                 self.tr("Provider Settings"),
                 self.iface.mainWindow(),
             ),
             # About dialog
-            QAction(create_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_about.png"), self.tr("About"), self.iface.mainWindow()
+            ),
             # Help page
-            QAction(create_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()),
+            QAction(
+                gui.GuiUtils.get_icon("icon_help.png"), self.tr("Help"), self.iface.mainWindow()
+            ),
         ]
 
         # Create menu
@@ -294,7 +282,7 @@ class ORStoolsDialogMain:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
 
-class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
+class ORStoolsDialog(QDialog, MAIN_WIDGET):
     """Define the custom behaviour of Dialog"""
 
     def __init__(self, iface: QgisInterface, parent=None) -> None:
@@ -365,6 +353,15 @@ class ORStoolsDialog(QDialog, Ui_ORStoolsDialogBase):
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
         self.routing_fromline_list.model().rowsRemoved.connect(self._reindex_list_items)
+
+        # Add icons to buttons
+        self.routing_fromline_map.setIcon(gui.GuiUtils.get_icon("icon_add.png"))
+        self.routing_fromline_clear.setIcon(gui.GuiUtils.get_icon("icon_clear.png"))
+        self.save_vertices.setIcon(gui.GuiUtils.get_icon("icon_save.png"))
+        self.provider_refresh.setIcon(gui.GuiUtils.get_icon("icon_refresh.png"))
+        self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
+        self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
+        self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
 
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(

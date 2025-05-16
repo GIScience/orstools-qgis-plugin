@@ -41,6 +41,7 @@ from qgis.core import (
     QgsAnnotation,
     QgsMarkerSymbol,
 )
+from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QEvent
 from qgis.PyQt.QtGui import QColor, QMouseEvent
 from qgis.PyQt.QtWidgets import (
@@ -108,7 +109,7 @@ class LineTool(QgsMapToolEmitPoint):
     def canvasMoveEvent(self, e: QEvent) -> None:
         hovering = self.check_annotation_hover(e.pos())
         if hovering:
-            QApplication.setOverrideCursor(Qt.OpenHandCursor)
+            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.OpenHandCursor)
         else:
             if not self.moving:
                 QApplication.restoreOverrideCursor()
@@ -133,9 +134,9 @@ class LineTool(QgsMapToolEmitPoint):
             return idx
 
     def keyPressEvent(self, event: QEvent) -> None:
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.dlg._clear_listwidget()
-        elif event.key() == Qt.Key_D:
+        elif event.key() == Qt.Key.Key_D:
             if self.last_point:
                 index = int(self.last_point["annotation"].document().toPlainText())
                 if self.dlg.annotations:
@@ -157,7 +158,7 @@ class LineTool(QgsMapToolEmitPoint):
         hovering = self.check_annotation_hover(event.pos())
         if hovering:
             self.mouseMoved.disconnect()
-            QApplication.setOverrideCursor(Qt.ClosedHandCursor)
+            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
             if self.dlg.rubber_band:
                 self.dlg.rubber_band.reset()
             self.move_i = self.dlg.annotations.index(hovering)
@@ -167,7 +168,7 @@ class LineTool(QgsMapToolEmitPoint):
             self.moving = True
 
     def canvasReleaseEvent(self, event: QEvent) -> None:
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.dlg.show()
             return
 
@@ -271,7 +272,9 @@ class LineTool(QgsMapToolEmitPoint):
         if self.dlg.rubber_band:
             self.dlg.rubber_band.reset()
         else:
-            self.dlg.rubber_band = QgsRubberBand(self.dlg.canvas, QgsWkbTypes.LineGeometry)
+            self.dlg.rubber_band = QgsRubberBand(
+                self.dlg.canvas, QgsWkbTypes.GeometryType.LineGeometry
+            )
         color = QColor(ROUTE_COLOR)
         color.setAlpha(100)
         self.dlg.rubber_band.setStrokeColor(color)
@@ -339,7 +342,7 @@ class LineTool(QgsMapToolEmitPoint):
                 else:
                     raise e
             except Exception as e:
-                self.toggle_preview.setChecked(state)
+                self.dlg.toggle_preview.setChecked(state)
                 if "Connection refused" in str(e):
                     self.api_key_message_bar()
                 else:

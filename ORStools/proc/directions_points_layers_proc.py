@@ -29,7 +29,7 @@
 
 from typing import Dict
 
-from qgis._core import QgsField
+from ..utils.wrapper import create_qgs_field
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -128,7 +128,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 self.CSV_FACTOR,
                 self.tr("Csv Factor (needs Csv Column and csv in Extra Info)"),
-                type=QgsProcessingParameterNumber.Double,
+                type=QgsProcessingParameterNumber.Type.Double,
                 minValue=0,
                 maxValue=1,
                 defaultValue=None,
@@ -269,10 +269,10 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
     @staticmethod
     def _get_route_dict(
         source: QgsProcessingFeatureSource,
-        source_field: QgsField,
+        source_field: create_qgs_field,
         sort_start,
         destination: QgsProcessingFeatureSource,
-        destination_field: QgsField,
+        destination_field: create_qgs_field,
         sort_end,
     ) -> dict:
         """
@@ -282,13 +282,13 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         :type source: QgsProcessingFeatureSource
 
         :param source_field: ID field from layer.
-        :type source_field: QgsField
+        :type source_field: create_qgs_field
 
         :param destination: Input to layer.
         :type destination: QgsProcessingFeatureSource
 
         :param destination_field: ID field to layer.
-        :type destination_field: QgsField
+        :type destination_field: create_qgs_field
 
         :returns: route_dict with coordinates and ID values
         :rtype: dict

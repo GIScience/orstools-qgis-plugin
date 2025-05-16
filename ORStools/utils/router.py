@@ -5,7 +5,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 
-from PyQt5.QtWidgets import QMessageBox
+from qgis.PyQt.QtWidgets import QMessageBox
 
 from ORStools.common import (
     client,

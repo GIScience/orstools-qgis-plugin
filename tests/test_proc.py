@@ -7,11 +7,11 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsRectangle,
-    QgsField,
 )
 from qgis.testing import unittest
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 
+from ORStools.utils.wrapper import create_qgs_field
 from ORStools.proc.directions_lines_proc import ORSDirectionsLinesAlgo
 from ORStools.proc.directions_points_layer_proc import ORSDirectionsPointsLayerAlgo
 from ORStools.proc.directions_points_layers_proc import ORSDirectionsPointsLayersAlgo
@@ -270,7 +270,7 @@ class TestProc(unittest.TestCase):
         self.assertEqual(len([i for i in processed_layer.getFeatures()]), 2)
 
         # test with "SNAPPED_NAME" being present in layer fields
-        new_field = QgsField("SNAPPED_NAME", QVariant.String)
+        new_field = create_qgs_field("SNAPPED_NAME", QMetaType.Type.QString)
         self.point_layer_2.dataProvider().addAttributes([new_field])
         self.point_layer_2.updateFields()
 
