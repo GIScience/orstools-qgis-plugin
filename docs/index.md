@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: Processing Algorithms
-      link: /processing_algorithms/directions_from_points_1_layer
+      link: processing_algorithms/processing_overview.md
 
 features:
   - title: Installation and Setup
@@ -18,7 +18,7 @@ features:
 
   - title: Usage
     details: Learn how to efficiently utilize the main features and functionalities of the ORStools plugin to streamline your workflow within QGIS.
-    link: https://github.com/Merydian/orstools-wiki-test/wiki/usage
+    link: usage.md
 
   - title: Developer Information
     details: Get detailed instructions on setting up your development environment for ORStools QGIS plugin.
