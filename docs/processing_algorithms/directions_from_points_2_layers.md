@@ -1,7 +1,12 @@
 # Directions from 2 Point-Layers
 This algorithm calculates optimal routes for multiple start and end points based on the input files.
 
+**Toolbox Button**
 <img src="/img/directions_from_points_2_layers_toolbox.png" alt="Toolbox">
+
+**Preview**
+<img src="/img/directions_from_points_2_layers_preview.png" alt="Preview">
+
 
 ## Parameters
 

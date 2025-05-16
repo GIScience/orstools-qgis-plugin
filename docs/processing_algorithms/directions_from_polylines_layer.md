@@ -1,7 +1,11 @@
 # Directions from 1 Polyline-Layer
 This algorithm calculates least-cost routes for multiple waypoints along one or multiple LineString(s).
 
+**Toolbox Button**
 <img src="/img/directions_from_polylines_layer_toolbox.png" alt="Toolbox">
+
+**Preview**
+<img src="/img/directions_from_polylines_layer_preview.png" alt="Preview">
 
 ## Parameters
 

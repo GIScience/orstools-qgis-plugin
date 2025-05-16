@@ -1,7 +1,11 @@
 # Directions from 1 Point-Layer
 This algorithm calculates optimal routes for (Multi)Point layers. 
 
+**Toolbox Button**
 <img src="/img/directions_from_points_1_layer_toolbox.png" alt="Toolbox">
+
+**Preview**
+<img src="/img/directions_from_points_1_layer_preview.png" alt="Preview">
 
 ## Parameters
 
