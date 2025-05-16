@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: "ORSTools"
-  text: "The QGIS plugin for the openrouteservice"
+  text: "The QGIS plugin for openrouteservice"
   tagline: Spatial services for everybody
   actions:
     - theme: brand
