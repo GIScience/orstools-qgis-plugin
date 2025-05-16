@@ -28,7 +28,7 @@ hero:
 features:
   - title: Installation and Setup
     details: Get step-by-step instructions on how to install and configure the ORStools plugin within your QGIS environment.
-    link: https://github.com/GIScience/orstools-qgis-plugin/wiki/ORS-Tools-Help
+    link: installation_and_setup.md
 
   - title: General Usage
     details: Learn how to efficiently utilize the main features and functionalities of the ORStools plugin to streamline your workflow within QGIS.
