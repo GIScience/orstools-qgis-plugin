@@ -6,7 +6,7 @@ This algorithm returns service/reachability areas for multiple locations and tim
 ## Parameters
 
 ### Provider
-Select the [openrouteservice provider](../general/provider_settings.md) you want to use.
+Select the [openrouteservice provider](../provider_settings.md) you want to use.
 
 ### Travel Mode
 Select mode of travel.

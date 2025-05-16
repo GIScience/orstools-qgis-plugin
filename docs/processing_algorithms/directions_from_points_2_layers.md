@@ -6,7 +6,7 @@ This algorithm calculates optimal routes for multiple start and end points based
 ## Parameters
 
 ### Provider
-Select the [openrouteservice provider](../general/provider_settings.md) you want to use.
+Select the [openrouteservice provider](../provider_settings.md) you want to use.
 
 
 ### Travel Mode
