@@ -7,7 +7,7 @@ In the configuration window (`Web` > `ORS Tools` > `Configuration`) you have set
 locally in a configuration file and will automatically be used across all tools. Here you can also set the base URL in
 case you're using a self-hosted ORS version and the requests per minute you're allocated (usually set to 60).
 
-![ORS Tools configuration](/wiki/img/wiki_orstools_config.png)
+![ORS Tools configuration](img/orstools_config.png)
 
 
 <details>

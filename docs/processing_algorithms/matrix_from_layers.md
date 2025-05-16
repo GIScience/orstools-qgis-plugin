@@ -1,7 +1,7 @@
 # Matrix from Layers
 This algorithm returns a duration and distance matrix for multiple source and destination points.
 
-<img src="/wiki/img/matrix_from_layers_toolbox.png" alt="Toolbox">
+<img src="/img/matrix_from_layers_toolbox.png" alt="Toolbox">
 
 ## Parameters
 

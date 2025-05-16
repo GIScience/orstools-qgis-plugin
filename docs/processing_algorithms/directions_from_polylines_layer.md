@@ -1,7 +1,7 @@
 # Directions from 1 Polyline-Layer
 This algorithm calculates least-cost routes for multiple waypoints along one or multiple LineString(s).
 
-<img src="/wiki/img/directions_from_polylines_layer_toolbox.png" alt="Toolbox">
+<img src="/img/directions_from_polylines_layer_toolbox.png" alt="Toolbox">
 
 ## Parameters
 
@@ -50,20 +50,20 @@ Dictates the cost. For longer routes don't use Shortest Path.
 <br>
 
 ### Traveling Salesman
-You can optionally perform a [Traveling Salesman Optimization](https://en.wikipedia.org/wiki/Travelling_salesman_problem) on the vertices of each (Multi)line features. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest.
+You can optionally perform a [Traveling Salesman Optimization](https://en.wikipedia.org/Travelling_salesman_problem) on the vertices of each (Multi)line features. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest.
 
 
 <details>
 <summary>Examples</summary>
 <br>
 <h4>Traveling Salesman Problem: Round trip</h4>
-<img src="/wiki/img/tsp_round_trip_line.png" alt="Traveling Salesman Problem: Round trip">
+<img src="/img/tsp_round_trip_line.png" alt="Traveling Salesman Problem: Round trip">
 <h4>Traveling Salesman Problem: fix start point</h4>
-<img src="/wiki/img/tsp_fix_start_point_line.png" alt="Traveling Salesman Problem: fix start point">
+<img src="/img/tsp_fix_start_point_line.png" alt="Traveling Salesman Problem: fix start point">
 <h4>Traveling Salesman Problem: fix end point</h4>
-<img src="/wiki/img/tsp_fix_end_point_line.png" alt="Traveling Salesman Problem: fix end point">
+<img src="/img/tsp_fix_end_point_line.png" alt="Traveling Salesman Problem: fix end point">
 <h4>Traveling Salesman Problem: fix start and end points</h4>
-<img src="/wiki/img/tsp_fix_start_and_end_point_line.png" alt="Traveling Salesman Problem: fix start and end points">
+<img src="/img/tsp_fix_start_and_end_point_line.png" alt="Traveling Salesman Problem: fix start and end points">
 </details>
 
 ### Directions(Output)
