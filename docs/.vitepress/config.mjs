@@ -8,22 +8,18 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/png', href: '/img/icon_orstools.png' }]
   ],
   themeConfig: {
-    // Logo in top-left nav
     logo: '/img/icon_orstools.png',
-
-    // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
       { text: 'General', link: '/general/provider_settings' },
       { text: 'Algorithms', link: '/processing_algorithms/directions_from_points_1_layer' }
     ],
-
     sidebar: [
       {
-          text: 'General',
-          items: [
-            { text: 'Provider Settings', link: '/general/provider_settings'}
-          ]
+        text: 'General',
+        items: [
+          { text: 'Provider Settings', link: '/general/provider_settings' }
+        ]
       },
       {
         text: 'Algorithms',
@@ -37,7 +33,6 @@ export default defineConfig({
         ]
       }
     ],
-
     socialLinks: [
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
     ]
