@@ -1,5 +1,4 @@
-# Plugin Usage
-
+# General Usage
 
 ## Main Plugin
 
