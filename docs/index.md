@@ -1,11 +1,13 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
   name: "ORSTools"
   text: "The QGIS plugin for openrouteservice"
   tagline: Spatial services for everybody
+  image:
+    src: img/icon_orstools.png
+    alt: ORSTools Icon
   actions:
     - theme: brand
       text: Processing Algorithms

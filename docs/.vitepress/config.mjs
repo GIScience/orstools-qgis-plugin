@@ -4,7 +4,13 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "ORSTools",
   description: "The QGIS plugin for the openrouteservice",
+  head: [
+    ['link', { rel: 'icon', type: 'image/png', href: '/img/icon_orstools.png' }]
+  ],
   themeConfig: {
+    // Logo in top-left nav
+    logo: '/img/icon_orstools.png',
+
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
