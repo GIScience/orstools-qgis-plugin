@@ -9,21 +9,19 @@ export default defineConfig({
   ],
   themeConfig: {
     logo: '/img/icon_orstools.png',
-    nav: [
-      { text: 'Home', link: '/' },
-      { text: 'General', link: '/provider_settings' },
-      { text: 'Algorithms', link: '/processing_algorithms/directions_from_points_1_layer' }
-    ],
     sidebar: [
       {
         text: 'General',
         items: [
-          { text: 'Provider Settings', link: '/provider_settings' }
+          { text: 'Installation and Setup', link: '/installation_and_setup' },
+          { text: 'General Usage', link: '/usage' },
+          { text: 'Developer Information', link: '/developer_information' }
         ]
       },
       {
-        text: 'Algorithms',
+        text: 'Toolbox Algorithms',
         items: [
+          { text: 'Overview', link: '/processing_algorithms/processing_overview' },
           { text: 'Directions from Points (1)', link: '/processing_algorithms/directions_from_points_1_layer' },
           { text: 'Directions from Polylines Layer', link: '/processing_algorithms/directions_from_polylines_layer' },
           { text: 'Directions from Points (2)', link: '/processing_algorithms/directions_from_points_2_layers' },
