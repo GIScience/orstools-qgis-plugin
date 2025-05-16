@@ -40,6 +40,6 @@ features:
 
   - title: Developer Information
     details: Get detailed instructions on setting up your development environment for ORStools QGIS plugin.
-    link: https://github.com/GIScience/orstools-qgis-plugin/blob/main/README.md
+    link: developer_information.md
 
 ---
