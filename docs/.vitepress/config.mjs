@@ -11,14 +11,14 @@ export default defineConfig({
     logo: '/img/icon_orstools.png',
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'General', link: '/general/provider_settings' },
+      { text: 'General', link: '/provider_settings' },
       { text: 'Algorithms', link: '/processing_algorithms/directions_from_points_1_layer' }
     ],
     sidebar: [
       {
         text: 'General',
         items: [
-          { text: 'Provider Settings', link: '/general/provider_settings' }
+          { text: 'Provider Settings', link: '/provider_settings' }
         ]
       },
       {
