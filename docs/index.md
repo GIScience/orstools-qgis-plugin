@@ -34,7 +34,7 @@ features:
     details: Learn how to efficiently utilize the main features and functionalities of the ORStools plugin to streamline your workflow within QGIS.
     link: usage.md
         
-  - title: Processing Algorithms
+  - title: Toolbox Algorithms
     details: Learn how to utilize the ORSTools toolbox algorithms.
     link: processing_algorithms/processing_overview.md
 
