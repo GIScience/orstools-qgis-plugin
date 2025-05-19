@@ -246,6 +246,8 @@ class ORStoolsDialogMain:
 
     def run_gui_control(self) -> None:
         """Slot function for OK button of main dialog."""
+        if self.dlg.routing_fromline_list.count() == 0:
+            return
         basepath = os.path.dirname(__file__)
 
         # add ors svg path
