@@ -52,10 +52,7 @@ from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager, gui
 from ..proc import ENDPOINTS, DEFAULT_SETTINGS
-from ORStools.utils import configmanager
-from .ORStoolsDialogConfigUI import Ui_ORStoolsDialogConfigBase
 from ..common import PROFILES
-from ..proc import ENDPOINTS, DEFAULT_SETTINGS
 
 CONFIG_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogConfigUI.ui"))
 
@@ -335,8 +332,12 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             endpoint_lineedit.setObjectName(f"{name}_{endpoint_name}_endpoint")
 
             endpoint_layout.addWidget(endpoint_lineedit, row, 1, 1, 3)
-
             row += 1
+
+        reset_endpoints_button = QtWidgets.QPushButton(self.tr("Reset Endpoints"), provider)
+        reset_endpoints_button.setObjectName(name + "_reset_endpoints_button")
+        reset_endpoints_button.clicked.connect(self._reset_endpoints)
+        endpoint_layout.addWidget(reset_endpoints_button)
 
         # Profile Section
         profile_box = QgsCollapsibleGroupBox(provider)
@@ -376,22 +377,7 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
 
         gridLayout_3.addWidget(profile_box, 7, 0, 1, 4)
 
-        row = 0
-        for profile_name in profiles:
-            profile_label = QtWidgets.QLabel(profile_box)
-            profile_label.setText(self.tr(profile_name.capitalize()))
-            profile_layout.addWidget(profile_label, row, 0, 1, 1)
-
-            profile_lineedit = QtWidgets.QLineEdit(profile_box)
-            profile_lineedit.setText(profile_name)
-            profile_lineedit.setObjectName(f"{name}_{profile_name}_lineedit")
-
-            profile_layout.addWidget(profile_lineedit, row, 1, 1, 3)
-
-            row += 1
-
-
-        # Add reset buttons at the bottom
+        # 6. Reset buttons section
         button_layout = QtWidgets.QHBoxLayout()
 
         reset_url_button = QtWidgets.QPushButton(self.tr("Reset URL"), provider)
@@ -401,15 +387,9 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         )
         button_layout.addWidget(reset_url_button)
 
-        reset_endpoints_button = QtWidgets.QPushButton(self.tr("Reset Endpoints"), provider)
-        reset_endpoints_button.setObjectName(name + "_reset_endpoints_button")
-        reset_endpoints_button.clicked.connect(self._reset_endpoints)
-        button_layout.addWidget(reset_endpoints_button)
-
-        gridLayout_3.addLayout(button_layout, 7, 0, 1, 4)
+        gridLayout_3.addLayout(button_layout, 8, 0, 1, 4)  # (8, 0–3)
 
         self.verticalLayout.addWidget(provider)
-        provider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
     def add_profile_button_clicked(self, button: QPushButton) -> None:
         dlg = QgsNewNameDialog("Enter profile name", "New Profile")
