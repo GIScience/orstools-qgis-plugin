@@ -26,6 +26,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import json
 import os
 import json
@@ -57,14 +58,16 @@ from qgis.core import (
     QgsGeometry,
     QgsCoordinateReferenceSystem,
     QgsSettings,
-    Qgis,  # noqa: F811
     QgsAnnotation,
     QgsCoordinateTransform,
     QgsTask,
     QgsApplication,
     QgsCoordinateTransform,
     Qgis,
-    QgsBlockingNetworkRequest
+    QgsBlockingNetworkRequest,
+    QgsCoordinateTransform,
+    Qgis,
+    QgsBlockingNetworkRequest,
 )
 from qgis.gui import (
     QgsMapCanvasAnnotationItem,
@@ -83,7 +86,15 @@ from qgis.PyQt.QtWidgets import (
     QShortcut,
 )
 from qgis.PyQt.QtGui import QTextDocument
-from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox, QCompleter
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QDialog,
+    QApplication,
+    QMenu,
+    QMessageBox,
+    QDialogButtonBox,
+    QCompleter,
+)
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QWidget,
@@ -492,9 +503,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
         self.rubber_band = None
         # add connection to linedit text change
-        self.geocode_edit.textChanged.connect(
-            lambda: self.wait_connect_geocode(self.geocode_edit)
-        )
+        self.geocode_edit.textChanged.connect(lambda: self.wait_connect_geocode(self.geocode_edit))
 
         self.start_geocode_coords = None
         self.dest_geocode_coords = None
