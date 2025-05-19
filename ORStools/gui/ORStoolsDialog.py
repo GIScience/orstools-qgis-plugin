@@ -26,12 +26,14 @@
  *                                                                         *
  ***************************************************************************/
 """
-
+import json
 import os
 import json
 from datetime import datetime
 from typing import Optional
 
+from qgis.PyQt.QtCore import QTimer, Qt, QUrl
+from qgis.PyQt.QtNetwork import QNetworkRequest
 from qgis.PyQt.QtWidgets import QCheckBox
 
 from ..utils.router import route_as_layer
@@ -56,7 +58,7 @@ from qgis.core import (
     QgsSettings,
     Qgis,  # noqa: F811
     QgsAnnotation,
-    QgsCoordinateTransform,
+    QgsCoordinateTransform, Qgis, QgsBlockingNetworkRequest
 )
 from qgis.gui import (
     QgsMapCanvasAnnotationItem,
@@ -65,7 +67,7 @@ from qgis.gui import (
 )
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
 from qgis.PyQt.QtGui import QTextDocument
-from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox, QCompleter
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QWidget,
@@ -428,6 +430,98 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     child.toggled.connect(self.reload_rubber_band)
 
         self.rubber_band = None
+        # add connection to linedit text change
+        self.geocode_edit.textChanged.connect(
+            lambda: self.wait_connect_geocode(self.geocode_edit)
+        )
+
+        self.start_geocode_coords = None
+        self.dest_geocode_coords = None
+        self.geocoded = None
+
+    def wait_connect_geocode(self, lineEdit):
+        text = lineEdit.text()
+        QTimer.singleShot(500, lambda: self.reload_geocode_completer(lineEdit, text))
+
+    def reload_geocode_completer(self, lineEdit, text):
+        if lineEdit.text() == text and lineEdit.text() != "":
+            provider_id = self.provider_combo.currentIndex()
+            provider = configmanager.read_config()["providers"][provider_id]
+            api_key = provider["key"]
+            if api_key != "":
+
+                def option_chosen(name, lineEdit):
+                    coords = [
+                        feature["geometry"]["coordinates"]
+                        for feature in data["features"]
+                        if feature["properties"]["name"] == name
+                    ][0]
+                    self.add_geocoded_item(coords, lineEdit, name)
+                    completer.activated.disconnect()
+                    lineEdit.setText("")
+
+                e = self._iface.mapCanvas().extent()
+                lat = e.yMinimum() + (e.yMaximum() - e.yMinimum()) / 2
+                lon = e.xMinimum() + (e.xMaximum() - e.xMinimum()) / 2
+                sourceCrs = self._iface.mapCanvas().mapSettings().destinationCrs()
+                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                middle = tr.transform(QgsPointXY(lon, lat))
+
+                url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={lineEdit.text()}&sources=geonames&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
+                request = QgsBlockingNetworkRequest()
+                error_code = request.get(QNetworkRequest(QUrl(url)))
+                if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+                    reply = request.reply()
+                    data = json.loads(reply.content().data().decode("utf-8"))
+                    suggest = set([i["properties"]["name"] for i in data["features"]])
+                    completer = QCompleter(suggest)
+                    completer.setCaseSensitivity(Qt.CaseInsensitive)
+                    completer.setFilterMode(Qt.MatchContains)
+                    completer.highlighted.connect(completer.highlighted.disconnect)
+                    completer.activated.connect(lambda t: option_chosen(t, lineEdit))
+                    lineEdit.setCompleter(completer)
+                    completer.complete()
+
+                else:
+                    raise ConnectionError(
+                        f"Error while trying to request geocoding autocomplete, error code: {error_code}"
+                    )
+            else:
+                QMessageBox.critical(
+                    self,
+                    "Missing API key",
+                    """
+                    Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+                    If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                    Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                    settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+                )
+
+    def add_geocoded_item(self, coordinates, lineEdit, name):
+        idx = "0"
+        p = f"Point {idx}: {coordinates[0]}, {coordinates[1]}"
+        items = [
+            self.routing_fromline_list.item(x).text()
+            for x in range(self.routing_fromline_list.count())
+        ]
+        coords = [i.split(":")[1] for i in items]
+        if p.split(":")[1] not in coords:
+            if lineEdit.objectName() == "geocode_start":
+                items.insert(0, p)
+            else:
+                items.insert(self.routing_fromline_list.count(), p)
+
+        self.routing_fromline_list.clear()
+        self.routing_fromline_list.addItems(items)
+
+        point = QgsPointXY(coordinates[0], coordinates[1])
+        annotation = self._linetool_annotate_point(point, idx)
+        self.annotations.append(annotation)
+        self.project.annotationManager().addAnnotation(annotation)
+        self._reindex_list_items()
+        self.geocoded = True
 
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
@@ -487,6 +581,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 self.rubber_band.reset()
             del self.line_tool
             self.line_tool = maptools.LineTool(self)
+            self.geocoded = False
 
     def _linetool_annotate_point(
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
@@ -535,7 +630,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         transformer = transform.transformToWGS(map_crs)
         point_wgs = transformer.transform(point)
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
-
         crs = self.canvas.mapSettings().destinationCrs()
         annotation = self._linetool_annotate_point(point, idx, crs)
         self.annotations.append(annotation)
@@ -564,6 +658,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
         try:
+            self.line_tool = maptools.LineTool(self)
             self.line_tool.create_rubber_band()
         except Exception as e:
             if "Connection refused" in str(e):
