@@ -464,6 +464,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                         for feature in data["features"]
                         if feature["properties"]["name"] == name
                     ][0]
+                    self.line_tool = maptools.LineTool(self)
                     self.add_geocoded_item(coords, lineEdit, name)
                     completer.activated.disconnect()
                     lineEdit.setText("")
@@ -666,7 +667,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             self.annotations.append(annotation)
             self.project.annotationManager().addAnnotation(annotation)
         try:
-            self.line_tool = maptools.LineTool(self)
             self.line_tool.create_rubber_band()
         except Exception as e:
             if "Connection refused" in str(e):
