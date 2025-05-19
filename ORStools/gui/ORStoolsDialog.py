@@ -34,6 +34,7 @@ from typing import Optional
 
 from qgis.PyQt.QtWidgets import QCheckBox
 
+from ..utils.gui import LayerMessageBox
 from ..utils.router import route_as_layer
 
 try:
@@ -57,6 +58,7 @@ from qgis.core import (
     Qgis,  # noqa: F811
     QgsAnnotation,
     QgsCoordinateTransform,
+    QgsWkbTypes,
 )
 from qgis.gui import (
     QgsMapCanvasAnnotationItem,
@@ -606,3 +608,34 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         """Load the saved state when the window is shown"""
         super().show()
         self.load_provider_combo_state()
+
+    def load_vertices_from_layer(self) -> None:
+        if not self.line_tool:
+            self.line_tool = maptools.LineTool(self)
+        box = LayerMessageBox()
+        res = box.exec_()
+        if res == QMessageBox.Ok:
+            layer = box.selectedLayer()
+            try:
+                self.routing_fromline_list.clear()
+
+                for id, feat in enumerate(layer.getFeatures()):
+                    geom = feat.geometry()
+                    if not geom:
+                        continue
+
+                    if geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isSingleType(geom.wkbType()):
+                        pt = geom.asPoint()
+                        self.create_vertex(pt, id)
+                        self.line_tool.create_rubber_band()
+
+                    elif geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isMultiType(geom.wkbType()):
+                        pts = geom.asMultiPoint()
+                        for pt in pts:
+                            self.create_vertex(pt, id)
+                            self.line_tool.create_rubber_band()
+            except Exception:
+                self._clear_annotations()
+                self._iface.messageBar().pushMessage(
+                    self.tr("Could not load points from Layer"), self.tr("Please select a valid point layer"), level=Qgis.MessageLevel.Warning, duration=3
+                )
