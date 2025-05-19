@@ -269,6 +269,8 @@ class LineTool(QgsMapToolEmitPoint):
         self.last_click = "double-click"
 
     def create_rubber_band(self) -> None:
+        if self.dlg.optimization_group.isChecked() and self.dlg.routing_fromline_list.count() == 2:
+            return
         if self.dlg.rubber_band:
             self.dlg.rubber_band.reset()
         else:
