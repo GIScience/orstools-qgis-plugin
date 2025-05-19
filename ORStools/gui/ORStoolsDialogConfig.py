@@ -442,7 +442,3 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
                 endpoint_name = name.split("_")[1]
                 endpoint_value = ENDPOINTS[endpoint_name]
                 line_edit_remove.setText(endpoint_value)
-
-    def remove_profile_button_clicked(self):
-        for item in self.list_widget_profiles.selectedItems():
-            self.list_widget_profiles.takeItem(self.list_widget_profiles.row(item))
