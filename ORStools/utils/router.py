@@ -120,5 +120,5 @@ Please add polygons to the layer or uncheck avoid polygons.
         dlg.debug_text.setHtml(clnt_msg)
 
 
-def tr(self, string: str) -> str:
-    return QCoreApplication.translate(str(self.__class__.__name__), string)
+def tr(string: str) -> str:
+    return QCoreApplication.translate("ORStoolsDialogMain", string)
