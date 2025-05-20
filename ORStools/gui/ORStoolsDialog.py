@@ -333,23 +333,32 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
         # Batch
-        self.batch_routing_points.clicked.connect(
+        self.pushButton_routing_points.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_points_2_layers")
         )
-        self.batch_routing_point.clicked.connect(
+        self.pushButton_routing_point.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_points_1_layer")
         )
-        self.batch_routing_line.clicked.connect(
+        self.pushButton_routing_line.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:directions_from_polylines_layer")
         )
-        self.batch_iso_point.clicked.connect(
+        self.pushButton_iso_point.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:isochrones_from_point")
         )
-        self.batch_iso_layer.clicked.connect(
+        self.pushButton_iso_layer.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:isochrones_from_layer")
         )
-        self.batch_matrix.clicked.connect(
+        self.pushButton_matrix.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:matrix_from_layers")
+        )
+        self.pushButton_snap_point.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:snap_from_point_layer")
+        )
+        self.pushButton_snap_layer.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:snap_from_point")
+        )
+        self.pushButton_export.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:export_network_from_map")
         )
 
         # Reset index of list items every time something is moved or deleted
