@@ -20,7 +20,7 @@ from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtGui import (
     QIcon,
 )
-from qgis._core import QgsMapLayer
+from qgis._core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
 
@@ -64,6 +64,7 @@ class LayerMessageBox(QMessageBox):
         self.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 
         self.layer_combo = QgsMapLayerComboBox(self)
+        self.layer_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
         self.layer_combo.setMinimumWidth(200)
 
         layout = self.layout()
