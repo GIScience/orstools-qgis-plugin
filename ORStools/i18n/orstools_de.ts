@@ -378,8 +378,8 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="62"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/signup&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://openrouteservice.org/dev/#/signup&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Registrieren&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://account.heigit.org&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Sign Up&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://account.heigit.org&quot;&gt;&lt;span style=&quot;font-weight: bold; text-decoration: underline; color:#a8b1f5;&quot;&gt;Registrieren&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="78"/>

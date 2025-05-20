@@ -55,7 +55,7 @@ in the GUI.
 
 QGIS version: **v3.4** or above
 
-[ORS API key](https://openrouteservice.org/dev/#/signup)
+[ORS API key](https://account.heigit.org)
 
 ### Installation
 
