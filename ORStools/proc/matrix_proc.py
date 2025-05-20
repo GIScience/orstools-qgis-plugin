@@ -60,6 +60,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         self.IN_START_FIELD: str = "INPUT_START_FIELD"
         self.IN_END: str = "INPUT_END_LAYER"
         self.IN_END_FIELD: str = "INPUT_END_FIELD"
+        self.OUT_NAME: str = "Route_Matrix"
         self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,

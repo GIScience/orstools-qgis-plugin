@@ -74,6 +74,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         self.EXTRA_INFO: str = "EXTRA_INFO"
         self.CSV_FACTOR: str = "CSV_FACTOR"
         self.CSV_COLUMN: str = "CSV_COLUMN"
+        self.OUT_NAME: str = "Directions_Lines"
         self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_LINES,
