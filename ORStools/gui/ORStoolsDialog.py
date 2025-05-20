@@ -32,6 +32,7 @@ from typing import Optional
 
 from qgis.PyQt.QtWidgets import QCheckBox
 
+from ..utils.gui import LayerMessageBox
 from ..utils.router import route_as_layer
 
 try:
@@ -42,7 +43,7 @@ except ModuleNotFoundError:
 import webbrowser
 
 from qgis.PyQt import uic
-from qgis._core import Qgis
+from qgis._core import Qgis, QgsWkbTypes
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -331,6 +332,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._clear_listwidget)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
+        self.load_vertices.clicked.connect(self.load_vertices_from_layer)
 
         # Batch
         self.pushButton_routing_points.clicked.connect(
@@ -373,6 +375,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
         self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
         self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
+        self.load_vertices.setIcon(gui.GuiUtils.get_icon("icon_load.png"))
 
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(
@@ -553,3 +556,49 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         """Reloads the rubber band of the linetool."""
         if self.line_tool is not None:
             self.line_tool.create_rubber_band()
+
+    def load_vertices_from_layer(self, testing: str = "") -> None:
+        if not self.line_tool:
+            self.line_tool = maptools.LineTool(self)
+
+        box = LayerMessageBox()
+
+        if testing == "ok":
+            result = QMessageBox.Ok
+        elif testing == "not_ok":
+            result = QMessageBox.Cancel
+        else:
+            result = box.exec_()
+
+        if result == QMessageBox.Ok:
+            layer = box.selectedLayer()
+            try:
+                self.routing_fromline_list.clear()
+
+                for id, feat in enumerate(layer.getFeatures()):
+                    geom = feat.geometry()
+                    if not geom:
+                        continue
+
+                    if geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isSingleType(
+                        geom.wkbType()
+                    ):
+                        pt = geom.asPoint()
+                        self.create_vertex(pt, id)
+                        self.line_tool.create_rubber_band()
+
+                    elif geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isMultiType(
+                        geom.wkbType()
+                    ):
+                        pts = geom.asMultiPoint()
+                        for pt in pts:
+                            self.create_vertex(pt, id)
+                            self.line_tool.create_rubber_band()
+            except Exception:
+                self._clear_annotations()
+                self._iface.messageBar().pushMessage(
+                    self.tr("Could not load points from Layer"),
+                    self.tr("Please select a valid point layer"),
+                    level=Qgis.MessageLevel.Warning,
+                    duration=3,
+                )
