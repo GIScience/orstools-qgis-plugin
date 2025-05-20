@@ -19,7 +19,7 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Toolbox Algorithms',
+        text: 'Processing Tools',
         items: [
           { text: 'Overview', link: '/processing_algorithms/processing_overview' },
           { text: 'Directions from Points (1)', link: '/processing_algorithms/directions_from_points_1_layer' },
