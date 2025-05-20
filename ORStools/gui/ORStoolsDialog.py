@@ -595,6 +595,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         if self.line_tool is not None:
             self.line_tool.create_rubber_band()
 
+    def load_vertices_from_layer(self, testing: str = "") -> None:
     def save_selected_provider_state(self) -> None:
         s = QgsSettings()
         s.setValue("ORSTools/gui/provider_combo", self.provider_combo.currentIndex())
@@ -613,9 +614,17 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
     def load_vertices_from_layer(self) -> None:
         if not self.line_tool:
             self.line_tool = maptools.LineTool(self)
+
         box = LayerMessageBox()
-        res = box.exec_()
-        if res == QMessageBox.Ok:
+
+        if testing == "ok":
+            result = QMessageBox.Ok
+        elif testing == "not_ok":
+            result = QMessageBox.Cancel
+        else:
+            result = box.exec_()
+
+        if result == QMessageBox.Ok:
             layer = box.selectedLayer()
             try:
                 self.routing_fromline_list.clear()

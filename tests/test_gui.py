@@ -1,5 +1,13 @@
+
 from qgis.PyQt.QtWidgets import QLineEdit
-from qgis.core import QgsSettings
+from qgis.core import (
+    QgsSettings,
+    QgsVectorLayer,
+    QgsFeature,
+    QgsGeometry,
+    QgsProject,
+    QgsPointXY,
+)
 from qgis.gui import QgsCollapsibleGroupBox
 from qgis.testing import unittest
 
@@ -22,6 +30,11 @@ QGISAPP, CANVAS, IFACE, PARENT = get_qgis_app()
 
 @pytest.mark.filterwarnings("ignore:.*imp module is deprecated.*")
 class TestGui(unittest.TestCase):
+    def tearDown(self):
+        """Run after each test"""
+        # Clean up layers
+        QgsProject.instance().removeAllMapLayers()
+
     def test_without_live_preview(self):
         from ORStools.gui.ORStoolsDialog import ORStoolsDialog
         from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
@@ -400,3 +413,42 @@ class TestGui(unittest.TestCase):
             "POINT(8.67251100000000008 49.39887900000000087)",
             next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )
+
+    def test_load_valid_point_layer(self):
+        """Test loading vertices from valid point layer."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create test layers
+        self.point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+        self.line_layer = QgsVectorLayer("LineString?crs=EPSG:4326", "test_lines", "memory")
+
+        # Add 3 features to point layer
+        for coords in [(1, 2), (3, 4), (5, 6)]:
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coords)))
+            self.point_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayers([self.point_layer, self.line_layer])
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 3)
+        self.assertIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+
+    def test_user_cancels_operation(self):
+        """Test when user cancels the dialog."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+        dialog_main.dlg.load_vertices_from_layer("not_ok")
+
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)
+        self.assertNotIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
