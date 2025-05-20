@@ -408,6 +408,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
         self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
         self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
+        self.load_vertices.setIcon(gui.GuiUtils.get_icon("icon_load.png"))
 
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(
