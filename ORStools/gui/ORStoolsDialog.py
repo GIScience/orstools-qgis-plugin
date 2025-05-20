@@ -625,12 +625,16 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     if not geom:
                         continue
 
-                    if geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isSingleType(geom.wkbType()):
+                    if geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isSingleType(
+                        geom.wkbType()
+                    ):
                         pt = geom.asPoint()
                         self.create_vertex(pt, id)
                         self.line_tool.create_rubber_band()
 
-                    elif geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isMultiType(geom.wkbType()):
+                    elif geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isMultiType(
+                        geom.wkbType()
+                    ):
                         pts = geom.asMultiPoint()
                         for pt in pts:
                             self.create_vertex(pt, id)
@@ -638,5 +642,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             except Exception:
                 self._clear_annotations()
                 self._iface.messageBar().pushMessage(
-                    self.tr("Could not load points from Layer"), self.tr("Please select a valid point layer"), level=Qgis.MessageLevel.Warning, duration=3
+                    self.tr("Could not load points from Layer"),
+                    self.tr("Please select a valid point layer"),
+                    level=Qgis.MessageLevel.Warning,
+                    duration=3,
                 )
