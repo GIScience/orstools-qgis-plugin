@@ -349,6 +349,15 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.pushButton_matrix.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:matrix_from_layers")
         )
+        self.pushButton_snap_point.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:snap_from_point_layer")
+        )
+        self.pushButton_snap_layer.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:snap_from_point")
+        )
+        self.pushButton_export.clicked.connect(
+            lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:export_network_from_map")
+        )
 
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
