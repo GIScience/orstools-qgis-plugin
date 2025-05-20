@@ -793,18 +793,18 @@ p, li { white-space: pre-wrap; }
          <property name="title">
           <string>Snapping</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_8">
-          <item>
-           <widget class="QPushButton" name="pushButton_snap_layer">
-            <property name="text">
-             <string>Snap from Point</string>
-            </property>
-           </widget>
-          </item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QPushButton" name="pushButton_snap_point">
             <property name="text">
              <string>Snap from Point Layer</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_snap_layer">
+            <property name="text">
+             <string>Snap from Point</string>
             </property>
            </widget>
           </item>
