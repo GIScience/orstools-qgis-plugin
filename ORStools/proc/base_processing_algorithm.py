@@ -143,7 +143,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for output, used in all child classes
         """
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         return QgsProcessingParameterFeatureSink(
             name=self.OUT,
             description=f"{self.OUT_NAME}_{timestamp}",
