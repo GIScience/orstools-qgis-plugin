@@ -382,6 +382,9 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             lambda: self.color_duplicate_items(self.routing_fromline_list)
         )
 
+        self.load_provider_combo_state()
+        self.provider_combo.activated.connect(self.save_selected_provider_state)
+
         advanced_boxes = self.advances_group.findChildren(QgsCollapsibleGroupBox)
         for box in advanced_boxes:
             box.collapsedStateChanged.connect(self.reload_rubber_band)
@@ -553,3 +556,18 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         """Reloads the rubber band of the linetool."""
         if self.line_tool is not None:
             self.line_tool.create_rubber_band()
+
+    def save_selected_provider_state(self) -> None:
+        s = QgsSettings()
+        s.setValue("ORSTools/gui/provider_combo", self.provider_combo.currentIndex())
+
+    def load_provider_combo_state(self):
+        s = QgsSettings()
+        index = s.value("ORSTools/gui/provider_combo")
+        if index:
+            self.provider_combo.setCurrentIndex(int(index))
+
+    def show(self):
+        """Load the saved state when the window is shown"""
+        super().show()
+        self.load_provider_combo_state()
