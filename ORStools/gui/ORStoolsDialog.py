@@ -28,6 +28,7 @@
 """
 
 import os
+from datetime import datetime
 from typing import Optional
 
 from qgis.PyQt.QtWidgets import QCheckBox
@@ -390,8 +391,9 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         ]
 
         if len(items) > 0:
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
             point_layer = QgsVectorLayer(
-                "point?crs=epsg:4326&field=ID:integer", "Vertices", "memory"
+                "point?crs=epsg:4326&field=ID:integer", f"Vertices_{timestamp}", "memory"
             )
             point_layer.updateFields()
             for idx, x in enumerate(items):
