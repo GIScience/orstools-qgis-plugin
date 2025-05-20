@@ -696,9 +696,9 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="batch_tab">
+     <widget class="QWidget" name="processing_tab">
       <attribute name="title">
-       <string>Batch Jobs</string>
+       <string>Processing Tools</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -742,7 +742,7 @@ p, li { white-space: pre-wrap; }
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Points (2 Layer)</string>
+             <string>Points (2 Layers)</string>
             </property>
            </widget>
           </item>
