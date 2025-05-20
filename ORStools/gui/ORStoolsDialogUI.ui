@@ -708,7 +708,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QPushButton" name="batch_routing_line">
+           <widget class="QPushButton" name="pushButton_routing_line">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -721,7 +721,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="batch_routing_point">
+           <widget class="QPushButton" name="pushButton_routing_point">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -734,7 +734,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="batch_routing_points">
+           <widget class="QPushButton" name="pushButton_routing_points">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -756,14 +756,14 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QPushButton" name="batch_iso_point">
+           <widget class="QPushButton" name="pushButton_iso_point">
             <property name="text">
              <string>Isochrones from Point</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="batch_iso_layer">
+           <widget class="QPushButton" name="pushButton_iso_layer">
             <property name="text">
              <string>Isochrones from Layer</string>
             </property>
@@ -779,7 +779,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QPushButton" name="batch_matrix">
+           <widget class="QPushButton" name="pushButton_matrix">
             <property name="text">
              <string>Matrix</string>
             </property>
