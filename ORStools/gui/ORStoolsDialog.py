@@ -27,6 +27,7 @@
  ***************************************************************************/
 """
 
+import json
 import os
 from typing import Optional
 
@@ -284,7 +285,9 @@ class ORStoolsDialogMain:
             self.dlg.line_tool = maptools.LineTool(self.dlg)
 
         except exceptions.ApiError as e:
-            if "Could not find routable point within a radius of 350.0 meters of specified coordinate":
+            parsed = json.loads(e.message)
+            error_code = int(parsed["error"]["code"])
+            if error_code == 2010:
                 maptools.LineTool(self.dlg).radius_message_box(e)
                 return
 
