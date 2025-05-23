@@ -59,6 +59,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         self.IN_DIFFERENCE: str = "INPUT_DIFFERENCE"
         self.IN_SMOOTHING: str = "INPUT_SMOOTHING"
         self.LOCATION_TYPE: str = "LOCATION_TYPE"
+        self.OUT_NAME: str = "Isochrones_Point"
         self.PARAMETERS: list = [
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,

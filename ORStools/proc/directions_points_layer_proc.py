@@ -75,6 +75,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         self.CSV_FACTOR: str = "CSV_FACTOR"
         self.CSV_COLUMN: str = "CSV_COLUMN"
         self.EXPORT_ORDER: str = "EXPORT_ORDER"
+        self.OUT_NAME: str = "Directions_Layer"
         self.PARAMETERS: List = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
