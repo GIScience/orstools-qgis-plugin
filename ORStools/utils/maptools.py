@@ -216,7 +216,7 @@ class LineTool(QgsMapToolEmitPoint):
                             item = f"Point {i}:{coords}"
                             self.dlg.routing_fromline_list.addItem(item)
                         self.dlg._reindex_list_items()
-                        self.radius_message_box()
+                        self.radius_message_box(e)
                         self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
                     else:
                         raise e
@@ -250,7 +250,7 @@ class LineTool(QgsMapToolEmitPoint):
                             self.dlg._reindex_list_items()
                             self.create_rubber_band()
 
-                        self.radius_message_box()
+                        self.radius_message_box(e)
                     else:
                         raise e
                 except Exception as e:
@@ -315,13 +315,14 @@ class LineTool(QgsMapToolEmitPoint):
         error_dict = json.loads(json_str)
         return error_dict["error"]["code"]
 
-    def radius_message_box(self) -> None:
+    def radius_message_box(self, e) -> None:
+        parsed = json.loads(e.message)
+        error_message = parsed["error"]["message"]
         self.dlg._iface.messageBar().pushMessage(
             self.tr("Please use a different point"),
-            self.tr("""Could not find routable point within a radius of 350.0 meters of specified coordinate. 
-            Use a different point closer to a road."""),
+            self.tr(f"""{error_message} Use a different point closer to a road."""),
             level=Qgis.MessageLevel.Warning,
-            duration=3,
+            duration=5,
         )
 
     def api_key_message_bar(self) -> None:
@@ -340,7 +341,7 @@ class LineTool(QgsMapToolEmitPoint):
             except ApiError as e:
                 self.dlg.toggle_preview.setChecked(state)
                 if self.get_error_code(e) == 2010:
-                    self.radius_message_box()
+                    self.radius_message_box(e)
                 else:
                     raise e
             except Exception as e:
