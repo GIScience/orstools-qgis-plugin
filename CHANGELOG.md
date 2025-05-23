@@ -54,7 +54,7 @@ RELEASING:
 - Rename output names of procs and append date and time ([#313](github.com/GIScience/orstools-qgis-plugin/issues/313))
 - Move comments and link about signup to new link ([#311](https://github.com/GIScience/orstools-qgis-plugin/issues/311))
 - Improve naming of batch jobs tab ([#321](github.com/GIScience/orstools-qgis-plugin/issues/321))
-- Less than two vertices not accepted wit optimization and live preview ([#317](github.com/GIScience/orstools-qgis-plugin/issues/317))
+- Less than two vertices not accepted with optimization and live preview ([#317](github.com/GIScience/orstools-qgis-plugin/issues/317))
 - Have Readme.md badges change on merge only ([#291](https://github.com/GIScience/orstools-qgis-plugin/issues/291)) 
 - Error with route calculation without vertices (No Issue)
 
