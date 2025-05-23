@@ -27,6 +27,7 @@
  ***************************************************************************/
 """
 
+import json
 import os
 from datetime import datetime
 from typing import Optional
@@ -80,7 +81,7 @@ from ORStools.common import (
     PROFILES,
     PREFERENCES,
 )
-from ORStools.utils import maptools, configmanager, transform, gui
+from ORStools.utils import maptools, configmanager, transform, gui, exceptions
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
@@ -249,37 +250,48 @@ class ORStoolsDialogMain:
         """Slot function for OK button of main dialog."""
         if self.dlg.routing_fromline_list.count() == 0:
             return
-        basepath = os.path.dirname(__file__)
 
-        # add ors svg path
-        my_new_path = os.path.join(basepath, "img/svg")
-        svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
-        if my_new_path not in svg_paths:
-            svg_paths.append(my_new_path)
-            QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
+        try:
+            basepath = os.path.dirname(__file__)
 
-        # Associate annotations with map layer, so they get deleted when layer is deleted
-        for annotation in self.dlg.annotations:
-            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
-            # , you can change order after optimization
-            # Then in theory, when the layer is remove, the annotation is removed as well
-            # Doesn't work though, the annotations are still there when project is re-opened
-            # annotation.setMapLayer(layer_out)
-            self.project.annotationManager().removeAnnotation(annotation)
-        self.dlg.annotations = []
-        self.dlg.rubber_band.reset()
+            layer_out = route_as_layer(self.dlg)
 
-        layer_out = route_as_layer(self.dlg)
+            # style output layer
+            qml_path = os.path.join(basepath, "linestyle.qml")
+            layer_out.loadNamedStyle(qml_path, True)
+            layer_out.triggerRepaint()
 
-        # style output layer
-        qml_path = os.path.join(basepath, "linestyle.qml")
-        layer_out.loadNamedStyle(qml_path, True)
-        layer_out.triggerRepaint()
+            self.project.addMapLayer(layer_out)
 
-        self.project.addMapLayer(layer_out)
+            # add ors svg path
+            my_new_path = os.path.join(basepath, "img/svg")
+            svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
+            if my_new_path not in svg_paths:
+                svg_paths.append(my_new_path)
+                QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
 
-        self.dlg._clear_listwidget()
-        self.dlg.line_tool = maptools.LineTool(self.dlg)
+            # Associate annotations with map layer, so they get deleted when layer is deleted
+            for annotation in self.dlg.annotations:
+                # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
+                # , you can change order after optimization
+                # Then in theory, when the layer is remove, the annotation is removed as well
+                # Doesn't work though, the annotations are still there when project is re-opened
+                # annotation.setMapLayer(layer_out)
+                self.project.annotationManager().removeAnnotation(annotation)
+
+            self.dlg.annotations = []
+            self.dlg.rubber_band.reset()
+
+            self.dlg._clear_listwidget()
+            self.dlg.line_tool = maptools.LineTool(self.dlg)
+
+        except exceptions.ApiError as e:
+            # Error thrown by ORStools/common/client.py, line 243, in _check_status
+            parsed = json.loads(e.message)
+            error_code = int(parsed["error"]["code"])
+            if error_code == 2010:
+                maptools.LineTool(self.dlg).radius_message_box(e)
+                return
 
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
@@ -453,6 +465,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             # Remove blue lines (rubber band)
             if self.rubber_band:
                 self.rubber_band.reset()
+            del self.line_tool
             self.line_tool = maptools.LineTool(self)
 
     def _linetool_annotate_point(
