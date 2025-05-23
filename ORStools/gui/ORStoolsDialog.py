@@ -285,6 +285,7 @@ class ORStoolsDialogMain:
             self.dlg.line_tool = maptools.LineTool(self.dlg)
 
         except exceptions.ApiError as e:
+            # Error thrown by ORStools/common/client.py, line 243, in _check_status
             parsed = json.loads(e.message)
             error_code = int(parsed["error"]["code"])
             if error_code == 2010:
