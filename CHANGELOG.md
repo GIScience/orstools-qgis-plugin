@@ -40,7 +40,7 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## [Unreleased]
+## [2.0.0] - 2025-05-23
 ### Added
 - Prepare plugin for Qt6 ([#303](github.com/GIScience/orstools-qgis-plugin/issues/303))
 - Keep the selected provider when closing/reopening ([#168](github.com/GIScience/orstools-qgis-plugin/issues/168))
@@ -55,8 +55,8 @@ RELEASING:
 - Move comments and link about signup to new link ([#311](https://github.com/GIScience/orstools-qgis-plugin/issues/311))
 - Improve naming of batch jobs tab ([#321](github.com/GIScience/orstools-qgis-plugin/issues/321))
 - Less than two vertices not accepted with optimization and live preview ([#317](github.com/GIScience/orstools-qgis-plugin/issues/317))
-- Have Readme.md badges change on merge only ([#291](https://github.com/GIScience/orstools-qgis-plugin/issues/291)) 
-- Error with route calculation without vertices (No Issue)
+- Have Readme.md badges change on merge only ([#291](https://github.com/GIScience/orstools-qgis-plugin/issues/291))
+- Error with route calculation without vertices (no Issue)
 
 ## [1.10.0] - 2024-11-21
 
@@ -304,7 +304,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.0...HEAD
+[1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...v2.0.0
 [1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...v1.9.0
 [1.8.4]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...v1.8.4
