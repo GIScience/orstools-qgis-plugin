@@ -57,6 +57,7 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         self.GROUP: str = "Snap"
         self.IN_POINTS: str = "IN_POINTS"
         self.RADIUS: str = "RADIUS"
+        self.OUT_NAME: str = "Snapping_Layer"
         self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,

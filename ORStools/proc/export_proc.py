@@ -59,6 +59,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         self.GROUP: str = "Export"
         self.IN_EXPORT: str = "INPUT_EXPORT"
         self.OUT_POINT = "OUTPUT_POINT"
+        self.OUT_NAME: str = "Network_Export"
         self.PARAMETERS: list = [
             QgsProcessingParameterExtent(
                 name=self.IN_EXPORT,

@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 
 from qgis.core import (
     QgsVectorLayer,
@@ -18,7 +18,9 @@ from qgis.PyQt.QtCore import QCoreApplication
 
 
 def route_as_layer(dlg):
-    layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_ORS", "memory")
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    layer_name = f"Route_ORS_{timestamp}"
+    layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", layer_name, "memory")
     layer_out.dataProvider().addAttributes(directions_core.get_fields())
     layer_out.updateFields()
 
