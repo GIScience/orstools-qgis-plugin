@@ -50,8 +50,6 @@ class ORStools:
         :type iface: QgsInterface
         """
         self.dialog = ORStoolsDialog.ORStoolsDialogMain(iface)
-        # should be done in initProcessing, so that qgis_process can skip GUI.
-        # self.provider = provider.ORStoolsProvider()
 
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -83,7 +81,6 @@ class ORStools:
     def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        #QgsApplication.processingRegistry().addProvider(self.provider)
         self.initProcessing()
         
         self.dialog.initGui()
