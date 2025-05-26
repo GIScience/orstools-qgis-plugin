@@ -40,7 +40,7 @@ from qgis.core import (
     QgsProcessingFeedback,
     QgsSettings,
 )
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from qgis.PyQt.QtGui import QIcon
 
@@ -179,14 +179,14 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
-    def get_endpoint_names_from_provider(self, provider: str | int ) -> dict:
+    def get_endpoint_names_from_provider(self, provider: Union[str,int] ) -> dict:
         providers = configmanager.read_config()["providers"]
         ors_provider = providers[int(provider)]
         return ors_provider["endpoints"]
 
     @classmethod
     def _get_ors_client_from_provider(
-        cls, provider: str | int, feedback: QgsProcessingFeedback
+        cls, provider: Union[str, int], feedback: QgsProcessingFeedback
     ) -> client.Client:
         """
         Connects client to provider and returns a client instance for requests to the ors API
