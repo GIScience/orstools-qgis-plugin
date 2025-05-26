@@ -21,7 +21,7 @@ from ORStools.proc.isochrones_point_proc import ORSIsochronesPointAlgo
 from ORStools.proc.matrix_proc import ORSMatrixAlgo
 from ORStools.proc.snap_layer_proc import ORSSnapLayerAlgo
 from ORStools.proc.snap_point_proc import ORSSnapPointAlgo
-from ORStools.proc.add_provider_conf import ORSProviderAddAlgo
+from ORStools.proc.provider_add_conf import ORSProviderAddAlgo
 
 
 class TestProc(unittest.TestCase):
