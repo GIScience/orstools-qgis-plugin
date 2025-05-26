@@ -306,5 +306,7 @@ class TestProc(unittest.TestCase):
         self.assertTrue(any(provider["name"] == "TestProvider" for provider in providers))
 
         # Clean up by removing the test provider
-        config["providers"] = [provider for provider in providers if provider["name"] != "TestProvider"]
+        config["providers"] = [
+            provider for provider in providers if provider["name"] != "TestProvider"
+        ]
         settings.setValue("ORStools/config", config)

@@ -44,44 +44,35 @@ from qgis.core import (
 from ORStools.utils import logger
 from ..proc import ENDPOINTS
 
+
 class ORSProviderAddAlgo(QgsProcessingAlgorithm):
     def __init__(self):
         super().__init__()
         self.PARAMETERS: list = [
             QgsProcessingParameterString(
                 name="ors_provider_name",
-                description=self.tr(
-                    "Set unique name for your ors provider"
-                ),
+                description=self.tr("Set unique name for your ors provider"),
             ),
             QgsProcessingParameterString(
                 name="ors_provider_api_key",
-                description=self.tr(
-                    "Set api key for your ors provider"
-                ),
-                optional=True
+                description=self.tr("Set api key for your ors provider"),
+                optional=True,
             ),
             QgsProcessingParameterString(
                 name="ors_provider_url",
-                description=self.tr(
-                    "Set url to ors api"
-                ),
+                description=self.tr("Set url to ors api"),
             ),
             QgsProcessingParameterNumber(
                 name="ors_provider_timeout",
-                description=self.tr(
-                    "Set custom timeout (in seconds)"
-                ),
-                defaultValue=60
+                description=self.tr("Set custom timeout (in seconds)"),
+                defaultValue=60,
             ),
             QgsProcessingParameterBoolean(
                 name="ors_provider_overwrite",
-                description=self.tr(
-                    "If True, existing provider is overwritten"
-                ),
-                defaultValue=False
+                description=self.tr("If True, existing provider is overwritten"),
+                defaultValue=False,
             ),
-            #TODO: Service Endpoints
+            # TODO: Service Endpoints
             # QgsProcessingParameterString(
             #     name="otp_endpoint_directions",
             #     description=self.tr("Endpoint for directions on your provider"),
@@ -99,71 +90,48 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
     def initAlgorithm(self, config={}):
         for parameter in self.PARAMETERS:
             self.addParameter(parameter)
-            
+
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
         s = QgsSettings()
-        provider_name = self.parameterAsString(
-            parameters,
-            "ors_provider_name",
-            context
-        )
-        provider_url = self.parameterAsString(
-            parameters,
-            "ors_provider_url",
-            context
-        )
-        provider_api_key = self.parameterAsString(
-            parameters,
-            "ors_provider_api_key",
-            context
-        )
-        provider_timeout = self.parameterAsInt(
-            parameters,
-            "ors_provider_timeout",
-            context
-        )
-        provider_overwrite = self.parameterAsBoolean(
-            parameters,
-            "ors_provider_timeout",
-            context
-        )
+        provider_name = self.parameterAsString(parameters, "ors_provider_name", context)
+        provider_url = self.parameterAsString(parameters, "ors_provider_url", context)
+        provider_api_key = self.parameterAsString(parameters, "ors_provider_api_key", context)
+        provider_timeout = self.parameterAsInt(parameters, "ors_provider_timeout", context)
+        provider_overwrite = self.parameterAsBoolean(parameters, "ors_provider_timeout", context)
 
         current_config = s.value("ORStools/config")
         feedback.pushInfo(str(ENDPOINTS))
         logger.log(str(ENDPOINTS), 2)
-        if (provider_name in [x['name'] for x in current_config['providers']]):
-            if (provider_overwrite):
+        if provider_name in [x["name"] for x in current_config["providers"]]:
+            if provider_overwrite:
                 msg = f"A provider with the name '{provider_name}' already exists. Replacement not yet implemented."
             else:
-                #ignoring reset of settings for now.
+                # ignoring reset of settings for now.
                 msg = f"A provider with the name '{provider_name}' already exists. Please mark overwrite checkbox."
             feedback.pushInfo(msg)
             logger.log(msg, 2)
-            return {
-                "OUTPUT": msg
-            }
+            return {"OUTPUT": msg}
         else:
             existing_config = s.value("ORStools/config")
             s.setValue(
-                "ORStools/config", 
+                "ORStools/config",
                 {
-                    'providers': existing_config['providers'] + [
-                        { 
-                            'base_url': provider_url, 
-                            'key': provider_api_key, 
-                            'name': provider_name, 
-                            'timeout': provider_timeout,
-                            'endpoints': ENDPOINTS #TODO: customize"new config added: "
+                    "providers": existing_config["providers"]
+                    + [
+                        {
+                            "base_url": provider_url,
+                            "key": provider_api_key,
+                            "name": provider_name,
+                            "timeout": provider_timeout,
+                            "endpoints": ENDPOINTS,  # TODO: customize"new config added: "
                         }
                     ]
-                }
+                },
             )
 
-            return {
-                "OUTPUT": f"new config added: {provider_name}"
-            }
+            return {"OUTPUT": f"new config added: {provider_name}"}
 
     def createInstance(self):
         return self.__class__()
@@ -177,8 +145,8 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
         :return:
         """
         return self.tr("Set Provider Config via Algorithm (e.g. headless)")
-    
+
     def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
-        #return string #disabling QCoreApplication.translate due to Qt
+        # return string #disabling QCoreApplication.translate due to Qt

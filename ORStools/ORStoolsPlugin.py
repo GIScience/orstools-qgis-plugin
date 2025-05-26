@@ -82,7 +82,7 @@ class ORStools:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         self.initProcessing()
-        
+
         self.dialog.initGui()
 
     def unload(self) -> None:

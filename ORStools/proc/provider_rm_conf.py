@@ -41,15 +41,14 @@ from qgis.core import (
 
 from ORStools.utils import logger
 
+
 class ORSProviderRmAlgo(QgsProcessingAlgorithm):
     def __init__(self):
         super().__init__()
         self.PARAMETERS: list = [
             QgsProcessingParameterString(
                 name="ors_provider_name",
-                description=self.tr(
-                    "Set unique name for your ors provider"
-                ),
+                description=self.tr("Set unique name for your ors provider"),
             ),
         ]
 
@@ -62,37 +61,32 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
     def initAlgorithm(self, config={}):
         for parameter in self.PARAMETERS:
             self.addParameter(parameter)
-            
+
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
         s = QgsSettings()
-        provider_name = self.parameterAsString(
-            parameters,
-            "ors_provider_name",
-            context
-        )
+        provider_name = self.parameterAsString(parameters, "ors_provider_name", context)
         current_config = s.value("ORStools/config")
-        if (provider_name in [x['name'] for x in current_config['providers']]):
-            found = [int(j) for j, y in {str(i): x for i, x in enumerate(current_config['providers'])}.items() if y['name']==provider_name]
-            if len(found)>0:
-                del current_config['providers'][found[0]]
-                s.setValue(
-                    "ORStools/config", 
-                    {
-                        'providers': current_config['providers']
-                    }
-                )
+        if provider_name in [x["name"] for x in current_config["providers"]]:
+            found = [
+                int(j)
+                for j, y in {str(i): x for i, x in enumerate(current_config["providers"])}.items()
+                if y["name"] == provider_name
+            ]
+            if len(found) > 0:
+                del current_config["providers"][found[0]]
+                s.setValue("ORStools/config", {"providers": current_config["providers"]})
                 msg = self.tr(f"Old config deleted: {provider_name}")
             else:
-                msg = self.tr(f"Old config not found! - {provider_name} - and is therfore not deleted.")
-            
+                msg = self.tr(
+                    f"Old config not found! - {provider_name} - and is therfore not deleted."
+                )
+
             #
             feedback.pushInfo(msg)
             logger.log(msg, 2)
-            return {
-                "OUTPUT": msg
-            }
+            return {"OUTPUT": msg}
 
     def createInstance(self):
         return self.__class__()
@@ -106,7 +100,7 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
         :return:
         """
         return self.tr("Remove Provider Config via Algorithm (e.g. headless)")
-    
+
     def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
