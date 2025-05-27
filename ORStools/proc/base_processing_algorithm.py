@@ -27,6 +27,8 @@
  ***************************************************************************/
 """
 
+from datetime import datetime
+
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
     QgsProcessing,
@@ -69,6 +71,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.IN_AVOID_COUNTRIES = "INPUT_AVOID_COUNTRIES"
         self.IN_AVOID_POLYGONS = "INPUT_AVOID_POLYGONS"
         self.OUT = "OUTPUT"
+        self.OUT_NAME = "ORSTOOLS_OUTPUT"
         self.PARAMETERS = None
 
     def createInstance(self) -> Any:
@@ -140,9 +143,10 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for output, used in all child classes
         """
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         return QgsProcessingParameterFeatureSink(
             name=self.OUT,
-            description=self.GROUP,
+            description=f"{self.OUT_NAME}_{timestamp}",
         )
 
     def option_parameters(self) -> [QgsProcessingParameterDefinition]:

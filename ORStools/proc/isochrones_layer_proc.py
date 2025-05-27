@@ -65,6 +65,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         self.USE_SMOOTHING: str = "USE_SMOOTHING"
         self.IN_SMOOTHING: str = "INPUT_SMOOTHING"
         self.LOCATION_TYPE: str = "LOCATION_TYPE"
+        self.OUT_NAME: str = "Isochrones_Layer"
         self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
