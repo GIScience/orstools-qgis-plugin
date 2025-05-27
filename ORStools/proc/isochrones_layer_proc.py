@@ -207,7 +207,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
-            feedback.pushDebug(f"{str(isochrone)}")
+            feedback.pushDebugInfo(f"{str(isochrone)}")
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
         return {self.OUT: self.dest_id}
