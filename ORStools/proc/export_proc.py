@@ -29,6 +29,7 @@
 
 from typing import Dict
 
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsWkbTypes,
     QgsFeature,
@@ -43,6 +44,8 @@ from qgis.core import (
 )
 
 from qgis.PyQt.QtCore import QMetaType
+
+from ..utils.gui import GuiUtils
 from ..utils.wrapper import create_qgs_field
 
 
@@ -175,3 +178,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Export Network from Map")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_export.png")
+        return QIcon(icon_path)
