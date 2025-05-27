@@ -198,7 +198,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                     "isochrones"
                 ]
                 response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
-                #feedback.pushInfo(f"{str(response.json())}")
 
                 for isochrone in self.isochrones.get_features(response, params["id"]):
                     sink.addFeature(isochrone)
