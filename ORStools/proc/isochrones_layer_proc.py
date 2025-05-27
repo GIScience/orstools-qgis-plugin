@@ -198,7 +198,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                     "isochrones"
                 ]
                 response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
-                feedback.pushInfo(f"{str(response)}")
 
                 for isochrone in self.isochrones.get_features(response, params["id"]):
                     sink.addFeature(isochrone)
@@ -208,6 +207,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
+            feedback.pushDebug(f"{str(isochrone)}")
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
         return {self.OUT: self.dest_id}
