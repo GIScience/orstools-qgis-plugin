@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## [Unreleased]
+### Added
+- Readd old icons and add new icons for processing algorithms
+
 ## [2.0.0] - 2025-05-23
 ### Added
 - Prepare plugin for Qt6 ([#303](github.com/GIScience/orstools-qgis-plugin/issues/303))
