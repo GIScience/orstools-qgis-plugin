@@ -29,6 +29,7 @@
 
 from typing import Dict
 
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -44,6 +45,7 @@ from qgis.core import (
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
 from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
+from ..utils.gui import GuiUtils
 
 
 # noinspection PyPep8Naming
@@ -182,3 +184,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Isochrones from Point")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_isochrones.png")
+        return QIcon(icon_path)

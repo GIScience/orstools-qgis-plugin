@@ -29,7 +29,7 @@
 
 from typing import Dict, List
 
-
+from qgis.PyQt.QtGui import QIcon
 from qgis._core import (
     QgsVectorLayer,
     QgsFeature,
@@ -54,6 +54,7 @@ from qgis.core import (
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
+from ..utils.gui import GuiUtils
 from ..utils.processing import get_params_optimize
 
 
@@ -302,3 +303,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Directions from 1 Point-Layer")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_directions.png")
+        return QIcon(icon_path)
