@@ -123,10 +123,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
     ) -> Dict[str, str]:
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
-        dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
-        location_type = dict(enumerate(LOCATION_TYPES))[parameters[self.LOCATION_TYPE]]
-
+        profile = dict(enumerate(PROFILES))[int(parameters[self.IN_PROFILE])]
+        dimension = dict(enumerate(DIMENSIONS))[int(parameters[self.IN_METRIC])]
+        location_type = dict(enumerate(LOCATION_TYPES))[int(parameters[self.LOCATION_TYPE])]
         factor = 60 if dimension == "time" else 1
         ranges_raw = parameters[self.IN_RANGES]
         ranges_proc = [x * factor for x in map(float, ranges_raw.split(","))]
