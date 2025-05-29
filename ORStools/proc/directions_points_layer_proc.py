@@ -30,14 +30,12 @@
 from typing import Dict, List
 
 from qgis.PyQt.QtGui import QIcon
-from qgis._core import (
+from qgis.core import (
     QgsVectorLayer,
     QgsFeature,
     QgsGeometry,
     QgsProject,
     QgsProcessingParameterBoolean,
-)
-from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
     QgsProcessing,

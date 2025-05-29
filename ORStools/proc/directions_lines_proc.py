@@ -29,14 +29,12 @@
 
 from typing import List, Dict, Generator
 
-from qgis._core import (
+from qgis.core import (
     QgsFeature,
     QgsVectorLayer,
     QgsGeometry,
     QgsProject,
     QgsProcessingParameterBoolean,
-)
-from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
     QgsProcessing,
