@@ -29,8 +29,8 @@
 
 from typing import Any, Generator
 
-from qgis._core import QgsMapLayer
 from qgis.core import (
+    QgsMapLayer,
     QgsPointXY,
     QgsFeature,
     QgsFields,

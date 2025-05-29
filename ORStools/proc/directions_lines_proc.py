@@ -29,14 +29,12 @@
 
 from typing import List, Dict, Generator
 
-from qgis._core import (
+from qgis.core import (
     QgsFeature,
     QgsVectorLayer,
     QgsGeometry,
     QgsProject,
     QgsProcessingParameterBoolean,
-)
-from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
     QgsProcessing,
@@ -51,10 +49,12 @@ from qgis.core import (
     QgsProcessingFeedback,
 )
 
+from qgis.PyQt.QtGui import QIcon
 from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
+from ..utils.gui import GuiUtils
 
 
 # noinspection PyPep8Naming
@@ -293,3 +293,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Directions from 1 Polyline-Layer")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_directions.png")
+        return QIcon(icon_path)

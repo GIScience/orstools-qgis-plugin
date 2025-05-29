@@ -29,6 +29,8 @@
 
 from typing import Dict
 
+from qgis.PyQt.QtGui import QIcon
+from ..utils.gui import GuiUtils
 from ..utils.wrapper import create_qgs_field
 from qgis.core import (
     QgsWkbTypes,
@@ -328,3 +330,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Directions from 2 Point-Layers")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_directions.png")
+        return QIcon(icon_path)

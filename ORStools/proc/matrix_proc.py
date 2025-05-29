@@ -29,6 +29,7 @@
 
 from typing import Dict
 
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsWkbTypes,
     QgsFeature,
@@ -48,6 +49,7 @@ from qgis.PyQt.QtCore import QMetaType
 from ORStools.common import PROFILES
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
+from ..utils.gui import GuiUtils
 
 
 # noinspection PyPep8Naming
@@ -234,3 +236,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Matrix from Layers")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_matrix.png")
+        return QIcon(icon_path)

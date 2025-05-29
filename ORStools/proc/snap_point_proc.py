@@ -29,6 +29,7 @@
 
 from typing import Dict
 
+from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QMetaType
 from qgis.core import (
     QgsProcessingParameterPoint,
@@ -41,6 +42,7 @@ from qgis.core import (
 )
 
 from ORStools.common import PROFILES
+from ORStools.utils.gui import GuiUtils
 from ORStools.utils.processing import get_snapped_point_features
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ORStools.utils import exceptions, logger
@@ -126,3 +128,7 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Snap from Point")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_snap.png")
+        return QIcon(icon_path)
