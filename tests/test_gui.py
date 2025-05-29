@@ -1,5 +1,5 @@
 from qgis.PyQt.QtWidgets import QLineEdit
-from qgis._core import QgsSettings
+from qgis.core import QgsSettings
 from qgis.gui import QgsCollapsibleGroupBox
 from qgis.testing import unittest
 
