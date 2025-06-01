@@ -10,7 +10,7 @@ This algorithm calculates optimal routes for (Multi)Point layers.
 ## Parameters
 
 ### Provider
-Select the [openrouteservice provider](../provider_settings.md) you want to use.
+Select the [openrouteservice provider](../installation_and_setup.md) you want to use.
 
 ### Travel Mode
 Select mode of travel.

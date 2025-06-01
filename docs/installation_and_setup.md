@@ -12,10 +12,24 @@ However, if you want or need to install the latest development version:
   - **Mac OS**: `Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins`
 3. Restart QGIS and if necessary, activate the ORS Tools plugin over the Plugin Manager.
 
-# Setup
+# Provider Settings
 
-First, you'll have to [sign-up](https://openrouteservice.org/sign-up) and register your API key in your [dashboard](https://openrouteservice.org/dev/#/home).
+In the configuration window (`Web` > `ORS Tools` > `Configuration`) you have set up the API key, which will be saved
+locally in the QGIS settings and will automatically be used across all tools. Here you can also set the base URL in
+case you're using a self-hosted ORS version and the requests per minute you're allocated (usually set to 60).
 
-In the configuration window (`Web` > `ORS Tools` > `Configuration`) you have set up the API key, which will be saved locally in a configuration file and will automatically be used across all tools. Here you can also set the base URL in case you're using a self-hosted ORS version and the requests per minute you're allocated (usually set to 40).
+## Sign up for an API key
+First, you'll have to [sign up](https://account.heigit.org/signup) and copy your API key from
+your [HeiGIT account dashboard](https://account.heigit.org).
 
-![ORS Tools config](/img/wiki_orstools_config.png)
+![Signup webpage](img/signup_tab.png)
+![openrouteservice dashboard](img/dashboard.png)
+
+
+## Set up the API key in QGIS
+1. Open the configuration window by going to `Web` > `ORS Tools` > `Configuration`. Or by clicking the gear icon in the plugin.
+2. Open the provider box by clicking on the caret icon next to the provider name.
+3. Enter your API key in the `API Key` field.
+
+![config_icon_gui.png](img/config_icon_gui.png)
+![config_gui.png](img/config_gui.png)

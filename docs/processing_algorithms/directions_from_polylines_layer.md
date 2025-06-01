@@ -10,7 +10,7 @@ This algorithm calculates least-cost routes for multiple waypoints along one or 
 ## Parameters
 
 ### Provider
-Select the [openrouteservice provider](../provider_settings.md) you want to use.
+Select the [openrouteservice provider](../installation_and_setup.md) you want to use.
 
 ### Travel mode
 Select mode of travel.
