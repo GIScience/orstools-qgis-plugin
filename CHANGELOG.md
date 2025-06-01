@@ -40,7 +40,7 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## [Unreleased]
+## [2.0.1] - 2025-06-01
 ### Added
 - Readd old icons and add new icons for processing algorithms
 
@@ -308,8 +308,9 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.0...HEAD
-[1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...v2.0.0
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...v2.0.0
 [1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...v1.9.0
 [1.8.4]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...v1.8.4
