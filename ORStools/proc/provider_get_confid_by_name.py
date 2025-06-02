@@ -78,9 +78,7 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
                 result = found[0]
                 msg = self.tr(f"The provider with name: {provider_name} has the ID {str(result)}")
             else:
-                msg = self.tr(
-                    f"Config with specified name not found! - {provider_name}"
-                )
+                msg = self.tr(f"Config with specified name not found! - {provider_name}")
                 result = -1
 
             #

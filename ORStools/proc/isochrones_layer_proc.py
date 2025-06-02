@@ -210,11 +210,11 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 logger.log(msg, 2)
                 continue
             feedback.setProgress(int(100.0 / source.featureCount() * num))
-            if int(100.0 / source.featureCount() * num)==100:
+            if int(100.0 / source.featureCount() * num) == 100:
                 feedback.pushDebugInfo(str(self.dest_id))
 
         sink.flushBuffer()
-        if hasattr(sink, 'finalize'):
+        if hasattr(sink, "finalize"):
             sink.finalize()
         else:
             del sink
