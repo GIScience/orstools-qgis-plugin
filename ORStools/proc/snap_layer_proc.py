@@ -135,12 +135,6 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
             feedback.reportError(msg)
             logger.log(msg)
 
-        sink.flushBuffer()
-        if hasattr(sink, 'finalize'):
-            sink.finalize()
-        else:
-            del sink
-        
         return {self.OUT: dest_id}
 
     def displayName(self) -> str:

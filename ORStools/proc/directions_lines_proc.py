@@ -252,12 +252,6 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
 
             feedback.setProgress(int(100.0 / count * num))
 
-        sink.flushBuffer()
-        if hasattr(sink, 'finalize'):
-            sink.finalize()
-        else:
-            del sink
-        
         return {self.OUT: dest_id}
 
     @staticmethod
