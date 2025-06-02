@@ -213,6 +213,12 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             if int(100.0 / source.featureCount() * num)==100:
                 feedback.pushDebugInfo(str(self.dest_id))
 
+        sink.flushBuffer()
+        if hasattr(sink, 'finalize'):
+            sink.finalize()
+        else:
+            del sink
+
         return {self.OUT: self.dest_id}
 
     # noinspection PyUnusedLocal
