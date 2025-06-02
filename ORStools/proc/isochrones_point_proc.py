@@ -168,6 +168,12 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             feedback.reportError(msg)
             logger.log(msg, 2)
 
+        sink.flushBuffer()
+        if hasattr(sink, 'finalize'):
+            sink.finalize()
+        else:
+            del sink
+        
         return {self.OUT: self.dest_id}
 
     # noinspection PyUnusedLocal
