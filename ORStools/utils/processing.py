@@ -123,6 +123,5 @@ def get_snapped_point_features(response: dict, og_features=None, feedback=None) 
     return feats
 
 
-def tr(self, string: str, context=None) -> str:
-    context = context or self.__class__.__name__
-    return QCoreApplication.translate(context, string)
+def tr(string: str) -> str:
+    return QCoreApplication.translate("ORStools", string)

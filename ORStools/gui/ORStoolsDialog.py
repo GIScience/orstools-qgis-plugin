@@ -44,7 +44,6 @@ except ModuleNotFoundError:
 import webbrowser
 
 from qgis.PyQt import uic
-from qgis._core import Qgis
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
