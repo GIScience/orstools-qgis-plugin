@@ -155,13 +155,13 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
             logger.log(msg)
 
         sink_line.flushBuffer()
-        if hasattr(sink_line, "finalize"):
+        if hasattr(sink_line, 'finalize'):
             sink_line.finalize()
         else:
             del sink_line
 
         sink_point.flushBuffer()
-        if hasattr(sink_point, "finalize"):
+        if hasattr(sink_point, 'finalize'):
             sink_point.finalize()
         else:
             del sink_point
