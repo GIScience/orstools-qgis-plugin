@@ -217,11 +217,11 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
                 sink.addFeature(feat)
 
         sink.flushBuffer()
-        if hasattr(sink, 'finalize'):
+        if hasattr(sink, "finalize"):
             sink.finalize()
         else:
             del sink
-            
+
         return {self.OUT: dest_id}
 
     # TODO working source_type and destination_type differ in both name and type from get_fields in directions_core.

@@ -213,7 +213,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
         sink.flushBuffer()
-        if hasattr(sink, 'finalize'):
+        if hasattr(sink, "finalize"):
             sink.finalize()
         else:
             del sink
