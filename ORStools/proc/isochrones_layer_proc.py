@@ -50,6 +50,8 @@ from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ORStools.utils import transform, exceptions, logger
 from ORStools.utils.gui import GuiUtils
 
+#import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # noinspection PyPep8Naming
 class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
@@ -67,6 +69,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         self.USE_SMOOTHING: str = "USE_SMOOTHING"
         self.IN_SMOOTHING: str = "INPUT_SMOOTHING"
         self.LOCATION_TYPE: str = "LOCATION_TYPE"
+        self.MAX_WORKERS: str = "MAX_WORKERS" 
         self.OUT_NAME: str = "Isochrones_Layer"
         self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
@@ -109,6 +112,15 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 options=LOCATION_TYPES,
                 defaultValue=LOCATION_TYPES[0],
             ),
+            QgsProcessingParameterNumber(
+                name=self.MAX_WORKERS,
+                description=self.tr("Number of parallel requests (1-8) | ONLY FOR CUSTOM ORS DEPLOYMENT!"),
+                defaultValue=1,
+                minValue=1,
+                maxValue=8,
+                optional=True,
+            ),
+
         ]
 
     # Save some important references
@@ -134,6 +146,11 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         # round to the nearest second or meter
         ranges_proc = list(map(int, ranges_proc))
         smoothing = parameters[self.IN_SMOOTHING]
+
+        max_workers = self.parameterAsInt(parameters, self.MAX_WORKERS, context)
+        if max_workers is None or max_workers < 1:
+            max_workers = 1  # Fallback default
+        feedback.pushDebugInfo(f"Using {max_workers} parallel workers")
 
         # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
@@ -189,31 +206,79 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             self.crs_out,
         )
 
-        for num, params in enumerate(requests):
+        def process_single_request(request_data):
+            """Verarbeitet eine einzelne ORS-Anfrage"""
+            num, params = request_data
             if feedback.isCanceled():
-                break
-
-            # If feature causes error, report and continue with next
+                return None, None
+                
             try:
-                # Populate features from response
-                endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
-                    "isochrones"
-                ]
+                endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])["isochrones"]
                 response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
-
-                for isochrone in self.isochrones.get_features(response, params["id"]):
-                    sink.addFeature(isochrone)
-
+                
+                features = list(self.isochrones.get_features(response, params["id"]))
+                return num, features
+                
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
                 logger.log(msg, 2)
-                continue
-            if self.IS_CLI and num % 100 == 0:
-                print(f"Done {num} from {source.featureCount()}", flush=True)
-            feedback.setProgress(int(100.0 / source.featureCount() * num))
-            if int(100.0 / source.featureCount() * num) == 100:
-                feedback.pushDebugInfo(str(self.dest_id))
+                return num, None
+
+        # Parallele Verarbeitung
+        completed_requests = 0
+        total_requests = len(requests)
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Alle Anfragen als Future-Objekte einreichen
+            future_to_request = {
+                executor.submit(process_single_request, (num, params)): num 
+                for num, params in enumerate(requests)
+            }
+            
+            # Ergebnisse sammeln sobald sie verfügbar sind
+            for future in as_completed(future_to_request):
+                if feedback.isCanceled():
+                    break
+                    
+                num, features = future.result()
+                
+                if features:
+                    for feature in features:
+                        sink.addFeature(feature)
+                
+                completed_requests += 1
+                
+                # Progress aktualisieren
+                feedback.setProgress(int(100.0 * completed_requests / total_requests))
+                
+                if self.IS_CLI and completed_requests % 100 == 0:
+                    print(f"Done {completed_requests} from {total_requests}", flush=True)
+        # for num, params in enumerate(requests):
+        #     if feedback.isCanceled():
+        #         break
+
+        #     # If feature causes error, report and continue with next
+        #     try:
+        #         # Populate features from response
+        #         endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+        #             "isochrones"
+        #         ]
+        #         response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
+
+        #         for isochrone in self.isochrones.get_features(response, params["id"]):
+        #             sink.addFeature(isochrone)
+
+        #     except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
+        #         msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
+        #         feedback.reportError(msg)
+        #         logger.log(msg, 2)
+        #         continue
+        #     if self.IS_CLI and num % 100 == 0:
+        #         print(f"Done {num} from {source.featureCount()}", flush=True)
+        #     feedback.setProgress(int(100.0 / source.featureCount() * num))
+        #     if int(100.0 / source.featureCount() * num) == 100:
+        #         feedback.pushDebugInfo(str(self.dest_id))
 
         sink.flushBuffer()
         if hasattr(sink, "finalize"):
