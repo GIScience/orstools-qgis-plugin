@@ -151,6 +151,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         if max_workers is None or max_workers < 1:
             max_workers = 1  # Fallback default
         feedback.pushDebugInfo(f"Using {max_workers} parallel workers")
+        if self.IS_CLI: print(f"Using {max_workers} parallel workers", flush=True)
 
         # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
