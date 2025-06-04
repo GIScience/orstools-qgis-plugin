@@ -78,15 +78,13 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
                 del current_config["providers"][found[0]]
                 s.setValue("ORStools/config", {"providers": current_config["providers"]})
                 msg = self.tr(f"Old config deleted: {provider_name}")
-            else:
-                msg = self.tr(
-                    f"Old config not found! - {provider_name} - and is therfore not deleted."
-                )
+        else:
+            msg = self.tr(f"Old config not found! - {provider_name} - and is therfore not deleted.")
 
-            #
-            feedback.pushInfo(msg)
-            logger.log(msg, 2)
-            return {"OUTPUT": msg}
+        #
+        feedback.pushInfo(msg)
+        logger.log(msg, 2)
+        return {"OUTPUT": msg}
 
     def createInstance(self):
         return self.__class__()

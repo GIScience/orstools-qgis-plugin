@@ -74,6 +74,14 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.OUT_NAME = "ORSTOOLS_OUTPUT"
         self.PARAMETERS = None
 
+        try:
+            if hasattr(iface, "mainWindow") and iface.mainWindow() is not None:
+                self.IS_CLI = False
+            else:
+                self.IS_CLI = True
+        except NameError:
+            self.IS_CLI = True
+
     def createInstance(self) -> Any:
         """
         Returns instance of any child class
