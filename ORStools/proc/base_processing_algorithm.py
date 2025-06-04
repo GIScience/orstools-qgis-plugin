@@ -73,7 +73,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.OUT = "OUTPUT"
         self.OUT_NAME = "ORSTOOLS_OUTPUT"
         self.PARAMETERS = None
-        
+
         try:
             if hasattr(iface, "mainWindow") and iface.mainWindow() is not None:
                 self.IS_CLI = False

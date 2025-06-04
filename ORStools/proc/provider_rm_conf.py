@@ -79,9 +79,7 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
                 s.setValue("ORStools/config", {"providers": current_config["providers"]})
                 msg = self.tr(f"Old config deleted: {provider_name}")
         else:
-            msg = self.tr(
-                f"Old config not found! - {provider_name} - and is therfore not deleted."
-            )
+            msg = self.tr(f"Old config not found! - {provider_name} - and is therfore not deleted.")
 
         #
         feedback.pushInfo(msg)
