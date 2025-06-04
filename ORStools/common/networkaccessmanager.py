@@ -254,7 +254,7 @@ class NetworkAccessManager(object):
         self._connections_made = [
             (self.reply.sslErrors, self.sslErrors),
             (self.reply.finished, self.replyFinished),
-            (self.reply.downloadProgress, self.downloadProgress)
+            (self.reply.downloadProgress, self.downloadProgress),
         ]
 
         self.reply.sslErrors.connect(self.sslErrors)
@@ -323,7 +323,7 @@ class NetworkAccessManager(object):
             # reply dump
             if re.match("(.)*server replied: $", self.reply.errorString()):
                 try:
-                    content_str = self.http_call_result.content.decode('utf-8', errors='replace')
+                    content_str = self.http_call_result.content.decode("utf-8", errors="replace")
                     errString = self.reply.errorString() + content_str
                 except ValueError:
                     errString = self.reply.errorString() + str(self.http_call_result.content)
@@ -410,12 +410,18 @@ class NetworkAccessManager(object):
                 self.reply.close()
             self.msg_log("Deleting reply ...")
             # Disconnect all slots
-            try: self.reply.sslErrors.disconnect(self.sslErrors)
-            except TypeError: pass
-            try: self.reply.finished.disconnect(self.replyFinished)
-            except: TypeError: pass
-            try: self.reply.downloadProgress.disconnect(self.downloadProgress)
-            except TypeError: pass
+            try:
+                self.reply.sslErrors.disconnect(self.sslErrors)
+            except TypeError:
+                pass
+            try:
+                self.reply.finished.disconnect(self.replyFinished)
+            except TypeError:
+                pass
+            try:
+                self.reply.downloadProgress.disconnect(self.downloadProgress)
+            except TypeError:
+                pass
             self._connections_made = []
             self.reply.deleteLater()
             self.reply = None
