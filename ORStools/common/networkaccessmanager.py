@@ -161,6 +161,7 @@ class NetworkAccessManager(object):
         self.exception_class = exception_class
         self.on_abort = False
         self.blocking_mode = False
+        self._connections_made = []
         self.http_call_result = Response(
             {
                 "status": 0,
@@ -249,6 +250,12 @@ class NetworkAccessManager(object):
         # necessary to trap local timeout managed by QgsNetworkAccessManager
         # calling QgsNetworkAccessManager::abortRequest
         QgsNetworkAccessManager.instance().requestTimedOut.connect(self.requestTimedOut)
+
+        self._connections_made = [
+            (self.reply.sslErrors, self.sslErrors),
+            (self.reply.finished, self.replyFinished),
+            (self.reply.downloadProgress, self.downloadProgress)
+        ]
 
         self.reply.sslErrors.connect(self.sslErrors)
         self.reply.finished.connect(self.replyFinished)
@@ -403,9 +410,13 @@ class NetworkAccessManager(object):
                 self.reply.close()
             self.msg_log("Deleting reply ...")
             # Disconnect all slots
-            self.reply.sslErrors.disconnect(self.sslErrors)
-            self.reply.finished.disconnect(self.replyFinished)
-            self.reply.downloadProgress.disconnect(self.downloadProgress)
+            try: self.reply.sslErrors.disconnect(self.sslErrors)
+            except TypeError: pass
+            try: self.reply.finished.disconnect(self.replyFinished)
+            except: TypeError: pass
+            try: self.reply.downloadProgress.disconnect(self.downloadProgress)
+            except TypeError: pass
+            self._connections_made = []
             self.reply.deleteLater()
             self.reply = None
         else:
