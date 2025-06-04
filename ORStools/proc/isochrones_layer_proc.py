@@ -209,6 +209,8 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
+            if self.IS_CLI and num%100==0: 
+                print(f"Done {num} from {source.featureCount()}", flush=True)
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
         return {self.OUT: self.dest_id}
