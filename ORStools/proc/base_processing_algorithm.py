@@ -42,7 +42,7 @@ from qgis.core import (
     QgsProcessingFeedback,
     QgsSettings,
 )
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from qgis.PyQt.QtGui import QIcon
 
@@ -73,6 +73,14 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.OUT = "OUTPUT"
         self.OUT_NAME = "ORSTOOLS_OUTPUT"
         self.PARAMETERS = None
+
+        try:
+            if hasattr(iface, "mainWindow") and iface.mainWindow() is not None:
+                self.IS_CLI = False
+            else:
+                self.IS_CLI = True
+        except NameError:
+            self.IS_CLI = True
 
     def createInstance(self) -> Any:
         """
@@ -183,14 +191,14 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             ),
         ]
 
-    def get_endpoint_names_from_provider(self, provider: str) -> dict:
+    def get_endpoint_names_from_provider(self, provider: Union[str, int]) -> dict:
         providers = configmanager.read_config()["providers"]
-        ors_provider = providers[provider]
+        ors_provider = providers[int(provider)]
         return ors_provider["endpoints"]
 
     @classmethod
     def _get_ors_client_from_provider(
-        cls, provider: str, feedback: QgsProcessingFeedback
+        cls, provider: Union[str, int], feedback: QgsProcessingFeedback
     ) -> client.Client:
         """
         Connects client to provider and returns a client instance for requests to the ors API
@@ -200,7 +208,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         agent = f"QGIS_{name}"
 
         providers = configmanager.read_config()["providers"]
-        ors_provider = providers[provider]
+        ors_provider = providers[int(provider)]
         ors_client = client.Client(ors_provider, agent)
         ors_client.overQueryLimit.connect(
             lambda: feedback.reportError("OverQueryLimit: Retrying...")
