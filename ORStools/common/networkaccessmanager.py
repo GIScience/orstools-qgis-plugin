@@ -316,7 +316,7 @@ class NetworkAccessManager(object):
             # reply dump
             if re.match("(.)*server replied: $", self.reply.errorString()):
                 try:
-                    content_str = self.http_call_result.content.decode('utf-8', errors='replace')
+                    content_str = self.http_call_result.content.decode("utf-8", errors="replace")
                     errString = self.reply.errorString() + content_str
                 except ValueError:
                     errString = self.reply.errorString() + str(self.http_call_result.content)

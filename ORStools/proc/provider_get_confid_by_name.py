@@ -68,6 +68,10 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
         s = QgsSettings()
         provider_name = self.parameterAsString(parameters, "ors_provider_name", context)
         current_config = s.value("ORStools/config")
+
+        msg = self.tr(f"Config with specified name not found! - {provider_name}")
+        result = -1
+
         if provider_name in [x["name"] for x in current_config["providers"]]:
             found = [
                 int(j)
@@ -77,14 +81,10 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
             if len(found) > 0:
                 result = found[0]
                 msg = self.tr(f"The provider with name: {provider_name} has the ID {str(result)}")
-            else:
-                msg = self.tr(f"Config with specified name not found! - {provider_name}")
-                result = -1
 
-            #
-            feedback.pushInfo(msg)
-            logger.log(msg, 2)
-            return {"OUTPUT": result}
+        feedback.pushInfo(msg)
+        logger.log(msg, 2)
+        return {"OUTPUT": result}
 
     def createInstance(self):
         return self.__class__()
