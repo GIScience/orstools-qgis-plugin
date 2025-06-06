@@ -130,6 +130,8 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
                     ]
                 },
             )
+            saved = s.sync()
+            logger.log(f"saved config: {saved}", 2)
 
             return {"OUTPUT": f"new config added: {provider_name}"}
 
