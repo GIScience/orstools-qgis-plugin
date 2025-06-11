@@ -194,7 +194,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 break
 
             # If feature causes error, report and continue with next
-            errorids = []
             try:
                 # Populate features from response
                 endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
@@ -207,7 +206,6 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
-                errorids.append(params['id'])
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
@@ -215,10 +213,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 print(f"Done {num} from {source.featureCount()}", flush=True)
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
-        return {
-            self.OUT: self.dest_id,
-            "no_isochrones_for": errorids,
-        }
+        return {self.OUT: self.dest_id}
 
     # noinspection PyUnusedLocal
     def postProcessAlgorithm(
