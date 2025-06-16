@@ -91,7 +91,7 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
         return self.__class__()
 
     def name(self):
-        return "remove_provider_config_via_algorithm"
+        return "config_remove_provider"
 
     def displayName(self) -> str:
         """
