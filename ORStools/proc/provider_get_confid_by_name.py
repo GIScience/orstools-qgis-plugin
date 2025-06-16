@@ -90,7 +90,7 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
         return self.__class__()
 
     def name(self):
-        return "get_provider_confid_by_name_algorithm"
+        return "config_get_provider_id_by_name"
 
     def displayName(self) -> str:
         """

@@ -139,7 +139,7 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
         return self.__class__()
 
     def name(self):
-        return "set_provider_config_to_ors_via_algorithm"
+        return "config_add_provider"
 
     def displayName(self) -> str:
         """
