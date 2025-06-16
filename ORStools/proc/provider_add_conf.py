@@ -116,7 +116,7 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
             return {"OUTPUT": msg}
         else:
             existing_config = s.value("ORStools/config")
-            s.setValue(
+            save_feedback1 = s.setValue(
                 "ORStools/config",
                 {
                     "providers": existing_config["providers"]
@@ -131,8 +131,9 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
                     ]
                 },
             )
-            saved = s.sync()
-            logger.log(f"saved config: {saved}", 2)
+            save_feedback2 = s.sync()
+            saved_config = s.value("ORStools/config")['providers']
+            logger.log(f"saved config: {saved_config, save_feedback1, save_feedback2}", 2)
 
             return {"OUTPUT": f"new config added: {provider_name}"}
 
