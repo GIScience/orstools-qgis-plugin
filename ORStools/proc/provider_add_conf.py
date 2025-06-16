@@ -95,8 +95,6 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
         s = QgsSettings()
-        feedback.pushInfo(f"Settingsfile: {s.fileName()}")
-        logger.log(f"Settingsfile: {s.fileName()}", 2)
         provider_name = self.parameterAsString(parameters, "ors_provider_name", context)
         provider_url = self.parameterAsString(parameters, "ors_provider_url", context)
         provider_api_key = self.parameterAsString(parameters, "ors_provider_api_key", context)
@@ -104,8 +102,6 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
         provider_overwrite = self.parameterAsBoolean(parameters, "ors_provider_timeout", context)
 
         current_config = s.value("ORStools/config")
-        feedback.pushInfo(str(ENDPOINTS))
-        logger.log(str(ENDPOINTS), 2)
         if provider_name in [x["name"] for x in current_config["providers"]]:
             if provider_overwrite:
                 msg = f"A provider with the name '{provider_name}' already exists. Replacement not yet implemented."
@@ -117,7 +113,7 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
             return {"OUTPUT": msg}
         else:
             existing_config = s.value("ORStools/config")
-            save_feedback1 = s.setValue(
+            s.setValue(
                 "ORStools/config",
                 {
                     "providers": existing_config["providers"]
@@ -132,11 +128,17 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
                     ]
                 },
             )
-            save_feedback2 = s.sync()
-            saved_config = s.value("ORStools/config")['providers']
-            logger.log(f"saved config: {saved_config, save_feedback1, save_feedback2}", 2)
+            s.sync() # this gives no feedback whatsover, so checking manually necessary:
 
-            return {"OUTPUT": f"new config added: {provider_name}"}
+            #testing writability of Config.
+            try:
+                with open(s.fileName(), 'a'):
+                    pass
+                return {"OUTPUT": f"new config added: {provider_name}"}
+            except IOError as e:
+                return {"OUTPUT": f"new config has not been added: {e} | {s.fileName()}"}
+
+            
 
     def createInstance(self):
         return self.__class__()
