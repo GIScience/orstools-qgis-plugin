@@ -83,6 +83,7 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
                 msg = self.tr(f"The provider with name: {provider_name} has the ID {str(result)}")
 
         feedback.pushInfo(msg)
+        feedback.pushDebug(f"This is the full list of providers: {current_config["providers"]}")
         logger.log(msg, 2)
         return {"OUTPUT": result}
 
