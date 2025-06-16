@@ -96,6 +96,7 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
     ) -> Dict[str, str]:
         s = QgsSettings()
         feedback.pushInfo(f"Settingsfile: {s.fileName()}")
+        logger.log(f"Settingsfile: {s.fileName()}", 2)
         provider_name = self.parameterAsString(parameters, "ors_provider_name", context)
         provider_url = self.parameterAsString(parameters, "ors_provider_url", context)
         provider_api_key = self.parameterAsString(parameters, "ors_provider_api_key", context)
