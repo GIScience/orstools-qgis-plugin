@@ -1,4 +1,3 @@
-
 from qgis.PyQt.QtWidgets import QLineEdit
 from qgis.core import (
     QgsSettings,
