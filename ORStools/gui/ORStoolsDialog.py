@@ -366,6 +366,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._clear_listwidget)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
+        self.load_vertices.clicked.connect(self.load_vertices_from_layer)
 
         # Batch
         self.pushButton_routing_points.clicked.connect(
