@@ -532,12 +532,17 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             self.line_tool = maptools.LineTool(self)
             self.canvas.setMapTool(self.line_tool)
 
-    def create_vertex(self, point, idx):
+    def create_vertex(self, point: QgsPointXY, idx: int, epsg: int = None) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self.canvas.mapSettings().destinationCrs()
+        if not epsg:
+            map_crs = self.canvas.mapSettings().destinationCrs()
 
-        transformer = transform.transformToWGS(map_crs)
-        point_wgs = transformer.transform(point)
+            transformer = transform.transformToWGS(map_crs)
+            point_wgs = transformer.transform(point)
+        else:
+            transformer = transform.transformToWGS(QgsCoordinateReferenceSystem(f"EPSG:{epsg}"))
+            point_wgs = transformer.transform(point)
+
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
         crs = self.canvas.mapSettings().destinationCrs()
@@ -596,7 +601,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         if self.line_tool is not None:
             self.line_tool.create_rubber_band()
 
-    def load_vertices_from_layer(self, testing: str = "") -> None:
     def save_selected_provider_state(self) -> None:
         s = QgsSettings()
         s.setValue("ORSTools/gui/provider_combo", self.provider_combo.currentIndex())
@@ -612,7 +616,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         super().show()
         self.load_provider_combo_state()
 
-    def load_vertices_from_layer(self) -> None:
+    def load_vertices_from_layer(self, testing: str = "") -> None:
         if not self.line_tool:
             self.line_tool = maptools.LineTool(self)
 
@@ -639,7 +643,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                         geom.wkbType()
                     ):
                         pt = geom.asPoint()
-                        self.create_vertex(pt, id)
+                        self.create_vertex(pt, id, 4326)
                         self.line_tool.create_rubber_band()
 
                     elif geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isMultiType(
