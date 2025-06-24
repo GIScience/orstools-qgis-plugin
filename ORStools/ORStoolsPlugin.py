@@ -34,6 +34,7 @@ import os.path
 
 from .gui import ORStoolsDialog
 from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS, PROFILES
+from .utils import configmanager
 
 
 class ORStools:
@@ -73,7 +74,10 @@ class ORStools:
         except TypeError:
             pass
 
-        self.add_default_provider_to_settings()
+        try:
+            configmanager.read_config()["providers"]
+        except KeyError:
+            self.add_default_provider_to_settings()
 
     def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
