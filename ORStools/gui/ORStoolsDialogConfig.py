@@ -419,7 +419,11 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         url = f"{base_url}/v2/status"
 
         if "api.openrouteservice.org" in url:
-            QMessageBox.warning(self, "Load profiles not possible", "Load profiles not possible, please use 'Restore Defaults' for the openrouteservice live API", )
+            QMessageBox.warning(
+                self,
+                "Load profiles not possible",
+                "Load profiles not possible, please use 'Restore Defaults' for the openrouteservice live API",
+            )
             return
 
         request = QgsBlockingNetworkRequest()

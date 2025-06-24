@@ -93,7 +93,7 @@ def on_config_click(parent):
     """
     config_dlg = ORStoolsDialogConfigMain(parent=parent)
     config_dlg.exec()
-    if type(parent) == ORStoolsDialog:
+    if type(parent) is ORStoolsDialog:
         parent.refresh_profiles()
 
 

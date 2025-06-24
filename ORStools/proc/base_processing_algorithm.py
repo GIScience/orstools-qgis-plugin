@@ -75,9 +75,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.PARAMETERS = None
 
         self.providers = configmanager.read_config()["providers"]
-        profiles_list = [
-            provider["profiles"] for provider in self.providers
-        ]
+        profiles_list = [provider["profiles"] for provider in self.providers]
         self.profiles = list(set(element for sublist in profiles_list for element in sublist))
 
     def createInstance(self) -> Any:
