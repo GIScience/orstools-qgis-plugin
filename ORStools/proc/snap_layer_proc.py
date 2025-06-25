@@ -79,7 +79,7 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
 
         # Get profile value
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
 
         # Get parameter values
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
