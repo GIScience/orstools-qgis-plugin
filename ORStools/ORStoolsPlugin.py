@@ -76,7 +76,7 @@ class ORStools:
 
         try:
             configmanager.read_config()["providers"]
-        except KeyError:
+        except (TypeError, KeyError):
             self.add_default_provider_to_settings()
 
     def initGui(self) -> None:
