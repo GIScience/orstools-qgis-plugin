@@ -46,7 +46,7 @@ from qgis.core import (
     QgsProcessingFeedback,
 )
 
-from ORStools.common import directions_core, PROFILES, PREFERENCES, EXTRA_INFOS
+from ORStools.common import directions_core, PREFERENCES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
@@ -246,9 +246,21 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                     f"/v2/{endpoint}/{profile}/geojson", {}, post_json=params
                 )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-                msg = f"Route from {values[0]} to {values[1]} caused a {e.__class__.__name__}:\n{str(e)}"
-                feedback.reportError(msg)
-                logger.log(msg)
+                if (
+                    isinstance(e, exceptions.ApiError)
+                    and "Parameter 'profile' has incorrect value" in e.message
+                ):
+                    provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                    msg = self.tr(
+                        f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                    )
+                    feedback.reportError(msg)
+                    logger.log(msg)
+                    break
+                else:
+                    msg = f"Route from {values[0]} to {values[1]} caused a {e.__class__.__name__}:\n{str(e)}"
+                    feedback.reportError(msg)
+                    logger.log(msg)
                 continue
 
             if extra_info:

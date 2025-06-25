@@ -50,7 +50,7 @@ from qgis.core import (
 )
 
 from qgis.PyQt.QtGui import QIcon
-from ORStools.common import directions_core, PROFILES, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
+from ORStools.common import directions_core, PREFERENCES, OPTIMIZATION_MODES, EXTRA_INFOS
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.processing import get_params_optimize
@@ -245,7 +245,16 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                             )
                         )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-                msg = f"Feature ID {num} caused a {e.__class__.__name__}:\n{str(e)}"
+                if (
+                    isinstance(e, exceptions.ApiError)
+                    and "Parameter 'profile' has incorrect value" in e.message
+                ):
+                    provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                    msg = self.tr(
+                        f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                    )
+                else:
+                    msg = f"Feature ID {num} caused a {e.__class__.__name__}:\n{str(e)}"
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue

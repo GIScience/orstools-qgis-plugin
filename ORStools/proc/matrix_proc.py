@@ -46,7 +46,6 @@ from ORStools.utils.wrapper import create_qgs_field
 
 from qgis.PyQt.QtCore import QMetaType
 
-from ORStools.common import PROFILES
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.gui import GuiUtils
@@ -182,41 +181,52 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])["matrix"]
             response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
 
+            (sink, dest_id) = self.parameterAsSink(
+                parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.NoGeometry
+            )
+
+            sources_attributes = [
+                feat.attribute(source_field_name) if source_field_name else feat.id()
+                for feat in sources_features
+            ]
+            destinations_attributes = [
+                feat.attribute(destination_field_name) if destination_field_name else feat.id()
+                for feat in destination_features
+            ]
+
+            for s, source in enumerate(sources_attributes):
+                for d, destination in enumerate(destinations_attributes):
+                    duration = response["durations"][s][d]
+                    distance = response["distances"][s][d]
+                    feat = QgsFeature()
+                    feat.setAttributes(
+                        [
+                            source,
+                            destination,
+                            duration / 3600 if duration is not None else None,
+                            distance / 1000 if distance is not None else None,
+                        ]
+                    )
+
+                    sink.addFeature(feat)
+
+            return {self.OUT: dest_id}
+
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            msg = f"{e.__class__.__name__}: {str(e)}"
+            if (
+                isinstance(e, exceptions.ApiError)
+                and "Parameter 'profile' has incorrect value" in e.message
+            ):
+                provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                msg = self.tr(
+                    f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                )
+            else:
+                msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 
-        (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.NoGeometry
-        )
-
-        sources_attributes = [
-            feat.attribute(source_field_name) if source_field_name else feat.id()
-            for feat in sources_features
-        ]
-        destinations_attributes = [
-            feat.attribute(destination_field_name) if destination_field_name else feat.id()
-            for feat in destination_features
-        ]
-
-        for s, source in enumerate(sources_attributes):
-            for d, destination in enumerate(destinations_attributes):
-                duration = response["durations"][s][d]
-                distance = response["distances"][s][d]
-                feat = QgsFeature()
-                feat.setAttributes(
-                    [
-                        source,
-                        destination,
-                        duration / 3600 if duration is not None else None,
-                        distance / 1000 if distance is not None else None,
-                    ]
-                )
-
-                sink.addFeature(feat)
-
-        return {self.OUT: dest_id}
+        return {self.OUT: ""}
 
     # TODO working source_type and destination_type differ in both name and type from get_fields in directions_core.
     #  Change to be consistent

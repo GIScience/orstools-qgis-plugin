@@ -49,7 +49,6 @@ from ..utils.gui import GuiUtils
 from ..utils.wrapper import create_qgs_field
 
 
-from ORStools.common import PROFILES
 from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
@@ -150,7 +149,16 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
                 sink_point.addFeature(point_feat)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            msg = f"{e.__class__.__name__}: {str(e)}"
+            if (
+                isinstance(e, exceptions.ApiError)
+                and "Parameter 'profile' has incorrect value" in e.message
+            ):
+                provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                msg = self.tr(
+                    f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                )
+            else:
+                msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 

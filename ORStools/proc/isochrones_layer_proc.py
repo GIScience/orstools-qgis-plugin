@@ -45,7 +45,7 @@ from qgis.core import (
     QgsProcessingFeedback,
 )
 
-from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
+from ORStools.common import isochrones_core, DIMENSIONS, LOCATION_TYPES
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ORStools.utils import transform, exceptions, logger
 from ORStools.utils.gui import GuiUtils
@@ -206,9 +206,21 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                     sink.addFeature(isochrone)
 
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-                msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
-                feedback.reportError(msg)
-                logger.log(msg, 2)
+                if (
+                    isinstance(e, exceptions.ApiError)
+                    and "Parameter 'profile' has incorrect value" in e.message
+                ):
+                    provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                    msg = self.tr(
+                        f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                    )
+                    feedback.reportError(msg)
+                    logger.log(msg, 2)
+                    break
+                else:
+                    msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
+                    feedback.reportError(msg)
+                    logger.log(msg, 2)
                 continue
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
