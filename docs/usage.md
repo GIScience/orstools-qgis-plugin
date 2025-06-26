@@ -4,7 +4,7 @@
 
 The standard GUI is launched either from the `Web` toolbar or the `Web` menu:
 
-![ORS Tools GUI](https://github.com/GIScience/orstools-qgis-plugin/blob/main/docs/wiki/img/wiki_orstools_01.png)
+![ORS Tools GUI](https://github.com/GIScience/orstools-qgis-plugin/blob/main/docs/wiki/public/wiki_orstools_01.png)
 
 You'll find a shortcut to the configuration settings and the wiki here. Also, it will show you your available requests for the current period of time (usually one day) as soon as you made the first request in the current QGIS session.
 

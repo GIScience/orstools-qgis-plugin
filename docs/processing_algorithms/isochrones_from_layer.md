@@ -2,10 +2,10 @@
 This algorithm returns service/reachability areas for multiple locations and time/distance ranges.
 
 **Toolbox Button**
-<img src="/img/isochrones_from_layer_toolbox.png" alt="Toolbox">
+<public src="/img/isochrones_from_layer_toolbox.png" alt="Toolbox">
 
 **Preview**
-<img src="/img/isochrones_from_layer_preview.png" alt="Preview">
+<public src="/img/isochrones_from_layer_preview.png" alt="Preview">
 
 ## Parameters
 

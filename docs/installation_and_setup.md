@@ -22,8 +22,8 @@ case you're using a self-hosted ORS version and the requests per minute you're a
 First, you'll have to [sign up](https://account.heigit.org/signup) and copy your API key from
 your [HeiGIT account dashboard](https://account.heigit.org).
 
-![Signup webpage](img/signup_tab.png)
-![openrouteservice dashboard](img/dashboard.png)
+![Signup webpage](public/signup_tab.png)
+![openrouteservice dashboard](public/dashboard.png)
 
 
 ## Set up the API key in QGIS
@@ -31,5 +31,5 @@ your [HeiGIT account dashboard](https://account.heigit.org).
 2. Open the provider box by clicking on the caret icon next to the provider name.
 3. Enter your API key in the `API Key` field.
 
-![config_icon_gui.png](img/config_icon_gui.png)
-![config_gui.png](img/config_gui.png)
+![config_icon_gui.png](public/config_icon_gui.png)
+![config_gui.png](public/config_gui.png)
