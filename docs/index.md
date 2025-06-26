@@ -6,7 +6,7 @@ hero:
   text: "The QGIS plugin for openrouteservice"
   tagline: Spatial services for everybody
   image:
-    src: img/icon_orstools.png
+    src: /icon_orstools.png
     alt: ORSTools Icon
   actions:
     - theme: brand

@@ -6,7 +6,7 @@ export default defineConfig({
   description: "The QGIS plugin for the openrouteservice",
   base: "/orstools-qgis-plugin/",
   head: [
-    ['link', { rel: 'icon', type: 'image/png', href: '/img/icon_orstools.png' }]
+    ['link', { rel: 'icon', type: 'image/png', href: '/icon_orstools.png' }]
   ],
   themeConfig: {
     logo: '/img/icon_orstools.png',
