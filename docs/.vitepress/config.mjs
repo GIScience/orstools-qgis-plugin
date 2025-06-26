@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "ORSTools",
   description: "The QGIS plugin for the openrouteservice",
+  base: "/orstools-qgis-plugin/",
   head: [
     ['link', { rel: 'icon', type: 'image/png', href: '/img/icon_orstools.png' }]
   ],
