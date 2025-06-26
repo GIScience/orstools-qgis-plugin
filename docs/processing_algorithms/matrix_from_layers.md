@@ -2,10 +2,10 @@
 This algorithm returns a duration and distance matrix for multiple source and destination points.
 
 **Toolbox Button**
-<public src="/img/matrix_from_layers_toolbox.png" alt="Toolbox">
+<img src="/img/matrix_from_layers_toolbox.png" alt="Toolbox">
 
 **Preview**
-<public src="/img/matrix_from_layers_preview.png" alt="Preview">
+<img src="/img/matrix_from_layers_preview.png" alt="Preview">
 
 ## Parameters
 

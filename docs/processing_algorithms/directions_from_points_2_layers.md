@@ -2,10 +2,10 @@
 This algorithm calculates optimal routes for multiple start and end points based on the input files.
 
 **Toolbox Button**
-<public src="/img/directions_from_points_2_layers_toolbox.png" alt="Toolbox">
+<img src="/img/directions_from_points_2_layers_toolbox.png" alt="Toolbox">
 
 **Preview**
-<public src="/img/directions_from_points_2_layers_preview.png" alt="Preview">
+<img src="/img/directions_from_points_2_layers_preview.png" alt="Preview">
 
 
 ## Parameters

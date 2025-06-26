@@ -2,10 +2,10 @@
 This algorithm calculates optimal routes for (Multi)Point layers. 
 
 **Toolbox Button**
-<public src="/img/directions_from_points_1_layer_toolbox.png" alt="Toolbox">
+<img src="/img/directions_from_points_1_layer_toolbox.png" alt="Toolbox">
 
 **Preview**
-<public src="/img/directions_from_points_1_layer_preview.png" alt="Preview">
+<img src="/img/directions_from_points_1_layer_preview.png" alt="Preview">
 
 ## Parameters
 
@@ -66,13 +66,13 @@ You can optionally perform a [Traveling Salesman Optimization](https://en.wikipe
 <summary>Examples</summary>
 <br>
 <h4>Traveling Salesman Problem: Round trip</h4>
-<public src="/img/tsp_round_trip.png" alt="Traveling Salesman Problem: Round trip">
+<img src="/img/tsp_round_trip.png" alt="Traveling Salesman Problem: Round trip">
 <h4>Traveling Salesman Problem: fix start point</h4>
-<public src="/img/tsp_fix_start_point.png" alt="Traveling Salesman Problem: fix start point">
+<img src="/img/tsp_fix_start_point.png" alt="Traveling Salesman Problem: fix start point">
 <h4>Traveling Salesman Problem: fix end point</h4>
-<public src="/img/tsp_fix_end_point.png" alt="Traveling Salesman Problem: fix end point">
+<img src="/img/tsp_fix_end_point.png" alt="Traveling Salesman Problem: fix end point">
 <h4>Traveling Salesman Problem: fix start and end points</h4>
-<public src="/img/tsp_fix_start_and_end_points.png" alt="Traveling Salesman Problem: fix start and end points">
+<img src="/img/tsp_fix_start_and_end_points.png" alt="Traveling Salesman Problem: fix start and end points">
 </details>
 
 ### Directions(Output)
