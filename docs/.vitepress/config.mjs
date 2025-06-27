@@ -9,7 +9,7 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/png', href: '/icon_orstools.png' }]
   ],
   themeConfig: {
-    logo: '/img/icon_orstools.png',
+    logo: '/icon_orstools.png',
     sidebar: [
       {
         text: 'General',
