@@ -57,7 +57,7 @@ Dictates the cost. For longer routes don't use Shortest Path.
 </details>
 <br>
 
-[comment]: <> (Gibt's hiervon irgenwo Erklärungen, die man beifügen oder verlinken könnte?)
+<!-- (Gibt's hiervon irgenwo Erklärungen, die man beifügen oder verlinken könnte?) -->
 
 ### Traveling Salesman
 You can optionally perform a [Traveling Salesman Optimization](https://en.wikipedia.org/Travelling_salesman_problem) on the waypoints of each (Multi)Point feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest.
