@@ -44,6 +44,7 @@ from ORStools.utils import exceptions, configmanager, logger
 
 _USER_AGENT = f"ORSQGISClient@v{__version__}"
 
+
 class Client(QObject):
     """Performs requests to the ORS API services."""
 
@@ -149,9 +150,9 @@ class Client(QObject):
             if not reply:
                 raise exceptions.GenericServerError("0", "No response received")
 
-            content = reply.content().data().decode('utf-8')
+            content = reply.content().data().decode("utf-8")
 
-        except Exception as e:
+        except Exception:
             try:
                 self._check_status(blocking_request)
 
