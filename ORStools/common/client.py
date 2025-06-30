@@ -34,22 +34,26 @@ from datetime import datetime, timedelta
 from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QUrl
+from qgis.PyQt.QtNetwork import QNetworkRequest
 from qgis.utils import iface
-from qgis.core import Qgis
+from qgis.core import (
+    Qgis,
+    QgsSettings,
+    QgsBlockingNetworkRequest,
+    QgsNetworkAccessManager
+)
 from requests.utils import unquote_unreserved
 
 from ORStools import __version__
-from ORStools.common import networkaccessmanager
 from ORStools.utils import exceptions, configmanager, logger
-
-from qgis.core import QgsSettings
 
 _USER_AGENT = f"ORSQGISClient@v{__version__}"
 
-
 class Client(QObject):
     """Performs requests to the ORS API services."""
+
+    overQueryLimit = pyqtSignal(int)
 
     def __init__(self, provider: Optional[dict] = None, agent: Optional[str] = None) -> None:
         """
@@ -65,13 +69,8 @@ class Client(QObject):
         self.key = provider["key"]
         self.base_url = provider["base_url"]
         self.ENV_VARS = provider.get("ENV_VARS")
+        self.timeout = provider.get("timeout")
 
-        # self.session = requests.Session()
-        retry_timeout = provider.get("timeout")
-
-        self.nam = networkaccessmanager.NetworkAccessManager(debug=False, timeout=retry_timeout)
-
-        self.retry_timeout = timedelta(seconds=retry_timeout)
         self.headers = {
             "User-Agent": _USER_AGENT,
             "Content-type": "application/json",
@@ -88,13 +87,11 @@ class Client(QObject):
         self.url = None
         self.warnings = None
 
-    overQueryLimit = pyqtSignal()
-
     def request(
         self,
         url: str,
         params: dict,
-        first_request_time: Optional[datetime.time] = None,
+        first_request_time: Optional[datetime] = None,
         retry_counter: int = 0,
         post_json: Optional[dict] = None,
     ):
@@ -131,140 +128,82 @@ class Client(QObject):
             first_request_time = datetime.now()
 
         elapsed = datetime.now() - first_request_time
-        if elapsed > self.retry_timeout:
+        if elapsed > timedelta(seconds=self.timeout):
             raise exceptions.Timeout()
 
-        if retry_counter > 0:
-            # 0.5 * (1.5 ^ i) is an increased sleep time of 1.5x per iteration,
-            # starting at 0.5s when retry_counter=1. The first retry will occur
-            # at 1, so subtract that first.
-            delay_seconds = 1.5 ** (retry_counter - 1)
-
-            # Jitter this value by 50% and pause.
-            time.sleep(delay_seconds * (random.random() + 0.5))
-
-        authed_url = self._generate_auth_url(
-            url,
-            params,
-        )
+        authed_url = self._generate_auth_url(url, params)
         self.url = self.base_url + authed_url
 
-        # Default to the client-level self.requests_kwargs, with method-level
-        # requests_kwargs arg overriding.
-        # final_requests_kwargs = self.requests_kwargs
+        request = QNetworkRequest(QUrl(self.url))
+        for header, value in self.headers.items():
+            request.setRawHeader(header.encode(), value.encode())
 
-        # Determine GET/POST
-        # requests_method = self.session.get
-        requests_method = "GET"
-        body = None
-        if post_json is not None:
-            # requests_method = self.session.post
-            # final_requests_kwargs["json"] = post_json
-            body = post_json
-            requests_method = "POST"
+        blocking_request = QgsBlockingNetworkRequest()
 
-        logger.log(f"url: {self.url}\nParameters: {json.dumps(body, indent=2)}", 0)
+        logger.log(f"url: {self.url}\nParameters: {json.dumps(post_json, indent=2)}", 0)
 
         try:
-            response, content = self.nam.request(
-                self.url, method=requests_method, body=body, headers=self.headers, blocking=True
-            )
-        except networkaccessmanager.RequestsExceptionTimeout:
-            raise exceptions.Timeout
+            if post_json is not None:
+                result = blocking_request.post(request, json.dumps(post_json).encode())
+            else:
+                result = blocking_request.get(request)
 
-        except networkaccessmanager.RequestsException:
+            if result != QgsBlockingNetworkRequest.NoError:
+                self._check_status(blocking_request)
+
+            reply = blocking_request.reply()
+            if not reply:
+                raise exceptions.GenericServerError("0", "No response received")
+
+            content = reply.content().data().decode('utf-8')
+
+        except Exception as e:
             try:
-                self._check_status()
-
+                self._check_status(blocking_request)
             except exceptions.OverQueryLimit as e:
-                # Let the instances know something happened
-                # noinspection PyUnresolvedReferences
+
                 self.overQueryLimit.emit()
                 logger.log(f"{e.__class__.__name__}: {str(e)}", 1)
-
-                iface.messageBar().pushMessage(
-                    "ORSTools", "Rate limit exceeded, retrying...", level=Qgis.Warning, duration=2
-                )
-
                 return self.request(url, params, first_request_time, retry_counter + 1, post_json)
-
             except exceptions.ApiError as e:
-                logger.log(
-                    f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2
-                )
+                if post_json:
+                    logger.log(
+                        f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2
+                    )
                 raise
-
             raise
 
-        # Write env variables if successful
         if self.ENV_VARS:
             for env_var in self.ENV_VARS:
-                configmanager.write_env_var(
-                    env_var, response.headers.get(self.ENV_VARS[env_var], "None")
-                )
+                header_value = reply.rawHeader(self.ENV_VARS[env_var].encode()).data().decode()
+                configmanager.write_env_var(env_var, header_value)
 
-        # Reset to old value
         self.settings.setValue("qgis/networkAndProxy/userAgent", self.user_agent)
 
-        return json.loads(content.decode("utf-8"))
+        return json.loads(content)
 
-    def _check_status(self) -> None:
-        """
-        Casts JSON response to dict
+    def _check_status(self, blocking_request: QgsBlockingNetworkRequest) -> None:
+        """Check response status and raise appropriate exceptions."""
+        reply = blocking_request.reply()
+        if not reply:
+            raise Exception("No response received. Check provider settings and availability.")
 
-        :raises ORStools.utils.exceptions.OverQueryLimitError: when rate limit is exhausted, HTTP 429
-        :raises ORStools.utils.exceptions.ApiError: when the backend API throws an error, HTTP 400
-        :raises ORStools.utils.exceptions.InvalidKey: when API key is invalid (or quota is exceeded), HTTP 403
-        :raises ORStools.utils.exceptions.GenericServerError: all other HTTP errors
-
-        :returns: response body
-        :rtype: dict
-        """
-
-        status_code = self.nam.http_call_result.status_code
-        message = (
-            self.nam.http_call_result.text
-            if self.nam.http_call_result.text != ""
-            else self.nam.http_call_result.reason
-        )
+        status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
+        message = reply.content().data().decode()
 
         if not status_code:
-            raise Exception(
-                f"{message}. Are your provider settings correct and the provider ready?"
-            )
+            raise Exception(f"No status code received. Check provider settings.")
 
-        elif status_code == 403:
+        if status_code == 403:
             raise exceptions.InvalidKey(str(status_code), message)
-
         elif status_code == 429:
             raise exceptions.OverQueryLimit(str(status_code), message)
-        # Internal error message for Bad Request
         elif 400 <= status_code < 500:
             raise exceptions.ApiError(str(status_code), message)
-        # Other HTTP errors have different formatting
         elif status_code != 200:
             raise exceptions.GenericServerError(str(status_code), message)
 
     def _generate_auth_url(self, path: str, params: Union[Dict, List]) -> str:
-        """Returns the path and query string portion of the request URL, first
-        adding any necessary parameters.
-
-        :param path: The path portion of the URL.
-        :type path: string
-
-        :param params: URL parameters.
-        :type params: dict or list of key/value tuples
-
-        :returns: encoded URL
-        :rtype: string
-        """
-
         if isinstance(params, dict):
             params = sorted(dict(**params).items())
-
-        # Only auto-add API key when using ORS. If own instance, API key must
-        # be explicitly added to params
-        # if self.key:
-        #     params.append(("api_key", self.key))
-
         return path + "?" + unquote_unreserved(urlencode(params))
