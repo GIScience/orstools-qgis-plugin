@@ -169,6 +169,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="check_key_button">
+        <property name="toolTip">
+         <string>Check if the API key for the selected provider is valid</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
