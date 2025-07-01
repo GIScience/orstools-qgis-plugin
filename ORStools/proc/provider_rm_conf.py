@@ -37,6 +37,7 @@ from qgis.core import (
     QgsProcessingParameterString,
     QgsProcessingContext,
     QgsProcessingFeedback,
+    QGis
 )
 try:
     from qgis.core import ProcessingAlgorithmFlags #only available >=3.36
@@ -118,7 +119,7 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
     
     def flags(self):
         base_flags = super().flags()
-        if Qgis.QGIS_VERSION_INT >= 33600:
+        if QGis.QGIS_VERSION_INT >= 33600:
             return ProcessingAlgorithmFlags(
                 base_flags | ProcessingAlgorithmFlags.ProcessingAlgorithmFlag.HideFromToolbox
             )
