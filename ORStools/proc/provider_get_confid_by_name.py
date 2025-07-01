@@ -86,7 +86,7 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
         logger.log(msg, 2)
         return {
             "OUTPUT": result,
-            "CONFIG": s.value("ORStools/config", {'providers': []})['providers']
+            "CONFIG": s.value("ORStools/config", {"providers": []})["providers"],
         }
 
     def createInstance(self):
@@ -107,4 +107,6 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
         return QCoreApplication.translate(context, string)
 
     def flags(self):
-        return super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36 but seems to work in 3.42, too
+        return (
+            super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox
+        )  # prior 3.36 but seems to work in 3.42, too

@@ -132,7 +132,7 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
             )
             s.sync()  # this gives no feedback whatsover, so checking manually is necessary:
             try:
-                with open(s.fileName(), 'a'):
+                with open(s.fileName(), "a"):
                     pass
                 msg = f"config has been added: {provider_name}"
             except IOError as e:
@@ -140,7 +140,7 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
 
             return {
                 "OUTPUT": msg,
-                "CONFIG": s.value("ORStools/config", {'providers': []})['providers']
+                "CONFIG": s.value("ORStools/config", {"providers": []})["providers"],
             }
 
     def createInstance(self):
@@ -162,4 +162,6 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
         # return string #disabling QCoreApplication.translate due to Qt
 
     def flags(self):
-        return super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36 but seems to work in 3.42, too
+        return (
+            super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox
+        )  # prior 3.36 but seems to work in 3.42, too

@@ -36,7 +36,7 @@ from qgis.core import (
     QgsProcessingAlgorithm,
     QgsProcessingParameterString,
     QgsProcessingContext,
-    QgsProcessingFeedback
+    QgsProcessingFeedback,
 )
 
 from ORStools.utils import logger
@@ -77,9 +77,9 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
             if len(found) > 0:
                 del current_config["providers"][found[0]]
                 s.setValue("ORStools/config", {"providers": current_config["providers"]})
-                s.sync() # this gives no feedback whatsover, so checking manually is necessary:
+                s.sync()  # this gives no feedback whatsover, so checking manually is necessary:
                 try:
-                    with open(s.fileName(), 'a'):
+                    with open(s.fileName(), "a"):
                         pass
                     msg = f"config deleted: {provider_name}"
                 except IOError as e:
@@ -90,10 +90,7 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
         #
         feedback.pushInfo(msg)
         logger.log(msg, 2)
-        return {
-            "OUTPUT": msg,
-            "CONFIG": s.value("ORStools/config", {'providers': []})['providers']
-        }
+        return {"OUTPUT": msg, "CONFIG": s.value("ORStools/config", {"providers": []})["providers"]}
 
     def createInstance(self):
         return self.__class__()
@@ -111,6 +108,8 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
     def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
-    
+
     def flags(self):
-        return super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36 but seems to work in 3.42, too
+        return (
+            super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox
+        )  # prior 3.36 but seems to work in 3.42, too
