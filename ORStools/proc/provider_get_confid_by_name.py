@@ -105,3 +105,6 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
     def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
+
+    def flags(self):
+        return super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36 but seems to work in 3.42, too

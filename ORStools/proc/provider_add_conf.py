@@ -160,3 +160,6 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
         # return string #disabling QCoreApplication.translate due to Qt
+
+    def flags(self):
+        return super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36 but seems to work in 3.42, too
