@@ -118,9 +118,4 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
         return QCoreApplication.translate(context, string)
     
     def flags(self):
-        # if Qgis.QGIS_VERSION_INT > 33600:
-        #     flags = ProcessingAlgorithmFlags()
-        #     flags.addFlag(ProcessingAlgorithmFlags.ProcessingAlgorithmFlag.HideFromToolbox)
-        #     return flags
-        # else:
-        return super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36
+        return super().flags() | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36 but seems to work in 3.42, too
