@@ -36,13 +36,8 @@ from qgis.core import (
     QgsProcessingAlgorithm,
     QgsProcessingParameterString,
     QgsProcessingContext,
-    QgsProcessingFeedback,
-    Qgis
+    QgsProcessingFeedback
 )
-try:
-    from qgis.core import ProcessingAlgorithmFlags #only available >=3.36
-except:
-    pass
 
 from ORStools.utils import logger
 
