@@ -81,8 +81,13 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
             if len(found) > 0:
                 del current_config["providers"][found[0]]
                 s.setValue("ORStools/config", {"providers": current_config["providers"]})
-                s.sync()
-                msg = self.tr(f"Old config deleted: {provider_name}")
+                s.sync() # this gives no feedback whatsover, so checking manually is necessary:
+                try:
+                    with open(s.fileName(), 'a'):
+                        pass
+                    msg = f"config deleted: {provider_name}"
+                except IOError as e:
+                    msg = f"config couldn't been deleted: {e} | {s.fileName()}"
         else:
             msg = self.tr(f"Old config not found! - {provider_name} - and is therfore not deleted.")
 
