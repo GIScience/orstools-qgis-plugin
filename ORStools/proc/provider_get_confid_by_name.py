@@ -84,7 +84,10 @@ class ORSProviderGetConfIdAlgo(QgsProcessingAlgorithm):
 
         feedback.pushInfo(msg)
         logger.log(msg, 2)
-        return {"OUTPUT": result}
+        return {
+            "OUTPUT": result,
+            "CONFIG": s.value("ORStools/config", {'providers': []})['providers']
+        }
 
     def createInstance(self):
         return self.__class__()

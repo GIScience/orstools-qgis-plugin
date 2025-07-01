@@ -130,9 +130,18 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
                     ]
                 },
             )
-            s.sync()
+            s.sync()  # this gives no feedback whatsover, so checking manually is necessary:
+            try:
+                with open(s.fileName(), 'a'):
+                    pass
+                msg = f"config has been added: {provider_name}"
+            except IOError as e:
+                msg = f"config couldn't be added: {e} | {s.fileName()}"
 
-            return {"OUTPUT": f"new config added: {provider_name}"}
+            return {
+                "OUTPUT": msg,
+                "CONFIG": s.value("ORStools/config", {'providers': []})['providers']
+            }
 
     def createInstance(self):
         return self.__class__()

@@ -38,6 +38,10 @@ from qgis.core import (
     QgsProcessingContext,
     QgsProcessingFeedback,
 )
+try:
+    from qgis.core import ProcessingAlgorithmFlags #only available >=3.36
+except:
+    pass
 
 from ORStools.utils import logger
 
@@ -85,7 +89,10 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
         #
         feedback.pushInfo(msg)
         logger.log(msg, 2)
-        return {"OUTPUT": msg}
+        return {
+            "OUTPUT": msg,
+            "CONFIG": s.value("ORStools/config", {'providers': []})['providers']
+        }
 
     def createInstance(self):
         return self.__class__()
@@ -103,3 +110,12 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
     def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
+    
+    def flags(self):
+        base_flags = super.flags()
+        if Qgis.QGIS_VERSION_INT >= 33600:
+            return ProcessingAlgorithmFlags(
+                base_flags | ProcessingAlgorithmFlags.ProcessingAlgorithmFlag.HideFromToolbox
+            )
+        else:
+            return base_flags | QgsProcessingAlgorithm.FlagHideFromToolbox #prior 3.36
