@@ -86,8 +86,7 @@ class ORSProviderRmAlgo(QgsProcessingAlgorithm):
                     msg = f"config couldn't been deleted: {e} | {s.fileName()}"
         else:
             msg = self.tr(f"Old config not found! - {provider_name} - and is therfore not deleted.")
-
-        #
+        
         feedback.pushInfo(msg)
         logger.log(msg, 2)
         return {"OUTPUT": msg, "CONFIG": s.value("ORStools/config", {"providers": []})["providers"]}
