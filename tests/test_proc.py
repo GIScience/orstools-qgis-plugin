@@ -297,7 +297,7 @@ class TestProc(unittest.TestCase):
 
         # Validate the result
         self.assertIn("OUTPUT", result)
-        self.assertEqual(result["OUTPUT"], "new config added: TestProvider")
+        self.assertEqual(result["OUTPUT"], "config has been added: TestProvider")
 
         # Verify the provider was added to the settings
         settings = QgsSettings()
@@ -310,3 +310,4 @@ class TestProc(unittest.TestCase):
             provider for provider in providers if provider["name"] != "TestProvider"
         ]
         settings.setValue("ORStools/config", config)
+        settings.sync()
