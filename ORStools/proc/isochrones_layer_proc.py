@@ -188,7 +188,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             # reactivated
             self.crs_out,
         )
-        errorids = []
+
         for num, params in enumerate(requests):
             if feedback.isCanceled():
                 break
@@ -206,26 +206,14 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
                 msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
-                errorids.append(params['id'])
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
             if self.IS_CLI and num % 100 == 0:
                 print(f"Done {num} from {source.featureCount()}", flush=True)
             feedback.setProgress(int(100.0 / source.featureCount() * num))
-            if int(100.0 / source.featureCount() * num) == 100:
-                feedback.pushDebugInfo(str(self.dest_id))
 
-        sink.flushBuffer()
-        if hasattr(sink, "finalize"):
-            sink.finalize()
-        else:
-            del sink
-
-        return {
-            self.OUT: self.dest_id,
-            "no_isochrones_for": errorids,
-        }
+        return {self.OUT: self.dest_id}
 
     # noinspection PyUnusedLocal
     def postProcessAlgorithm(

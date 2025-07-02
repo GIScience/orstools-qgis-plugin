@@ -102,6 +102,8 @@ class ORSProviderAddAlgo(QgsProcessingAlgorithm):
         provider_overwrite = self.parameterAsBoolean(parameters, "ors_provider_timeout", context)
 
         current_config = s.value("ORStools/config")
+        feedback.pushInfo(str(ENDPOINTS))
+        logger.log(str(ENDPOINTS), 2)
         if provider_name in [x["name"] for x in current_config["providers"]]:
             if provider_overwrite:
                 msg = f"A provider with the name '{provider_name}' already exists. Replacement not yet implemented."
