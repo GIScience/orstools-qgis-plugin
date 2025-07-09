@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from qgis.PyQt.QtWidgets import QLineEdit
 from qgis.core import QgsSettings
 from qgis.gui import QgsCollapsibleGroupBox
@@ -5,7 +7,7 @@ from qgis.testing import unittest
 
 from qgis.PyQt.QtTest import QTest
 from qgis.PyQt.QtCore import Qt, QEvent, QPoint
-from qgis.PyQt.QtWidgets import QPushButton
+from qgis.PyQt.QtWidgets import QPushButton, QMessageBox
 from qgis.gui import QgsMapCanvas, QgsMapMouseEvent, QgsRubberBand
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -358,3 +360,51 @@ class TestGui(unittest.TestCase):
             "POINT(8.67251100000000008 49.39887900000000087)",
             next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )
+
+    def test_check_key_button(self):
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialog
+        from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
+
+        CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
+        CANVAS.setExtent(QgsRectangle(258889, 7430342, 509995, 7661955))
+        CANVAS.setDestinationCrs(CRS)
+        CANVAS.setFrameStyle(0)
+        CANVAS.resize(600, 400)
+        self.assertEqual(CANVAS.width(), 600)
+        self.assertEqual(CANVAS.height(), 400)
+
+        dlg = ORStoolsDialog(IFACE)
+        dlg.open()
+        self.assertTrue(dlg.isVisible())
+
+        # Set and reset config to test whether the reset works
+        dlg_config = ORStoolsDialogConfigMain()
+        provider = dlg_config.providers.findChildren(QgsCollapsibleGroupBox)[0]
+
+        # set endpoint of directions to non-existent value
+        line_edit = provider.findChild(QLineEdit, "openrouteservice_key_text")
+        api_key = line_edit.text()
+        line_edit.setText("notanapikey")
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "key"
+        ]
+
+        self.assertEqual(settings_directions_endpoint, "notanapikey")
+
+        with patch.object(QMessageBox, "information", return_value=QMessageBox.Ok) as mock_info, \
+                patch.object(QMessageBox, "critical", return_value=QMessageBox.Ok) as mock_crit:
+            dlg.check_key_button.clicked.emit()
+
+            dlg_config = ORStoolsDialogConfigMain()
+            provider = dlg_config.providers.findChildren(QgsCollapsibleGroupBox)[0]
+
+            line_edit = provider.findChild(QLineEdit, "openrouteservice_key_text")
+            line_edit.setText(api_key)
+            dlg_config.accept()
+
+            dlg.check_key_button.clicked.emit()
+
+            mock_info.assert_called_once()
+            mock_crit.assert_called_once()
