@@ -104,11 +104,10 @@ class LineTool(QgsMapToolEmitPoint):
 
     def canvasMoveEvent(self, e: QEvent) -> None:
         hovering = self.check_annotation_hover(e.pos())
-        if hovering:
+        if hovering and not QApplication.overrideCursor() == QtCore.Qt.CursorShape.OpenHandCursor:
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.OpenHandCursor)
-        else:
-            if not self.moving:
-                QApplication.restoreOverrideCursor()
+        elif not hovering and not self.moving:
+            QApplication.restoreOverrideCursor()
 
     def check_annotation_hover(self, pos: QMouseEvent) -> int:
         click = [pos.x(), pos.y()]
@@ -128,6 +127,8 @@ class LineTool(QgsMapToolEmitPoint):
         if dists and min(dists) < self.click_dist:
             idx = dists[min(dists)]
             return idx
+        else:
+            return 0
 
     def keyPressEvent(self, event: QEvent) -> None:
         if event.key() == Qt.Key.Key_Escape:
@@ -151,6 +152,9 @@ class LineTool(QgsMapToolEmitPoint):
                 self.dlg._clear_listwidget()
 
     def canvasPressEvent(self, event: QEvent) -> None:
+        if event.button() == Qt.MouseButton.RightButton:
+            return
+
         hovering = self.check_annotation_hover(event.pos())
         if hovering:
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
@@ -164,6 +168,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     def canvasReleaseEvent(self, event: QEvent) -> None:
         if event.button() == Qt.MouseButton.RightButton:
+            QApplication.restoreOverrideCursor()
             self.dlg.show()
             return
 
