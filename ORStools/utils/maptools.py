@@ -77,10 +77,6 @@ class LineTool(QgsMapToolEmitPoint):
         self.dlg.routing_preference_combo.currentIndexChanged.connect(self._toggle_preview)
         self.dlg.routing_travel_combo.currentIndexChanged.connect(self._toggle_preview)
 
-        self.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.pointReleased.connect(lambda event, idx: self._on_movetool_map_release(event, idx))
-        self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-
         self.last_click = "single-click"
         self.moving = None
         self.moved_idxs = 0
@@ -157,7 +153,6 @@ class LineTool(QgsMapToolEmitPoint):
     def canvasPressEvent(self, event: QEvent) -> None:
         hovering = self.check_annotation_hover(event.pos())
         if hovering:
-            self.mouseMoved.disconnect()
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
             if self.dlg.rubber_band:
                 self.dlg.rubber_band.reset()
@@ -205,8 +200,6 @@ class LineTool(QgsMapToolEmitPoint):
                         self.dlg.routing_fromline_list.addItem(item)
                     self.create_rubber_band()
                     self.save_last_point(point, annotation)
-                    self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-
                 except ApiError as e:
                     if self.get_error_code(e) == 2010:
                         self.moving = False
@@ -217,7 +210,6 @@ class LineTool(QgsMapToolEmitPoint):
                             self.dlg.routing_fromline_list.addItem(item)
                         self.dlg._reindex_list_items()
                         self.radius_message_box(e)
-                        self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
                     else:
                         raise e
                 except Exception as e:
