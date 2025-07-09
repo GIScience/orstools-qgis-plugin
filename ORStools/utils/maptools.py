@@ -78,7 +78,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.dlg.routing_travel_combo.currentIndexChanged.connect(self._toggle_preview)
 
         self.last_click = "single-click"
-        self.moving = None
+        self.dragging_vertex = None
         self.moved_idxs = 0
         self.error_idxs = 0
         self.click_dist = 25
@@ -106,7 +106,7 @@ class LineTool(QgsMapToolEmitPoint):
         hovering = self.check_annotation_hover(e.pos())
         if hovering and not QApplication.overrideCursor() == QtCore.Qt.CursorShape.OpenHandCursor:
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.OpenHandCursor)
-        elif not hovering and not self.moving:
+        elif not hovering and not self.dragging_vertex:
             QApplication.restoreOverrideCursor()
 
     def check_annotation_hover(self, pos: QMouseEvent) -> int:
@@ -164,7 +164,7 @@ class LineTool(QgsMapToolEmitPoint):
             self.dlg.project.annotationManager().removeAnnotation(
                 self.dlg.annotations.pop(self.move_i)
             )
-            self.moving = True
+            self.dragging_vertex = True
 
     def canvasReleaseEvent(self, event: QEvent) -> None:
         if event.button() == Qt.MouseButton.RightButton:
@@ -176,9 +176,9 @@ class LineTool(QgsMapToolEmitPoint):
         self.points.append(point)
 
         if self.last_click == "single-click":
-            if self.moving:
+            if self.dragging_vertex:
                 try:
-                    self.moving = False
+                    self.dragging_vertex = False
                     QApplication.restoreOverrideCursor()
                     crs = self.dlg.canvas.mapSettings().destinationCrs()
 
@@ -207,7 +207,7 @@ class LineTool(QgsMapToolEmitPoint):
                     self.save_last_point(point, annotation)
                 except ApiError as e:
                     if self.get_error_code(e) == 2010:
-                        self.moving = False
+                        self.dragging_vertex = False
                         self.dlg.routing_fromline_list.clear()
                         for i, x in enumerate(backup):
                             coords = x.split(":")[1]
@@ -233,7 +233,7 @@ class LineTool(QgsMapToolEmitPoint):
 
                         if self.dlg.routing_fromline_list.count() > 1:
                             self.create_rubber_band()
-                            self.moving = False
+                            self.dragging_vertex = False
                 except ApiError as e:
                     if self.get_error_code(e) == 2010:
                         self.error_idxs += 1
