@@ -32,7 +32,7 @@ import os
 from datetime import datetime
 from typing import Optional
 
-from qgis.PyQt.QtWidgets import QCheckBox
+from qgis.PyQt.QtNetwork import QNetworkRequest
 
 from ..utils.router import route_as_layer
 
@@ -57,11 +57,20 @@ from qgis.core import (
     Qgis,  # noqa: F811
     QgsAnnotation,
     QgsCoordinateTransform,
+    QgsBlockingNetworkRequest,
 )
 from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInterface
-from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
+from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication, QUrl
 from qgis.PyQt.QtGui import QTextDocument
-from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QDialog,
+    QApplication,
+    QMenu,
+    QMessageBox,
+    QDialogButtonBox,
+    QCheckBox,
+)
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QWidget,
@@ -385,6 +394,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
         self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
         self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
+        self.check_key_button.setIcon(gui.GuiUtils.get_icon("icon_key.png"))
 
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(
@@ -396,6 +406,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
         self.load_provider_combo_state()
         self.provider_combo.activated.connect(self.save_selected_provider_state)
+        self.provider_combo.currentIndexChanged.connect(self.set_check_provider_button)
+        self.check_key_button.clicked.connect(self.check_api_key)
 
         advanced_boxes = self.advances_group.findChildren(QgsCollapsibleGroupBox)
         for box in advanced_boxes:
@@ -407,6 +419,43 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     child.toggled.connect(self.reload_rubber_band)
 
         self.rubber_band = None
+
+    def set_check_provider_button(self):
+        """Checks, whether the current provider is of the public API and set a check provider if so"""
+        provider = configmanager.read_config()["providers"][self.provider_combo.currentIndex()]
+        url = provider.get("base_url", "")
+        if url == "https://api.openrouteservice.org":
+            self.check_key_button.show()
+        else:
+            self.check_key_button.hide()
+
+    def check_api_key(self) -> None:
+        provider = configmanager.read_config()["providers"][self.provider_combo.currentIndex()]
+        api_key = provider.get("key", "")
+
+        if not api_key:
+            QMessageBox.critical(
+                self, self.tr("Error"), self.tr("No API key set for the selected provider.")
+            )
+            return
+
+        url = f"https://api.openrouteservice.org/v2/directions/driving-car?api_key={api_key}&start=8.681495,49.41461&end=8.687872,49.420318"
+        request = QgsBlockingNetworkRequest()
+        qrequest = QNetworkRequest(QUrl(url))
+        qrequest.setRawHeader(
+            b"Accept",
+            b"application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
+        )
+        error_code = request.get(qrequest)
+
+        if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+            QMessageBox.information(self, self.tr("Success"), self.tr("API key check successful!"))
+        else:
+            QMessageBox.critical(
+                self,
+                self.tr("API key Error"),
+                self.tr(f"API key check failed, key: {api_key} is invalid."),
+            )
 
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
