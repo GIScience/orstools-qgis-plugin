@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+### Fixed
+- Reset hand cursor after deactivating line tool ([#342](https://github.com/GIScience/orstools-qgis-plugin/issues/342))
+
 ## [2.0.1] - 2025-06-01
 ### Added
 - Readd old icons and add new icons for processing algorithms
