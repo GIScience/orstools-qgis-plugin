@@ -205,6 +205,11 @@ class ORStoolsDialogMain:
         # Remove action for keyboard shortcut
         self.iface.unregisterMainWindowAction(self.actions[0])
 
+        # Clear rubber band and annotations
+        if self.dlg:
+            self.dlg._clear_listwidget()
+            self.dlg._clear_annotations()
+
         del self.dlg
 
     # @staticmethod
