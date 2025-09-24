@@ -258,7 +258,6 @@ class LineTool(QgsMapToolEmitPoint):
                 else:
                     raise e
 
-
     def canvasDoubleClickEvent(self, e: QEvent) -> None:
         """
         Populate line list widget with coordinates, end point moving and show dialog again.
