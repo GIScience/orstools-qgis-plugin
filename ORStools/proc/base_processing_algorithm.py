@@ -203,7 +203,9 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         ors_provider = providers[provider]
         ors_client = client.Client(ors_provider, agent)
         ors_client.overQueryLimit.connect(
-            lambda: feedback.reportError("OverQueryLimit: Retrying...")
+            lambda retry_time: feedback.reportError(
+                f"OverQueryLimit: Retrying in {retry_time} seconds."
+            )
         )
         return ors_client
 
