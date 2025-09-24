@@ -101,6 +101,9 @@ class LineTool(QgsMapToolEmitPoint):
 
     mouseMoved = pyqtSignal(["QPoint"])
 
+    # Mouse movement changes the cursor if it is hovering over an annotation.
+    # In that state, clicking means dragging an annotation.
+    # Thus, we only change restore the Cursor once we are not dragging the annotation anymore.
     def canvasMoveEvent(self, e: QEvent) -> None:
         hovering = self.check_annotation_hover(e.pos())
         if hovering and not QApplication.overrideCursor() == QtCore.Qt.CursorShape.OpenHandCursor:
@@ -156,6 +159,8 @@ class LineTool(QgsMapToolEmitPoint):
 
         hovering = self.check_annotation_hover(event.pos())
         if hovering:
+            # clicking should only change the cursor if it is hovering over an annotation.
+            # The corresponding reset happens in the release event.
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
             if self.dlg.rubber_band:
                 self.dlg.rubber_band.reset()
@@ -175,9 +180,10 @@ class LineTool(QgsMapToolEmitPoint):
         self.points.append(point)
 
         if self.dragging_vertex:
+            QApplication.restoreOverrideCursor()
+            self.dragging_vertex = False
+
             try:
-                self.dragging_vertex = False
-                QApplication.restoreOverrideCursor()
                 crs = self.dlg.canvas.mapSettings().destinationCrs()
 
                 annotation = self.dlg._linetool_annotate_point(point, self.move_i, crs=crs)
@@ -205,7 +211,6 @@ class LineTool(QgsMapToolEmitPoint):
                 self.save_last_point(point, annotation)
             except ApiError as e:
                 if self.get_error_code(e) == 2010:
-                    self.dragging_vertex = False
                     self.dlg.routing_fromline_list.clear()
                     for i, x in enumerate(items):
                         coords = x.split(":")[1]
