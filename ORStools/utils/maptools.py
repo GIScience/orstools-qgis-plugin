@@ -220,18 +220,22 @@ class LineTool(QgsMapToolEmitPoint):
                     self.api_key_message_bar()
                 else:
                     raise e
-        # Not moving release
+        # Non-dragging release
         else:
-            try:
-                if not self.dlg.isVisible():
-                    self.idx -= self.error_idxs
-                    self.dlg.create_vertex(point, self.idx)
-                    self.idx += 1
-                    self.error_idxs = 0
+            # Dragging is possible while the main GUI is visible.
+            # Thus, we only check its visibility while not dragging
+            if self.dlg.isVisible():
+                return
 
-                    if self.dlg.routing_fromline_list.count() > 1:
-                        self.create_rubber_band()
-                        self.dragging_vertex = False
+            try:
+                self.idx -= self.error_idxs
+                self.dlg.create_vertex(point, self.idx)
+                self.idx += 1
+                self.error_idxs = 0
+
+                if self.dlg.routing_fromline_list.count() > 1:
+                    self.create_rubber_band()
+                    self.dragging_vertex = False
             except ApiError as e:
                 if self.get_error_code(e) == 2010:
                     self.error_idxs += 1
