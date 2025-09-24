@@ -40,6 +40,10 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
+## Unreleased
+### Added
+- API key validation for selected provider ([#339](https://github.com/GIScience/orstools-qgis-plugin/issues/339))
+
 ## [2.0.1] - 2025-06-01
 ### Added
 - Readd old icons and add new icons for processing algorithms
