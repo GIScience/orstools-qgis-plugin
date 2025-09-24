@@ -212,7 +212,7 @@ class LineTool(QgsMapToolEmitPoint):
             except ApiError as e:
                 if self.get_error_code(e) == 2010:
                     self.dlg.routing_fromline_list.clear()
-                    for i, x in enumerate(items):
+                    for i, x in enumerate(backup):
                         coords = x.split(":")[1]
                         item = f"Point {i}:{coords}"
                         self.dlg.routing_fromline_list.addItem(item)
