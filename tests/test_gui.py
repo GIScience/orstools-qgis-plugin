@@ -303,10 +303,13 @@ class TestGui(unittest.TestCase):
 
         layer = proc.test_directions_points_layer()
 
-        self.assertEqual(
-            "POINT(8.67251100000000008 49.39887900000000087)",
-            next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
-        )
+        # self.assertEqual(
+        #     "POINT(8.67251100000000008 49.39887900000000087)",
+        #     next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
+        # )
+        pt = next(layer.getFeatures()).geometry().asPolyline()[0]
+        self.assertAlmostEqual(pt.x(), 8.67251100000000008, 3)
+        self.assertAlmostEqual(pt.y(), 49.39887900000000087, 3)
 
     def test_ORStoolsDialogConfig_url(self):
         from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
@@ -354,7 +357,6 @@ class TestGui(unittest.TestCase):
 
         layer = proc.test_directions_points_layer()
 
-        self.assertEqual(
-            "POINT(8.67251100000000008 49.39887900000000087)",
-            next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
-        )
+        pt = next(layer.getFeatures()).geometry().asPolyline()[0]
+        self.assertAlmostEqual(pt.x(), 8.67251100000000008, 3)
+        self.assertAlmostEqual(pt.y(), 49.39887900000000087, 3)

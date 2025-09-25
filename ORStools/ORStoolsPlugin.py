@@ -33,7 +33,8 @@ from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
 
 from .gui import ORStoolsDialog
-from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS
+from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS, PROFILES
+from .utils import configmanager
 
 
 class ORStools:
@@ -73,7 +74,10 @@ class ORStools:
         except TypeError:
             pass
 
-        self.add_default_provider_to_settings()
+        try:
+            configmanager.read_config()["providers"]
+        except (TypeError, KeyError):
+            self.add_default_provider_to_settings()
 
     def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -90,7 +94,7 @@ class ORStools:
         s = QgsSettings()
         settings = s.value("ORStools/config")
 
-        settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
+        settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints", "profiles"]
 
         # Add any new settings here for backwards compatibility
         if settings:
@@ -100,6 +104,8 @@ class ORStools:
                     changed = True
                     # Add here, like the endpoints
                     prov["endpoints"] = ENDPOINTS
+                    settings["providers"][i] = prov
+                    prov["profiles"] = PROFILES
                     settings["providers"][i] = prov
             if changed:
                 s.setValue("ORStools/config", settings)
