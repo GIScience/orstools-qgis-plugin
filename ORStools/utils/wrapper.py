@@ -28,7 +28,6 @@
  ***************************************************************************/
 """
 
-
 from typing import Union, Optional, Any
 
 from qgis.PyQt.QtCore import QMetaType, QVariant
