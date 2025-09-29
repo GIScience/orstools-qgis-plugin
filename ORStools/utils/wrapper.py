@@ -28,7 +28,8 @@
  ***************************************************************************/
 """
 
-from typing import Union, Optional
+
+from typing import Union, Optional, Any
 
 from qgis.PyQt.QtCore import QMetaType, QVariant
 from qgis.core import QgsField, Qgis
@@ -36,20 +37,31 @@ from qgis.core import QgsField, Qgis
 
 def create_field_qgis_3_38_plus(
     name: str,
-    type_enum: Union[QMetaType.Type, QVariant.Type],
+    type_enum: Any,
     length: int,
     precision: int,
     comment: str,
-    subtype_enum: Optional[Union[QMetaType.Type, QVariant.Type]] = None,
+    subtype_enum: Optional[Any] = None,
 ) -> QgsField:
-    """Create a QgsField for QGIS ≥ 3.38 using QMetaType.Type enums."""
-    if isinstance(type_enum, QVariant.Type):
-        type_enum = QMetaType.Type(type_enum)
-    if subtype_enum and isinstance(subtype_enum, QVariant.Type):
-        subtype_enum = QMetaType.Type(subtype_enum)
+    """Create a QgsField for QGIS ≥ 3.38 using QMetaType.Type enums. Compatible with Qt6."""
+    # Qt6: QVariant.Type is an enum, QMetaType.Type is int
+    # Normalize to QVariant.Type
+    if hasattr(QVariant, "Type"):  # Qt5/Qt6 compatibility
+        if isinstance(type_enum, QMetaType.Type):
+            type_enum = QVariant.Type(type_enum)
+        elif isinstance(type_enum, int):
+            type_enum = QVariant.Type(type_enum)
+        if subtype_enum is not None:
+            if isinstance(subtype_enum, QMetaType.Type):
+                subtype_enum = QVariant.Type(subtype_enum)
+            elif isinstance(subtype_enum, int):
+                subtype_enum = QVariant.Type(subtype_enum)
+    else:
+        # Fallback for older Qt
+        pass
 
-    type_enum = QVariant.Type(type_enum)
-    subtype_enum = QVariant.Type(subtype_enum) if subtype_enum is not None else QVariant.Invalid
+    type_enum = type_enum if type_enum is not None else QVariant.Invalid
+    subtype_enum = subtype_enum if subtype_enum is not None else QVariant.Invalid
 
     return QgsField(
         name,
