@@ -89,7 +89,7 @@ class TestProc(unittest.TestCase):
             "INPUT_AVOID_POLYGONS": None,
             "INPUT_LAYER_FIELD": None,
             "INPUT_LINE_LAYER": self.line_layer,
-            "INPUT_OPTIMIZE": 0,
+            "INPUT_OPTIMIZE": 1,
             "INPUT_PREFERENCE": 0,
             "INPUT_PROFILE": 0,
             "INPUT_PROVIDER": 0,
