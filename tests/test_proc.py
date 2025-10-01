@@ -81,7 +81,7 @@ class TestProc(unittest.TestCase):
         feat_length = next(processed_layer.getFeatures()).geometry().length()
         self.assertTrue(feat_length > 0)
 
-    def test_directions_lines_opti(self):
+    def test_directions_lines_layer_optimize(self):
         parameters = {
             "INPUT_AVOID_BORDERS": None,
             "INPUT_AVOID_COUNTRIES": "",
