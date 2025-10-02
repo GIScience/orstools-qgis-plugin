@@ -1,0 +1,19 @@
+{
+    "type": "module",
+    "version": "9.2.0",
+    "devDependencies": {
+      "mermaid": "^11.6.0",
+      "vitepress": "^1.6.3",
+      "vitepress-plugin-mermaid": "^2.0.17"
+    },
+    "scripts": {
+      "docs:dev": "vitepress dev docs",
+      "docs:build": "vitepress build docs",
+      "docs:preview": "vitepress preview docs",
+      "build-preview": "vitepress build docs && vitepress preview docs --port 4176"
+    },
+    "dependencies": {
+      "vitepress-plugin-codeblocks-fold": "^1.2.35",
+      "vitepress-versioning-plugin": "^1.3.0"
+    }
+  }
