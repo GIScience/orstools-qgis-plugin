@@ -178,7 +178,7 @@ class LineTool(QgsMapToolEmitPoint):
         point = self.toMapCoordinates(event.pos())
         self.points.append(point)
 
-        if self.dragging_vertex:            
+        if self.dragging_vertex:
             self.dragging_vertex = False
 
             try:
