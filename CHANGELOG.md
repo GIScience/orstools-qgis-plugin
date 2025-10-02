@@ -45,6 +45,9 @@ RELEASING:
 - Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
 - Reset hand cursor after deactivating line tool ([#342](https://github.com/GIScience/orstools-qgis-plugin/issues/342))
 
+## Added
+- Improve cursor behaviour during digitization
+
 ## [2.0.1] - 2025-06-01
 ### Added
 - Readd old icons and add new icons for processing algorithms
