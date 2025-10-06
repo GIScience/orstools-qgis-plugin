@@ -43,20 +43,13 @@ def create_field_qgis_3_38_plus(
     subtype_enum: Optional[Any] = None,
 ) -> QgsField:
     """Create a QgsField for QGIS ≥ 3.38 using QMetaType.Type enums. Compatible with Qt6."""
-    # Qt6: QVariant.Type is an enum, QMetaType.Type is int
-    # Normalize to QVariant.Type
     if hasattr(QVariant, "Type"):  # Qt5/Qt6 compatibility
-        if isinstance(type_enum, QMetaType.Type):
-            type_enum = QVariant.Type(type_enum)
-        elif isinstance(type_enum, int):
+        if isinstance(type_enum, int):
             type_enum = QVariant.Type(type_enum)
         if subtype_enum is not None:
-            if isinstance(subtype_enum, QMetaType.Type):
-                subtype_enum = QVariant.Type(subtype_enum)
-            elif isinstance(subtype_enum, int):
+            if isinstance(subtype_enum, int):
                 subtype_enum = QVariant.Type(subtype_enum)
     else:
-        # Fallback for older Qt
         pass
 
     type_enum = type_enum if type_enum is not None else QVariant.Invalid
@@ -71,6 +64,7 @@ def create_field_qgis_3_38_plus(
         comment,
         subtype_enum,
     )
+
 
 
 def create_field_legacy_qgis(
