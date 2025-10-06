@@ -44,6 +44,7 @@ RELEASING:
 ### Fixed
 - Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
 - Reset hand cursor after deactivating line tool ([#342](https://github.com/GIScience/orstools-qgis-plugin/issues/342))
+- Check API key being set before running tests ([#358](https://github.com/GIScience/orstools-qgis-plugin/issues/358))
 
 ## [2.0.1] - 2025-06-01
 ### Added
