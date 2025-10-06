@@ -52,7 +52,7 @@ def create_field_qgis_3_38_plus(
     else:
         pass
 
-    invalid = QVariant.Type(0) if hasattr(QVariant, "Type") else    QMetaType.Type(0)
+    invalid = QVariant.Type(0) if hasattr(QVariant, "Type") else QMetaType.Type(0)
     type_enum = type_enum if type_enum is not None else invalid
     subtype_enum = subtype_enum if subtype_enum is not None else invalid
 
