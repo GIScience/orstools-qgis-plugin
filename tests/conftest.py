@@ -18,6 +18,8 @@ def pytest_sessionstart(session):
     Called after the Session object has been created and
     before performing collection and entering the run test loop.
     """
+    if not os.environ.get("ORS_API_KEY"):
+        raise ValueError("No API key found in environment variables. Please set ORS_API_KEY environment variable to run tests.")
     if data["providers"][0]["key"] == "":
         data["providers"][0]["key"] = os.environ.get("ORS_API_KEY")
         s.setValue("ORStools/config", data)
