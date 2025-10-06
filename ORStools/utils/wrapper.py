@@ -66,7 +66,6 @@ def create_field_qgis_3_38_plus(
     )
 
 
-
 def create_field_legacy_qgis(
     name: str,
     type_enum: Union[QMetaType.Type, QVariant],
