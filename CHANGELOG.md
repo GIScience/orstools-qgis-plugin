@@ -41,6 +41,10 @@ RELEASING:
  -->
 
 ## Unreleased
+
+### Added
+- pre-commit configuration with Ruff linter for code quality enforcement
+
 ### Fixed
 - Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
 - Reset hand cursor after deactivating line tool ([#342](https://github.com/GIScience/orstools-qgis-plugin/issues/342))
