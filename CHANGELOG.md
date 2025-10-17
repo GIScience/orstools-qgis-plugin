@@ -51,6 +51,9 @@ RELEASING:
 - Set url slashes correctly with optimization requests in procs ([#347](https://github.com/GIScience/orstools-qgis-plugin/issues/347))
 - Qt6 incompatibility with QVariant ([#355](https://github.com/GIScience/orstools-qgis-plugin/issues/355))
 
+## Added
+- Improve cursor behaviour during digitization
+
 ## [2.0.1] - 2025-06-01
 ### Added
 - Readd old icons and add new icons for processing algorithms
