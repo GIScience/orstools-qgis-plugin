@@ -12,6 +12,60 @@ class TestCommon(unittest.TestCase):
         if cls.api_key is None:
             raise ValueError("ORS_API_KEY environment variable is not set")
 
+    def test_client_retry_on_over_query_limit(self):
+        """Test that client retries on OverQueryLimit and eventually succeeds"""
+        provider = {
+            "ENV_VARS": None,
+            "base_url": "https://api.openrouteservice.org",
+            "key": self.api_key,
+            "name": "openrouteservice",
+            "timeout": 60,
+        }
+        
+        params = {
+            "preference": "fastest",
+            "geometry": "true",
+            "instructions": "false",
+            "elevation": True,
+            "id": 1,
+            "coordinates": [[8.684101, 50.131613], [8.68534, 50.131651]],
+        }
+        
+        agent = "QGIS_ORStools_testing"
+        profile = "driving-car"
+        clnt = client.Client(provider, agent)
+        
+        # Mock to fail twice, then succeed
+        call_count = [0]
+        def mock_request(post_json, blocking_request, request):
+            call_count[0] += 1
+            if call_count[0] <= 2:
+                raise client.exceptions.OverQueryLimit("429", "Over query limit")
+            
+            # Return a mock successful response on third call
+            from unittest.mock import Mock
+            mock_reply = Mock()
+            mock_content = Mock()
+            mock_data = Mock()
+            mock_data.decode.return_value = '{"success": true}'
+            mock_content.data.return_value = mock_data
+            mock_reply.content.return_value = mock_content
+            return mock_reply
+        
+        clnt._request = mock_request
+        clnt.get_delay_seconds = lambda x: 0  # Speed up test by removing delays
+        
+        response = clnt.fetch_with_retry(
+            "/v2/directions/" + profile + "/geojson", 
+            {}, 
+            post_json=params,
+            max_retries=5
+        )
+        
+        self.assertEqual(call_count[0], 3)  # Should have made 3 attempts
+        self.assertTrue(response)
+        self.assertEqual(response["success"], True)
+
     def test_client_request_geometry(self):
         test_response = {
             "type": "FeatureCollection",
@@ -94,7 +148,7 @@ class TestCommon(unittest.TestCase):
         agent = "QGIS_ORStools_testing"
         profile = "driving-car"
         clnt = client.Client(provider, agent)
-        response = clnt.request("/v2/directions/" + profile + "/geojson", {}, post_json=params)
+        response = clnt.fetch_with_retry("/v2/directions/" + profile + "/geojson", {}, post_json=params)
         self.assertAlmostEqual(
             response["features"][0]["geometry"]["coordinates"][0][0],
             test_response["features"][0]["geometry"]["coordinates"][0][0],
