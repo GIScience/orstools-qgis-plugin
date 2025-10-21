@@ -109,7 +109,7 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request("/v2/snap/" + profile, {}, post_json=params)
+            response = ors_client.fetch_with_retry("/v2/snap/" + profile, {}, post_json=params)
             point_features = get_snapped_point_features(response, feedback=feedback)
 
             for feat in point_features:

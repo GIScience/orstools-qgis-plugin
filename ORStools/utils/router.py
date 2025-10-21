@@ -60,7 +60,7 @@ Remember, the first and last location are not part of the optimization.
                     """),
                 )
                 return
-            response = clnt.request("/optimization", {}, post_json=params)
+            response = clnt.fetch_with_retry("/optimization", {}, post_json=params)
             feat = directions_core.get_output_features_optimization(
                 response, params["vehicles"][0]["profile"]
             )
@@ -85,7 +85,7 @@ Please add polygons to the layer or uncheck avoid polygons.
                 logger.log(msg, 0)
                 dlg.debug_text.setText(msg)
                 return
-            response = clnt.request("/v2/directions/" + profile + "/geojson", {}, post_json=params)
+            response = clnt.fetch_with_retry("/v2/directions/" + profile + "/geojson", {}, post_json=params)
             feat = directions_core.get_output_feature_directions(
                 response, profile, params["preference"], directions.options
             )
