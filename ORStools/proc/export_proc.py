@@ -77,7 +77,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -113,7 +113,9 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         # Make request and catch ApiError
         try:
             endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])["export"]
-            response = ors_client.fetch_with_retry(f"/v2/{endpoint}/{profile}", {}, post_json=params)
+            response = ors_client.fetch_with_retry(
+                f"/v2/{endpoint}/{profile}", {}, post_json=params
+            )
             nodes_dict = {item["nodeId"]: item["location"] for item in response["nodes"]}
             edges = response["edges"]
             for edge in edges:

@@ -123,7 +123,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
@@ -200,7 +200,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                     "isochrones"
                 ]
-                response = ors_client.fetch_with_retry(f"/v2/{endpoint}/{profile}", {}, post_json=params)
+                response = ors_client.fetch_with_retry(
+                    f"/v2/{endpoint}/{profile}", {}, post_json=params
+                )
 
                 for isochrone in self.isochrones.get_features(response, params["id"]):
                     sink.addFeature(isochrone)

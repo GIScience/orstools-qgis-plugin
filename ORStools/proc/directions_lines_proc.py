@@ -128,7 +128,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
