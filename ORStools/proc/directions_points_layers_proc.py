@@ -242,7 +242,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                     "directions"
                 ]
-                response = ors_client.request(
+                response = ors_client.fetch_with_retry(
                     f"/v2/{endpoint}/{profile}/geojson", {}, post_json=params
                 )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:

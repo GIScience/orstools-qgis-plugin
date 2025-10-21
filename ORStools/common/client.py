@@ -35,7 +35,7 @@ from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal, QUrl
-from qgis.PyQt.QtNetwork import QNetworkRequest
+from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.core import QgsSettings, QgsBlockingNetworkRequest
 from requests.utils import unquote_unreserved
 
@@ -65,7 +65,6 @@ class Client(QObject):
         self.base_url = provider["base_url"]
         self.ENV_VARS = provider.get("ENV_VARS")
         self.timeout = provider.get("timeout")
-        self.retry_counter: int = 0
 
         self.headers = {
             "User-Agent": _USER_AGENT,
@@ -83,53 +82,38 @@ class Client(QObject):
         self.url = None
         self.warnings = None
 
-    def request(
+    def _request(
+        self,
+        post_json: Optional[dict],
+        blocking_request: QgsBlockingNetworkRequest,
+        request: QNetworkRequest
+    ) -> str:
+        if post_json is not None:
+            result = blocking_request.post(request, json.dumps(post_json).encode())
+        else:
+            result = blocking_request.get(request)
+
+        if result != QgsBlockingNetworkRequest.NoError:
+            self._check_status(blocking_request.reply())
+            return None
+
+        return blocking_request.reply()
+
+    def fetch_with_retry(
         self,
         url: str,
         params: dict,
         first_request_time: Optional[datetime] = None,
         post_json: Optional[dict] = None,
+        max_retries: int = 100,
     ):
-        """Performs HTTP GET/POST with credentials, returning the body as
-        JSON.
-
-        :param url: URL extension for request. Should begin with a slash.
-        :type url: string
-
-        :param params: HTTP GET parameters.
-        :type params: dict or list of key/value tuples
-
-        :param first_request_time: The time of the first request (None if no
-            retries have occurred).
-        :type first_request_time: datetime.datetime
-
-        :param retry_counter: Amount of retries with increasing timeframe before raising a timeout exception
-        :type retry_counter: int
-
-        :param post_json: Parameters for POST endpoints
-        :type post_json: dict
-
-        :param retry_counter: Duration the requests will be retried for before
-            raising a timeout exception.
-        :type retry_counter: int
-
-        :raises ORStools.utils.exceptions.ApiError: when the API returns an error.
-
-        :returns: openrouteservice response body
-        :rtype: dict
-        """
-
-        if not first_request_time:
-            first_request_time = datetime.now()
-
-        elapsed = datetime.now() - first_request_time
-        if elapsed > timedelta(seconds=self.timeout):
-            raise exceptions.Timeout()
+        first_request_time = datetime.now()
 
         authed_url = self._generate_auth_url(url, params)
         self.url = self.base_url + authed_url
 
         request = QNetworkRequest(QUrl(self.url))
+        
         for header, value in self.headers.items():
             request.setRawHeader(header.encode(), value.encode())
 
@@ -137,44 +121,35 @@ class Client(QObject):
 
         logger.log(f"url: {self.url}\nParameters: {json.dumps(post_json, indent=2)}", 0)
 
-        try:
-            if post_json is not None:
-                result = blocking_request.post(request, json.dumps(post_json).encode())
-            else:
-                result = blocking_request.get(request)
+        content = None
 
-            if result != QgsBlockingNetworkRequest.NoError:
-                self._check_status(blocking_request)
-
-            reply = blocking_request.reply()
-            if not reply:
-                raise exceptions.GenericServerError("0", "No response received")
-
-            content = reply.content().data().decode("utf-8")
-
-        except Exception:
+        for i in range(max_retries):
             try:
-                self._check_status(blocking_request)
-
+                reply = self._request(post_json, blocking_request, request)
+                content = reply.content().data().decode()
+                break
+            
             except exceptions.OverQueryLimit as e:
-                logger.log(f"{e.__class__.__name__}: {str(e)}", 1)
-                delay_seconds = self.get_delay_seconds(self.retry_counter)
-                self.overQueryLimit.emit(delay_seconds)
-                self.retry_counter += 1
-                time.sleep(delay_seconds)
-                return self.request(url, params, first_request_time, post_json)
+                if datetime.now() - first_request_time > timedelta(seconds=self.timeout):
+                    raise exceptions.Timeout()
 
+                logger.log(f"{e.__class__.__name__}: {str(e)}", 1)
+
+                delay_seconds = self.get_delay_seconds(i)
+                self.overQueryLimit.emit(delay_seconds)
+                time.sleep(delay_seconds)
+                
             except exceptions.ApiError as e:
                 if post_json:
                     logger.log(
                         f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2
                     )
                 raise
-            raise
 
         # Write env variables if successful
         if self.ENV_VARS:
             for env_var in self.ENV_VARS:
+                #TODO 
                 header_value = reply.rawHeader(self.ENV_VARS[env_var].encode()).data().decode()
                 configmanager.write_env_var(env_var, header_value)
 
@@ -195,12 +170,8 @@ class Client(QObject):
         logger.log(f"Retry Counter: {retry_counter}, Delay: {delay_seconds:.2f}s", 1)
         return int(delay_seconds)
 
-    def _check_status(self, blocking_request: QgsBlockingNetworkRequest) -> None:
+    def _check_status(self, reply: QNetworkReply) -> None:
         """Check response status and raise appropriate exceptions."""
-        reply = blocking_request.reply()
-        if not reply:
-            raise Exception("No response received. Check provider settings and availability.")
-
         status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
         message = reply.content().data().decode()
 
