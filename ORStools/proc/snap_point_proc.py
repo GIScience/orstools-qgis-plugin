@@ -79,7 +79,7 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -109,7 +109,7 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request("/v2/snap/" + profile, {}, post_json=params)
+            response = ors_client.fetch_with_retry("/v2/snap/" + profile, {}, post_json=params)
             point_features = get_snapped_point_features(response, feedback=feedback)
 
             for feat in point_features:

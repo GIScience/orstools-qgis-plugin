@@ -29,49 +29,51 @@
 
 import json
 import random
-import time
 from datetime import datetime, timedelta
 from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal
-from qgis.utils import iface
-from qgis.core import Qgis
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QUrl, QTimer, QEventLoop
+from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
+from qgis.core import QgsSettings, QgsBlockingNetworkRequest
 from requests.utils import unquote_unreserved
 
 from ORStools import __version__
-from ORStools.common import networkaccessmanager
 from ORStools.utils import exceptions, configmanager, logger
-
-from qgis.core import QgsSettings
 
 _USER_AGENT = f"ORSQGISClient@v{__version__}"
 
 
 class Client(QObject):
-    """Performs requests to the ORS API services."""
+    """Performs requests to the ORS API services.
+
+    This class handles HTTP communication with the openrouteservice API,
+    including authentication, retry logic for rate limiting, and progress
+    tracking.
+
+    Signals:
+        overQueryLimit: Emitted when rate limit is hit, passes delay in seconds
+        downloadProgress: Emitted during download, passes progress ratio (0-1)
+    """
+
+    overQueryLimit = pyqtSignal(int)
+    downloadProgress = pyqtSignal(int)
 
     def __init__(self, provider: Optional[dict] = None, agent: Optional[str] = None) -> None:
-        """
-        :param provider: A openrouteservice provider from config.yml
-        :type provider: dict
+        """Initialize the ORS API client.
 
-        :param retry_timeout: Timeout across multiple retryable requests, in
-            seconds.
-        :type retry_timeout: int
+        :param provider: Provider configuration containing base_url, key, timeout, and ENV_VARS
+        :type provider: dict
+        :param agent: User agent string for the HTTP requests
+        :type agent: str
         """
         QObject.__init__(self)
 
         self.key = provider["key"]
         self.base_url = provider["base_url"]
         self.ENV_VARS = provider.get("ENV_VARS")
+        self.timeout = provider.get("timeout")
 
-        # self.session = requests.Session()
-        retry_timeout = provider.get("timeout")
-
-        self.nam = networkaccessmanager.NetworkAccessManager(debug=False, timeout=retry_timeout)
-
-        self.retry_timeout = timedelta(seconds=retry_timeout)
         self.headers = {
             "User-Agent": _USER_AGENT,
             "Content-type": "application/json",
@@ -88,145 +90,154 @@ class Client(QObject):
         self.url = None
         self.warnings = None
 
-    overQueryLimit = pyqtSignal()
+    def _request(
+        self,
+        post_json: Optional[dict],
+        blocking_request: QgsBlockingNetworkRequest,
+        request: QNetworkRequest,
+    ) -> str:
+        """Execute a blocking network request.
 
-    def request(
+        :param post_json: JSON payload for POST requests, None for GET requests
+        :type post_json: dict or None
+        :param blocking_request: QGIS blocking network request handler
+        :type blocking_request: QgsBlockingNetworkRequest
+        :param request: Network request with URL and headers
+        :type request: QNetworkRequest
+        :return: Network reply content
+        :rtype: QgsNetworkReplyContent
+        :raises: Various ApiError exceptions based on HTTP status codes
+        """
+        if post_json is not None:
+            result = blocking_request.post(request, json.dumps(post_json).encode())
+        else:
+            result = blocking_request.get(request)
+
+        if result != QgsBlockingNetworkRequest.NoError:
+            self._check_status(blocking_request.reply())
+            return None
+
+        return blocking_request.reply()
+
+    def fetch_with_retry(
         self,
         url: str,
         params: dict,
-        first_request_time: Optional[datetime.time] = None,
-        retry_counter: int = 0,
+        first_request_time: Optional[datetime] = None,
         post_json: Optional[dict] = None,
+        max_retries: int = 100,
     ):
-        """Performs HTTP GET/POST with credentials, returning the body as
-        JSON.
+        """Fetch data from the API with automatic retry on rate limit errors.
 
-        :param url: URL extension for request. Should begin with a slash.
-        :type url: string
+        Implements exponential backoff with jitter for retries. The first retry
+        occurs after exactly 61 seconds, subsequent retries use exponential
+        backoff capped at 5 minutes.
 
-        :param params: HTTP GET parameters.
-        :type params: dict or list of key/value tuples
-
-        :param first_request_time: The time of the first request (None if no
-            retries have occurred).
-        :type first_request_time: datetime.datetime
-
-        :param retry_counter: Amount of retries with increasing timeframe before raising a timeout exception
-        :type retry_counter: int
-
-        :param post_json: Parameters for POST endpoints
-        :type post_json: dict
-
-        :param retry_counter: Duration the requests will be retried for before
-            raising a timeout exception.
-        :type retry_counter: int
-
-        :raises ORStools.utils.exceptions.ApiError: when the API returns an error.
-
-        :returns: openrouteservice response body
+        :param url: API endpoint path (e.g., "/v2/directions/driving-car/geojson")
+        :type url: str
+        :param params: URL query parameters
+        :type params: dict
+        :param first_request_time: Timestamp of the first request attempt
+        :type first_request_time: datetime or None
+        :param post_json: JSON payload for POST requests
+        :type post_json: dict or None
+        :param max_retries: Maximum number of retry attempts
+        :type max_retries: int
+        :return: Parsed JSON response from the API
         :rtype: dict
+        :raises exceptions.Timeout: When total retry time exceeds configured timeout
+        :raises exceptions.ApiError: On non-retryable API errors (4xx except 429)
         """
+        first_request_time = datetime.now()
 
-        if not first_request_time:
-            first_request_time = datetime.now()
-
-        elapsed = datetime.now() - first_request_time
-        if elapsed > self.retry_timeout:
-            raise exceptions.Timeout()
-
-        if retry_counter > 0:
-            # 0.5 * (1.5 ^ i) is an increased sleep time of 1.5x per iteration,
-            # starting at 0.5s when retry_counter=1. The first retry will occur
-            # at 1, so subtract that first.
-            delay_seconds = 1.5 ** (retry_counter - 1)
-
-            # Jitter this value by 50% and pause.
-            time.sleep(delay_seconds * (random.random() + 0.5))
-
-        authed_url = self._generate_auth_url(
-            url,
-            params,
-        )
+        authed_url = self._generate_auth_url(url, params)
         self.url = self.base_url + authed_url
 
-        # Default to the client-level self.requests_kwargs, with method-level
-        # requests_kwargs arg overriding.
-        # final_requests_kwargs = self.requests_kwargs
+        request = QNetworkRequest(QUrl(self.url))
 
-        # Determine GET/POST
-        # requests_method = self.session.get
-        requests_method = "GET"
-        body = None
-        if post_json is not None:
-            # requests_method = self.session.post
-            # final_requests_kwargs["json"] = post_json
-            body = post_json
-            requests_method = "POST"
+        for header, value in self.headers.items():
+            request.setRawHeader(header.encode(), value.encode())
 
-        logger.log(f"url: {self.url}\nParameters: {json.dumps(body, indent=2)}", 0)
+        blocking_request = QgsBlockingNetworkRequest()
 
-        try:
-            response, content = self.nam.request(
-                self.url, method=requests_method, body=body, headers=self.headers, blocking=True
-            )
-        except networkaccessmanager.RequestsExceptionTimeout:
-            raise exceptions.Timeout
+        blocking_request.downloadProgress.connect(lambda r, t: self.downloadProgress.emit(r / t))
 
-        except networkaccessmanager.RequestsException:
+        logger.log(f"url: {self.url}\nParameters: {json.dumps(post_json, indent=2)}", 0)
+
+        content = None
+
+        for i in range(max_retries):
             try:
-                self._check_status()
+                reply = self._request(post_json, blocking_request, request)
+                content = reply.content().data().decode()
+                break
 
             except exceptions.OverQueryLimit as e:
-                # Let the instances know something happened
-                # noinspection PyUnresolvedReferences
-                self.overQueryLimit.emit()
+                if datetime.now() - first_request_time > timedelta(seconds=self.timeout):
+                    raise exceptions.Timeout()
+
                 logger.log(f"{e.__class__.__name__}: {str(e)}", 1)
 
-                iface.messageBar().pushMessage(
-                    "ORSTools", "Rate limit exceeded, retrying...", level=Qgis.Warning, duration=2
-                )
+                delay_seconds = self.get_delay_seconds(i)
+                self.overQueryLimit.emit(delay_seconds)
 
-                return self.request(url, params, first_request_time, retry_counter + 1, post_json)
+                loop = QEventLoop()
+                QTimer.singleShot(delay_seconds * 1000, loop.quit)
+                loop.exec_()
 
             except exceptions.ApiError as e:
-                logger.log(
-                    f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2
-                )
+                if post_json:
+                    logger.log(
+                        f"Feature ID {post_json['id']} caused a {e.__class__.__name__}: {str(e)}", 2
+                    )
                 raise
-
-            raise
 
         # Write env variables if successful
         if self.ENV_VARS:
             for env_var in self.ENV_VARS:
-                configmanager.write_env_var(
-                    env_var, response.headers.get(self.ENV_VARS[env_var], "None")
-                )
+                header_value = reply.rawHeader(self.ENV_VARS[env_var].encode()).data().decode()
+                configmanager.write_env_var(env_var, header_value)
 
         # Reset to old value
         self.settings.setValue("qgis/networkAndProxy/userAgent", self.user_agent)
 
-        return json.loads(content.decode("utf-8"))
+        return json.loads(content)
 
-    def _check_status(self) -> None:
+    def get_delay_seconds(self, retry_counter: int) -> int:
+        """Calculate delay before next retry attempt.
+
+        First retry waits exactly 61 seconds. Subsequent retries use exponential
+        backoff with base delay of 60s * 1.5^(retry_counter-1), capped at 300s,
+        with random jitter between 30-60% of the calculated delay.
+
+        :param retry_counter: Zero-based retry attempt number
+        :type retry_counter: int
+        :return: Delay in seconds before next retry
+        :rtype: int
         """
-        Casts JSON response to dict
+        if retry_counter == 0:
+            delay_seconds = 61
+        else:
+            base_delay = min(60 * (1.5 ** (retry_counter - 1)), 300)
+            jitter = random.uniform(0.3, 0.6)
+            delay_seconds = base_delay * jitter
 
-        :raises ORStools.utils.exceptions.OverQueryLimitError: when rate limit is exhausted, HTTP 429
-        :raises ORStools.utils.exceptions.ApiError: when the backend API throws an error, HTTP 400
-        :raises ORStools.utils.exceptions.InvalidKey: when API key is invalid (or quota is exceeded), HTTP 403
-        :raises ORStools.utils.exceptions.GenericServerError: all other HTTP errors
+        logger.log(f"Retry Counter: {retry_counter}, Delay: {delay_seconds:.2f}s", 1)
+        return int(delay_seconds)
 
-        :returns: response body
-        :rtype: dict
+    def _check_status(self, reply: QNetworkReply) -> None:
+        """Check HTTP response status and raise appropriate exceptions.
+
+        :param reply: Network reply to check
+        :type reply: QNetworkReply
+        :raises exceptions.InvalidKey: On 403 Forbidden (invalid API key)
+        :raises exceptions.OverQueryLimit: On 429 Too Many Requests
+        :raises exceptions.ApiError: On 4xx client errors
+        :raises exceptions.GenericServerError: On 5xx server errors
+        :raises Exception: On network errors or invalid responses
         """
-
-        status_code = self.nam.http_call_result.status_code
-        message = (
-            self.nam.http_call_result.text
-            if self.nam.http_call_result.text != ""
-            else self.nam.http_call_result.reason
-        )
+        status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
+        message = reply.content().data().decode()
 
         if not status_code:
             raise Exception(
@@ -235,7 +246,6 @@ class Client(QObject):
 
         elif status_code == 403:
             raise exceptions.InvalidKey(str(status_code), message)
-
         elif status_code == 429:
             raise exceptions.OverQueryLimit(str(status_code), message)
         # Internal error message for Bad Request
@@ -246,19 +256,15 @@ class Client(QObject):
             raise exceptions.GenericServerError(str(status_code), message)
 
     def _generate_auth_url(self, path: str, params: Union[Dict, List]) -> str:
-        """Returns the path and query string portion of the request URL, first
-        adding any necessary parameters.
+        """Generate authenticated URL with query parameters.
 
-        :param path: The path portion of the URL.
-        :type path: string
-
-        :param params: URL parameters.
-        :type params: dict or list of key/value tuples
-
-        :returns: encoded URL
-        :rtype: string
+        :param path: API endpoint path
+        :type path: str
+        :param params: Query parameters as dict or list of tuples
+        :type params: dict or list
+        :return: URL path with encoded query string
+        :rtype: str
         """
-
         if isinstance(params, dict):
             params = sorted(dict(**params).items())
 

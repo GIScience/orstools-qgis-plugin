@@ -93,7 +93,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -180,7 +180,9 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         # Make request and catch ApiError
         try:
             endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])["matrix"]
-            response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
+            response = ors_client.fetch_with_retry(
+                f"/v2/{endpoint}/{profile}", {}, post_json=params
+            )
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"{e.__class__.__name__}: {str(e)}"
