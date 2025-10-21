@@ -7,6 +7,7 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsRectangle,
+    QgsSettings,
 )
 from qgis.testing import unittest
 from qgis.PyQt.QtCore import QMetaType
@@ -20,6 +21,7 @@ from ORStools.proc.isochrones_point_proc import ORSIsochronesPointAlgo
 from ORStools.proc.matrix_proc import ORSMatrixAlgo
 from ORStools.proc.snap_layer_proc import ORSSnapLayerAlgo
 from ORStools.proc.snap_point_proc import ORSSnapPointAlgo
+from ORStools.proc.provider_add_conf import ORSProviderAddAlgo
 
 
 class TestProc(unittest.TestCase):
@@ -330,3 +332,35 @@ class TestProc(unittest.TestCase):
         self.assertRaises(
             Exception, lambda: snap_points.processAlgorithm(parameters, self.context, self.feedback)
         )
+
+    def test_add_provider(self):
+        parameters = {
+            "ors_provider_name": "TestProvider",
+            "ors_provider_api_key": "test_api_key",
+            "ors_provider_url": "https://test.example.org",
+            "ors_provider_timeout": 120,
+            "ors_provider_overwrite": False,
+        }
+
+        # Create an instance of the algorithm
+        add_provider_algo = ORSProviderAddAlgo().create()
+
+        # Run the algorithm
+        result = add_provider_algo.processAlgorithm(parameters, self.context, self.feedback)
+
+        # Validate the result
+        self.assertIn("OUTPUT", result)
+        self.assertEqual(result["OUTPUT"], "config has been added: TestProvider")
+
+        # Verify the provider was added to the settings
+        settings = QgsSettings()
+        config = settings.value("ORStools/config")
+        providers = config["providers"]
+        self.assertTrue(any(provider["name"] == "TestProvider" for provider in providers))
+
+        # Clean up by removing the test provider
+        config["providers"] = [
+            provider for provider in providers if provider["name"] != "TestProvider"
+        ]
+        settings.setValue("ORStools/config", config)
+        settings.sync()
