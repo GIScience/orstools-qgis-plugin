@@ -29,12 +29,11 @@
 
 import json
 import random
-import time
 from datetime import datetime, timedelta
 from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal, QUrl
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QUrl, QTimer, QEventLoop
 from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.core import QgsSettings, QgsBlockingNetworkRequest
 from requests.utils import unquote_unreserved
@@ -137,7 +136,10 @@ class Client(QObject):
 
                 delay_seconds = self.get_delay_seconds(i)
                 self.overQueryLimit.emit(delay_seconds)
-                time.sleep(delay_seconds)
+                
+                loop = QEventLoop()
+                QTimer.singleShot(delay_seconds * 1000, loop.quit)  # milliseconds
+                loop.exec_()
                 
             except exceptions.ApiError as e:
                 if post_json:
@@ -149,7 +151,6 @@ class Client(QObject):
         # Write env variables if successful
         if self.ENV_VARS:
             for env_var in self.ENV_VARS:
-                #TODO 
                 header_value = reply.rawHeader(self.ENV_VARS[env_var].encode()).data().decode()
                 configmanager.write_env_var(env_var, header_value)
 
