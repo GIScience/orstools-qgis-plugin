@@ -48,7 +48,7 @@ class Client(QObject):
     """Performs requests to the ORS API services."""
 
     overQueryLimit = pyqtSignal(int)
-    downloadProgress = pyqtSignal(int, int)
+    downloadProgress = pyqtSignal(int)
 
 
     def __init__(self, provider: Optional[dict] = None, agent: Optional[str] = None) -> None:
@@ -120,9 +120,7 @@ class Client(QObject):
 
         blocking_request = QgsBlockingNetworkRequest()
 
-        blocking_request.downloadProgress.connect(
-            lambda r, t: self.downloadProgress.emit(r, t)
-        )
+        blocking_request.downloadProgress.connect(lambda r, t: self.downloadProgress.emit(r/t))
 
         logger.log(f"url: {self.url}\nParameters: {json.dumps(post_json, indent=2)}", 0)
 
@@ -146,7 +144,7 @@ class Client(QObject):
                 loop = QEventLoop()
                 QTimer.singleShot(delay_seconds * 1000, loop.quit)  # milliseconds
                 loop.exec_()
-                
+
             except exceptions.ApiError as e:
                 if post_json:
                     logger.log(

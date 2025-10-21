@@ -232,6 +232,17 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
 
         return options
 
+    def get_client(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> client.Client:
+        """
+        Returns a client instance for requests to the ors API
+        """
+        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client.downloadProgress.connect(feedback.setProgress)
+
+        return ors_client
+
     # noinspection PyUnusedLocal
     def initAlgorithm(self, configuration: Dict) -> None:
         """
