@@ -1,0 +1,112 @@
+# Directions from 1 Polyline-Layer
+This algorithm calculates least-cost routes for multiple waypoints along one or multiple LineString(s).
+
+**Toolbox Button**
+<img src="/directions_from_polylines_layer_toolbox.png" alt="Toolbox">
+
+**Preview**
+<img src="/directions_from_polylines_layer_preview.png" alt="Preview">
+
+## Parameters
+
+### Provider
+Select the [openrouteservice provider](../installation_and_setup.md) you want to use.
+
+### Travel mode
+Select mode of travel.
+
+<details>
+<summary>Options</summary>
+<br>
+<ul>
+ <li>driving-car</li>
+ <li>driving-hgv</li>
+ <li>cycling-regular</li>
+ <li>cycling-road</li>
+ <li>cycling-mountain</li>
+ <li>cycling-electric</li>
+ <li>foot-walking</li>
+ <li>foot-hiking</li>
+ <li>wheelchair</li>
+</ul>
+</details>
+
+A detailed description of this can be viewed [here](https://giscience.github.io/openrouteservice/technical-details/travel-speeds/#travel-time-calculation)
+
+### Input Line Layer
+A (Multi-)LineString layer along which the route will be calculated. A route will be calculated for each line. Each LineString can have up to 50 waypoints.
+
+### Layer ID Field
+Values will transfer to the output layer and can be used to join layers or group features afterwards.
+
+### Travel Preference
+Dictates the cost. For longer routes don't use Shortest Path.
+
+<details>
+<summary>Options</summary>
+<br>
+<ul>
+ <li>fastest</li>
+ <li>shortest</li>
+ <li>recommended</li>
+</ul>
+</details>
+<br>
+
+### Traveling Salesman
+You can optionally perform a [Traveling Salesman Optimization](https://en.wikipedia.org/Travelling_salesman_problem) on the vertices of each (Multi)line features. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest.
+
+
+<details>
+<summary>Examples</summary>
+<br>
+<h4>Traveling Salesman Problem: Round trip</h4>
+<img src="/tsp_round_trip_line.png" alt="Traveling Salesman Problem: Round trip">
+<h4>Traveling Salesman Problem: fix start point</h4>
+<img src="/tsp_fix_start_point_line.png" alt="Traveling Salesman Problem: fix start point">
+<h4>Traveling Salesman Problem: fix end point</h4>
+<img src="/tsp_fix_end_point_line.png" alt="Traveling Salesman Problem: fix end point">
+<h4>Traveling Salesman Problem: fix start and end points</h4>
+<img src="/tsp_fix_start_and_end_point_line.png" alt="Traveling Salesman Problem: fix start and end points">
+</details>
+
+### Directions(Output)
+Specify a path, where the layer will be saved. Leaving this empty will result in a temporary layer. 
+
+## Advanced Parameters
+These are optional parameters you can use to avoid certain areas.
+
+### Features to Avoid
+You can make your route avoid particular features. Specify them here.
+
+<details>
+<summary>Options</summary>
+<br>
+<ul>
+  <li>Highways</li>
+  <li>Tollways</li>
+  <li>Ferries</li>
+  <li>Fords</li>
+  <li>Steps</li>
+</ul>
+</details>
+<br>
+
+### Types of borders to avoid
+Specify which type of border crossing to avoid.
+
+<details>
+<summary>Options</summary>
+<br>
+<ul>
+  <li>all</li>
+  <li>controlled</li>
+</ul>
+</details>
+<br>
+
+### Comma-separated list of ids of countries to avoid
+List of countries to exclude from route with driving-* profiles. Can be used together with 'avoid_borders': 'controlled'. [ 11, 193 ] would exclude Austria and Switzerland. List of countries and application examples can be found [here](https://giscience.github.io/openrouteservice/technical-details/country-list). Also, ISO standard country codes can be used in place of the numerical ids, for example, DE or DEU for Germany.
+
+### Polygons to avoid
+You can make your route avoid particular polygons from your layers. Specify them here.
