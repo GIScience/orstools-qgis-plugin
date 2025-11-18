@@ -61,7 +61,7 @@ class LayerMessageBox(QMessageBox):
         super().__init__(parent)
         self.setWindowTitle("Choose a Layer")
         self.setText("Select a point layer from the list:")
-        self.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        self.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
 
         self.layer_combo = QgsMapLayerComboBox(self)
         self.layer_combo.setFilters(QgsMapLayerProxyModel.PointLayer)

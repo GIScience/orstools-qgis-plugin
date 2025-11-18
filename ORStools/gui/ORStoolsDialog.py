@@ -623,13 +623,13 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         box = LayerMessageBox()
 
         if testing == "ok":
-            result = QMessageBox.Ok
+            result = QMessageBox.StandardButton.Ok
         elif testing == "not_ok":
-            result = QMessageBox.Cancel
+            result = QMessageBox.StandardButton.Cancel
         else:
-            result = box.exec_()
+            result = box.exec()
 
-        if result == QMessageBox.Ok:
+        if result == QMessageBox.StandardButton.Ok:
             layer = box.selectedLayer()
             try:
                 self.routing_fromline_list.clear()
@@ -639,14 +639,14 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     if not geom:
                         continue
 
-                    if geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isSingleType(
+                    if geom.type() == QgsWkbTypes.GeometryType.PointGeometry and QgsWkbTypes.isSingleType(
                         geom.wkbType()
                     ):
                         pt = geom.asPoint()
                         self.create_vertex(pt, id, 4326)
                         self.line_tool.create_rubber_band()
 
-                    elif geom.type() == QgsWkbTypes.PointGeometry and QgsWkbTypes.isMultiType(
+                    elif geom.type() == QgsWkbTypes.GeometryType.PointGeometry and QgsWkbTypes.isMultiType(
                         geom.wkbType()
                     ):
                         pts = geom.asMultiPoint()

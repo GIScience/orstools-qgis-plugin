@@ -182,6 +182,7 @@ class Client(QObject):
                 delay_seconds = self.get_delay_seconds(i)
                 self.overQueryLimit.emit(delay_seconds)
 
+
                 loop = QEventLoop()
                 QTimer.singleShot(delay_seconds * 1000, loop.quit)
                 loop.exec()
