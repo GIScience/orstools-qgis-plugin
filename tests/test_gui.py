@@ -413,41 +413,360 @@ class TestGui(unittest.TestCase):
             next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )
 
-    def test_load_valid_point_layer(self):
-        """Test loading vertices from valid point layer."""
+    def test_load_valid_point_layer_single_geometry(self):
+        """Test loading vertices from valid point layer with single point geometries."""
         from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
-
+    
         dialog_main = ORStoolsDialogMain(IFACE)
         dialog_main._init_gui_control()
-
-        # Create test layers
-        self.point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
-        self.line_layer = QgsVectorLayer("LineString?crs=EPSG:4326", "test_lines", "memory")
-
+    
+        # Create test layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+    
         # Add 3 features to point layer
-        for coords in [(1, 2), (3, 4), (5, 6)]:
+        for coords in [(1.0, 2.0), (3.0, 4.0), (5.0, 6.0)]:
             feat = QgsFeature()
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coords)))
-            self.point_layer.dataProvider().addFeature(feat)
-
-        QgsProject.instance().addMapLayers([self.point_layer, self.line_layer])
-
+            point_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(point_layer)
+    
         # Run test
         dialog_main.dlg.load_vertices_from_layer("ok")
-
+    
         # Verify
         self.assertTrue(dialog_main.dlg.line_tool is not None)
         self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 3)
         self.assertIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
-
-    def test_user_cancels_operation(self):
-        """Test when user cancels the dialog."""
+        
+        # Verify coordinates
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(0).text(),
+            "Point 0: 1.000000, 2.000000"
+        )
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(1).text(),
+            "Point 1: 3.000000, 4.000000"
+        )
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(2).text(),
+            "Point 2: 5.000000, 6.000000"
+        )
+    
+    def test_load_multipoint_geometry(self):
+        """Test loading vertices from layer with multipoint geometries."""
         from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
-
+    
         dialog_main = ORStoolsDialogMain(IFACE)
         dialog_main._init_gui_control()
+    
+        # Create test layer with multipoint
+        multipoint_layer = QgsVectorLayer("MultiPoint?crs=EPSG:4326", "test_multipoints", "memory")
+    
+        # Add multipoint feature
+        feat = QgsFeature()
+        points = [QgsPointXY(1.0, 2.0), QgsPointXY(3.0, 4.0), QgsPointXY(5.0, 6.0)]
+        feat.setGeometry(QgsGeometry.fromMultiPointXY(points))
+        multipoint_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(multipoint_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify - all points from multipoint should be loaded
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 3)
+        self.assertIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+    
+    def test_load_layer_with_different_crs(self):
+        """Test loading vertices from layer with non-WGS84 CRS."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create test layer with Web Mercator CRS
+        point_layer = QgsVectorLayer("Point?crs=EPSG:3857", "test_points_3857", "memory")
+    
+        # Add features (coordinates in EPSG:3857)
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(260102.8, 6251528.2)))
+        point_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 1)
+        
+        # Verify transformation occurred (should be in WGS84)
+        item_text = dialog_main.dlg.routing_fromline_list.item(0).text()
+        self.assertTrue("Point 0:" in item_text)
+        # Coordinates should be approximately 1.0, 2.0 after transformation
+        coords = item_text.split(":")[1].strip()
+        x, y = (float(i) for i in coords.split(", "))
+        self.assertAlmostEqual(x, 2.3, places=1)
+        self.assertAlmostEqual(y, 48.9, places=1)
+    
+    def test_load_empty_layer(self):
+        """Test loading vertices from empty layer."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create empty layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "empty_points", "memory")
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify - should handle empty layer gracefully
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)
+    
+    def test_load_layer_with_null_geometries(self):
+        """Test loading vertices from layer with null geometries."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create layer with null geometries
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+    
+        # Add feature with valid geometry
+        feat1 = QgsFeature()
+        feat1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.0, 2.0)))
+        point_layer.dataProvider().addFeature(feat1)
+    
+        # Add feature with null geometry
+        feat2 = QgsFeature()
+        feat2.setGeometry(QgsGeometry())
+        point_layer.dataProvider().addFeature(feat2)
+    
+        # Add another valid feature
+        feat3 = QgsFeature()
+        feat3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(3.0, 4.0)))
+        point_layer.dataProvider().addFeature(feat3)
+    
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify - should skip null geometry
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 2)
+    
+    def test_load_invalid_layer_type(self):
+        """Test loading vertices from non-point layer."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create line layer
+        line_layer = QgsVectorLayer("LineString?crs=EPSG:4326", "test_lines", "memory")
+        
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPolylineXY([QgsPointXY(0, 0), QgsPointXY(1, 1)]))
+        line_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(line_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify - should not load line geometries
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)
+    
+    def test_user_cancels_import_operation(self):
+        """Test when user cancels the dialog."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+        
+        # Create valid layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.0, 2.0)))
+        point_layer.dataProvider().addFeature(feat)
+        QgsProject.instance().addMapLayer(point_layer)
+        
         dialog_main.dlg.load_vertices_from_layer("not_ok")
-
+    
         self.assertTrue(dialog_main.dlg.line_tool is not None)
         self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)
         self.assertNotIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+    
+    def test_load_layer_with_many_points(self):
+        """Test loading many points from layer."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create layer with 100 points
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "many_points", "memory")
+        n = 52
+        
+        for i in range(n):
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(float(i), float(i))))
+            point_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), n)
+        self.assertIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+    
+    def test_load_layer_replaces_existing_vertices(self):
+        """Test that loading a layer clears existing vertices."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Add some vertices manually first
+        dialog_main.dlg.routing_fromline_list.addItem("Point 0: 0.000000, 0.000000")
+        dialog_main.dlg.routing_fromline_list.addItem("Point 1: 1.000000, 1.000000")
+        
+        initial_count = dialog_main.dlg.routing_fromline_list.count()
+        self.assertEqual(initial_count, 2)
+    
+        # Create and load layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5.0, 5.0)))
+        point_layer.dataProvider().addFeature(feat)
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify old vertices were cleared
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 1)
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(0).text(),
+            "Point 0: 5.000000, 5.000000"
+        )
+    
+    def test_load_layer_with_extreme_coordinates(self):
+        """Test loading vertices with extreme coordinate values."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create layer with extreme coordinates (but valid WGS84)
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "extreme_coords", "memory")
+    
+        # Add features at extremes
+        extreme_coords = [
+            (-180.0, -90.0),  # Southwest corner
+            (180.0, 90.0),    # Northeast corner
+            (0.0, 0.0),       # Origin
+            (-179.9, 89.9),   # Near extremes
+        ]
+        
+        for coords in extreme_coords:
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coords)))
+            point_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify all points loaded
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 4)
+    
+    def test_load_layer_creates_annotations(self):
+        """Test that loading vertices creates map annotations."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+        
+        for coords in [(1.0, 2.0), (3.0, 4.0)]:
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coords)))
+            point_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify annotations were created
+        self.assertEqual(len(dialog_main.dlg.annotations), 2)
+        
+        # Verify annotations are in project
+        project_annotations = QgsProject.instance().annotationManager().annotations()
+        for annotation in dialog_main.dlg.annotations:
+            self.assertIn(annotation, project_annotations)
+    
+    def test_load_layer_mixed_multipoint_and_single(self):
+        """Test loading from layer with mixed single and multipoint geometries."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create layer that can hold both
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "mixed_points", "memory")
+    
+        # Add single point
+        feat1 = QgsFeature()
+        feat1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.0, 2.0)))
+        point_layer.dataProvider().addFeature(feat1)
+    
+        # Add single point
+        feat2 = QgsFeature()
+        feat2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(3.0, 4.0)))
+        point_layer.dataProvider().addFeature(feat2)
+    
+        QgsProject.instance().addMapLayer(point_layer)
+    
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Verify correct count
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 2)
+    
+    def test_load_layer_exception_handling(self):
+        """Test exception handling when loading fails."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+    
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+    
+        # Create a polygon layer (invalid for point loading)
+        polygon_layer = QgsVectorLayer("Polygon?crs=EPSG:4326", "test_polygons", "memory")
+        
+        feat = QgsFeature()
+        points = [QgsPointXY(0, 0), QgsPointXY(1, 0), QgsPointXY(1, 1), QgsPointXY(0, 1), QgsPointXY(0, 0)]
+        feat.setGeometry(QgsGeometry.fromPolygonXY([points]))
+        polygon_layer.dataProvider().addFeature(feat)
+    
+        QgsProject.instance().addMapLayer(polygon_layer)
+    
+        # Run test - should handle gracefully
+        dialog_main.dlg.load_vertices_from_layer("ok")
+    
+        # Should not crash and list should be empty
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)

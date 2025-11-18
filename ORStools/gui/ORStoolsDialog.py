@@ -643,7 +643,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                         geom.wkbType()
                     ):
                         pt = geom.asPoint()
-                        self.create_vertex(pt, id, 4326)
+                        self.create_vertex(pt, id, layer.crs().postgisSrid())
                         self.line_tool.create_rubber_band()
 
                     elif geom.type() == QgsWkbTypes.GeometryType.PointGeometry and QgsWkbTypes.isMultiType(
@@ -651,7 +651,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     ):
                         pts = geom.asMultiPoint()
                         for pt in pts:
-                            self.create_vertex(pt, id)
+                            self.create_vertex(pt, id, layer.crs().postgisSrid())
                             self.line_tool.create_rubber_band()
             except Exception:
                 self._clear_annotations()
