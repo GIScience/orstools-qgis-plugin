@@ -639,15 +639,17 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     if not geom:
                         continue
 
-                    if geom.type() == QgsWkbTypes.GeometryType.PointGeometry and QgsWkbTypes.isSingleType(
-                        geom.wkbType()
+                    if (
+                        geom.type() == QgsWkbTypes.GeometryType.PointGeometry
+                        and QgsWkbTypes.isSingleType(geom.wkbType())
                     ):
                         pt = geom.asPoint()
                         self.create_vertex(pt, id, layer.crs().postgisSrid())
                         self.line_tool.create_rubber_band()
 
-                    elif geom.type() == QgsWkbTypes.GeometryType.PointGeometry and QgsWkbTypes.isMultiType(
-                        geom.wkbType()
+                    elif (
+                        geom.type() == QgsWkbTypes.GeometryType.PointGeometry
+                        and QgsWkbTypes.isMultiType(geom.wkbType())
                     ):
                         pts = geom.asMultiPoint()
                         for pt in pts:
