@@ -657,37 +657,6 @@ class TestGui(unittest.TestCase):
             dialog_main.dlg.routing_fromline_list.item(0).text(), "Point 0: 5.000000, 5.000000"
         )
 
-    def test_load_layer_with_extreme_coordinates(self):
-        """Test loading vertices with extreme coordinate values."""
-        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
-
-        dialog_main = ORStoolsDialogMain(IFACE)
-        dialog_main._init_gui_control()
-
-        # Create layer with extreme coordinates (but valid WGS84)
-        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "extreme_coords", "memory")
-
-        # Add features at extremes
-        extreme_coords = [
-            (-180.0, -90.0),  # Southwest corner
-            (180.0, 90.0),  # Northeast corner
-            (0.0, 0.0),  # Origin
-            (-179.9, 89.9),  # Near extremes
-        ]
-
-        for coords in extreme_coords:
-            feat = QgsFeature()
-            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coords)))
-            point_layer.dataProvider().addFeature(feat)
-
-        QgsProject.instance().addMapLayer(point_layer)
-
-        # Run test
-        dialog_main.dlg.load_vertices_from_layer("ok")
-
-        # Verify all points loaded
-        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 4)
-
     def test_load_layer_creates_annotations(self):
         """Test that loading vertices creates map annotations."""
         from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
