@@ -10,9 +10,9 @@ test_cases_qvariant = [
 ]
 
 test_cases_qmetatype = [
-    ("int_field", QMetaType.Int, 10, 0, "Integer field", None),
-    ("double_field", QMetaType.Double, 10, 5, "Double field", QMetaType.Float),
-    ("string_field", QMetaType.QString, 50, 0, "String field", None),
+    ("int_field", QMetaType.Type.Int, 10, 0, "Integer field", None),
+    ("double_field", QMetaType.Type.Double, 10, 5, "Double field", QMetaType.Type.Float),
+    ("string_field", QMetaType.Type.QString, 50, 0, "String field", None),
 ]
 
 

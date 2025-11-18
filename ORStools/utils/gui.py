@@ -16,9 +16,12 @@ __source__ = "https://github.com/felt/qgis-plugin/blob/main/felt/gui/gui_utils.p
 
 import os
 
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtGui import (
     QIcon,
 )
+from qgis._core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox
 
 
 class GuiUtils:
@@ -51,3 +54,21 @@ class GuiUtils:
             return path
 
         return path
+
+
+class LayerMessageBox(QMessageBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Choose a Layer")
+        self.setText("Select a point layer from the list:")
+        self.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+
+        self.layer_combo = QgsMapLayerComboBox(self)
+        self.layer_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.layer_combo.setMinimumWidth(200)
+
+        layout = self.layout()
+        layout.addWidget(self.layer_combo, 1, 1, 1, 2)
+
+    def selectedLayer(self):
+        return self.layer_combo.currentLayer()
