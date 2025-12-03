@@ -203,7 +203,9 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         ors_provider = providers[provider]
         ors_client = client.Client(ors_provider, agent)
         ors_client.overQueryLimit.connect(
-            lambda: feedback.reportError("OverQueryLimit: Retrying...")
+            lambda retry_time: feedback.reportError(
+                f"OverQueryLimit: Retrying in {retry_time} seconds."
+            )
         )
         return ors_client
 
@@ -229,6 +231,17 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             options["avoid_polygons"] = _get_avoid_polygons(polygons_layer)
 
         return options
+
+    def get_client(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> client.Client:
+        """
+        Returns a client instance for requests to the ors API
+        """
+        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client.downloadProgress.connect(feedback.setProgress)
+
+        return ors_client
 
     # noinspection PyUnusedLocal
     def initAlgorithm(self, configuration: Dict) -> None:

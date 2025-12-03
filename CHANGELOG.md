@@ -41,10 +41,18 @@ RELEASING:
  -->
 
 ## Unreleased
+
+### Added
+- pre-commit configuration with Ruff linter for code quality enforcement
+- Improve cursor behaviour during digitization
+
 ### Fixed
 - Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
 - Reset hand cursor after deactivating line tool ([#342](https://github.com/GIScience/orstools-qgis-plugin/issues/342))
 - Check API key being set before running tests ([#358](https://github.com/GIScience/orstools-qgis-plugin/issues/358))
+- Set url slashes correctly with optimization requests in procs ([#347](https://github.com/GIScience/orstools-qgis-plugin/issues/347))
+- Qt6 incompatibility with QVariant ([#355](https://github.com/GIScience/orstools-qgis-plugin/issues/355))
+- Switch to QgsBlockingNetworkRequest ([#117](https://github.com/GIScience/orstools-qgis-plugin/issues/117))
 
 ## [2.0.1] - 2025-06-01
 ### Added

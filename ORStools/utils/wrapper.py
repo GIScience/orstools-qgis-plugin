@@ -28,75 +28,60 @@
  ***************************************************************************/
 """
 
-from typing import Union, Optional
+from typing import Optional, Any
 
 from qgis.PyQt.QtCore import QMetaType, QVariant
-from qgis.core import QgsField, Qgis
+from qgis.core import QgsField
 
 
-def create_field_qgis_3_38_plus(
-    name: str,
-    type_enum: Union[QMetaType.Type, QVariant.Type],
-    length: int,
-    precision: int,
-    comment: str,
-    subtype_enum: Optional[Union[QMetaType.Type, QVariant.Type]] = None,
-) -> QgsField:
-    """Create a QgsField for QGIS ≥ 3.38 using QMetaType.Type enums."""
-    if isinstance(type_enum, QVariant.Type):
-        type_enum = QMetaType.Type(type_enum)
-    if subtype_enum and isinstance(subtype_enum, QVariant.Type):
-        subtype_enum = QMetaType.Type(subtype_enum)
+def normalize_field_type(type_enum: Optional[Any]) -> Any:
+    """
+    Normalize field type enum based on Qt version.
 
-    type_enum = QVariant.Type(type_enum)
-    subtype_enum = QVariant.Type(subtype_enum) if subtype_enum is not None else QVariant.Invalid
+    - Qt5: Uses QVariant.Type enums (has QVariant.Type attribute)
+    - Qt6: Uses QMetaType.Type enums (no QVariant.Type attribute)
+    """
+    if type_enum is None:
+        return _get_invalid_type()
 
-    return QgsField(
-        name,
-        type_enum,
-        "",
-        length,
-        precision,
-        comment,
-        subtype_enum,
-    )
+    if hasattr(QVariant, "Type"):  # Qt5
+        return QVariant.Type(type_enum) if isinstance(type_enum, int) else type_enum
+    else:  # Qt6
+        return QMetaType.Type(type_enum) if isinstance(type_enum, int) else type_enum
 
 
-def create_field_legacy_qgis(
-    name: str,
-    type_enum: Union[QMetaType.Type, QVariant],
-    length: int,
-    precision: int,
-    comment: str,
-    subtype_enum: Optional[Union[QMetaType.Type, QVariant]] = None,
-) -> QgsField:
-    """Create a QgsField for QGIS < 3.38 using QVariant.Type enums."""
-    # Normalize QMetaType.Type → QVariant.Type
-    if isinstance(type_enum, QMetaType.Type):
-        type_enum = QVariant.Type(type_enum)
-    if subtype_enum and isinstance(subtype_enum, QMetaType.Type):
-        subtype_enum = QVariant.Type(subtype_enum)
-    return QgsField(
-        name,
-        type_enum,
-        "",  # default type editor
-        length,
-        precision,
-        comment,
-        subtype_enum or QVariant.Invalid,
-    )
+def _get_invalid_type() -> Any:
+    """Get the appropriate invalid type enum based on Qt version."""
+    if hasattr(QVariant, "Type"):  # Qt5
+        return QVariant.Invalid  # or QVariant.Type(0) - they're equivalent
+    else:  # Qt6
+        return QMetaType.Type(0)
 
 
 def create_qgs_field(
-    name: str, type_enum, length: int = 0, precision: int = 0, comment: str = "", subtype_enum=None
+    name: str,
+    type_enum: Any,
+    length: int = 0,
+    precision: int = 0,
+    comment: str = "",
+    subtype_enum: Optional[Any] = None,
 ) -> QgsField:
     """
-    Factory that picks the correct QgsField constructor
-    based on the QGIS version.
+    Factory that creates a QgsField with proper type handling
+    based on the Qt version.
+
+    - Qt5: Uses QVariant.Type enums and QVariant.Invalid for subtypes
+    - Qt6: Uses QMetaType.Type enums
     """
-    if Qgis.versionInt() >= 33800:  # QGIS 3.38 or newer
-        return create_field_qgis_3_38_plus(
-            name, type_enum, length, precision, comment, subtype_enum
-        )
-    else:
-        return create_field_legacy_qgis(name, type_enum, length, precision, comment, subtype_enum)
+    normalized_type = normalize_field_type(type_enum)
+    normalized_subtype = normalize_field_type(subtype_enum)  # Use same function
+
+    return QgsField(
+        name,
+        normalized_type,
+        "",  # type name (empty string for default)
+        length,
+        precision,
+        comment,
+        normalized_subtype,
+    )

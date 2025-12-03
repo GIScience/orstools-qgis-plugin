@@ -135,7 +135,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
 
@@ -231,7 +231,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                         "optimization"
                     ]
-                    response = ors_client.request(f"{endpoint}/", {}, post_json=params)
+                    response = ors_client.fetch_with_retry(f"/{endpoint}/", {}, post_json=params)
 
                     sink.addFeature(
                         directions_core.get_output_features_optimization(
@@ -269,7 +269,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
                     endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                         "directions"
                     ]
-                    response = ors_client.request(
+                    response = ors_client.fetch_with_retry(
                         f"/v2/{endpoint}/{profile}/geojson", {}, post_json=params
                     )
 

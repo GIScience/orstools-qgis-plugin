@@ -44,9 +44,6 @@ from qgis.core import (
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QEvent
 from qgis.PyQt.QtGui import QColor, QMouseEvent
-from qgis.PyQt.QtWidgets import (
-    QApplication,
-)
 
 from ORStools import ROUTE_COLOR
 from ORStools.utils import transform, router
@@ -106,10 +103,12 @@ class LineTool(QgsMapToolEmitPoint):
     # Thus, we only change restore the Cursor once we are not dragging the annotation anymore.
     def canvasMoveEvent(self, e: QEvent) -> None:
         hovering = self.check_annotation_hover(e.pos())
-        if hovering and not QApplication.overrideCursor() == QtCore.Qt.CursorShape.OpenHandCursor:
-            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.OpenHandCursor)
-        elif not hovering and not self.dragging_vertex:
-            QApplication.restoreOverrideCursor()
+        if hovering:
+            self.setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
+        elif not self.dragging_vertex and self.dlg.isVisible():
+            self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        elif not self.dragging_vertex:
+            self.setCursor(QtCore.Qt.CursorShape.CrossCursor)
 
     def check_annotation_hover(self, pos: QMouseEvent) -> int:
         click = [pos.x(), pos.y()]
@@ -161,7 +160,7 @@ class LineTool(QgsMapToolEmitPoint):
         if hovering:
             # clicking should only change the cursor if it is hovering over an annotation.
             # The corresponding reset happens in the release event.
-            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
+            self.setCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
             if self.dlg.rubber_band:
                 self.dlg.rubber_band.reset()
             self.move_i = self.dlg.annotations.index(hovering)
@@ -172,7 +171,7 @@ class LineTool(QgsMapToolEmitPoint):
 
     def canvasReleaseEvent(self, event: QEvent) -> None:
         if event.button() == Qt.MouseButton.RightButton:
-            QApplication.restoreOverrideCursor()
+            self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
             self.dlg.show()
             return
 
@@ -180,7 +179,6 @@ class LineTool(QgsMapToolEmitPoint):
         self.points.append(point)
 
         if self.dragging_vertex:
-            QApplication.restoreOverrideCursor()
             self.dragging_vertex = False
 
             try:
