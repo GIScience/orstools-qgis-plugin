@@ -74,8 +74,8 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
-        self.setTooltTip(self.PARAMETERS[0], self.tr("Extent for which to export the graph."))
-        self.setTooltTip(self.PARAMETERS[1], self.tr("Name of the exported point layer"))
+        self.setToolTip(self.PARAMETERS[0], self.tr("Extent for which to export the graph."))
+        self.setToolTip(self.PARAMETERS[1], self.tr("Name of the exported point layer"))
 
 
     def processAlgorithm(
