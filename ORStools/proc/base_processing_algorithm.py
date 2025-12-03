@@ -143,7 +143,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             defaultValue=PROFILES[0],
         )
 
-        self.setToolTip(parameter, "Select a mode of travel.")
+        self.setToolTip(parameter, self.tr("Select a mode of travel."))
 
         return parameter
 
