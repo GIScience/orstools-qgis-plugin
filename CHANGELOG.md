@@ -40,9 +40,109 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-# Unreleased
+## Unreleased
 
-- Add tooltip hints in processing algorithms ([#196](https://github.com/GIScience/orstools-qgis-plugin/issues/196))
+### Added
+- pre-commit configuration with Ruff linter for code quality enforcement
+- Improve cursor behaviour during digitization
+- tooltip hints in processing algorithms ([#196](https://github.com/GIScience/orstools-qgis-plugin/issues/196))
+
+
+### Fixed
+- Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
+- Reset hand cursor after deactivating line tool ([#342](https://github.com/GIScience/orstools-qgis-plugin/issues/342))
+- Check API key being set before running tests ([#358](https://github.com/GIScience/orstools-qgis-plugin/issues/358))
+- Set url slashes correctly with optimization requests in procs ([#347](https://github.com/GIScience/orstools-qgis-plugin/issues/347))
+- Qt6 incompatibility with QVariant ([#355](https://github.com/GIScience/orstools-qgis-plugin/issues/355))
+- Switch to QgsBlockingNetworkRequest ([#117](https://github.com/GIScience/orstools-qgis-plugin/issues/117))
+
+## [2.0.1] - 2025-06-01
+### Added
+- Readd old icons and add new icons for processing algorithms
+
+## [2.0.0] - 2025-05-23
+### Added
+- Prepare plugin for Qt6 ([#303](github.com/GIScience/orstools-qgis-plugin/issues/303))
+- Keep the selected provider when closing/reopening ([#168](github.com/GIScience/orstools-qgis-plugin/issues/168))
+- Allow endpoint configuration for processing algorithms ([#301](github.com/GIScience/orstools-qgis-plugin/issues/301))
+- Support for Snap endpoint ([#262](https://github.com/GIScience/orstools-qgis-plugin/issues/262))
+- Make vertex marker on map drag and droppable, add live preview ([#204](https://github.com/GIScience/orstools-qgis-plugin/issues/204))
+- Test correctness of processing algorithm output ([#283](https://github.com/GIScience/orstools-qgis-plugin/issues/283))
+
+### Fixed
+- Improve error handling with radius error ([#326](https://github.com/GIScience/orstools-qgis-plugin/issues/326))
+- Rename output names of procs and append date and time ([#313](github.com/GIScience/orstools-qgis-plugin/issues/313))
+- Move comments and link about signup to new link ([#311](https://github.com/GIScience/orstools-qgis-plugin/issues/311))
+- Improve naming of batch jobs tab ([#321](github.com/GIScience/orstools-qgis-plugin/issues/321))
+- Less than two vertices not accepted with optimization and live preview ([#317](github.com/GIScience/orstools-qgis-plugin/issues/317))
+- Have Readme.md badges change on merge only ([#291](https://github.com/GIScience/orstools-qgis-plugin/issues/291))
+- Error with route calculation without vertices (no Issue)
+
+## [1.10.0] - 2024-11-21
+
+### Added
+- Exit digitization on right click or Escape key press ([#285](https://github.com/GIScience/orstools-qgis-plugin/issues/285))
+
+### Fixed:
+- Error with adding waypoints after calculating routes ([#288](https://github.com/GIScience/orstools-qgis-plugin/issues/288))
+
+## [1.9.0] - 2024-10-29
+
+### Fixed
+- Error with canvas scenes when deleting selected vertices in list ([#278](https://github.com/GIScience/orstools-qgis-plugin/pull/278))
+
+### Added
+- Processing algorithm for the Export endpoint ([#210](https://github.com/GIScience/orstools-qgis-plugin/issues/210))
+- Updates to german translation ([#280](https://github.com/GIScience/orstools-qgis-plugin/pull/280))
+
+### Changed
+- Use QgsSettings instead of config.yml file to avoid deletion of providers on update ([#108](https://github.com/GIScience/orstools-qgis-plugin/issues/108))
+
+## [1.8.4] - 2024-07-29
+
+### Fixed
+- issue with missing locale value for non-default user([#271](https://github.com/GIScience/orstools-qgis-plugin/issues/271))
+
+## [1.8.3] - 2024-05-29
+
+### Fixed
+- Add csv\_column parameter to request made by points\_layers\_proc([#260](https://github.com/GIScience/orstools-qgis-plugin/issues/260))
+- make extra\_info work with two points layers
+
+## [1.8.2] - 2024-05-20
+
+### Fixed
+- use python 3.9-compatible type hint
+
+## [1.8.1] - 2024-05-17
+
+### Fixed
+- use if-else instead of structural pattern matching
+
+## [1.8.0] - 2024-05-17
+
+### Added
+- Add support for decimal ranges with isochrones([#237](https://github.com/GIScience/orstools-qgis-plugin/issues/237))
+- Add hint for joining with `Layer ID Field` ([#143](https://github.com/GIScience/orstools-qgis-plugin/issues/143))
+- Add option to export order of optimization route points ([#145](https://github.com/GIScience/orstools-qgis-plugin/issues/145))
+- Add `extra_info` parameter to directions processing algorithms ([#251](https://github.com/GIScience/orstools-qgis-plugin/pull/251))
+
+### Changed
+- Rename `Ok` button in configuration window to `Save` for clarification ([#241](https://github.com/GIScience/orstools-qgis-plugin/issues/241))
+- Replace PyQt5 imports with qgis.PyQt imports to prepare for Qt6-QGis builds
+
+### Fixed
+- QGis crashes when selecting more than two vertices for deletion ([#230](https://github.com/GIScience/orstools-qgis-plugin/issues/230))
+- Vertices on canvas not depicted fully with n having more than one digit in length ([#235](https://github.com/GIScience/orstools-qgis-plugin/issues/235))
+- Replace qt QSettings with QgsSettings for centralized configuration management ([#239](https://github.com/GIScience/orstools-qgis-plugin/issues/239))
+- Point Annotations stay after saving project and not deleting them manually ([#229](https://github.com/GIScience/orstools-qgis-plugin/issues/229))
+- Issue with MultiPoint-layers and optimization
+- Improved type hints
+
+
+# Unreleased
+### Added
+- Unit- and e2e-testing
 
 ## [1.7.1] - 2024-01-15
 
@@ -224,7 +324,16 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.1...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...v2.0.0
+[1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...v1.10.0
+[1.9.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.4...v1.9.0
+[1.8.4]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.3...v1.8.4
+[1.8.3]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.2...v1.8.3
+[1.8.2]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.1...v1.8.2
+[1.8.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.8.0...v1.8.1
+[1.8.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.5.3...v1.6.0

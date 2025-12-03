@@ -27,7 +27,9 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtCore import QCoreApplication, QSettings
+from datetime import datetime
+
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
     QgsProcessing,
     QgsProcessingAlgorithm,
@@ -38,10 +40,11 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
     QgsProcessingFeedback,
+    QgsSettings,
 )
-from typing import Any
+from typing import Any, Dict
 
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
@@ -54,7 +57,7 @@ from ..gui.directions_gui import _get_avoid_polygons
 class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
     """Base algorithm class for ORS algorithms"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Default attributes used in all child classes
         """
@@ -68,6 +71,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.IN_AVOID_COUNTRIES = "INPUT_AVOID_COUNTRIES"
         self.IN_AVOID_POLYGONS = "INPUT_AVOID_POLYGONS"
         self.OUT = "OUTPUT"
+        self.OUT_NAME = "ORSTOOLS_OUTPUT"
         self.PARAMETERS = None
 
     def createInstance(self) -> Any:
@@ -91,16 +95,16 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         return self.ALGO_NAME
 
-    def shortHelpString(self):
+    def shortHelpString(self) -> str:
         """
         Displays the sidebar help in the algorithm window
         """
-        locale = QSettings().value("locale/userLocale")[0:2]
+        locale = QgsSettings().value("locale/userLocale")[0:2]
 
         return read_help_file(algorithm=self.ALGO_NAME, locale=locale)
 
     @staticmethod
-    def helpUrl():
+    def helpUrl() -> str:
         """
         Will be connected to the Help button in the Algorithm window
         """
@@ -147,9 +151,10 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for output, used in all child classes
         """
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         parameter = QgsProcessingParameterFeatureSink(
             name=self.OUT,
-            description=self.GROUP,
+            description=f"{self.OUT_NAME}_{timestamp}",
         )
         self.setToolTip(parameter, self.tr("Select where the output should be saved."))
 
@@ -184,7 +189,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 self.IN_AVOID_POLYGONS,
                 self.tr("Polygons to avoid", "ORSBaseProcessingAlgorithm"),
-                types=[QgsProcessing.TypeVectorPolygon],
+                types=[QgsProcessing.SourceType.TypeVectorPolygon],
                 optional=True,
             ),
         ]
@@ -204,6 +209,11 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
 
         return parameters
 
+    def get_endpoint_names_from_provider(self, provider: str) -> dict:
+        providers = configmanager.read_config()["providers"]
+        ors_provider = providers[provider]
+        return ors_provider["endpoints"]
+
     @classmethod
     def _get_ors_client_from_provider(
         cls, provider: str, feedback: QgsProcessingFeedback
@@ -219,7 +229,9 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         ors_provider = providers[provider]
         ors_client = client.Client(ors_provider, agent)
         ors_client.overQueryLimit.connect(
-            lambda: feedback.reportError("OverQueryLimit: Retrying...")
+            lambda retry_time: feedback.reportError(
+                f"OverQueryLimit: Retrying in {retry_time} seconds."
+            )
         )
         return ors_client
 
@@ -246,30 +258,54 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
 
         return options
 
+    def get_client(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> client.Client:
+        """
+        Returns a client instance for requests to the ors API
+        """
+        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client.downloadProgress.connect(feedback.setProgress)
+
+        return ors_client
+
     # noinspection PyUnusedLocal
-    def initAlgorithm(self, configuration):
+    def initAlgorithm(self, configuration: Dict) -> None:
         """
         Combines default and algorithm parameters and adds them in order to the
         algorithm dialog window.
         """
-        parameters = (
-            [self.provider_parameter(), self.profile_parameter()]
-            + self.PARAMETERS
-            + self.option_parameters()
-            + [self.output_parameter()]
-        )
+        if self.ALGO_NAME not in [
+            "snap_from_point_layer",
+            "snap_from_point",
+            "export_network_from_map",
+        ]:
+            parameters = (
+                [self.provider_parameter(), self.profile_parameter()]
+                + self.PARAMETERS
+                + self.option_parameters()
+                + [self.output_parameter()]
+            )
+        else:
+            parameters = (
+                [self.provider_parameter(), self.profile_parameter()]
+                + self.PARAMETERS
+                + [self.output_parameter()]
+            )
         for param in parameters:
             if param.name() in ADVANCED_PARAMETERS:
                 if self.GROUP == "Matrix":
-                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagHidden)
+                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagHidden)
                 else:
                     # flags() is a wrapper around an enum of ints for type-safety.
                     # Flags are added by or-ing values, much like the union operator would work
-                    param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+                    param.setFlags(
+                        param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced
+                    )
 
             self.addParameter(param)
 
-    def tr(self, string, context=None):
+    def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
 

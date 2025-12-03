@@ -9,6 +9,7 @@ SOURCES = ../common/directions_core.py \
           ../proc/isochrones_layer_proc.py \
           ../proc/isochrones_point_proc.py \
           ../proc/matrix_proc.py \
+	  ../proc/export_proc.py \
           ../gui/ORStoolsDialog.py \
           ../gui/ORStoolsDialogConfig.py
 

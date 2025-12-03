@@ -29,14 +29,15 @@
 
 from itertools import product
 from qgis.core import QgsPoint, QgsPointXY, QgsGeometry, QgsFeature, QgsFields, QgsField
-from typing import List
+from typing import List, Generator, Tuple, Any, Optional
 
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 
-from ORStools.utils import convert
+from ORStools.utils import convert, logger
+from ORStools.utils.wrapper import create_qgs_field
 
 
-def get_request_point_features(route_dict, row_by_row):
+def get_request_point_features(route_dict: dict, row_by_row: str) -> Generator[List, Tuple, None]:
     """
     Processes input point features depending on the layer to layer relation in directions settings
 
@@ -75,20 +76,22 @@ def get_request_point_features(route_dict, row_by_row):
 
 
 def get_fields(
-    from_type=QVariant.String,
-    to_type=QVariant.String,
-    from_name="FROM_ID",
-    to_name="TO_ID",
-    line=False,
-):
+    from_type: QMetaType.Type = QMetaType.Type.QString,
+    to_type: QMetaType.Type = QMetaType.Type.QString,
+    from_name: str = "FROM_ID",
+    to_name: str = "TO_ID",
+    line: bool = False,
+    extra_info: list = [],
+    two_layers: bool = False,
+) -> QgsField:
     """
     Builds output fields for directions response layer.
 
     :param from_type: field type for 'FROM_ID' field
-    :type from_type: QVariant enum
+    :type from_type: QMetaType enum
 
     :param to_type: field type for 'TO_ID' field
-    :type to_type: QVariant enum
+    :type to_type: QMetaType enum
 
     :param from_name: field name for 'FROM_ID' field
     :type from_name: str
@@ -104,21 +107,34 @@ def get_fields(
     """
 
     fields = QgsFields()
-    fields.append(QgsField("DIST_KM", QVariant.Double))
-    fields.append(QgsField("DURATION_H", QVariant.Double))
-    fields.append(QgsField("PROFILE", QVariant.String))
-    fields.append(QgsField("PREF", QVariant.String))
-    fields.append(QgsField("OPTIONS", QVariant.String))
-    fields.append(QgsField(from_name, from_type))
+    if not extra_info:
+        fields.append(create_qgs_field("DIST_KM", QMetaType.Type.Double))
+        fields.append(create_qgs_field("DURATION_H", QMetaType.Type.Double))
+        fields.append(create_qgs_field("PROFILE", QMetaType.Type.QString))
+        fields.append(create_qgs_field("PREF", QMetaType.Type.QString))
+        fields.append(create_qgs_field("OPTIONS", QMetaType.Type.QString))
+        fields.append(create_qgs_field(from_name, from_type))
     if not line:
-        fields.append(QgsField(to_name, to_type))
+        fields.append(create_qgs_field(to_name, to_type))
+    if two_layers:
+        fields.append(create_qgs_field(from_name, from_type))
+    for info in extra_info:
+        field_type = QMetaType.Type.Int
+        if info in ["waytype", "surface", "waycategory", "roadaccessrestrictions", "steepness"]:
+            field_type = QMetaType.Type.QString
+        fields.append(create_qgs_field(info.upper(), field_type))
 
     return fields
 
 
 def get_output_feature_directions(
-    response, profile, preference, options=None, from_value=None, to_value=None
-):
+    response: dict,
+    profile: str,
+    preference: str,
+    options: Optional[str] = None,
+    from_value: Any = None,
+    to_value: Any = None,
+) -> QgsFeature:
     """
     Build output feature based on response attributes for directions endpoint.
 
@@ -165,7 +181,9 @@ def get_output_feature_directions(
     return feat
 
 
-def get_output_features_optimization(response, profile, from_value=None):
+def get_output_features_optimization(
+    response: dict, profile: str, from_value: Any = None
+) -> QgsFeature:
     """
     Build output feature based on response attributes for optimization endpoint.
 
@@ -205,9 +223,10 @@ def get_output_features_optimization(response, profile, from_value=None):
 
 def build_default_parameters(
     preference: str,
-    point_list: List[QgsPointXY] = None,
-    coordinates: list = None,
-    options: dict = None,
+    point_list: Optional[List[QgsPointXY]] = None,
+    coordinates: Optional[list] = None,
+    options: Optional[dict] = None,
+    extra_info: Optional[list] = None,
 ) -> dict:
     """
     Build default parameters for directions endpoint. Either uses a list of QgsPointXY to create the coordinates
@@ -239,6 +258,48 @@ def build_default_parameters(
         "elevation": True,
         "id": None,
         "options": options,
+        "extra_info": extra_info,
     }
 
     return params
+
+
+def get_extra_info_features_directions(
+    response: dict, extra_info_order: List[str], to_from_values: Optional[list] = None
+):
+    extra_info_order = [
+        key if key != "waytype" else "waytypes" for key in extra_info_order
+    ]  # inconsistency in API
+    response_mini = response["features"][0]
+    coordinates = response_mini["geometry"]["coordinates"]
+    feats = list()
+    extra_info = response_mini["properties"]["extras"]
+    extras_list = {i: [] for i in extra_info_order}
+    for key in extra_info_order:
+        try:
+            values = extra_info[key]["values"]
+        except KeyError:
+            logger.log(f"{key} is not available as extra_info.")
+            continue
+        for val in values:
+            for i in range(val[0], val[1]):
+                value = convert.decode_extrainfo(key, val[2])
+                extras_list[key].append(value)
+
+    for i in range(len(coordinates) - 1):
+        feat = QgsFeature()
+        qgis_coords = [QgsPoint(x, y, z) for x, y, z in coordinates[i : i + 2]]
+        feat.setGeometry(QgsGeometry.fromPolyline(qgis_coords))
+        attrs = list()
+        for j in extras_list:
+            extra = extras_list[j]
+            attr = extra[i]
+            attrs.append(attr)
+
+        if to_from_values:  # for directions from two point layers
+            attrs = [to_from_values[0], to_from_values[1]] + attrs
+        feat.setAttributes(attrs)
+
+        feats.append(feat)
+
+    return feats

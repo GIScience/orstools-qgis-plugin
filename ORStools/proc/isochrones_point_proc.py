@@ -27,6 +27,9 @@
  ***************************************************************************/
 """
 
+from typing import Dict
+
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -35,27 +38,31 @@ from qgis.core import (
     QgsProcessingParameterEnum,
     QgsProcessingParameterPoint,
     QgsProcessingParameterNumber,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
 from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
+from ..utils.gui import GuiUtils
 
 
 # noinspection PyPep8Naming
 class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "isochrones_from_point"
-        self.GROUP = "Isochrones"
-        self.IN_POINT = "INPUT_POINT"
-        self.IN_METRIC = "INPUT_METRIC"
-        self.IN_RANGES = "INPUT_RANGES"
-        self.IN_KEY = "INPUT_APIKEY"
-        self.IN_DIFFERENCE = "INPUT_DIFFERENCE"
-        self.IN_SMOOTHING = "INPUT_SMOOTHING"
-        self.LOCATION_TYPE = "LOCATION_TYPE"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "isochrones_from_point"
+        self.GROUP: str = "Isochrones"
+        self.IN_POINT: str = "INPUT_POINT"
+        self.IN_METRIC: str = "INPUT_METRIC"
+        self.IN_RANGES: str = "INPUT_RANGES"
+        self.IN_KEY: str = "INPUT_APIKEY"
+        self.IN_DIFFERENCE: str = "INPUT_DIFFERENCE"
+        self.IN_SMOOTHING: str = "INPUT_SMOOTHING"
+        self.LOCATION_TYPE: str = "LOCATION_TYPE"
+        self.OUT_NAME: str = "Isochrones_Point"
+        self.PARAMETERS: list = [
             QgsProcessingParameterPoint(
                 name=self.IN_POINT,
                 description=self.tr(
@@ -117,8 +124,10 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
-    def processAlgorithm(self, parameters, context, feedback):
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
@@ -126,7 +135,9 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
 
         factor = 60 if dimension == "time" else 1
         ranges_raw = parameters[self.IN_RANGES]
-        ranges_proc = [x * factor for x in map(int, ranges_raw.split(","))]
+        ranges_proc = [x * factor for x in map(float, ranges_raw.split(","))]
+        # round to the nearest second or meter
+        ranges_proc = list(map(int, ranges_proc))
         smoothing = parameters[self.IN_SMOOTHING]
 
         options = self.parseOptions(parameters, context)
@@ -154,14 +165,19 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             self.OUT,
             context,
             self.isochrones.get_fields(),
-            QgsWkbTypes.Polygon,
+            QgsWkbTypes.Type.Polygon,
             # Needs Multipolygon if difference parameter will ever be
             # reactivated
             self.crs_out,
         )
 
         try:
-            response = ors_client.request("/v2/isochrones/" + profile, {}, post_json=params)
+            endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                "isochrones"
+            ]
+            response = ors_client.fetch_with_retry(
+                f"/v2/{endpoint}/{profile}", {}, post_json=params
+            )
 
             # Populate features from response
             for isochrone in self.isochrones.get_features(response, params["id"]):
@@ -175,7 +191,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: self.dest_id}
 
     # noinspection PyUnusedLocal
-    def postProcessAlgorithm(self, context, feedback):
+    def postProcessAlgorithm(self, context, feedback) -> Dict[str, str]:
         """Style polygon layer in post-processing step."""
         processed_layer = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
         self.isochrones.stylePoly(processed_layer)
@@ -188,3 +204,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Isochrones from Point")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_isochrones.png")
+        return QIcon(icon_path)

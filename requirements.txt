@@ -1,1 +1,8 @@
+# developement
 ruff
+pytest
+pre-commit
+
+# testing
+pyyaml
+pytest

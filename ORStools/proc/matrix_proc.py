@@ -27,39 +27,47 @@
  ***************************************************************************/
 """
 
+from typing import Dict
+
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsWkbTypes,
     QgsFeature,
     QgsProcessing,
     QgsFields,
-    QgsField,
     QgsProcessingException,
     QgsProcessingParameterField,
     QgsProcessingParameterFeatureSource,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
-from PyQt5.QtCore import QVariant
+from ORStools.utils.wrapper import create_qgs_field
+
+from qgis.PyQt.QtCore import QMetaType
 
 from ORStools.common import PROFILES
 from ORStools.utils import transform, exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
+from ..utils.gui import GuiUtils
 
 
 # noinspection PyPep8Naming
 class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     def __init__(self):
         super().__init__()
-        self.ALGO_NAME = "matrix_from_layers"
-        self.GROUP = "Matrix"
-        self.IN_START = "INPUT_START_LAYER"
-        self.IN_START_FIELD = "INPUT_START_FIELD"
-        self.IN_END = "INPUT_END_LAYER"
-        self.IN_END_FIELD = "INPUT_END_FIELD"
-        self.PARAMETERS = [
+        self.ALGO_NAME: str = "matrix_from_layers"
+        self.GROUP: str = "Matrix"
+        self.IN_START: str = "INPUT_START_LAYER"
+        self.IN_START_FIELD: str = "INPUT_START_FIELD"
+        self.IN_END: str = "INPUT_END_LAYER"
+        self.IN_END_FIELD: str = "INPUT_END_FIELD"
+        self.OUT_NAME: str = "Route_Matrix"
+        self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_START,
                 description=self.tr("Input Start Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_START_FIELD,
@@ -71,7 +79,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 name=self.IN_END,
                 description=self.tr("Input End Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             QgsProcessingParameterField(
                 name=self.IN_END_FIELD,
@@ -99,8 +107,10 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             ),
         )
 
-    def processAlgorithm(self, parameters, context, feedback):
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
+        ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
@@ -123,7 +133,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         # Abort when MultiPoint type
         if (
             QgsWkbTypes.flatType(source.wkbType()) or QgsWkbTypes.flatType(destination.wkbType())
-        ) == QgsWkbTypes.MultiPoint:
+        ) == QgsWkbTypes.Type.MultiPoint:
             raise QgsProcessingException(
                 "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer."
             )
@@ -186,7 +196,10 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
 
         # Make request and catch ApiError
         try:
-            response = ors_client.request("/v2/matrix/" + profile, {}, post_json=params)
+            endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])["matrix"]
+            response = ors_client.fetch_with_retry(
+                f"/v2/{endpoint}/{profile}", {}, post_json=params
+            )
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
             msg = f"{e.__class__.__name__}: {str(e)}"
@@ -194,7 +207,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             logger.log(msg)
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUT, context, sink_fields, QgsWkbTypes.NoGeometry
+            parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.NoGeometry
         )
 
         sources_attributes = [
@@ -227,12 +240,12 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
     # TODO working source_type and destination_type differ in both name and type from get_fields in directions_core.
     #  Change to be consistent
     @staticmethod
-    def get_fields(source_type=QVariant.Int, destination_type=QVariant.Int):
+    def get_fields(source_type=QMetaType.Type.Int, destination_type=QMetaType.Type.Int):
         fields = QgsFields()
-        fields.append(QgsField("FROM_ID", source_type))
-        fields.append(QgsField("TO_ID", destination_type))
-        fields.append(QgsField("DURATION_H", QVariant.Double))
-        fields.append(QgsField("DIST_KM", QVariant.Double))
+        fields.append(create_qgs_field("FROM_ID", source_type))
+        fields.append(create_qgs_field("TO_ID", destination_type))
+        fields.append(create_qgs_field("DURATION_H", QMetaType.Type.Double))
+        fields.append(create_qgs_field("DIST_KM", QMetaType.Type.Double))
 
         return fields
 
@@ -242,3 +255,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Matrix from Layers")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_matrix.png")
+        return QIcon(icon_path)

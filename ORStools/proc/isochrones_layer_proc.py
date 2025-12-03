@@ -27,6 +27,9 @@
  ***************************************************************************/
 """
 
+from typing import Dict
+
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsWkbTypes,
     QgsCoordinateReferenceSystem,
@@ -38,11 +41,14 @@ from qgis.core import (
     QgsProcessingParameterString,
     QgsProcessingParameterEnum,
     QgsProcessingParameterNumber,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
 )
 
 from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ORStools.utils import transform, exceptions, logger
+from ORStools.utils.gui import GuiUtils
 
 
 # noinspection PyPep8Naming
@@ -52,20 +58,21 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         self.ALGO_NAME = "isochrones_from_layer"
         self.GROUP = "Isochrones"
 
-        self.IN_POINTS = "INPUT_POINT_LAYER"
-        self.IN_FIELD = "INPUT_FIELD"
-        self.IN_METRIC = "INPUT_METRIC"
-        self.IN_RANGES = "INPUT_RANGES"
-        self.IN_KEY = "INPUT_APIKEY"
-        self.IN_DIFFERENCE = "INPUT_DIFFERENCE"
-        self.USE_SMOOTHING = "USE_SMOOTHING"
-        self.IN_SMOOTHING = "INPUT_SMOOTHING"
-        self.LOCATION_TYPE = "LOCATION_TYPE"
-        self.PARAMETERS = [
+        self.IN_POINTS: str = "INPUT_POINT_LAYER"
+        self.IN_FIELD: str = "INPUT_FIELD"
+        self.IN_METRIC: str = "INPUT_METRIC"
+        self.IN_RANGES: str = "INPUT_RANGES"
+        self.IN_KEY: str = "INPUT_APIKEY"
+        self.IN_DIFFERENCE: str = "INPUT_DIFFERENCE"
+        self.USE_SMOOTHING: str = "USE_SMOOTHING"
+        self.IN_SMOOTHING: str = "INPUT_SMOOTHING"
+        self.LOCATION_TYPE: str = "LOCATION_TYPE"
+        self.OUT_NAME: str = "Isochrones_Layer"
+        self.PARAMETERS: list = [
             QgsProcessingParameterFeatureSource(
                 name=self.IN_POINTS,
                 description=self.tr("Input Point layer"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             ),
             # QgsProcessingParameterBoolean(
             #     name=self.IN_DIFFERENCE,
@@ -139,8 +146,10 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.prepareAlgorithm
-    def processAlgorithm(self, parameters, context, feedback):
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+    def processAlgorithm(
+        self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
@@ -148,7 +157,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         factor = 60 if dimension == "time" else 1
         ranges_raw = parameters[self.IN_RANGES]
-        ranges_proc = [x * factor for x in map(int, ranges_raw.split(","))]
+        ranges_proc = [x * factor for x in map(float, ranges_raw.split(","))]
+        # round to the nearest second or meter
+        ranges_proc = list(map(int, ranges_proc))
         smoothing = parameters[self.IN_SMOOTHING]
 
         # self.difference = self.parameterAsBool(parameters, self.IN_DIFFERENCE, context)
@@ -159,7 +170,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
 
         # Make the actual requests
         requests = []
-        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.MultiPoint:
+        if QgsWkbTypes.flatType(source.wkbType()) == QgsWkbTypes.Type.MultiPoint:
             raise QgsProcessingException(
                 "TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer."
             )
@@ -199,7 +210,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             self.OUT,
             context,
             self.isochrones.get_fields(),
-            QgsWkbTypes.Polygon,
+            QgsWkbTypes.Type.Polygon,
             # Needs Multipolygon if difference parameter will ever be
             # reactivated
             self.crs_out,
@@ -212,7 +223,12 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             # If feature causes error, report and continue with next
             try:
                 # Populate features from response
-                response = ors_client.request("/v2/isochrones/" + profile, {}, post_json=params)
+                endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
+                    "isochrones"
+                ]
+                response = ors_client.fetch_with_retry(
+                    f"/v2/{endpoint}/{profile}", {}, post_json=params
+                )
 
                 for isochrone in self.isochrones.get_features(response, params["id"]):
                     sink.addFeature(isochrone)
@@ -227,7 +243,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         return {self.OUT: self.dest_id}
 
     # noinspection PyUnusedLocal
-    def postProcessAlgorithm(self, context, feedback):
+    def postProcessAlgorithm(
+        self, context: QgsProcessingContext, feedback: QgsProcessingFeedback
+    ) -> Dict[str, str]:
         """Style polygon layer in post-processing step."""
         # processed_layer = self.isochrones.calculate_difference(self.dest_id, context)
         processed_layer = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
@@ -261,3 +279,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
         :return:
         """
         return self.tr("Isochrones from Point-Layer")
+
+    def icon(self):
+        icon_path = GuiUtils.get_icon("icon_isochrones.png")
+        return QIcon(icon_path)
