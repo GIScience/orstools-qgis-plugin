@@ -74,6 +74,9 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
+        self.setToolTip(self.PARAMETERS[0], self.tr("Select input point from map view."))
+        self.setToolTip(self.PARAMETERS[1], self.tr("The radius in which to search for points. Note: usually, a limit is configured."))
+
     crs_out = QgsCoordinateReferenceSystem.fromEpsgId(4326)
 
     def processAlgorithm(
