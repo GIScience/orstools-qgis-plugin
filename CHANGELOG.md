@@ -40,7 +40,6 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-<<<<<<< HEAD
 ## Unreleased
 
 ### Added
