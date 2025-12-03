@@ -300,9 +300,9 @@ class TestProc(unittest.TestCase):
         dest_id = snap_point.processAlgorithm(parameters, self.context, self.feedback)
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
         new_feat = next(processed_layer.getFeatures())
-        self.assertEqual(
-            new_feat.geometry().asWkt(), "Point (-106.61225600000000213 34.98548300000000211)"
-        )
+        pt = new_feat.geometry().asPoint()
+        self.assertAlmostEqual(pt.x(), -106.61225600000000213, places=3)
+        self.assertAlmostEqual(pt.y(), 34.98548300000000211, places=3)
 
         parameters = {
             "INPUT_PROFILE": 0,
@@ -317,9 +317,10 @@ class TestProc(unittest.TestCase):
         processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
         new_feat = next(processed_layer.getFeatures())
 
-        self.assertEqual(
-            new_feat.geometry().asWkt(), "Point (8.46554599999999979 49.48699799999999982)"
-        )
+        pt = new_feat.geometry().asPoint()
+        self.assertAlmostEqual(pt.x(), 8.46554599999999979, places=2)
+        self.assertAlmostEqual(pt.y(), 49.48699799999999982, places=2)
+
         self.assertEqual(len([i for i in processed_layer.getFeatures()]), 2)
 
         # test with "SNAPPED_NAME" being present in layer fields

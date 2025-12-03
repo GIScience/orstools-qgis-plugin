@@ -49,7 +49,6 @@ from ..utils.gui import GuiUtils
 from ..utils.wrapper import create_qgs_field
 
 
-from ORStools.common import PROFILES
 from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 
@@ -80,7 +79,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
 
         target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
         rect = self.parameterAsExtent(parameters, self.IN_EXPORT, context, crs=target_crs)
@@ -152,7 +151,16 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
                 sink_point.addFeature(point_feat)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            msg = f"{e.__class__.__name__}: {str(e)}"
+            if (
+                isinstance(e, exceptions.ApiError)
+                and "Parameter 'profile' has incorrect value" in e.message
+            ):
+                provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                msg = self.tr(
+                    f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                )
+            else:
+                msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 

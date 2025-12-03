@@ -42,7 +42,6 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
 )
 
-from ORStools.common import PROFILES
 from ORStools.utils.gui import GuiUtils
 from ORStools.utils.processing import get_snapped_point_features
 from ORStools.proc.base_processing_algorithm import ORSBaseProcessingAlgorithm
@@ -79,7 +78,7 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
         ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
 
         # Get parameter values
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
@@ -131,7 +130,16 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
                 sink.addFeature(feat)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            msg = f"{e.__class__.__name__}: {str(e)}"
+            if (
+                isinstance(e, exceptions.ApiError)
+                and "Parameter 'profile' has incorrect value" in e.message
+            ):
+                provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                msg = self.tr(
+                    f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                )
+            else:
+                msg = f"{e.__class__.__name__}: {str(e)}"
             feedback.reportError(msg)
             logger.log(msg)
 

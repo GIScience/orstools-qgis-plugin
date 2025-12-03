@@ -48,7 +48,7 @@ from qgis.PyQt.QtGui import QIcon
 
 from ORStools import RESOURCE_PREFIX, __help__
 from ORStools.utils import configmanager
-from ..common import client, PROFILES, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
+from ..common import client, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
 from ..utils.processing import read_help_file
 from ..gui.directions_gui import _get_avoid_polygons
 
@@ -73,6 +73,10 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         self.OUT = "OUTPUT"
         self.OUT_NAME = "ORSTOOLS_OUTPUT"
         self.PARAMETERS = None
+
+        self.providers = configmanager.read_config()["providers"]
+        profiles_list = [provider["profiles"] for provider in self.providers]
+        self.profiles = list(set(element for sublist in profiles_list for element in sublist))
 
     def createInstance(self) -> Any:
         """
@@ -120,7 +124,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for provider, used in all child classes
         """
-        providers = [provider["name"] for provider in configmanager.read_config()["providers"]]
+        providers = [provider["name"] for provider in self.providers]
         return QgsProcessingParameterEnum(
             self.IN_PROVIDER,
             self.tr("Provider", "ORSBaseProcessingAlgorithm"),
@@ -132,11 +136,12 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Parameter definition for profile, used in all child classes
         """
+
         return QgsProcessingParameterEnum(
             self.IN_PROFILE,
             self.tr("Travel mode", "ORSBaseProcessingAlgorithm"),
-            PROFILES,
-            defaultValue=PROFILES[0],
+            self.profiles,
+            defaultValue=self.profiles[0],
         )
 
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:

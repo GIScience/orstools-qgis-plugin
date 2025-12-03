@@ -42,7 +42,7 @@ from qgis.core import (
     QgsProcessingFeedback,
 )
 
-from ORStools.common import isochrones_core, PROFILES, DIMENSIONS, LOCATION_TYPES
+from ORStools.common import isochrones_core, DIMENSIONS, LOCATION_TYPES
 from ORStools.utils import exceptions, logger
 from .base_processing_algorithm import ORSBaseProcessingAlgorithm
 from ..utils.gui import GuiUtils
@@ -111,7 +111,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
     ) -> Dict[str, str]:
         ors_client = self.get_client(parameters, context, feedback)
 
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
         location_type = dict(enumerate(LOCATION_TYPES))[parameters[self.LOCATION_TYPE]]
 
@@ -166,7 +166,16 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
                 sink.addFeature(isochrone)
 
         except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:
-            msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
+            if (
+                isinstance(e, exceptions.ApiError)
+                and "Parameter 'profile' has incorrect value" in e.message
+            ):
+                provider = self.providers[parameters[self.IN_PROVIDER]]["name"]
+                msg = self.tr(
+                    f'The selected profile "{profile}" is not available in the chosen provider "{provider}"'
+                )
+            else:
+                msg = f"Feature ID {params['id']} caused a {e.__class__.__name__}:\n{str(e)}"
             feedback.reportError(msg)
             logger.log(msg, 2)
 

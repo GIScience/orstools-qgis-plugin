@@ -27,7 +27,12 @@
  ***************************************************************************/
 """
 
-from qgis.gui import QgsCollapsibleGroupBox
+import json
+
+from PyQt5.QtCore import QUrl
+from PyQt5.QtNetwork import QNetworkRequest
+from qgis._core import QgsBlockingNetworkRequest
+from qgis.gui import QgsCollapsibleGroupBox, QgsNewNameDialog
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QMetaObject
@@ -36,11 +41,18 @@ from qgis.PyQt.QtWidgets import (
     QInputDialog,
     QLineEdit,
     QDialogButtonBox,
+    QMessageBox,
+    QWidget,
+    QListWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
 )
 from qgis.PyQt.QtGui import QIntValidator
 
 from ORStools.utils import configmanager, gui
 from ..proc import ENDPOINTS, DEFAULT_SETTINGS
+from ..common import PROFILES
 
 CONFIG_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogConfigUI.ui"))
 
@@ -74,7 +86,10 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
 
         collapsible_boxes = self.providers.findChildren(QgsCollapsibleGroupBox)
         collapsible_boxes = [
-            i for i in collapsible_boxes if "_provider_endpoints" not in i.objectName()
+            i
+            for i in collapsible_boxes
+            if "_provider_endpoints" not in i.objectName()
+            and "_provider_profiles" not in i.objectName()
         ]
         for idx, box in enumerate(collapsible_boxes):
             current_provider = self.temp_config["providers"][idx]
@@ -117,6 +132,12 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
                     QtWidgets.QLineEdit, box.title() + "_snapping_endpoint"
                 ).text(),
             }
+            profile_box = box.findChild(QgsCollapsibleGroupBox, f"{box.title()}_provider_profiles")
+
+            list_widget = profile_box.findChild(QListWidget)
+            current_provider["profiles"] = [
+                list_widget.item(i).text() for i in range(list_widget.count())
+            ]
 
         configmanager.write_config(self.temp_config)
         self.close()
@@ -148,6 +169,7 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
                 provider_entry["key"],
                 provider_entry["timeout"],
                 provider_entry["endpoints"],
+                provider_entry["profiles"],
                 new=False,
             )
 
@@ -167,7 +189,9 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             self, self.tr("New ORS provider"), self.tr("Enter a name for the provider")
         )
         if ok:
-            self._add_box(provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, new=True)
+            self._add_box(
+                provider_name, "http://localhost:8082/ors", "", 60, ENDPOINTS, PROFILES, new=True
+            )
 
     def _remove_provider(self) -> None:
         """Remove list of providers from list."""
@@ -197,15 +221,57 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         for box in collapsible_boxes:
             box.setCollapsed(True)
 
+    def _reset_all_providers(self) -> None:
+        """Reset all providers."""
+
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setWindowTitle("Confirm Reset")
+        msg_box.setText(
+            "Are you sure you want to delete all providers? This action cannot be undone."
+        )
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+        result = msg_box.exec()
+        if result == QMessageBox.Yes:
+            for box_remove in self.providers.findChildren(QWidget):
+                if box_remove.objectName() in ["_provider_endpoints", "_provider_profiles"]:
+                    continue
+                self.verticalLayout.removeWidget(box_remove)
+                box_remove.setParent(None)
+                box_remove.deleteLater()
+
+            configmanager.write_config(DEFAULT_SETTINGS)
+
+            self.temp_config = configmanager.read_config()
+            self._build_ui()
+
+        else:
+            pass
+
     def _add_box(
-        self, name: str, url: str, key: str, timeout: int, endpoints: dict, new: bool = False
+        self,
+        name: str,
+        url: str,
+        key: str,
+        timeout: int,
+        endpoints: dict,
+        profiles: dict,
+        new: bool = False,
     ) -> None:
         """
         Adds a provider box to the QWidget layout and self.temp_config.
         """
         if new:
             self.temp_config["providers"].append(
-                dict(name=name, base_url=url, key=key, timeout=timeout, endpoints=endpoints)
+                dict(
+                    name=name,
+                    base_url=url,
+                    key=key,
+                    timeout=timeout,
+                    endpoints=endpoints,
+                    profiles=profiles,
+                )
             )
 
         provider = QgsCollapsibleGroupBox(self.providers)
@@ -266,10 +332,52 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
             endpoint_lineedit.setObjectName(f"{name}_{endpoint_name}_endpoint")
 
             endpoint_layout.addWidget(endpoint_lineedit, row, 1, 1, 3)
-
             row += 1
 
-        # Add reset buttons at the bottom
+        reset_endpoints_button = QtWidgets.QPushButton(self.tr("Reset Endpoints"), provider)
+        reset_endpoints_button.setObjectName(name + "_reset_endpoints_button")
+        reset_endpoints_button.clicked.connect(self._reset_endpoints)
+        endpoint_layout.addWidget(reset_endpoints_button)
+
+        # Profile Section
+        profile_box = QgsCollapsibleGroupBox(provider)
+        profile_box.setObjectName(name + "_provider_profiles")
+        profile_box.setTitle(self.tr("Profiles"))
+        profile_layout = QHBoxLayout(profile_box)
+
+        list_widget_profiles = QListWidget(profile_box)
+        list_widget_profiles.addItems(profiles)
+        profile_layout.addWidget(list_widget_profiles)
+
+        button_layout = QVBoxLayout()
+        add_profile_button = QPushButton(self.tr("+"), profile_box)
+        remove_profile_button = QPushButton(self.tr("-"), profile_box)
+        load_profiles_button = QPushButton(self.tr("Load profiles"), profile_box)
+        restore_defaults_button = QPushButton(self.tr("Restore defaults"), profile_box)
+
+        add_profile_button.clicked.connect(
+            lambda: self.add_profile_button_clicked(add_profile_button)
+        )
+        remove_profile_button.clicked.connect(
+            lambda: self.remove_profile_button_clicked(remove_profile_button)
+        )
+        load_profiles_button.clicked.connect(
+            lambda: self.load_profiles_button_clicked(load_profiles_button)
+        )
+        restore_defaults_button.clicked.connect(
+            lambda: self.restore_defaults_button_clicked(restore_defaults_button)
+        )
+
+        button_layout.addWidget(add_profile_button)
+        button_layout.addWidget(remove_profile_button)
+        button_layout.addWidget(load_profiles_button)
+        button_layout.addWidget(restore_defaults_button)
+
+        profile_layout.addLayout(button_layout)
+
+        gridLayout_3.addWidget(profile_box, 7, 0, 1, 4)
+
+        # 6. Reset buttons section
         button_layout = QtWidgets.QHBoxLayout()
 
         reset_url_button = QtWidgets.QPushButton(self.tr("Reset URL"), provider)
@@ -279,14 +387,62 @@ class ORStoolsDialogConfigMain(QDialog, CONFIG_WIDGET):
         )
         button_layout.addWidget(reset_url_button)
 
-        reset_endpoints_button = QtWidgets.QPushButton(self.tr("Reset Endpoints"), provider)
-        reset_endpoints_button.setObjectName(name + "_reset_endpoints_button")
-        reset_endpoints_button.clicked.connect(self._reset_endpoints)
-        button_layout.addWidget(reset_endpoints_button)
-
-        gridLayout_3.addLayout(button_layout, 7, 0, 1, 4)
+        gridLayout_3.addLayout(button_layout, 8, 0, 1, 4)  # (8, 0–3)
 
         self.verticalLayout.addWidget(provider)
+
+    def add_profile_button_clicked(self, button: QPushButton) -> None:
+        dlg = QgsNewNameDialog("Enter profile name", "New Profile")
+        list_widget = button.parent().findChild(QListWidget)
+        if dlg.exec_():
+            profile_name = dlg.name()
+            if profile_name:
+                list_widget.addItem(profile_name)
+
+    def remove_profile_button_clicked(self, button: QPushButton) -> None:
+        list_widget = button.parent().findChild(QListWidget)
+        selected = list_widget.selectedItems()
+        if selected:
+            for item in selected:
+                list_widget.takeItem(list_widget.row(item))
+        else:
+            list_widget.takeItem(0)
+
+    def load_profiles_button_clicked(self, button: QPushButton) -> None:
+        list_widget = button.parent().findChild(QListWidget)
+        grand_parent = button.parent().parent()
+        base_url = None
+        for child in grand_parent.findChildren(QLineEdit):
+            if "_base_url_text" in child.objectName():
+                base_url = child.text()
+
+        url = f"{base_url}/v2/status"
+
+        if "api.openrouteservice.org" in url:
+            QMessageBox.warning(
+                self,
+                "Load profiles not possible",
+                "Load profiles not possible, please use 'Restore Defaults' for the openrouteservice live API",
+            )
+            return
+
+        request = QgsBlockingNetworkRequest()
+        print(url)
+        error_code = request.get(QNetworkRequest(QUrl(url)))
+
+        if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+            reply = request.reply()
+            content = json.loads(reply.content().data().decode("utf-8"))
+            list_widget.addItems([i for i in content["profiles"].keys()])
+        else:
+            QMessageBox.warning(
+                self, "Unable to load profiles", "There was an error loading the profiles."
+            )
+
+    def restore_defaults_button_clicked(self, button: QPushButton) -> None:
+        list_widget = button.parent().findChild(QListWidget)
+        list_widget.clear()
+        list_widget.addItems(PROFILES)
 
     def _reset_endpoints(self) -> None:
         """Resets the endpoints to their original values."""
