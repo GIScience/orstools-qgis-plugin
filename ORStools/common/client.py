@@ -33,6 +33,7 @@ from datetime import datetime, timedelta
 from typing import Union, Dict, List, Optional
 from urllib.parse import urlencode
 
+
 from qgis.PyQt.QtCore import QObject, pyqtSignal, QUrl, QTimer, QEventLoop
 from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.core import QgsSettings, QgsBlockingNetworkRequest
