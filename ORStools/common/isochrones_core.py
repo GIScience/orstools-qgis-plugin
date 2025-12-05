@@ -203,7 +203,10 @@ class Isochrones:
 
         n = len(unique_values)
         max_position = 0.7 if n < 10 else 1.0
-        colors = [color_ramp.color(i / (n - 1) * max_position) if n > 1 else color_ramp.color(0) for i in range(n)]
+        colors = [
+            color_ramp.color(i / (n - 1) * max_position) if n > 1 else color_ramp.color(0)
+            for i in range(n)
+        ]
 
         categories = []
 
