@@ -58,37 +58,37 @@
     <message>
         <location filename="../proc/base_processing_algorithm.py" line="131"/>
         <source>Select the provider that should be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dienst auswählen, der genutzt werden soll.</translation>
     </message>
     <message>
         <location filename="../proc/base_processing_algorithm.py" line="146"/>
         <source>Select a mode of travel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verkehrsmittel auswählen.</translation>
     </message>
     <message>
         <location filename="../proc/base_processing_algorithm.py" line="159"/>
         <source>Select where the output should be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswählen, wo Ausgabe gespeichert werden soll.</translation>
     </message>
     <message>
         <location filename="../proc/base_processing_algorithm.py" line="197"/>
         <source>Select features that should be avoided by the algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Features auswählen, die vermeidet werden sollen</translation>
     </message>
     <message>
         <location filename="../proc/base_processing_algorithm.py" line="200"/>
         <source>Select borders that should be avoided by the algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Grenzen auswählen, die vermeidet werden sollen.</translation>
     </message>
     <message>
         <location filename="../proc/base_processing_algorithm.py" line="203"/>
         <source>Select countries that should be avoided by the algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Länder auswählen, die vermeidet werden sollen.</translation>
     </message>
     <message>
         <location filename="../proc/base_processing_algorithm.py" line="206"/>
         <source>Select polygons that should be avoided by the algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Polygone auswählen, die vermeidet werden sollen.</translation>
     </message>
 </context>
 <context>
@@ -141,17 +141,17 @@
     <message>
         <location filename="../proc/directions_lines_proc.py" line="129"/>
         <source>Values will transfer to the output layer and can be used to join layers or group features afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werte werden ins Ausgabe-Layer übernommen und können genutzt werden, um Layer zu joinen oder Features zu gruppieren.</translation>
     </message>
     <message>
         <location filename="../proc/directions_lines_proc.py" line="135"/>
         <source>Dictates the cost. For longer routes don&apos;t use Shortest Path.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für lange routen nicht &quot;kürzeste&quot; nutzen.</translation>
     </message>
     <message>
         <location filename="../proc/directions_lines_proc.py" line="139"/>
         <source>You can optionally perform a Traveling Salesman on the waypoints of each MultiPoint feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest Advanced Parameters: see the documentation for descriptions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Optional kann das Problem des Handlungsreisenden für den Wegpunkt jedes Multi-Point feautres gelöst werden. Ignoriert alle anderen Konfigurationen.</translation>
     </message>
 </context>
 <context>
@@ -218,27 +218,27 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="135"/>
         <source>Point or MultiPoint layer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkt -oder Multi-Punkt-Layer.</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="136"/>
         <source>Values will transfer to the output layer and can be used to join layers or group features afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werte werden ins Ausgabe-Layer übernommen und können genutzt werden, um Layer zu joinen oder Features zu gruppieren.</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="142"/>
         <source>Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x).</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkte werden entsprechend dem Wert dieses Feldes sortiert, bevor der Algorithmus läuft. (Achtung: Text-Felder werden alphabetisch sortiert: 1, 13, 2, D, a, x).</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="148"/>
         <source>Dictates the cost. For longer routes don&apos;t use Shortest Path.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für lange routen nicht &quot;kürzeste&quot; nutzen.</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layer_proc.py" line="152"/>
         <source>You can optionally perform a Traveling Salesman Optimization on the waypoints of each (Multi)Point feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest.</source>
-        <translation type="unfinished"></translation>
+        <translation>Optional kann das Problem des Handlungsreisenden für den Wegpunkt jedes (Multi)-Point Features gelöst werden. Ignoriert alle anderen Konfigurationen.</translation>
     </message>
 </context>
 <context>
@@ -306,27 +306,27 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/directions_points_layers_proc.py" line="146"/>
         <source>Only Point layers are allowed, not MultiPoint.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur Punkt-Layer erlaubt, kein MultiPunkt.</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layers_proc.py" line="162"/>
         <source>Values will transfer to the output layer and can be used to join layers or group features afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werte werden ins Ausgabe-Layer übernommen und können genutzt werden, um Layer zu joinen oder Features zu gruppieren.</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layers_proc.py" line="168"/>
         <source>Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkte werden entsprechend dem Wert dieses Feldes sortiert, bevor der Algorithmus läuft. (Achtung: Text-Felder werden alphabetisch sortiert: 1, 13, 2, D, a, x)</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layers_proc.py" line="174"/>
         <source>Dictates the cost. For longer routes don&apos;t use Shortest Path.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für lange routen nicht &quot;kürzeste&quot; nutzen.</translation>
     </message>
     <message>
         <location filename="../proc/directions_points_layers_proc.py" line="178"/>
         <source>Either &apos;row-by-row&apos; until one layers has no more features or &apos;all-by-all&apos; for every feature combination</source>
-        <translation type="unfinished"></translation>
+        <translation>Entweder &apos;Zeile für Zeile&apos; bis ein Layer keine Features mehr hat, oder &apos;Alle mal Alle&apos; für jede Feature-Kombination</translation>
     </message>
 </context>
 <context>
@@ -344,12 +344,12 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/export_proc.py" line="77"/>
         <source>Extent for which to export the graph.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausdehnung des exportierten Graphen.</translation>
     </message>
     <message>
         <location filename="../proc/export_proc.py" line="78"/>
         <source>Name of the exported point layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Name des exportierten Punkt-Layers</translation>
     </message>
 </context>
 <context>
@@ -392,27 +392,27 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/isochrones_layer_proc.py" line="114"/>
         <source>Only Point layers are allowed, not MultiPoint.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur Punkt-Layer erlaubt, kein MultiPunkt.</translation>
     </message>
     <message>
         <location filename="../proc/isochrones_layer_proc.py" line="117"/>
         <source>Values will transfer to the output layer and can be used to join layers or group features afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werte werden ins Ausgabe-Layer übernommen und können genutzt werden, um Layer zu joinen oder Features zu gruppieren.</translation>
     </message>
     <message>
         <location filename="../proc/isochrones_layer_proc.py" line="123"/>
         <source>Parameter needs to be a comma-separated list of integer values, no decimal points.</source>
-        <translation type="unfinished"></translation>
+        <translation>Parameter muss eine komma-getrennte Liste von Ganzzahlen sein, keine Dezimal-Punkte.</translation>
     </message>
     <message>
         <location filename="../proc/isochrones_layer_proc.py" line="129"/>
         <source>Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100.</source>
-        <translation type="unfinished"></translation>
+        <translation>Generalisiert das Isochronen-Vieleck entsprechend eines &apos;smoothing_factors&apos; zwischen 0 und 100.</translation>
     </message>
     <message>
         <location filename="../proc/isochrones_layer_proc.py" line="135"/>
         <source>Start treats the location(s) as starting point, destination as goal.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;start&apos; behandelt die Orte als Startpunkte, &apos;destination&apos; als Zielpunkte.</translation>
     </message>
 </context>
 <context>
@@ -450,22 +450,22 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/isochrones_point_proc.py" line="100"/>
         <source>Choose a Point from the map.</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkt aus der Kartenansicht wählen.</translation>
     </message>
     <message>
         <location filename="../proc/isochrones_point_proc.py" line="101"/>
         <source>Parameter needs to be a comma-separated list of integer values, no decimal points.</source>
-        <translation type="unfinished"></translation>
+        <translation>Parameter muss eine komma-getrennte Liste von Ganzzahlen sein, keine Dezimal-Punkte.</translation>
     </message>
     <message>
         <location filename="../proc/isochrones_point_proc.py" line="107"/>
         <source>Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100.</source>
-        <translation type="unfinished"></translation>
+        <translation>Generalisiert das Isochronen-Vieleck entsprechend eines &apos;smoothing_factors&apos; zwischen 0 und 100.</translation>
     </message>
     <message>
         <location filename="../proc/isochrones_point_proc.py" line="113"/>
         <source>Start treats the location(s) as starting point, destination as goal.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;start&apos; behandelt die Orte als Startpunkte, &apos;destination&apos; als Zielpunkte.</translation>
     </message>
 </context>
 <context>
@@ -498,12 +498,12 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/matrix_proc.py" line="93"/>
         <source>Only Point layers are allowed, not MultiPoint.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur Punkt-Layer erlaubt, kein MultiPunkt.</translation>
     </message>
     <message>
         <location filename="../proc/matrix_proc.py" line="103"/>
         <source>Values will transfer to the output layer and can be used to join layers or group features afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werte werden ins Ausgabe-Layer übernommen und können genutzt werden, um Layer zu joinen oder Features zu gruppieren.</translation>
     </message>
 </context>
 <context>
@@ -511,27 +511,27 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/snap_layer_proc.py" line="64"/>
         <source>Input Point Layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingabelayer (Punkte)</translation>
     </message>
     <message>
         <location filename="../proc/snap_layer_proc.py" line="69"/>
         <source>Search Radius [m]</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchradius [m]</translation>
     </message>
     <message>
         <location filename="../proc/snap_layer_proc.py" line="76"/>
         <source>The radius in which to search for points. Note: usually, a limit is configured.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Radius in dem nach Punkten gesucht wird. Achtung: üblicherweise ist dienstseitig ein Limit konfiguriert.</translation>
     </message>
     <message>
         <location filename="../proc/snap_layer_proc.py" line="116"/>
         <source>Source layer may not contain field names &quot;SNAPPED_DISTANCE&quot; or &quot;SNAPPED_NAME&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Quell-Layer darf kein Feld namens &quot;SNAPPED_DISTANCE&quot; oder &quot;SNAPPED_NAME&quot; beinhalten</translation>
     </message>
     <message>
         <location filename="../proc/snap_layer_proc.py" line="152"/>
         <source>Snap from Point Layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Von Punkt-Layer einrasten</translation>
     </message>
 </context>
 <context>
@@ -539,27 +539,27 @@ Duplikate entfernen oder Wegpunktoptimierung abwählen.</translation>
     <message>
         <location filename="../proc/snap_point_proc.py" line="63"/>
         <source>Input Point from map canvas (mutually exclusive with layer option)</source>
-        <translation type="unfinished">Eingabepunkt aus Kartenansicht (schließt Ebenen-Option aus)</translation>
+        <translation>Eingabepunkt aus Kartenansicht (schließt Ebenen-Option aus)</translation>
     </message>
     <message>
         <location filename="../proc/snap_point_proc.py" line="70"/>
         <source>Search Radius [m]</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchradius [m]</translation>
     </message>
     <message>
         <location filename="../proc/snap_point_proc.py" line="77"/>
         <source>Select input point from map view.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wegpunkte aus Kartenansicht auswählen.</translation>
     </message>
     <message>
         <location filename="../proc/snap_point_proc.py" line="78"/>
         <source>The radius in which to search for points. Note: usually, a limit is configured.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Radius in dem nach Punkten gesucht wird. Achtung: üblicherweise ist dienstseitig ein Limit konfiguriert.</translation>
     </message>
     <message>
         <location filename="../proc/snap_point_proc.py" line="138"/>
         <source>Snap from Point</source>
-        <translation type="unfinished"></translation>
+        <translation>Von Punkt einrasten</translation>
     </message>
 </context>
 <context>
@@ -682,7 +682,7 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; padding: 10px; -qt-block-indent:0; text-indent:0px ; background-color:#e7f2fa; color: #999999&quot;&gt;&lt;img stype=&quot;margin: 10px&quot; src=&quot;:/plugins/ORStools/img/icon_about.png&quot; width=16 height=16 /&gt;  Sämtliche Einstellungen werden überschrieben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -808,7 +808,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="745"/>
         <source>Points (2 Layers)</source>
-        <translation type="unfinished">zwei Punktlayern</translation>
+        <translation>zwei Punktlayer</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="755"/>
@@ -868,42 +868,42 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="272"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add waypoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Right- or double-click will pause waypoint selection, drag and drop will still be enabled. Another click on the green + button will continue the selection process. The ESC-button will terminate it and delete all waypoints.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wegpunkte interaktiv aus Kartenansicht hinzufügen.&lt;/p&gt;&lt;p&gt;Rechts- oder Doppelklick pausiert die Wegpunktwahl, Drag-and-Drop ist immer noch verfügbar. Weiteres Hinzufügen durch erneuten Klick auf den grünen +-Knopf. Die ESC-Taste beendet und löscht alle Wegpunkte.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="326"/>
         <source>LivePreview</source>
-        <translation type="unfinished"></translation>
+        <translation>Live-Vorschau</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="701"/>
         <source>Processing Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Verarbeitungswerkzeuge</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="794"/>
         <source>Snapping</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf Straßen einrasten</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="800"/>
         <source>Snap from Point Layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Von Punkt-Layer einrasten</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="807"/>
         <source>Snap from Point</source>
-        <translation type="unfinished"></translation>
+        <translation>Von Punkt einrasten</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="817"/>
         <source>Graph Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Graph-Export</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogUI.ui" line="823"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Export</translation>
     </message>
 </context>
 <context>
@@ -969,17 +969,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../gui/ORStoolsDialogConfig.py" line="254"/>
         <source>Service Endpoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Dienst-Endpunkte</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogConfig.py" line="275"/>
         <source>Reset URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL zurücksetzen</translation>
     </message>
     <message>
         <location filename="../gui/ORStoolsDialogConfig.py" line="282"/>
         <source>Reset Endpoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Endpunkte zurücksetzen</translation>
     </message>
 </context>
 <context>
