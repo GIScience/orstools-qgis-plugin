@@ -194,7 +194,7 @@ class Isochrones:
         n = len(unique_values)
         max_position = min(0.1 * n, 1.0)
 
-        colors = [ color_ramp.color(((i + 1) / n)  * max_position) for i in range(n) ]
+        colors = [color_ramp.color(((i + 1) / n) * max_position) for i in range(n)]
 
         categories = []
 
