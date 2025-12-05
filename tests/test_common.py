@@ -9,8 +9,6 @@ class TestCommon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.api_key = os.environ.get("ORS_API_KEY")
-        if cls.api_key is None:
-            raise ValueError("ORS_API_KEY environment variable is not set")
 
     def test_client_retry_on_over_query_limit(self):
         """Test that client retries on OverQueryLimit and eventually succeeds"""
