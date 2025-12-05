@@ -301,7 +301,7 @@ class TestGui(unittest.TestCase):
 
         self.assertEqual(settings_directions_endpoint, "directions")
 
-        layer = proc.test_directions_points_layer()
+        layer = proc.get_directions_points_layer()
 
         self.assertEqual(
             "POINT(8.67251100000000008 49.39887900000000087)",
@@ -337,7 +337,7 @@ class TestGui(unittest.TestCase):
         proc = TestProc()
         proc.setUpClass()
 
-        self.assertRaises(Exception, proc.test_directions_points_layer)
+        self.assertRaises(Exception, proc.get_directions_points_layer)
 
         # reset url
         url_reset_button = dlg_config.findChild(QPushButton, "openrouteservice_reset_url_button")
@@ -352,7 +352,7 @@ class TestGui(unittest.TestCase):
 
         self.assertEqual(settings_directions_endpoint, "directions")
 
-        layer = proc.test_directions_points_layer()
+        layer = proc.get_directions_points_layer()
 
         self.assertEqual(
             "POINT(8.67251100000000008 49.39887900000000087)",
