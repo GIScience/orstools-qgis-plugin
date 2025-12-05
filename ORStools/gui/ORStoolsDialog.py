@@ -27,7 +27,6 @@
  ***************************************************************************/
 """
 
-import json
 import os
 from datetime import datetime
 from typing import Optional
@@ -58,7 +57,11 @@ from qgis.core import (
     QgsAnnotation,
     QgsCoordinateTransform,
 )
-from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInterface
+from qgis.gui import (
+    QgsMapCanvasAnnotationItem,
+    QgsCollapsibleGroupBox,
+    QgisInterface,
+)
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
 from qgis.PyQt.QtGui import QTextDocument
 from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
@@ -291,11 +294,18 @@ class ORStoolsDialogMain:
 
         except exceptions.ApiError as e:
             # Error thrown by ORStools/common/client.py, line 243, in _check_status
-            parsed = json.loads(e.message)
-            error_code = int(parsed["error"]["code"])
+            error_code = e.status
             if error_code == 2010:
                 maptools.LineTool(self.dlg).radius_message_box(e)
                 return
+            elif error_code == "404":
+                self.iface.messageBar().pushMessage(
+                    "Error 404: Not Found",
+                    "Are your endpoints set correctly in the Provider Settings?",
+                    level=Qgis.MessageLevel.Warning,
+                )
+            else:
+                raise e
 
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
