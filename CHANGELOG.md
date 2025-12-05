@@ -46,6 +46,7 @@ RELEASING:
 - pre-commit configuration with Ruff linter for code quality enforcement
 - Improve cursor behaviour during digitization
 - Improve isochrone color ramp with many ranges
+- Enabled usage of custom endpoints in main application
 
 ### Fixed
 - Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
