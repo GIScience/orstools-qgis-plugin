@@ -73,6 +73,13 @@ class ORSSnapLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
+        self.setToolTip(
+            self.PARAMETERS[1],
+            self.tr(
+                "The radius in which to search for points. Note: usually, a limit is configured."
+            ),
+        )
+
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:

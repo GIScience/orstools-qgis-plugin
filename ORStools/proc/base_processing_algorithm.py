@@ -121,36 +121,47 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         Parameter definition for provider, used in all child classes
         """
         providers = [provider["name"] for provider in configmanager.read_config()["providers"]]
-        return QgsProcessingParameterEnum(
+        parameter = QgsProcessingParameterEnum(
             self.IN_PROVIDER,
             self.tr("Provider", "ORSBaseProcessingAlgorithm"),
             providers,
             defaultValue=providers[0],
         )
 
+        self.setToolTip(parameter, self.tr("Select the provider that should be used."))
+
+        return parameter
+
     def profile_parameter(self) -> QgsProcessingParameterEnum:
         """
         Parameter definition for profile, used in all child classes
         """
-        return QgsProcessingParameterEnum(
+        parameter = QgsProcessingParameterEnum(
             self.IN_PROFILE,
             self.tr("Travel mode", "ORSBaseProcessingAlgorithm"),
             PROFILES,
             defaultValue=PROFILES[0],
         )
 
+        self.setToolTip(parameter, self.tr("Select a mode of travel."))
+
+        return parameter
+
     def output_parameter(self) -> QgsProcessingParameterFeatureSink:
         """
         Parameter definition for output, used in all child classes
         """
         timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        return QgsProcessingParameterFeatureSink(
+        parameter = QgsProcessingParameterFeatureSink(
             name=self.OUT,
             description=f"{self.OUT_NAME}_{timestamp}",
         )
+        self.setToolTip(parameter, self.tr("Select where the output should be saved."))
+
+        return parameter
 
     def option_parameters(self) -> [QgsProcessingParameterDefinition]:
-        return [
+        parameters = [
             QgsProcessingParameterEnum(
                 self.IN_AVOID_FEATS,
                 self.tr("Features to avoid", "ORSBaseProcessingAlgorithm"),
@@ -182,6 +193,21 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
                 optional=True,
             ),
         ]
+
+        self.setToolTip(
+            parameters[0], self.tr("Select features that should be avoided by the algorithm.")
+        )
+        self.setToolTip(
+            parameters[1], self.tr("Select borders that should be avoided by the algorithm.")
+        )
+        self.setToolTip(
+            parameters[2], self.tr("Select countries that should be avoided by the algorithm.")
+        )
+        self.setToolTip(
+            parameters[3], self.tr("Select polygons that should be avoided by the algorithm.")
+        )
+
+        return parameters
 
     def get_endpoint_names_from_provider(self, provider: str) -> dict:
         providers = configmanager.read_config()["providers"]
@@ -282,3 +308,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
     def tr(self, string: str, context=None) -> str:
         context = context or self.__class__.__name__
         return QCoreApplication.translate(context, string)
+
+    def setToolTip(self, parameter, text):
+        basic = parameter.toolTip()
+        parameter.toolTip = lambda: f"{basic}\n{text}"
