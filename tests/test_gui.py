@@ -49,14 +49,14 @@ class TestGui(unittest.TestCase):
         map_button: QPushButton = dlg.routing_fromline_map
 
         # click green add vertices button
-        QTest.mouseClick(map_button, Qt.LeftButton)
+        QTest.mouseClick(map_button, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
         self.assertIsInstance(CANVAS.mapTool(), maptools.LineTool)
 
         # click on canvas at [0, 0]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.MouseButton.LeftButton))
 
-        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.MouseButton.LeftButton))
 
         self.assertEqual(dlg.routing_fromline_list.count(), 2)
 
@@ -65,7 +65,7 @@ class TestGui(unittest.TestCase):
         self.assertEqual(len_rubber_band, 2)
 
         # doubleclick on canvas at [5, 5]
-        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(5, 5, Qt.LeftButton))
+        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(5, 5, Qt.MouseButton.LeftButton))
         self.assertTrue(dlg.isVisible())
 
         # Check first item of list widget
@@ -101,17 +101,17 @@ class TestGui(unittest.TestCase):
         self.assertTrue(dlg.toggle_preview.isChecked())
 
         # click 'routing_fromline_map'
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
         self.assertIsInstance(CANVAS.mapTool(), maptools.LineTool)
 
         # click on canvas at [0, 0]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.MouseButton.LeftButton))
         # click on canvas at [5, 5]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 0, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 0, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 0, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 0, Qt.MouseButton.LeftButton))
 
         self.assertEqual(
             dlg.routing_fromline_list.item(0).text(), "Point 0: -123.384059, 48.448463"
@@ -123,14 +123,14 @@ class TestGui(unittest.TestCase):
         self.assertTrue(len_rubber_band > 2)
 
         # Right click and thus show dlg
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.RightButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.MouseButton.RightButton))
         self.assertTrue(dlg.isVisible())
         # Test that right click doesn't create a point
         self.assertEqual(dlg.routing_fromline_list.count(), 5)
 
         # click on canvas at [10, 10]
         # Check that the click with an open dlg doesn't create an entry
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 5)
 
         # test whether point order remains valid when selected points are deleted from QListWidget
@@ -138,12 +138,12 @@ class TestGui(unittest.TestCase):
         dlg.routing_fromline_clear.clicked.emit()
 
         # click again after deletion
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.MouseButton.LeftButton))
 
         # Right click and thus show dlg
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.RightButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.MouseButton.RightButton))
         self.assertTrue(dlg.isVisible())
 
         self.assertEqual(dlg.routing_fromline_list.count(), 5)
@@ -161,20 +161,20 @@ class TestGui(unittest.TestCase):
         self.assertEqual(len_rubber_band, 5)
 
         # Click Add Vertices again
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
 
         # continue digitization
         # click on canvas at [10, 5]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 6)
 
         # Double click and thus show dlg
-        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(0, 5, Qt.LeftButton))
+        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(0, 5, Qt.MouseButton.LeftButton))
         self.assertTrue(dlg.isVisible())
 
         # clear list widget and check that it's empty
-        QTest.mouseClick(dlg.routing_fromline_clear, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_clear, Qt.MouseButton.LeftButton)
         self.assertEqual(dlg.routing_fromline_list.count(), 0)
         # Check that the rubber band is empty
         self.assertEqual(type(dlg.rubber_band), QgsRubberBand)
@@ -197,27 +197,27 @@ class TestGui(unittest.TestCase):
         self.assertTrue(dlg.isVisible())
 
         # click 'routing_fromline_map'
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
         self.assertIsInstance(CANVAS.mapTool(), maptools.LineTool)
 
         # Add some points to the list
-        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 5, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 50, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 50, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 5, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 50, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 50, Qt.MouseButton.LeftButton))
 
         # Add point to be dragged
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 4)
         self.assertEqual(
             dlg.routing_fromline_list.item(3).text(), "Point 3: -123.375767, 48.445713"
         )
 
         # Press at previous position
-        dlg.line_tool.canvasPressEvent(self.map_press(11, 5, Qt.LeftButton))
+        dlg.line_tool.canvasPressEvent(self.map_press(11, 5, Qt.MouseButton.LeftButton))
 
         # Release somewhere else
-        dlg.line_tool.canvasReleaseEvent(self.map_release(50, 10, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(50, 10, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 4)
         # Check that the coordinates of the point at the same position in the list has changed
         self.assertEqual(
@@ -231,31 +231,31 @@ class TestGui(unittest.TestCase):
     def map_release(self, x, y, side):
         return QgsMapMouseEvent(
             CANVAS,
-            QEvent.MouseButtonRelease,
+            QEvent.Type.MouseButtonRelease,
             QPoint(x, y),  # Relative to the canvas' dimensions
             side,
             side,
-            Qt.NoModifier,
+            Qt.KeyboardModifier.NoModifier,
         )
 
     def map_press(self, x, y, side):
         return QgsMapMouseEvent(
             CANVAS,
-            QEvent.MouseButtonPress,
+            QEvent.Type.MouseButtonPress,
             QPoint(x, y),  # Relative to the canvas' dimensions
             side,
             side,
-            Qt.NoModifier,
+            Qt.KeyboardModifier.NoModifier,
         )
 
     def map_dclick(self, x, y, side):
         return QgsMapMouseEvent(
             CANVAS,
-            QEvent.MouseButtonDblClick,
+            QEvent.Type.MouseButtonDblClick,
             QPoint(x, y),  # Relative to the canvas' dimensions
             side,
             side,
-            Qt.NoModifier,
+            Qt.KeyboardModifier.NoModifier,
         )
 
     def test_ORStoolsDialogConfig_endpoints(self):

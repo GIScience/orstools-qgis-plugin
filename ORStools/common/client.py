@@ -183,7 +183,7 @@ class Client(QObject):
 
                 loop = QEventLoop()
                 QTimer.singleShot(delay_seconds * 1000, loop.quit)
-                loop.exec_()
+                loop.exec()
 
             except exceptions.ApiError as e:
                 if post_json:
@@ -236,7 +236,7 @@ class Client(QObject):
         :raises exceptions.GenericServerError: On 5xx server errors
         :raises Exception: On network errors or invalid responses
         """
-        status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
+        status_code = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
         message = reply.content().data().decode()
 
         if not status_code:
