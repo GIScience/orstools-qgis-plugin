@@ -39,6 +39,8 @@ from qgis.core import (
     QgsSimpleFillSymbolLayer,
     QgsRendererCategory,
     QgsCategorizedSymbolRenderer,
+    QgsGradientStop,
+    QgsGradientColorRamp,
 )
 
 from qgis.PyQt.QtCore import QMetaType
@@ -186,18 +188,22 @@ class Isochrones:
         field = layer.fields().indexOf(self.field_dimension_name)
         unique_values = sorted(layer.uniqueValues(field))
 
-        colors = {
-            0: QColor("#2b83ba"),
-            1: QColor("#64abb0"),
-            2: QColor("#9dd3a7"),
-            3: QColor("#c7e9ad"),
-            4: QColor("#edf8b9"),
-            5: QColor("#ffedaa"),
-            6: QColor("#fec980"),
-            7: QColor("#f99e59"),
-            8: QColor("#e85b3a"),
-            9: QColor("#d7191c"),
-        }
+        color_ramp = QgsGradientColorRamp(QColor("#2b83ba"), QColor("#d7191c"))
+        stops = [
+            QgsGradientStop(0.111, QColor("#64abb0")),
+            QgsGradientStop(0.222, QColor("#9dd3a7")),
+            QgsGradientStop(0.333, QColor("#c7e9ad")),
+            QgsGradientStop(0.444, QColor("#edf8b9")),
+            QgsGradientStop(0.555, QColor("#ffedaa")),
+            QgsGradientStop(0.666, QColor("#fec980")),
+            QgsGradientStop(0.777, QColor("#f99e59")),
+            QgsGradientStop(0.888, QColor("#e85b3a")),
+        ]
+        color_ramp.setStops(stops)
+
+        n = len(unique_values)
+        max_position = 0.7 if n < 10 else 1.0
+        colors = [color_ramp.color(i / (n - 1) * max_position) if n > 1 else color_ramp.color(0) for i in range(n)]
 
         categories = []
 
