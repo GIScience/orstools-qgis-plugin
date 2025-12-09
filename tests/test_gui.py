@@ -358,3 +358,45 @@ class TestGui(unittest.TestCase):
             "POINT(8.67251100000000008 49.39887900000000087)",
             next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )
+
+    def test_custom_endpoints(self):
+        from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
+
+        # Set and reset config to test whether the reset works
+        dlg_config = ORStoolsDialogConfigMain()
+        provider = dlg_config.providers.findChildren(QgsCollapsibleGroupBox)[0]
+
+        # set endpoint of directions to non-existent value
+        line_edit = provider.findChild(QLineEdit, "openrouteservice_directions_endpoint")
+        line_edit.setText("custom_directions_endpoint")
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "endpoints"
+        ]["directions"]
+
+        proc = TestProc()
+        proc.setUpClass()
+
+        self.assertEqual(settings_directions_endpoint, "custom_directions_endpoint")
+
+        layer = proc.get_directions_points_layer()
+        self.assertEqual(layer.featureCount(), 0)
+
+        # reset endpoints
+        dlg_config._reset_endpoints()
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "endpoints"
+        ]["directions"]
+
+        self.assertEqual(settings_directions_endpoint, "directions")
+
+        layer = proc.get_directions_points_layer()
+        self.assertEqual(layer.featureCount(), 93)
+
+        self.assertEqual(
+            "POINT(8.67251100000000008 49.39887900000000087)",
+            next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
+        )

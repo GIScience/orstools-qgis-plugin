@@ -47,6 +47,7 @@ RELEASING:
 - Improve cursor behaviour during digitization
 - tooltip hints in processing algorithms ([#196](https://github.com/GIScience/orstools-qgis-plugin/issues/196))
 - Improve isochrone color ramp with many ranges
+- Enabled usage of custom endpoints in main application
 
 ### Fixed
 - Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
