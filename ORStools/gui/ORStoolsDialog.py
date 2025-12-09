@@ -28,6 +28,7 @@
 """
 
 import os
+import json
 from datetime import datetime
 from typing import Optional
 
@@ -294,7 +295,12 @@ class ORStoolsDialogMain:
 
         except exceptions.ApiError as e:
             # Error thrown by ORStools/common/client.py, line 243, in _check_status
-            error_code = e.status
+            try:
+                parsed = json.loads(e.message)
+                error_code = int(parsed["error"]["code"])
+            except KeyError:
+                error_code = e.status
+
             if error_code == 2010:
                 maptools.LineTool(self.dlg).radius_message_box(e)
                 return

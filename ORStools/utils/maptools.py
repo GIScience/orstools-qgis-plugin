@@ -310,7 +310,12 @@ class LineTool(QgsMapToolEmitPoint):
             self.dlg.rubber_band.show()
 
     def get_error_code(self, e: QEvent) -> int:
-        return e.status
+        json_start_index = e.message.find("{")
+        json_end_index = e.message.rfind("}") + 1
+        json_str = e.message[json_start_index:json_end_index]
+        error_dict = json.loads(json_str)
+
+        return error_dict["error"]["code"] if error_dict["error"]["code"] else e.status
 
     def radius_message_box(self, e) -> None:
         parsed = json.loads(e.message)
