@@ -36,7 +36,6 @@
      </property>
      <property name="font">
       <font>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -54,7 +53,6 @@
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
-          <weight>50</weight>
           <bold>false</bold>
          </font>
         </property>
@@ -70,7 +68,6 @@
        <widget class="QLabel" name="label_2">
         <property name="font">
          <font>
-          <weight>50</weight>
           <bold>false</bold>
          </font>
         </property>
@@ -86,7 +83,6 @@
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
-          <weight>50</weight>
           <bold>false</bold>
          </font>
         </property>
@@ -179,7 +175,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -198,7 +194,7 @@
      </property>
      <widget class="QWidget" name="qwidget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -212,7 +208,13 @@
        </property>
        <item>
         <widget class="QWidget" name="routing_travel_group" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2,0">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
@@ -237,13 +239,26 @@
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </widget>
        </item>
        <item>
         <widget class="QWidget" name="widget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -271,6 +286,9 @@
             </property>
             <property name="sizeConstraint">
              <enum>QLayout::SetNoConstraint</enum>
+            </property>
+            <property name="bottomMargin">
+             <number>200</number>
             </property>
             <item>
              <widget class="QPushButton" name="routing_fromline_map">
@@ -332,19 +350,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </item>
           <item>
@@ -352,7 +357,7 @@
             <item>
              <widget class="QListWidget" name="routing_fromline_list">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -383,22 +388,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </item>
          </layout>
@@ -406,6 +395,12 @@
        </item>
        <item>
         <widget class="QCheckBox" name="toggle_preview">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>LivePreview</string>
          </property>
@@ -434,10 +429,10 @@
          <property name="checked">
           <bool>false</bool>
          </property>
-         <property name="collapsed">
+         <property name="collapsed" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="saveCollapsedState">
+         <property name="saveCollapsedState" stdset="0">
           <bool>false</bool>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -476,10 +471,10 @@
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0">
@@ -598,10 +593,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
@@ -672,10 +667,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -718,10 +713,10 @@ p, li { white-space: pre-wrap; }
             <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="collapsed">
+            <property name="collapsed" stdset="0">
              <bool>true</bool>
             </property>
-            <property name="saveCollapsedState">
+            <property name="saveCollapsedState" stdset="0">
              <bool>false</bool>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -730,7 +725,7 @@ p, li { white-space: pre-wrap; }
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid areas by specifying a (Multi-)Polygon layer. &lt;/p&gt;&lt;p&gt;Does &lt;span style=&quot; font-weight:600;&quot;&gt;not work&lt;/span&gt; for memory (scratch) Polygon layers!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;, only the first feature of the layer will be respected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
-               <property name="showCrs">
+               <property name="showCrs" stdset="0">
                 <bool>false</bool>
                </property>
               </widget>
@@ -917,10 +912,10 @@ p, li { white-space: pre-wrap; }
      <property name="flat">
       <bool>true</bool>
      </property>
-     <property name="collapsed">
+     <property name="collapsed" stdset="0">
       <bool>true</bool>
      </property>
-     <property name="saveCollapsedState">
+     <property name="saveCollapsedState" stdset="0">
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -950,8 +945,8 @@ p, li { white-space: pre-wrap; }
         <property name="autoFormatting">
          <set>QTextEdit::AutoBulletList</set>
         </property>
-        <property name="tabStopWidth">
-         <number>80</number>
+        <property name="tabStopDistance">
+         <double>80.000000000000000</double>
         </property>
         <property name="placeholderText">
          <string>Queries and errors will be printed here.</string>
