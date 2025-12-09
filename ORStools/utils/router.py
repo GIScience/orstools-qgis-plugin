@@ -85,8 +85,11 @@ Please add polygons to the layer or uncheck avoid polygons.
                 logger.log(msg, 0)
                 dlg.debug_text.setText(msg)
                 return
+
+            endpoint = provider["endpoints"]["directions"]
+
             response = clnt.fetch_with_retry(
-                "/v2/directions/" + profile + "/geojson", {}, post_json=params
+                f"/v2/{endpoint}/" + profile + "/geojson", {}, post_json=params
             )
             feat = directions_core.get_output_feature_directions(
                 response, profile, params["preference"], directions.options

@@ -5,6 +5,7 @@ from qgis.core import QgsSettings
 from ORStools.ORStoolsPlugin import ORStools
 from tests.utils.utilities import get_qgis_app
 
+
 def pytest_sessionstart(session):
     """
     Called after the Session object has been created and
