@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>868</height>
+    <width>517</width>
+    <height>673</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -175,7 +175,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -194,7 +194,7 @@
      </property>
      <widget class="QWidget" name="qwidget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -208,7 +208,13 @@
        </property>
        <item>
         <widget class="QWidget" name="routing_travel_group" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2,0">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
@@ -233,13 +239,26 @@
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </widget>
        </item>
        <item>
         <widget class="QWidget" name="widget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -256,112 +275,135 @@
            <height>16777215</height>
           </size>
          </property>
-         <layout class="QGridLayout" name="gridLayout">
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
-          <item row="0" column="0">
-           <widget class="QPushButton" name="routing_fromline_map">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>10</number>
             </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add waypoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Right- or double-click will pause waypoint selection, drag and drop will still be enabled. Another click on the green + button will continue the selection process. The ESC-button will terminate it and delete all waypoints.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
             </property>
-            <property name="text">
-             <string/>
+            <property name="bottomMargin">
+             <number>200</number>
             </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/plugins/ORStools/img/icon_add.png</normaloff>:/plugins/ORStools/img/icon_add.png</iconset>
-            </property>
-           </widget>
+            <item>
+             <widget class="QPushButton" name="routing_fromline_map">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add waypoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Right- or double-click will pause waypoint selection, drag and drop will still be enabled. Another click on the green + button will continue the selection process. The ESC-button will terminate it and delete all waypoints.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>:/plugins/ORStools/img/icon_add.png</normaloff>:/plugins/ORStools/img/icon_add.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="save_vertices">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer. Use the processing algorithms (batch jobs) to work with points from layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>:/plugins/ORStools/img/icon_save.png</normaloff>:/plugins/ORStools/img/icon_save.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="routing_fromline_clear">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>:/plugins/ORStools/img/icon_clear.png</normaloff>:/plugins/ORStools/img/icon_clear.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="routing_fromline_clear">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/plugins/ORStools/img/icon_clear.png</normaloff>:/plugins/ORStools/img/icon_clear.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="save_vertices">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save points in list to layer. Use the processing algorithms (batch jobs) to work with points from layers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/plugins/ORStools/img/icon_save.png</normaloff>:/plugins/ORStools/img/icon_save.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="toggle_preview">
-            <property name="text">
-             <string>LivePreview</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" rowspan="4">
-           <widget class="QListWidget" name="routing_fromline_list">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Select waypoints from the map!</string>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Sunken</enum>
-            </property>
-            <property name="dragDropMode">
-             <enum>QAbstractItemView::InternalMove</enum>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
-            </property>
-           </widget>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QListWidget" name="routing_fromline_list">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Select waypoints from the map!</string>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::InternalMove</enum>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::MultiSelection</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="toggle_preview">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>LivePreview</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -375,7 +417,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>20</height>
+           <height>23</height>
           </size>
          </property>
          <property name="title">
@@ -414,7 +456,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>20</height>
+              <height>23</height>
              </size>
             </property>
             <property name="toolTip">
@@ -610,7 +652,7 @@ p, li { white-space: pre-wrap; }
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>20</height>
+              <height>23</height>
              </size>
             </property>
             <property name="toolTip">
@@ -656,7 +698,7 @@ p, li { white-space: pre-wrap; }
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>20</height>
+              <height>23</height>
              </size>
             </property>
             <property name="toolTip">
@@ -861,7 +903,7 @@ p, li { white-space: pre-wrap; }
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>20</height>
+       <height>23</height>
       </size>
      </property>
      <property name="title">
@@ -903,14 +945,14 @@ p, li { white-space: pre-wrap; }
         <property name="autoFormatting">
          <set>QTextEdit::AutoBulletList</set>
         </property>
+        <property name="tabStopDistance">
+         <double>80.000000000000000</double>
+        </property>
         <property name="placeholderText">
          <string>Queries and errors will be printed here.</string>
         </property>
         <property name="openExternalLinks">
          <bool>true</bool>
-        </property>
-        <property name="tabStopWidth" stdset="0">
-         <number>80</number>
         </property>
        </widget>
       </item>
