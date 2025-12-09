@@ -40,14 +40,16 @@ RELEASING:
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
 
-## Unreleased
+## [2.1.0] - 2025-12-09
 
 ### Added
 - pre-commit configuration with Ruff linter for code quality enforcement
-- Improve cursor behaviour during digitization
 - tooltip hints in processing algorithms ([#196](https://github.com/GIScience/orstools-qgis-plugin/issues/196))
-- Improve isochrone color ramp with many ranges
+- Improve isochrone color ramp with many ranges ([#264](https://github.com/GIScience/orstools-qgis-plugin/issues/264))
 - Enabled usage of custom endpoints in main application
+
+### Changed
+- Improve cursor behaviour during digitization ([#357](https://github.com/GIScience/orstools-qgis-plugin/pull/357))
 
 ### Fixed
 - Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
@@ -325,7 +327,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.1...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...v2.0.0
 [1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...v1.10.0
