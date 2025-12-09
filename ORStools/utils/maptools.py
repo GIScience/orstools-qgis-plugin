@@ -310,11 +310,7 @@ class LineTool(QgsMapToolEmitPoint):
             self.dlg.rubber_band.show()
 
     def get_error_code(self, e: QEvent) -> int:
-        json_start_index = e.message.find("{")
-        json_end_index = e.message.rfind("}") + 1
-        json_str = e.message[json_start_index:json_end_index]
-        error_dict = json.loads(json_str)
-        return error_dict["error"]["code"]
+        return e.status
 
     def radius_message_box(self, e) -> None:
         parsed = json.loads(e.message)
@@ -341,8 +337,15 @@ class LineTool(QgsMapToolEmitPoint):
                 self.create_rubber_band()
             except ApiError as e:
                 self.dlg.toggle_preview.setChecked(state)
-                if self.get_error_code(e) == 2010:
+                error_code = self.get_error_code(e)
+                if error_code == 2010:
                     self.radius_message_box(e)
+                elif error_code == "404":
+                    self.dlg._iface.messageBar().pushMessage(
+                        "Error 404: Not Found",
+                        "Are your endpoints set correctly in the Provider Settings?",
+                        level=Qgis.MessageLevel.Warning,
+                    )
                 else:
                     raise e
             except Exception as e:
