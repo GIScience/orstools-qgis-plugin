@@ -69,7 +69,7 @@ class TestGui(unittest.TestCase):
         self.assertTrue(dlg.isVisible())
 
         # Check first item of list widget
-        self.assertEqual(dlg.routing_fromline_list.item(0).text(), "Point 0: -0.187575, 56.516620")
+        self.assertEqual(dlg.routing_fromline_list.item(0).text(), "Point 0: -20880.750000, 7661955.000000")
 
         # Check rubber band has only 2 vertices
         self.assertEqual(dlg.routing_fromline_list.count(), 2)
@@ -114,7 +114,7 @@ class TestGui(unittest.TestCase):
         dlg.line_tool.canvasReleaseEvent(self.map_release(10, 0, Qt.MouseButton.LeftButton))
 
         self.assertEqual(
-            dlg.routing_fromline_list.item(0).text(), "Point 0: -123.384059, 48.448463"
+            dlg.routing_fromline_list.item(0).text(), "Point 0: -13735050.625000, 6181790.000000"
         )
 
         # Check that the live preview rubber band has more than two vertices
@@ -210,7 +210,7 @@ class TestGui(unittest.TestCase):
         dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 4)
         self.assertEqual(
-            dlg.routing_fromline_list.item(3).text(), "Point 3: -123.375767, 48.445713"
+            dlg.routing_fromline_list.item(3).text(), "Point 3: -13734127.517857, 6181328.446429"
         )
 
         # Press at previous position
@@ -219,6 +219,21 @@ class TestGui(unittest.TestCase):
         # Release somewhere else
         dlg.line_tool.canvasReleaseEvent(self.map_release(50, 10, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 4)
+        
+        self.assertEqual(
+            dlg.routing_fromline_list.count(), 4
+        )
+
+        # Set project CRS to EPSG:4326 to force coordinate transformation
+        project_crs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        self.assertEqual(dlg.last_crs.authid(), "EPSG:3857")
+        CANVAS.setDestinationCrs(project_crs)
+        self.assertEqual(dlg.canvas.mapSettings().destinationCrs().authid(), "EPSG:4326")
+
+        self.assertEqual(
+            dlg.routing_fromline_list.count(), 4
+        )
+
         # Check that the coordinates of the point at the same position in the list has changed
         self.assertEqual(
             dlg.routing_fromline_list.item(3).text(), "Point 3: -123.342597, 48.442962"
