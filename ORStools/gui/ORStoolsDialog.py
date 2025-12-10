@@ -34,6 +34,7 @@ from typing import Optional
 
 from qgis.PyQt.QtWidgets import QCheckBox
 
+from ..utils.gui import LayerMessageBox
 from ..utils.router import route_as_layer
 
 try:
@@ -57,6 +58,7 @@ from qgis.core import (
     Qgis,  # noqa: F811
     QgsAnnotation,
     QgsCoordinateTransform,
+    QgsWkbTypes,
 )
 from qgis.gui import (
     QgsMapCanvasAnnotationItem,
@@ -364,6 +366,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._clear_listwidget)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
+        self.load_vertices.clicked.connect(self.load_vertices_from_layer)
 
         # Batch
         self.pushButton_routing_points.clicked.connect(
@@ -406,6 +409,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
         self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
         self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
+        self.load_vertices.setIcon(gui.GuiUtils.get_icon("icon_load.png"))
 
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(
@@ -528,12 +532,17 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             self.line_tool = maptools.LineTool(self)
             self.canvas.setMapTool(self.line_tool)
 
-    def create_vertex(self, point, idx):
+    def create_vertex(self, point: QgsPointXY, idx: int, epsg: int = None) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self.canvas.mapSettings().destinationCrs()
+        if not epsg:
+            map_crs = self.canvas.mapSettings().destinationCrs()
 
-        transformer = transform.transformToWGS(map_crs)
-        point_wgs = transformer.transform(point)
+            transformer = transform.transformToWGS(map_crs)
+            point_wgs = transformer.transform(point)
+        else:
+            transformer = transform.transformToWGS(QgsCoordinateReferenceSystem(f"EPSG:{epsg}"))
+            point_wgs = transformer.transform(point)
+
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
 
         crs = self.canvas.mapSettings().destinationCrs()
@@ -606,3 +615,51 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         """Load the saved state when the window is shown"""
         super().show()
         self.load_provider_combo_state()
+
+    def load_vertices_from_layer(self, testing: str = "") -> None:
+        if not self.line_tool:
+            self.line_tool = maptools.LineTool(self)
+
+        box = LayerMessageBox()
+
+        if testing == "ok":
+            result = QMessageBox.StandardButton.Ok
+        elif testing == "not_ok":
+            result = QMessageBox.StandardButton.Cancel
+        else:
+            result = box.exec()
+
+        if result == QMessageBox.StandardButton.Ok:
+            layer = box.selectedLayer()
+            try:
+                self.routing_fromline_list.clear()
+
+                for id, feat in enumerate(layer.getFeatures()):
+                    geom = feat.geometry()
+                    if not geom:
+                        continue
+
+                    if (
+                        geom.type() == QgsWkbTypes.GeometryType.PointGeometry
+                        and QgsWkbTypes.isSingleType(geom.wkbType())
+                    ):
+                        pt = geom.asPoint()
+                        self.create_vertex(pt, id, layer.crs().postgisSrid())
+                        self.line_tool.create_rubber_band()
+
+                    elif (
+                        geom.type() == QgsWkbTypes.GeometryType.PointGeometry
+                        and QgsWkbTypes.isMultiType(geom.wkbType())
+                    ):
+                        pts = geom.asMultiPoint()
+                        for pt in pts:
+                            self.create_vertex(pt, id, layer.crs().postgisSrid())
+                            self.line_tool.create_rubber_band()
+            except Exception:
+                self._clear_annotations()
+                self._iface.messageBar().pushMessage(
+                    self.tr("Could not load points from Layer"),
+                    self.tr("Please select a valid point layer"),
+                    level=Qgis.MessageLevel.Warning,
+                    duration=3,
+                )
