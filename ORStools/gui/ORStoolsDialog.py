@@ -29,7 +29,6 @@
 
 import json
 import os
-import json
 from datetime import datetime
 from typing import Optional
 
@@ -485,8 +484,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     data = json.loads(reply.content().data().decode("utf-8"))
                     suggest = set([i["properties"]["name"] for i in data["features"]])
                     completer = QCompleter(suggest)
-                    completer.setCaseSensitivity(Qt.CaseInsensitive)
-                    completer.setFilterMode(Qt.MatchContains)
+                    completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+                    completer.setFilterMode(Qt.MatchFlag.MatchContains)
                     completer.highlighted.connect(completer.highlighted.disconnect)
                     completer.activated.connect(lambda t: option_chosen(t, lineEdit))
                     lineEdit.setCompleter(completer)
