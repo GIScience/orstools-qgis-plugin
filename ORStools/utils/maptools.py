@@ -32,11 +32,8 @@ import math
 
 from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 from qgis.core import (
-    QgsProject,
     QgsPointXY,
-    QgsCoordinateReferenceSystem,
     Qgis,
-    QgsCoordinateTransform,
     QgsWkbTypes,
     QgsAnnotation,
     QgsMarkerSymbol,
@@ -46,7 +43,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal, QEvent
 from qgis.PyQt.QtGui import QColor, QMouseEvent
 
 from ORStools import ROUTE_COLOR
-from ORStools.utils import transform, router
+from ORStools.utils import router
 from ORStools.utils.exceptions import ApiError
 
 
@@ -188,17 +185,12 @@ class LineTool(QgsMapToolEmitPoint):
                 self.dlg.annotations.insert(self.move_i, annotation)
                 self.dlg.project.annotationManager().addAnnotation(annotation)
 
-                transformer = transform.transformToWGS(crs)
-                point_wgs = transformer.transform(point)
-
                 items = [
                     self.dlg.routing_fromline_list.item(x).text()
                     for x in range(self.dlg.routing_fromline_list.count())
                 ]
                 backup = items.copy()
-                items[self.move_i] = (
-                    f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
-                )
+                items[self.move_i] = f"Point {self.move_i}: {point.x():.6f}, {point.y():.6f}"
 
                 self.dlg.routing_fromline_list.clear()
                 for i, x in enumerate(items):
@@ -291,9 +283,6 @@ class LineTool(QgsMapToolEmitPoint):
             else:
                 self.dlg._clear_annotations()
         else:
-            dest_crs = self.dlg.canvas.mapSettings().destinationCrs()
-            original_crs = QgsCoordinateReferenceSystem("EPSG:4326")
-            transform = QgsCoordinateTransform(original_crs, dest_crs, QgsProject.instance())
             items = [
                 self.dlg.routing_fromline_list.item(x).text()
                 for x in range(self.dlg.routing_fromline_list.count())
@@ -301,9 +290,8 @@ class LineTool(QgsMapToolEmitPoint):
             split = [x.split(":")[1] for x in items]
             coords = [tuple(map(float, coord.split(", "))) for coord in split]
             points_xy = [QgsPointXY(x, y) for x, y in coords]
-            reprojected_point = [transform.transform(point) for point in points_xy]
-            for point in reprojected_point:
-                if point == reprojected_point[-1]:
+            for point in points_xy:
+                if point == points_xy[-1]:
                     self.dlg.rubber_band.addPoint(point, True)
                 else:
                     self.dlg.rubber_band.addPoint(point, False)
