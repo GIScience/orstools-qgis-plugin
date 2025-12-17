@@ -111,7 +111,6 @@ class Directions:
             item = layers_list.item(idx).text()
             param, coords = item.split(":")
 
-
             coordinates.append([float(coord) for coord in coords.split(", ")])
 
         transformed_coordinates = []

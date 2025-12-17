@@ -190,9 +190,7 @@ class LineTool(QgsMapToolEmitPoint):
                     for x in range(self.dlg.routing_fromline_list.count())
                 ]
                 backup = items.copy()
-                items[self.move_i] = (
-                    f"Point {self.move_i}: {point.x():.6f}, {point.y():.6f}"
-                )
+                items[self.move_i] = f"Point {self.move_i}: {point.x():.6f}, {point.y():.6f}"
 
                 self.dlg.routing_fromline_list.clear()
                 for i, x in enumerate(items):

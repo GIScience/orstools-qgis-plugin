@@ -69,7 +69,9 @@ class TestGui(unittest.TestCase):
         self.assertTrue(dlg.isVisible())
 
         # Check first item of list widget
-        self.assertEqual(dlg.routing_fromline_list.item(0).text(), "Point 0: -20880.750000, 7661955.000000")
+        self.assertEqual(
+            dlg.routing_fromline_list.item(0).text(), "Point 0: -20880.750000, 7661955.000000"
+        )
 
         # Check rubber band has only 2 vertices
         self.assertEqual(dlg.routing_fromline_list.count(), 2)
@@ -219,10 +221,8 @@ class TestGui(unittest.TestCase):
         # Release somewhere else
         dlg.line_tool.canvasReleaseEvent(self.map_release(50, 10, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 4)
-        
-        self.assertEqual(
-            dlg.routing_fromline_list.count(), 4
-        )
+
+        self.assertEqual(dlg.routing_fromline_list.count(), 4)
 
         # Set project CRS to EPSG:4326 to force coordinate transformation
         project_crs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
@@ -230,9 +230,7 @@ class TestGui(unittest.TestCase):
         CANVAS.setDestinationCrs(project_crs)
         self.assertEqual(dlg.canvas.mapSettings().destinationCrs().authid(), "EPSG:4326")
 
-        self.assertEqual(
-            dlg.routing_fromline_list.count(), 4
-        )
+        self.assertEqual(dlg.routing_fromline_list.count(), 4)
 
         # Check that the coordinates of the point at the same position in the list has changed
         self.assertEqual(

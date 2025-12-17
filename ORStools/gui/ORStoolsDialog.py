@@ -559,7 +559,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             transform = QgsCoordinateTransform(self.last_crs, project_crs, QgsProject.instance())
 
             point = transform.transform(point)
-            
+
             coords = f"{point.x():.6f}, {point.y():.6f}"
             item = f"Point {idx}: {coords}"
             self.routing_fromline_list.addItem(item)
@@ -612,6 +612,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.load_provider_combo_state()
 
     def _on_crs_changed(self) -> None:
-        """Handle CRS change event."""  
+        """Handle CRS change event."""
         self._reindex_list_items()
         self.last_crs = self.canvas.mapSettings().destinationCrs()
