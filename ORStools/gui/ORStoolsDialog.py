@@ -520,14 +520,14 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             api_key = provider["key"]
             if api_key != "":
 
-                def option_chosen(name, lineEdit):
+                def option_chosen(label, lineEdit):
                     coords = [
                         feature["geometry"]["coordinates"]
                         for feature in data["features"]
-                        if feature["properties"]["name"] == name
+                        if feature["properties"]["label"] == label
                     ][0]
                     self.line_tool = maptools.LineTool(self)
-                    self.add_geocoded_item(coords, lineEdit, name)
+                    self.add_geocoded_item(coords, lineEdit)
                     completer.activated.disconnect()
                     lineEdit.setText("")
 
@@ -547,7 +547,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
                     reply = request.reply()
                     data = json.loads(reply.content().data().decode("utf-8"))
-                    suggest = set([i["properties"]["name"] for i in data["features"]])
+                    suggest = set([i["properties"]["label"] for i in data["features"]])
                     completer = QCompleter(suggest)
                     completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
                     completer.setFilterMode(Qt.MatchFlag.MatchContains)
@@ -572,7 +572,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
                 )
 
-    def add_geocoded_item(self, coordinates, lineEdit, name):
+    def add_geocoded_item(self, coordinates, lineEdit) -> None:
         idx = "0"
         p = f"Point {idx}: {coordinates[0]}, {coordinates[1]}"
         items = [
