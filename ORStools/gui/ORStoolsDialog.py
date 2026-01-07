@@ -511,9 +511,9 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
     def wait_connect_geocode(self, lineEdit):
         text = lineEdit.text()
-        QTimer.singleShot(500, lambda: self.reload_geocode_completer(lineEdit, text))
+        QTimer.singleShot(500, lambda: self.reload_geocode_completer_ors(lineEdit, text))
 
-    def reload_geocode_completer(self, lineEdit, text):
+    def reload_geocode_completer_ors(self, lineEdit, text):
         if lineEdit.text() == text and lineEdit.text() != "":
             provider_id = self.provider_combo.currentIndex()
             provider = configmanager.read_config()["providers"][provider_id]
