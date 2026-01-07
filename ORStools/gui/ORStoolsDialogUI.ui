@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>517</width>
-    <height>673</height>
+    <width>541</width>
+    <height>805</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,7 +24,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="sizeConstraint">
-    <enum>QLayout::SetMinAndMaxSize</enum>
+    <enum>QLayout::SizeConstraint::SetMinAndMaxSize</enum>
    </property>
    <item>
     <widget class="QGroupBox" name="resources_group">
@@ -43,13 +43,13 @@
       <string>Resources</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
      <property name="flat">
       <bool>false</bool>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item alignment="Qt::AlignHCenter">
+      <item alignment="Qt::AlignmentFlag::AlignHCenter">
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
@@ -64,7 +64,7 @@
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignHCenter">
+      <item alignment="Qt::AlignmentFlag::AlignHCenter">
        <widget class="QLabel" name="label_2">
         <property name="font">
          <font>
@@ -79,7 +79,7 @@
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignHCenter">
+      <item alignment="Qt::AlignmentFlag::AlignHCenter">
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
@@ -204,7 +204,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QWidget" name="routing_travel_group" native="true">
@@ -216,7 +216,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3,2,0">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <item>
            <widget class="QLabel" name="routing_travel_label">
@@ -242,7 +242,7 @@
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -277,7 +277,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -285,7 +285,7 @@
              <number>10</number>
             </property>
             <property name="sizeConstraint">
-             <enum>QLayout::SetNoConstraint</enum>
+             <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
             </property>
             <property name="bottomMargin">
              <number>200</number>
@@ -378,13 +378,13 @@
                <string>Select waypoints from the map!</string>
               </property>
               <property name="frameShadow">
-               <enum>QFrame::Sunken</enum>
+               <enum>QFrame::Shadow::Sunken</enum>
               </property>
               <property name="dragDropMode">
-               <enum>QAbstractItemView::InternalMove</enum>
+               <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
               </property>
               <property name="selectionMode">
-               <enum>QAbstractItemView::MultiSelection</enum>
+               <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
               </property>
              </widget>
             </item>
@@ -394,17 +394,53 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="toggle_preview">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>LivePreview</string>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <item alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QCheckBox" name="toggle_preview">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>LivePreview</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_distance">
+             <property name="text">
+              <string>Distance:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="live_distance">
+             <property name="text">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_duration">
+             <property name="text">
+              <string>Duration:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="live_duration">
+             <property name="text">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QgsCollapsibleGroupBox" name="advances_group">
@@ -437,7 +473,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <item>
            <widget class="QgsCollapsibleGroupBox" name="optimization_group">
@@ -479,7 +515,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0">
              <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
              </property>
              <item row="2" column="3">
               <widget class="QRadioButton" name="fix_both">
@@ -511,7 +547,7 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="3" alignment="Qt::AlignHCenter">
+             <item row="1" column="0" colspan="3" alignment="Qt::AlignmentFlag::AlignHCenter">
               <widget class="QLabel" name="label_5">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Other Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -601,7 +637,7 @@ p, li { white-space: pre-wrap; }
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
              <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
              </property>
              <item row="0" column="0">
               <widget class="QCheckBox" name="routing_avoid_highways_3">
@@ -872,7 +908,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -920,7 +956,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+       <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
       </property>
       <item>
        <widget class="QTextBrowser" name="debug_text">
@@ -943,7 +979,7 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
         <property name="autoFormatting">
-         <set>QTextEdit::AutoBulletList</set>
+         <set>QTextEdit::AutoFormattingFlag::AutoBulletList</set>
         </property>
         <property name="tabStopDistance">
          <double>80.000000000000000</double>
@@ -999,10 +1035,10 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QDialogButtonBox" name="global_buttons">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+         <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
         </property>
        </widget>
       </item>

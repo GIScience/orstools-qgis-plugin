@@ -428,6 +428,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     child.toggled.connect(self.reload_rubber_band)
 
         self.rubber_band = None
+        self.set_live_preview_stats_visibility(False)
 
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
@@ -456,6 +457,21 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self._iface.messageBar().pushMessage(
             self.tr("Success"), self.tr("Vertices saved to layer."), level=Qgis.MessageLevel.Success
         )
+
+    def set_live_preview_stats_visibility(self, visible: bool) -> None:
+        self.label_distance.setVisible(visible)
+        self.live_distance.setVisible(visible)
+        self.label_duration.setVisible(visible)
+        self.live_duration.setVisible(visible)
+
+    def set_live_preview_stats(self, duration: float, distance: float) -> None:
+        def format_duration(hours: float) -> str:
+            h = int(hours)
+            m = int((hours - h) * 60)
+            return f"{h:02d}:{m:02d}"
+
+        self.live_duration.setText(f"{format_duration(duration)} h")
+        self.live_distance.setText(f"{distance} km")
 
     def _on_prov_refresh_click(self) -> None:
         """Populates provider dropdown with fresh list from config.yml"""
@@ -487,6 +503,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 self.rubber_band.reset()
             del self.line_tool
             self.line_tool = maptools.LineTool(self)
+            self.set_live_preview_stats(0, 0)
 
     def _linetool_annotate_point(
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None

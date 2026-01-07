@@ -288,6 +288,8 @@ class LineTool(QgsMapToolEmitPoint):
                 feature = next(route_layer.getFeatures())
                 self.dlg.rubber_band.addGeometry(feature.geometry(), route_layer)
                 self.dlg.rubber_band.show()
+
+                self.dlg.set_live_preview_stats(feature["DURATION_H"], feature["DIST_KM"])
             else:
                 self.dlg._clear_annotations()
         else:
@@ -336,6 +338,9 @@ class LineTool(QgsMapToolEmitPoint):
         )
 
     def _toggle_preview(self) -> None:
+        self.dlg.set_live_preview_stats(0, 0)
+        self.dlg.set_live_preview_stats_visibility(self.dlg.toggle_preview.isChecked())
+
         if self.dlg.routing_fromline_list.count() > 0:
             state = not self.dlg.toggle_preview.isChecked()
             try:
