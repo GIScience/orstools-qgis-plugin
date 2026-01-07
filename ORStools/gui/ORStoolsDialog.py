@@ -511,9 +511,12 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
     def wait_connect_geocode(self, lineEdit):
         text = lineEdit.text()
-        QTimer.singleShot(500, lambda: self.reload_geocode_completer_ors(lineEdit, text))
+        request = QgsBlockingNetworkRequest()
+        QTimer.singleShot(300, lambda: self.reload_geocode_completer_ors(request, lineEdit, text))
 
-    def reload_geocode_completer_ors(self, lineEdit, text):
+    def reload_geocode_completer_ors(self, request, lineEdit, text):
+        request.abort()
+
         if lineEdit.text() == text and lineEdit.text() != "":
             provider_id = self.provider_combo.currentIndex()
             provider = configmanager.read_config()["providers"][provider_id]
@@ -542,7 +545,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 encoded = quote(lineEdit.text())
 
                 url = f"https://api.openrouteservice.org/geocode/search?api_key={api_key}&text={encoded}&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
-                request = QgsBlockingNetworkRequest()
                 error_code = request.get(QNetworkRequest(QUrl(url)))
                 if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
                     reply = request.reply()
