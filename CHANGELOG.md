@@ -39,7 +39,10 @@ RELEASING:
 13. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
-
+## Unrealeased
+### Added
+- Depiction of live preview route statistics
+ 
 ## [2.1.0] - 2025-12-09
 
 ### Added
