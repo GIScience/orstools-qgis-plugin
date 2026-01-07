@@ -470,6 +470,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             m = int((hours - h) * 60)
             return f"{h:02d}:{m:02d}"
 
+        self.set_live_preview_stats_visibility(self.toggle_preview.isChecked())
         self.live_duration.setText(f"{format_duration(duration)} h")
         self.live_distance.setText(f"{distance} km")
 
