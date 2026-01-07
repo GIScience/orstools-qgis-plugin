@@ -31,6 +31,7 @@ import json
 import os
 from datetime import datetime
 from typing import Optional
+from urllib.parse import quote
 
 from qgis.PyQt.QtCore import QTimer, Qt, QUrl
 from qgis.PyQt.QtNetwork import QNetworkRequest
@@ -538,7 +539,9 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
                 middle = tr.transform(QgsPointXY(lon, lat))
 
-                url = f"https://api.openrouteservice.org/geocode/autocomplete?api_key={api_key}&text={lineEdit.text()}&sources=geonames&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
+                encoded = quote(lineEdit.text())
+
+                url = f"https://api.openrouteservice.org/geocode/search?api_key={api_key}&text={encoded}&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
                 request = QgsBlockingNetworkRequest()
                 error_code = request.get(QNetworkRequest(QUrl(url)))
                 if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
@@ -555,7 +558,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
                 else:
                     raise ConnectionError(
-                        f"Error while trying to request geocoding autocomplete, error code: {error_code}"
+                        f"Error while trying to request geocoding search, error code: {error_code}"
                     )
             else:
                 QMessageBox.critical(
