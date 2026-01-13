@@ -30,6 +30,7 @@
 import json
 import math
 
+from ORStools.gui import directions_gui
 from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 from qgis.core import (
     QgsProject,
@@ -283,7 +284,9 @@ class LineTool(QgsMapToolEmitPoint):
         self.dlg.rubber_band.setStrokeColor(color)
         self.dlg.rubber_band.setWidth(5)
         if self.dlg.toggle_preview.isChecked() and self.dlg.routing_fromline_list.count() > 1:
-            route_layer = router.route_as_layer(self.dlg)
+            provider, profile, optimize = router.get_routing_parameters(self.dlg)
+            directions = directions_gui.Directions(self.dlg)
+            route_layer = router.route_as_layer(provider, profile, optimize, directions)
             if route_layer:
                 feature = next(route_layer.getFeatures())
                 self.dlg.rubber_band.addGeometry(feature.geometry(), route_layer)
