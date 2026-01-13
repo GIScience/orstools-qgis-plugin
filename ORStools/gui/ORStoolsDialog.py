@@ -266,29 +266,21 @@ class ORStoolsDialogMain:
             provider, profile, optimize = get_routing_parameters(self.dlg)
             directions = directions_gui.Directions(self.dlg)
 
-            layer_out = route_as_layer(self.dlg, provider, profile, optimize, directions)
+            layer_out = route_as_layer(provider, profile, optimize, directions)
 
-            # style output layer
             qml_path = os.path.join(basepath, "linestyle.qml")
             layer_out.loadNamedStyle(qml_path, True)
             layer_out.triggerRepaint()
 
             self.project.addMapLayer(layer_out)
 
-            # add ors svg path
             my_new_path = os.path.join(basepath, "img/svg")
             svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
             if my_new_path not in svg_paths:
                 svg_paths.append(my_new_path)
                 QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
 
-            # Associate annotations with map layer, so they get deleted when layer is deleted
             for annotation in self.dlg.annotations:
-                # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
-                # , you can change order after optimization
-                # Then in theory, when the layer is remove, the annotation is removed as well
-                # Doesn't work though, the annotations are still there when project is re-opened
-                # annotation.setMapLayer(layer_out)
                 self.project.annotationManager().removeAnnotation(annotation)
 
             self.dlg.annotations = []
@@ -296,6 +288,37 @@ class ORStoolsDialogMain:
 
             self.dlg._clear_listwidget()
             self.dlg.line_tool = maptools.LineTool(self.dlg)
+
+        except exceptions.InvalidInput:
+            QMessageBox.critical(
+                self.dlg,
+                self.tr("Wrong number of waypoints"),
+                self.tr("""At least 3 or 4 waypoints are needed to perform routing optimization. 
+                            Remember, the first and last location are not part of the optimization.
+                            """),
+            )
+
+        except exceptions.EmptyLayerError:
+            QMessageBox.warning(
+                self.dlg,
+                self.tr("Empty layer"),
+                self.tr("""
+                    The specified avoid polygon(s) layer does not contain any features.
+                    Please add polygons to the layer or uncheck avoid polygons.
+                                        """),
+            )
+
+        except exceptions.InvalidKey:
+            QMessageBox.critical(
+                self.dlg,
+                self.tr("Missing API key"),
+                self.tr("""
+            Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+            If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+            Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+            settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
+            )
 
         except exceptions.ApiError as e:
             # Error thrown by ORStools/common/client.py, line 243, in _check_status
