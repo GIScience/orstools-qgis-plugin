@@ -34,7 +34,8 @@ from typing import Optional
 
 from qgis.PyQt.QtWidgets import QCheckBox
 
-from ..utils.router import route_as_layer
+from ..utils.router import route_as_layer, get_routing_parameters
+from ORStools.gui import directions_gui
 
 try:
     import processing
@@ -262,7 +263,10 @@ class ORStoolsDialogMain:
         try:
             basepath = os.path.dirname(__file__)
 
-            layer_out = route_as_layer(self.dlg)
+            provider, profile, optimize = get_routing_parameters(self.dlg)
+            directions = directions_gui.Directions(self.dlg)
+
+            layer_out = route_as_layer(self.dlg, provider, profile, optimize, directions)
 
             # style output layer
             qml_path = os.path.join(basepath, "linestyle.qml")

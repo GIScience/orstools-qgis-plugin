@@ -11,21 +11,28 @@ from ORStools.common import (
     client,
     directions_core,
 )
-from ORStools.gui import directions_gui
+
 from ORStools.utils import exceptions, logger, configmanager
 
 from qgis.PyQt.QtCore import QCoreApplication
 
+def get_routing_parameters(dlg):
+    provider_id = dlg.provider_combo.currentIndex()
+    provider = configmanager.read_config()["providers"][provider_id]
 
-def route_as_layer(dlg):
+    profile = dlg.routing_travel_combo.currentText()
+
+    optimize = dlg.optimization_group.isChecked()
+
+    return provider, profile, optimize
+
+
+def route_as_layer(dlg, provider, profile, optimize, directions):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     layer_name = f"Route_ORS_{timestamp}"
     layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", layer_name, "memory")
     layer_out.dataProvider().addAttributes(directions_core.get_fields())
     layer_out.updateFields()
-
-    provider_id = dlg.provider_combo.currentIndex()
-    provider = configmanager.read_config()["providers"][provider_id]
 
     # if no API key is present, when ORS is selected, throw an error message
     if not provider["key"] and provider["base_url"].startswith("https://api.openrouteservice.org"):
@@ -45,11 +52,10 @@ def route_as_layer(dlg):
     clnt = client.Client(provider, agent)
     clnt_msg = ""
 
-    directions = directions_gui.Directions(dlg)
     params = None
     try:
         params = directions.get_parameters()
-        if dlg.optimization_group.isChecked():
+        if optimize:
             if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
                 QMessageBox.critical(
                     dlg,
@@ -66,7 +72,6 @@ Remember, the first and last location are not part of the optimization.
             )
         else:
             params["coordinates"] = directions.get_request_line_feature()
-            profile = dlg.routing_travel_combo.currentText()
             # abort on empty avoid polygons layer
             if (
                 "options" in params
