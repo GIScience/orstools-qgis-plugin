@@ -59,13 +59,18 @@ class InvalidKey(Exception):
         else:
             return f"{self.status} ({self.message})"
 
+
 class InvalidInput(Exception):
     """Signifies that the request failed because of invalid input data."""
+
     pass
+
 
 class EmptyLayerError(Exception):
     """Signifies that the request has been aborted due to an empty layer."""
+
     pass
+
 
 class OverQueryLimit(Exception):
     """Signifies that the request failed because the client exceeded its query rate limit."""
