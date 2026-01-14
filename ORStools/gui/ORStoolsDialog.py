@@ -265,19 +265,9 @@ class ORStoolsDialogMain:
 
         self.dlg.show()
 
-    def run_gui_control(self) -> None:
-        """Slot function for OK button of main dialog."""
-        if self.dlg.routing_fromline_list.count() == 0:
-            return
-
-        def on_finished(exception, result=None) -> None:
-            """
-            Callback when task finishes.
-
-            :param exception: Exception if task failed, None otherwise
-            :param result: The layer_out returned from the task function
-            """
-            if isinstance(exception, exceptions.InvalidInput):
+    def handle_task_exception(self, exception: Exception) -> None:
+        """Handles exceptions thrown by routing task."""
+        if isinstance(exception, exceptions.InvalidInput):
                 QMessageBox.critical(
                     self.dlg,
                     self.tr("Wrong number of waypoints"),
@@ -286,7 +276,7 @@ class ORStoolsDialogMain:
                                 """),
                 )
 
-            if isinstance(exception, exceptions.EmptyLayerError):
+        elif isinstance(exception, exceptions.EmptyLayerError):
                 QMessageBox.warning(
                     self.dlg,
                     self.tr("Empty layer"),
@@ -296,7 +286,7 @@ class ORStoolsDialogMain:
                                             """),
                 )
 
-            if isinstance(exception, exceptions.InvalidKey):
+        elif isinstance(exception, exceptions.InvalidKey):
                 QMessageBox.critical(
                     self.dlg,
                     self.tr("Missing API key"),
@@ -308,7 +298,7 @@ class ORStoolsDialogMain:
                 settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
                 )
 
-            if isinstance(exception, exceptions.ApiError):
+        elif isinstance(exception, exceptions.ApiError):
                 # Error thrown by ORStools/common/client.py, line 243, in _check_status
                 try:
                     parsed = json.loads(exception.message)
@@ -328,25 +318,41 @@ class ORStoolsDialogMain:
                 else:
                     raise exception
 
-            layer_out = result
-            if layer_out is None:
-                logger.log("Task completed but returned None", 2)
-                return
+    def on_finished(self, exception, result=None) -> None:
+        """
+        Callback when task finishes.
 
-            logger.log("Starting to add route layer to QGIS project...", 0)
-            basepath = os.path.dirname(__file__)
-            qml_path = os.path.join(basepath, "linestyle.qml")
-            layer_out.loadNamedStyle(qml_path, True)
-            layer_out.triggerRepaint()
+        :param exception: Exception if task failed, None otherwise
+        :param result: The layer_out returned from the task function
+        """
+        if exception is not None:
+            self.handle_task_exception(exception)
+            return
 
-            self.project.addMapLayer(layer_out)
+        layer_out = result
+        if layer_out is None:
+            logger.log("Task completed but returned None", 2)
+            return
 
-            my_new_path = os.path.join(basepath, "img/svg")
-            svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
-            if my_new_path not in svg_paths:
-                svg_paths.append(my_new_path)
-                QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
-            logger.log("Route layer added to QGIS project.", 0)
+        logger.log("Starting to add route layer to QGIS project...", 0)
+        basepath = os.path.dirname(__file__)
+        qml_path = os.path.join(basepath, "linestyle.qml")
+        layer_out.loadNamedStyle(qml_path, True)
+        layer_out.triggerRepaint()
+
+        self.project.addMapLayer(layer_out)
+
+        my_new_path = os.path.join(basepath, "img/svg")
+        svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
+        if my_new_path not in svg_paths:
+            svg_paths.append(my_new_path)
+            QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
+        logger.log("Route layer added to QGIS project.", 0)
+
+    def run_gui_control(self) -> None:
+        """Slot function for OK button of main dialog."""
+        if self.dlg.routing_fromline_list.count() == 0:
+            return
 
         provider, profile, optimize = get_routing_parameters(self.dlg)
         directions = directions_gui.Directions(self.dlg)
@@ -358,17 +364,12 @@ class ORStoolsDialogMain:
             profile=profile,
             optimize=optimize,
             directions=directions.get_directions(),
-            on_finished=on_finished,
+            on_finished=self.on_finished,
         )
 
         QgsApplication.taskManager().addTask(self.task)
 
-        for annotation in self.dlg.annotations:
-            self.project.annotationManager().removeAnnotation(annotation)
-
-        self.dlg.annotations = []
-        self.dlg.rubber_band.reset()
-
+        self.dlg._clear_annotations()
         self.dlg._clear_listwidget()
         self.dlg.line_tool = maptools.LineTool(self.dlg)
 
