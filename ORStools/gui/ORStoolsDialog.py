@@ -95,7 +95,7 @@ from ORStools.common import (
     PROFILES,
     PREFERENCES,
 )
-from ORStools.utils import logger, maptools, configmanager, transform, gui, exceptions
+from ORStools.utils import maptools, configmanager, transform, gui, exceptions
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
@@ -268,57 +268,57 @@ class ORStoolsDialogMain:
     def handle_task_exception(self, exception: Exception) -> None:
         """Handles exceptions thrown by routing task."""
         if isinstance(exception, exceptions.InvalidInput):
-                QMessageBox.critical(
-                    self.dlg,
-                    self.tr("Wrong number of waypoints"),
-                    self.tr("""At least 3 or 4 waypoints are needed to perform routing optimization. 
+            QMessageBox.critical(
+                self.dlg,
+                self.tr("Wrong number of waypoints"),
+                self.tr("""At least 3 or 4 waypoints are needed to perform routing optimization. 
                                 Remember, the first and last location are not part of the optimization.
                                 """),
-                )
+            )
 
         elif isinstance(exception, exceptions.EmptyLayerError):
-                QMessageBox.warning(
-                    self.dlg,
-                    self.tr("Empty layer"),
-                    self.tr("""
+            QMessageBox.warning(
+                self.dlg,
+                self.tr("Empty layer"),
+                self.tr("""
                         The specified avoid polygon(s) layer does not contain any features.
                         Please add polygons to the layer or uncheck avoid polygons.
                                             """),
-                )
+            )
 
         elif isinstance(exception, exceptions.InvalidKey):
-                QMessageBox.critical(
-                    self.dlg,
-                    self.tr("Missing API key"),
-                    self.tr("""
+            QMessageBox.critical(
+                self.dlg,
+                self.tr("Missing API key"),
+                self.tr("""
                 Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
 
                 If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
                 Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
                 settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
-                )
+            )
 
         elif isinstance(exception, exceptions.ApiError):
-                # Error thrown by ORStools/common/client.py, line 243, in _check_status
-                try:
-                    parsed = json.loads(exception.message)
-                    error_code = int(parsed["error"]["code"])
-                except KeyError:
-                    error_code = exception.status
+            # Error thrown by ORStools/common/client.py, line 243, in _check_status
+            try:
+                parsed = json.loads(exception.message)
+                error_code = int(parsed["error"]["code"])
+            except KeyError:
+                error_code = exception.status
 
-                if error_code == 2010:
-                    maptools.LineTool(self.dlg).radius_message_box(exception)
-                    return
-                elif error_code == "404":
-                    self.iface.messageBar().pushMessage(
-                        "Error 404: Not Found",
-                        "Are your endpoints set correctly in the Provider Settings?",
-                        level=Qgis.MessageLevel.Warning,
-                    )
-                else:
-                    raise exception
+            if error_code == 2010:
+                maptools.LineTool(self.dlg).radius_message_box(exception)
+                return
+            elif error_code == "404":
+                self.iface.messageBar().pushMessage(
+                    "Error 404: Not Found",
+                    "Are your endpoints set correctly in the Provider Settings?",
+                    level=Qgis.MessageLevel.Warning,
+                )
+            else:
+                raise exception
 
-    def on_finished(self, exception, result=None) -> None:
+    def on_finished(self, exception, layer_out=None) -> None:
         """
         Callback when task finishes.
 
@@ -329,12 +329,6 @@ class ORStoolsDialogMain:
             self.handle_task_exception(exception)
             return
 
-        layer_out = result
-        if layer_out is None:
-            logger.log("Task completed but returned None", 2)
-            return
-
-        logger.log("Starting to add route layer to QGIS project...", 0)
         basepath = os.path.dirname(__file__)
         qml_path = os.path.join(basepath, "linestyle.qml")
         layer_out.loadNamedStyle(qml_path, True)
@@ -347,7 +341,6 @@ class ORStoolsDialogMain:
         if my_new_path not in svg_paths:
             svg_paths.append(my_new_path)
             QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
-        logger.log("Route layer added to QGIS project.", 0)
 
     def run_gui_control(self) -> None:
         """Slot function for OK button of main dialog."""

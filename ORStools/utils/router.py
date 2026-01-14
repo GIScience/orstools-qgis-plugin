@@ -28,7 +28,6 @@ def get_routing_parameters(dlg):
 
 
 def route_as_layer(task, provider, profile, optimize, directions):
-    logger.log("Starting routing request...", 0)
     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     layer_name = f"Route_ORS_{timestamp}"
     layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", layer_name, "memory")
@@ -79,7 +78,6 @@ def route_as_layer(task, provider, profile, optimize, directions):
 
         layer_out.updateExtents()
 
-        logger.log("Routing request completed.", 0)
         return layer_out
 
         # Update quota; handled in client module after successful request
