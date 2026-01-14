@@ -58,6 +58,8 @@ from qgis.core import (
     Qgis,  # noqa: F811
     QgsAnnotation,
     QgsCoordinateTransform,
+    QgsTask,
+    QgsApplication,
 )
 from qgis.gui import (
     QgsMapCanvasAnnotationItem,
@@ -85,7 +87,7 @@ from ORStools.common import (
     PROFILES,
     PREFERENCES,
 )
-from ORStools.utils import maptools, configmanager, transform, gui, exceptions
+from ORStools.utils import logger, maptools, configmanager, transform, gui, exceptions
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
@@ -260,14 +262,71 @@ class ORStoolsDialogMain:
         if self.dlg.routing_fromline_list.count() == 0:
             return
 
-        try:
+        def on_finished(exception, result=None) -> None:
+            """
+            Callback when task finishes.
+
+            :param exception: Exception if task failed, None otherwise
+            :param result: The layer_out returned from the task function
+            """
+            if isinstance(exception, exceptions.InvalidInput):
+                QMessageBox.critical(
+                    self.dlg,
+                    self.tr("Wrong number of waypoints"),
+                    self.tr("""At least 3 or 4 waypoints are needed to perform routing optimization. 
+                                Remember, the first and last location are not part of the optimization.
+                                """),
+                )
+
+            if isinstance(exception, exceptions.EmptyLayerError):
+                QMessageBox.warning(
+                    self.dlg,
+                    self.tr("Empty layer"),
+                    self.tr("""
+                        The specified avoid polygon(s) layer does not contain any features.
+                        Please add polygons to the layer or uncheck avoid polygons.
+                                            """),
+                )
+
+            if isinstance(exception, exceptions.InvalidKey):
+                QMessageBox.critical(
+                    self.dlg,
+                    self.tr("Missing API key"),
+                    self.tr("""
+                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
+                )
+
+            if isinstance(exception, exceptions.ApiError):
+                # Error thrown by ORStools/common/client.py, line 243, in _check_status
+                try:
+                    parsed = json.loads(exception.message)
+                    error_code = int(parsed["error"]["code"])
+                except KeyError:
+                    error_code = exception.status
+
+                if error_code == 2010:
+                    maptools.LineTool(self.dlg).radius_message_box(exception)
+                    return
+                elif error_code == "404":
+                    self.iface.messageBar().pushMessage(
+                        "Error 404: Not Found",
+                        "Are your endpoints set correctly in the Provider Settings?",
+                        level=Qgis.MessageLevel.Warning,
+                    )
+                else:
+                    raise exception
+
+            layer_out = result
+            if layer_out is None:
+                logger.log("Task completed but returned None", 2)
+                return
+
+            logger.log("Starting to add route layer to QGIS project...", 0)
             basepath = os.path.dirname(__file__)
-
-            provider, profile, optimize = get_routing_parameters(self.dlg)
-            directions = directions_gui.Directions(self.dlg)
-
-            layer_out = route_as_layer(provider, profile, optimize, directions)
-
             qml_path = os.path.join(basepath, "linestyle.qml")
             layer_out.loadNamedStyle(qml_path, True)
             layer_out.triggerRepaint()
@@ -279,66 +338,31 @@ class ORStoolsDialogMain:
             if my_new_path not in svg_paths:
                 svg_paths.append(my_new_path)
                 QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
+            logger.log("Route layer added to QGIS project.", 0)
 
-            for annotation in self.dlg.annotations:
-                self.project.annotationManager().removeAnnotation(annotation)
+        provider, profile, optimize = get_routing_parameters(self.dlg)
+        directions = directions_gui.Directions(self.dlg)
 
-            self.dlg.annotations = []
-            self.dlg.rubber_band.reset()
+        self.task = QgsTask.fromFunction(
+            "ORStools Routing Task",
+            route_as_layer,
+            provider=provider,
+            profile=profile,
+            optimize=optimize,
+            directions=directions.get_directions(),
+            on_finished=on_finished,
+        )
 
-            self.dlg._clear_listwidget()
-            self.dlg.line_tool = maptools.LineTool(self.dlg)
+        QgsApplication.taskManager().addTask(self.task)
 
-        except exceptions.InvalidInput:
-            QMessageBox.critical(
-                self.dlg,
-                self.tr("Wrong number of waypoints"),
-                self.tr("""At least 3 or 4 waypoints are needed to perform routing optimization. 
-                            Remember, the first and last location are not part of the optimization.
-                            """),
-            )
+        for annotation in self.dlg.annotations:
+            self.project.annotationManager().removeAnnotation(annotation)
 
-        except exceptions.EmptyLayerError:
-            QMessageBox.warning(
-                self.dlg,
-                self.tr("Empty layer"),
-                self.tr("""
-                    The specified avoid polygon(s) layer does not contain any features.
-                    Please add polygons to the layer or uncheck avoid polygons.
-                                        """),
-            )
+        self.dlg.annotations = []
+        self.dlg.rubber_band.reset()
 
-        except exceptions.InvalidKey:
-            QMessageBox.critical(
-                self.dlg,
-                self.tr("Missing API key"),
-                self.tr("""
-            Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
-
-            If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
-            Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
-            settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
-            )
-
-        except exceptions.ApiError as e:
-            # Error thrown by ORStools/common/client.py, line 243, in _check_status
-            try:
-                parsed = json.loads(e.message)
-                error_code = int(parsed["error"]["code"])
-            except KeyError:
-                error_code = e.status
-
-            if error_code == 2010:
-                maptools.LineTool(self.dlg).radius_message_box(e)
-                return
-            elif error_code == "404":
-                self.iface.messageBar().pushMessage(
-                    "Error 404: Not Found",
-                    "Are your endpoints set correctly in the Provider Settings?",
-                    level=Qgis.MessageLevel.Warning,
-                )
-            else:
-                raise e
+        self.dlg._clear_listwidget()
+        self.dlg.line_tool = maptools.LineTool(self.dlg)
 
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)

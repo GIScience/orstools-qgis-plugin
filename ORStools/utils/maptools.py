@@ -286,7 +286,9 @@ class LineTool(QgsMapToolEmitPoint):
         if self.dlg.toggle_preview.isChecked() and self.dlg.routing_fromline_list.count() > 1:
             provider, profile, optimize = router.get_routing_parameters(self.dlg)
             directions = directions_gui.Directions(self.dlg)
-            route_layer = router.route_as_layer(provider, profile, optimize, directions)
+            route_layer = router.route_as_layer(
+                None, provider, profile, optimize, directions.get_directions()
+            )
             if route_layer:
                 feature = next(route_layer.getFeatures())
                 self.dlg.rubber_band.addGeometry(feature.geometry(), route_layer)

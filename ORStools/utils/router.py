@@ -27,7 +27,8 @@ def get_routing_parameters(dlg):
     return provider, profile, optimize
 
 
-def route_as_layer(provider, profile, optimize, directions):
+def route_as_layer(task, provider, profile, optimize, directions):
+    logger.log("Starting routing request...", 0)
     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     layer_name = f"Route_ORS_{timestamp}"
     layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", layer_name, "memory")
@@ -44,7 +45,7 @@ def route_as_layer(provider, profile, optimize, directions):
 
     params = None
     try:
-        params = directions.get_parameters()
+        params = directions["parameters"]
         if optimize:
             if len(params["jobs"]) <= 1:  # Start/end locations don't count as job
                 raise exceptions.InvalidInput()
@@ -52,8 +53,9 @@ def route_as_layer(provider, profile, optimize, directions):
             feat = directions_core.get_output_features_optimization(
                 response, params["vehicles"][0]["profile"]
             )
+
         else:
-            params["coordinates"] = directions.get_request_line_feature()
+            params["coordinates"] = directions["request_line_feature"]
             # abort on empty avoid polygons layer
             if (
                 "options" in params
@@ -70,13 +72,14 @@ def route_as_layer(provider, profile, optimize, directions):
                 f"/v2/{endpoint}/" + profile + "/geojson", {}, post_json=params
             )
             feat = directions_core.get_output_feature_directions(
-                response, profile, params["preference"], directions.options
+                response, profile, params["preference"], directions["options"]
             )
 
         layer_out.dataProvider().addFeature(feat)
 
         layer_out.updateExtents()
 
+        logger.log("Routing request completed.", 0)
         return layer_out
 
         # Update quota; handled in client module after successful request
@@ -102,6 +105,7 @@ def route_as_layer(provider, profile, optimize, directions):
         # Set URL in debug window
         if params:
             clnt_msg += f'<a href="{clnt.url}">{clnt.url}</a><br>Parameters:<br>{json.dumps(params, indent=2)}'
+
 
 def tr(string: str) -> str:
     return QCoreApplication.translate("ORStoolsDialogMain", string)
