@@ -360,7 +360,12 @@ class ORStoolsDialogMain:
             on_finished=self.on_finished,
         )
 
+        self.dlg.setDisabled(True)
+
         QgsApplication.taskManager().addTask(self.task)
+
+        self.task.taskCompleted.connect(lambda: self.dlg.setDisabled(False))
+        self.task.taskTerminated.connect(lambda: self.dlg.setDisabled(False))
 
         self.dlg._clear_annotations()
         self.dlg._clear_listwidget()
