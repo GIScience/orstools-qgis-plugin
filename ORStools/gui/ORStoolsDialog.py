@@ -433,7 +433,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.provider_refresh.clicked.connect(self._on_prov_refresh_click)
 
         # Routing tab
-        self.routing_fromline_map.clicked.connect(self._on_linetool_init)
+        self.routing_fromline_map.clicked.connect(lambda: self._on_linetool_init(hide=True))
         self.routing_fromline_clear.clicked.connect(self._clear_listwidget)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
 
@@ -574,6 +574,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 )
 
     def add_geocoded_item(self, coordinates, lineEdit) -> None:
+        self._on_linetool_init(hide=False)
         idx = "0"
         p = f"Point {idx}: {coordinates[0]}, {coordinates[1]}"
         items = [
@@ -688,9 +689,10 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         if self.rubber_band:
             self.rubber_band.reset()
 
-    def _on_linetool_init(self) -> None:
+    def _on_linetool_init(self, hide: bool) -> None:
         """Hides GUI dialog, inits line maptool and add items to line list box."""
-        self.hide()
+        if hide:
+            self.hide()
         if self.line_tool:
             self.canvas.setMapTool(self.line_tool)
         else:
