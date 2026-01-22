@@ -519,6 +519,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
     def reload_geocode_completer_ors(self, request, lineEdit, text):
         request.abort()
+        self.setDisabled(True)
 
         if lineEdit.text() == text and lineEdit.text() != "":
             provider_id = self.provider_combo.currentIndex()
@@ -566,6 +567,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
                     settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
                 )
+        self.setDisabled(False)
 
     def add_geocoded_item(self, coordinates, lineEdit) -> None:
         self._on_linetool_init(hide=False)
