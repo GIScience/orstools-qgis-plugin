@@ -513,17 +513,17 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         text = lineEdit.text()
         request = QgsBlockingNetworkRequest()
         QTimer.singleShot(300, lambda: self.reload_geocode_completer_ors(request, lineEdit, text))
-    
+
     def option_chosen(self, label, lineEdit, data, completer):
-                    coords = [
-                        feature["geometry"]["coordinates"]
-                        for feature in data["features"]
-                        if feature["properties"]["label"] == label
-                    ][0]
-                    self.line_tool = maptools.LineTool(self)
-                    self.add_geocoded_item(coords, lineEdit)
-                    completer.activated.disconnect()
-                    lineEdit.setText("")
+        coords = [
+            feature["geometry"]["coordinates"]
+            for feature in data["features"]
+            if feature["properties"]["label"] == label
+        ][0]
+        self.line_tool = maptools.LineTool(self)
+        self.add_geocoded_item(coords, lineEdit)
+        completer.activated.disconnect()
+        lineEdit.setText("")
 
     def reload_geocode_completer_ors(self, request, lineEdit, text):
         request.abort()
@@ -553,7 +553,9 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
                     completer.setFilterMode(Qt.MatchFlag.MatchContains)
                     completer.highlighted.connect(completer.highlighted.disconnect)
-                    completer.activated.connect(lambda t: self.option_chosen(t, lineEdit, data, completer))
+                    completer.activated.connect(
+                        lambda t: self.option_chosen(t, lineEdit, data, completer)
+                    )
                     lineEdit.setCompleter(completer)
                     completer.complete()
 
