@@ -85,14 +85,7 @@ from qgis.PyQt.QtWidgets import (
     QDialogButtonBox,
     QShortcut,
 )
-from qgis.PyQt.QtGui import QTextDocument
 from qgis.PyQt.QtWidgets import (
-    QAction,
-    QDialog,
-    QApplication,
-    QMenu,
-    QMessageBox,
-    QDialogButtonBox,
     QCompleter,
 )
 from qgis.PyQt.QtGui import QColor
