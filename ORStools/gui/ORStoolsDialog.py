@@ -359,10 +359,6 @@ class ORStoolsDialogMain:
         self.task.taskCompleted.connect(lambda: self.dlg.setDisabled(False))
         self.task.taskTerminated.connect(lambda: self.dlg.setDisabled(False))
 
-        self.dlg._clear_annotations()
-        self.dlg._clear_listwidget()
-        self.dlg.line_tool = maptools.LineTool(self.dlg)
-
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
 
