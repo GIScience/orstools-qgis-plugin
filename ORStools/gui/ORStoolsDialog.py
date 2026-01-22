@@ -59,12 +59,8 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsSettings,
     QgsAnnotation,
-    QgsCoordinateTransform,
     QgsTask,
     QgsApplication,
-    QgsCoordinateTransform,
-    Qgis,
-    QgsBlockingNetworkRequest,
     QgsCoordinateTransform,
     Qgis,
     QgsBlockingNetworkRequest,
@@ -541,7 +537,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
                     reply = request.reply()
                     data = json.loads(reply.content().data().decode("utf-8"))
-                    suggest = set([i["properties"]["label"] for i in data["features"]])
+                    suggest = [i["properties"]["label"] for i in data["features"]]
                     completer = QCompleter(suggest)
                     completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
                     completer.setFilterMode(Qt.MatchFlag.MatchContains)
