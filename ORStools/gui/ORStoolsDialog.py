@@ -64,8 +64,16 @@ from qgis.gui import (
     QgisInterface,
 )
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
-from qgis.PyQt.QtGui import QTextDocument
-from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from qgis.PyQt.QtGui import QTextDocument, QKeySequence
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QDialog,
+    QApplication,
+    QMenu,
+    QMessageBox,
+    QDialogButtonBox,
+    QShortcut,
+)
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QWidget,
@@ -393,6 +401,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.pushButton_export.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:export_network_from_map")
         )
+        shortcut = QShortcut(QKeySequence("Ctrl+Return"), self)
+        shortcut.activated.connect(lambda: self.global_buttons.accepted.emit())
 
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
