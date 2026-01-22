@@ -5,13 +5,18 @@ from qgis.testing import unittest
 
 from qgis.PyQt.QtTest import QTest
 from qgis.PyQt.QtCore import Qt, QEvent, QPoint
-from qgis.PyQt.QtWidgets import QPushButton
+from qgis.PyQt.QtWidgets import QPushButton, QMessageBox
 from qgis.gui import QgsMapCanvas, QgsMapMouseEvent, QgsRubberBand
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsRectangle,
+    QgsBlockingNetworkRequest,
 )
 import pytest
+
+
+from unittest.mock import Mock, patch
+import json
 
 from .test_proc import TestProc
 from tests.utils.utilities import get_qgis_app
@@ -400,3 +405,125 @@ class TestGui(unittest.TestCase):
             "POINT(8.67251100000000008 49.39887900000000087)",
             next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
         )
+
+    def test_reload_geocode_completer_ors(self):
+        """Test geocoding completer functionality with mocked API response."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialog
+
+        CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
+        CANVAS.setExtent(QgsRectangle(-13732628.1, 6181790.0, -13728426.7, 6179205.3))
+        CANVAS.setDestinationCrs(CRS)
+        CANVAS.setFrameStyle(0)
+        CANVAS.resize(600, 400)
+
+        dlg = ORStoolsDialog(IFACE)
+        dlg.open()
+        self.assertTrue(dlg.isVisible())
+
+        mock_response = {
+            "geocoding": {"version": "0.2", "query": {"text": "heidelberg"}},
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [8.6724, 49.3988]},
+                    "properties": {
+                        "id": "101906011",
+                        "gid": "whosonfirst:locality:101906011",
+                        "layer": "locality",
+                        "name": "Heidelberg",
+                        "label": "Heidelberg, BW, Germany",
+                        "country": "Germany",
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [145.0569, -37.7549]},
+                    "properties": {
+                        "id": "101933031",
+                        "gid": "whosonfirst:locality:101933031",
+                        "layer": "locality",
+                        "name": "Heidelberg",
+                        "label": "Heidelberg, VIC, Australia",
+                        "country": "Australia",
+                    },
+                },
+            ],
+        }
+
+        mock_request = Mock(spec=QgsBlockingNetworkRequest)
+        mock_reply = Mock()
+        mock_reply.content.return_value = Mock(
+            data=Mock(return_value=json.dumps(mock_response).encode("utf-8"))
+        )
+        mock_request.reply.return_value = mock_reply
+        mock_request.get.return_value = QgsBlockingNetworkRequest.ErrorCode.NoError
+        mock_request.abort = Mock()
+
+        text = "heidelberg"
+        dlg.geocode_edit.setText(text)
+
+        dlg.reload_geocode_completer_ors(mock_request, dlg.geocode_edit, text)
+
+        mock_request.get.assert_called_once()
+
+        completer = dlg.geocode_edit.completer()
+        self.assertIsNotNone(completer)
+
+        model = completer.completionModel()
+        self.assertEqual(model.rowCount(), 2)
+
+        completions = []
+        for i in range(model.rowCount()):
+            index = model.index(i, 0)
+            completions.append(model.data(index))
+
+        self.assertIn("Heidelberg, BW, Germany", completions)
+        self.assertIn("Heidelberg, VIC, Australia", completions)
+
+        completer.setCurrentRow(0)
+        first_completion = completer.currentCompletion()
+
+        self.assertIn("Germany", first_completion)
+
+        completer.activated.emit(first_completion)
+
+        self.assertEqual(dlg.routing_fromline_list.count(), 1)
+
+        item_text = dlg.routing_fromline_list.item(0).text()
+        self.assertIn("8.672", item_text)
+        self.assertIn("49.398", item_text)
+
+        self.assertEqual(len(dlg.annotations), 1)
+
+        self.assertEqual(dlg.geocode_edit.text(), "")
+
+        self.assertTrue(dlg.geocoded)
+
+    def test_reload_geocode_completer_ors_no_api_key(self):
+        """Test geocoding completer shows error when API key is missing."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialog
+        from ORStools.utils import configmanager
+
+        original_config = configmanager.read_config()
+
+        config = original_config.copy()
+        config["providers"][0]["key"] = ""
+
+        with patch("ORStools.utils.configmanager.read_config", return_value=config):
+            dlg = ORStoolsDialog(IFACE)
+            dlg.open()
+
+            mock_request = Mock(spec=QgsBlockingNetworkRequest)
+            mock_request.abort = Mock()
+            text = "heidelberg"
+            dlg.geocode_edit.setText(text)
+
+            with patch.object(QMessageBox, "critical") as mock_msgbox:
+                dlg.reload_geocode_completer_ors(mock_request, dlg.geocode_edit, text)
+                mock_msgbox.assert_called_once()
+
+            self.assertEqual(dlg.routing_fromline_list.count(), 0)
+
+    def test_add_geocoded_item(self):
+        pass
