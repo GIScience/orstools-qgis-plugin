@@ -513,17 +513,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         text = lineEdit.text()
         request = QgsBlockingNetworkRequest()
         QTimer.singleShot(300, lambda: self.reload_geocode_completer_ors(request, lineEdit, text))
-
-    def reload_geocode_completer_ors(self, request, lineEdit, text):
-        request.abort()
-
-        if lineEdit.text() == text and lineEdit.text() != "":
-            provider_id = self.provider_combo.currentIndex()
-            provider = configmanager.read_config()["providers"][provider_id]
-            api_key = provider["key"]
-            if api_key != "":
-
-                def option_chosen(label, lineEdit):
+    
+    def option_chosen(self, label, lineEdit, data, completer):
                     coords = [
                         feature["geometry"]["coordinates"]
                         for feature in data["features"]
@@ -534,6 +525,14 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     completer.activated.disconnect()
                     lineEdit.setText("")
 
+    def reload_geocode_completer_ors(self, request, lineEdit, text):
+        request.abort()
+
+        if lineEdit.text() == text and lineEdit.text() != "":
+            provider_id = self.provider_combo.currentIndex()
+            provider = configmanager.read_config()["providers"][provider_id]
+            api_key = provider["key"]
+            if api_key != "":
                 e = self._iface.mapCanvas().extent()
                 lat = e.yMinimum() + (e.yMaximum() - e.yMinimum()) / 2
                 lon = e.xMinimum() + (e.xMaximum() - e.xMinimum()) / 2
@@ -554,7 +553,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
                     completer.setFilterMode(Qt.MatchFlag.MatchContains)
                     completer.highlighted.connect(completer.highlighted.disconnect)
-                    completer.activated.connect(lambda t: option_chosen(t, lineEdit))
+                    completer.activated.connect(lambda t: self.option_chosen(t, lineEdit, data, completer))
                     lineEdit.setCompleter(completer)
                     completer.complete()
 
