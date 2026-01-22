@@ -520,7 +520,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             for feature in data["features"]
             if feature["properties"]["label"] == label
         ][0]
-        self.line_tool = maptools.LineTool(self)
         self.add_geocoded_item(coords, lineEdit)
         completer.activated.disconnect()
         lineEdit.setText("")
@@ -577,8 +576,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
     def add_geocoded_item(self, coordinates, lineEdit) -> None:
         self._on_linetool_init(hide=False)
-        idx = "0"
-        p = f"Point {idx}: {coordinates[0]}, {coordinates[1]}"
+        self.line_tool.idx += 1
+        p = f"Point {self.line_tool.idx}: {coordinates[0]}, {coordinates[1]}"
         items = [
             self.routing_fromline_list.item(x).text()
             for x in range(self.routing_fromline_list.count())
@@ -594,7 +593,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.routing_fromline_list.addItems(items)
 
         point = QgsPointXY(coordinates[0], coordinates[1])
-        annotation = self._linetool_annotate_point(point, idx)
+        annotation = self._linetool_annotate_point(point, self.line_tool.idx)
         self.annotations.append(annotation)
         self.project.annotationManager().addAnnotation(annotation)
         self._reindex_list_items()
