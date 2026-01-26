@@ -542,6 +542,7 @@ class TestGui(unittest.TestCase):
 
     def test_load_valid_point_layer(self):
         """Test loading vertices from valid point layer."""
+
     def test_load_valid_point_layer_single_geometry(self):
         """Test loading vertices from valid point layer with single point geometries."""
         from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain

@@ -779,8 +779,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.load_provider_combo_state()
 
     def load_vertices_from_layer(self, testing: str = "") -> None:
-        if not self.line_tool:
-            self.line_tool = maptools.LineTool(self)
+        self._on_linetool_init(hide=False)
 
         box = LayerMessageBox()
 
@@ -807,7 +806,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     ):
                         pt = geom.asPoint()
                         self.create_vertex(pt, id, layer.crs().postgisSrid())
-                        self.line_tool.create_rubber_band()
 
                     elif (
                         geom.type() == QgsWkbTypes.GeometryType.PointGeometry
@@ -816,7 +814,9 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                         pts = geom.asMultiPoint()
                         for pt in pts:
                             self.create_vertex(pt, id, layer.crs().postgisSrid())
-                            self.line_tool.create_rubber_band()
+                self.line_tool.create_rubber_band()
+                self._reindex_list_items()
+
             except Exception:
                 self._clear_annotations()
                 self._iface.messageBar().pushMessage(
