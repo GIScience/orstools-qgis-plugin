@@ -793,8 +793,6 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         if result == QMessageBox.StandardButton.Ok:
             layer = box.selectedLayer()
             try:
-                self.routing_fromline_list.clear()
-
                 for id, feat in enumerate(layer.getFeatures()):
                     geom = feat.geometry()
                     if not geom:
