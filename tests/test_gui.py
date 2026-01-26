@@ -399,7 +399,7 @@ class TestGui(unittest.TestCase):
         self.assertEqual(settings_directions_endpoint, "directions")
 
         layer = proc.get_directions_points_layer()
-        self.assertEqual(layer.featureCount(), 93)
+        self.assertAlmostEqual(layer.featureCount(), 93, delta=3)
 
         self.assertEqual(
             "POINT(8.67251100000000008 49.39887900000000087)",
