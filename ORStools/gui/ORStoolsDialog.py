@@ -626,6 +626,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
     def _clear_listwidget(self) -> None:
         """Clears the contents of the QgsListWidget and the annotations."""
+        self.setDisabled(True)
         items = self.routing_fromline_list.selectedItems()
         if items:
             rows = [self.routing_fromline_list.row(item) for item in items]
@@ -647,6 +648,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
             del self.line_tool
             self.line_tool = maptools.LineTool(self)
             self.geocoded = False
+        self.setDisabled(False)
 
     def _linetool_annotate_point(
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
