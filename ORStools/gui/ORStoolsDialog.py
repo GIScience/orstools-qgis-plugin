@@ -70,6 +70,7 @@ from qgis.gui import (
     QgsCollapsibleGroupBox,
     QgisInterface,
 )
+from qgis.core import QgsWkbTypes
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
 from qgis.PyQt.QtGui import QTextDocument, QKeySequence
 from qgis.PyQt.QtWidgets import (
@@ -103,6 +104,7 @@ from ORStools.common import (
     PREFERENCES,
 )
 from ORStools.utils import maptools, configmanager, transform, gui, exceptions
+from ORStools.utils.gui import LayerMessageBox
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
