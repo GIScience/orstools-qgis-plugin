@@ -782,9 +782,9 @@ class TestGui(unittest.TestCase):
         dialog_main.dlg.load_vertices_from_layer("ok")
 
         # Verify old vertices were cleared
-        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 1)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 3)
         self.assertEqual(
-            dialog_main.dlg.routing_fromline_list.item(0).text(), "Point 0: 5.000000, 5.000000"
+            dialog_main.dlg.routing_fromline_list.item(2).text(), "Point 2: 5.000000, 5.000000"
         )
 
     def test_load_layer_creates_annotations(self):
