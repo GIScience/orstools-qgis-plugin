@@ -781,7 +781,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
     def load_vertices_from_layer(self, testing: str = "") -> None:
         self._on_linetool_init(hide=False)
 
-        box = LayerMessageBox()
+        box = LayerMessageBox(iface=self._iface)
 
         if testing == "ok":
             result = QMessageBox.StandardButton.Ok

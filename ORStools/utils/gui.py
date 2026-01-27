@@ -57,7 +57,7 @@ class GuiUtils:
 
 
 class LayerMessageBox(QMessageBox):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, iface=None):
         super().__init__(parent)
         self.setWindowTitle("Choose a Layer")
         self.setText("Select a point layer from the list:")
@@ -66,6 +66,7 @@ class LayerMessageBox(QMessageBox):
         self.layer_combo = QgsMapLayerComboBox(self)
         self.layer_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
         self.layer_combo.setMinimumWidth(200)
+        self.layer_combo.setLayer(iface.activeLayer())
 
         layout = self.layout()
         layout.addWidget(self.layer_combo, 1, 1, 1, 2)
