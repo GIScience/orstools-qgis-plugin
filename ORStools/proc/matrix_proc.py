@@ -89,10 +89,27 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
+        self.setToolTip(
+            self.PARAMETERS[0], self.tr("Only Point layers are allowed, not MultiPoint.")
+        )
+        self.setToolTip(
+            self.PARAMETERS[1],
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
+        )
+        self.setToolTip(self.PARAMETERS[2], "Only Point layers are allowed, not MultiPoint.")
+        self.setToolTip(
+            self.PARAMETERS[3],
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
+        )
+
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
         profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
@@ -179,7 +196,9 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         # Make request and catch ApiError
         try:
             endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])["matrix"]
-            response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
+            response = ors_client.fetch_with_retry(
+                f"/v2/{endpoint}/{profile}", {}, post_json=params
+            )
 
             (sink, dest_id) = self.parameterAsSink(
                 parameters, self.OUT, context, sink_fields, QgsWkbTypes.Type.NoGeometry

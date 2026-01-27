@@ -1,17 +1,29 @@
 from qgis.PyQt.QtWidgets import QLineEdit
-from qgis.core import QgsSettings
+from qgis.core import (
+    QgsSettings,
+    QgsVectorLayer,
+    QgsFeature,
+    QgsGeometry,
+    QgsProject,
+    QgsPointXY,
+)
 from qgis.gui import QgsCollapsibleGroupBox
 from qgis.testing import unittest
 
 from qgis.PyQt.QtTest import QTest
 from qgis.PyQt.QtCore import Qt, QEvent, QPoint
-from qgis.PyQt.QtWidgets import QPushButton
+from qgis.PyQt.QtWidgets import QPushButton, QMessageBox
 from qgis.gui import QgsMapCanvas, QgsMapMouseEvent, QgsRubberBand
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsRectangle,
+    QgsBlockingNetworkRequest,
 )
 import pytest
+
+
+from unittest.mock import Mock, patch
+import json
 
 from .test_proc import TestProc
 from tests.utils.utilities import get_qgis_app
@@ -22,6 +34,11 @@ QGISAPP, CANVAS, IFACE, PARENT = get_qgis_app()
 
 @pytest.mark.filterwarnings("ignore:.*imp module is deprecated.*")
 class TestGui(unittest.TestCase):
+    def tearDown(self):
+        """Run after each test"""
+        # Clean up layers
+        QgsProject.instance().removeAllMapLayers()
+
     def test_without_live_preview(self):
         from ORStools.gui.ORStoolsDialog import ORStoolsDialog
         from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
@@ -49,14 +66,14 @@ class TestGui(unittest.TestCase):
         map_button: QPushButton = dlg.routing_fromline_map
 
         # click green add vertices button
-        QTest.mouseClick(map_button, Qt.LeftButton)
+        QTest.mouseClick(map_button, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
         self.assertIsInstance(CANVAS.mapTool(), maptools.LineTool)
 
         # click on canvas at [0, 0]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.MouseButton.LeftButton))
 
-        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.MouseButton.LeftButton))
 
         self.assertEqual(dlg.routing_fromline_list.count(), 2)
 
@@ -65,7 +82,7 @@ class TestGui(unittest.TestCase):
         self.assertEqual(len_rubber_band, 2)
 
         # doubleclick on canvas at [5, 5]
-        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(5, 5, Qt.LeftButton))
+        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(5, 5, Qt.MouseButton.LeftButton))
         self.assertTrue(dlg.isVisible())
 
         # Check first item of list widget
@@ -101,17 +118,17 @@ class TestGui(unittest.TestCase):
         self.assertTrue(dlg.toggle_preview.isChecked())
 
         # click 'routing_fromline_map'
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
         self.assertIsInstance(CANVAS.mapTool(), maptools.LineTool)
 
         # click on canvas at [0, 0]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 0, Qt.MouseButton.LeftButton))
         # click on canvas at [5, 5]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 0, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 0, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 5, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(5, 0, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 0, Qt.MouseButton.LeftButton))
 
         self.assertEqual(
             dlg.routing_fromline_list.item(0).text(), "Point 0: -123.384059, 48.448463"
@@ -123,14 +140,14 @@ class TestGui(unittest.TestCase):
         self.assertTrue(len_rubber_band > 2)
 
         # Right click and thus show dlg
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.RightButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.MouseButton.RightButton))
         self.assertTrue(dlg.isVisible())
         # Test that right click doesn't create a point
         self.assertEqual(dlg.routing_fromline_list.count(), 5)
 
         # click on canvas at [10, 10]
         # Check that the click with an open dlg doesn't create an entry
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 5)
 
         # test whether point order remains valid when selected points are deleted from QListWidget
@@ -138,12 +155,12 @@ class TestGui(unittest.TestCase):
         dlg.routing_fromline_clear.clicked.emit()
 
         # click again after deletion
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 10, Qt.MouseButton.LeftButton))
 
         # Right click and thus show dlg
-        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.RightButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(0, 5, Qt.MouseButton.RightButton))
         self.assertTrue(dlg.isVisible())
 
         self.assertEqual(dlg.routing_fromline_list.count(), 5)
@@ -161,20 +178,20 @@ class TestGui(unittest.TestCase):
         self.assertEqual(len_rubber_band, 5)
 
         # Click Add Vertices again
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
 
         # continue digitization
         # click on canvas at [10, 5]
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 6)
 
         # Double click and thus show dlg
-        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(0, 5, Qt.LeftButton))
+        dlg.line_tool.canvasDoubleClickEvent(self.map_dclick(0, 5, Qt.MouseButton.LeftButton))
         self.assertTrue(dlg.isVisible())
 
         # clear list widget and check that it's empty
-        QTest.mouseClick(dlg.routing_fromline_clear, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_clear, Qt.MouseButton.LeftButton)
         self.assertEqual(dlg.routing_fromline_list.count(), 0)
         # Check that the rubber band is empty
         self.assertEqual(type(dlg.rubber_band), QgsRubberBand)
@@ -197,27 +214,27 @@ class TestGui(unittest.TestCase):
         self.assertTrue(dlg.isVisible())
 
         # click 'routing_fromline_map'
-        QTest.mouseClick(dlg.routing_fromline_map, Qt.LeftButton)
+        QTest.mouseClick(dlg.routing_fromline_map, Qt.MouseButton.LeftButton)
         self.assertFalse(dlg.isVisible())
         self.assertIsInstance(CANVAS.mapTool(), maptools.LineTool)
 
         # Add some points to the list
-        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 5, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 50, Qt.LeftButton))
-        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 50, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 5, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 50, Qt.MouseButton.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(100, 50, Qt.MouseButton.LeftButton))
 
         # Add point to be dragged
-        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(10, 5, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 4)
         self.assertEqual(
             dlg.routing_fromline_list.item(3).text(), "Point 3: -123.375767, 48.445713"
         )
 
         # Press at previous position
-        dlg.line_tool.canvasPressEvent(self.map_press(11, 5, Qt.LeftButton))
+        dlg.line_tool.canvasPressEvent(self.map_press(11, 5, Qt.MouseButton.LeftButton))
 
         # Release somewhere else
-        dlg.line_tool.canvasReleaseEvent(self.map_release(50, 10, Qt.LeftButton))
+        dlg.line_tool.canvasReleaseEvent(self.map_release(50, 10, Qt.MouseButton.LeftButton))
         self.assertEqual(dlg.routing_fromline_list.count(), 4)
         # Check that the coordinates of the point at the same position in the list has changed
         self.assertEqual(
@@ -231,31 +248,31 @@ class TestGui(unittest.TestCase):
     def map_release(self, x, y, side):
         return QgsMapMouseEvent(
             CANVAS,
-            QEvent.MouseButtonRelease,
+            QEvent.Type.MouseButtonRelease,
             QPoint(x, y),  # Relative to the canvas' dimensions
             side,
             side,
-            Qt.NoModifier,
+            Qt.KeyboardModifier.NoModifier,
         )
 
     def map_press(self, x, y, side):
         return QgsMapMouseEvent(
             CANVAS,
-            QEvent.MouseButtonPress,
+            QEvent.Type.MouseButtonPress,
             QPoint(x, y),  # Relative to the canvas' dimensions
             side,
             side,
-            Qt.NoModifier,
+            Qt.KeyboardModifier.NoModifier,
         )
 
     def map_dclick(self, x, y, side):
         return QgsMapMouseEvent(
             CANVAS,
-            QEvent.MouseButtonDblClick,
+            QEvent.Type.MouseButtonDblClick,
             QPoint(x, y),  # Relative to the canvas' dimensions
             side,
             side,
-            Qt.NoModifier,
+            Qt.KeyboardModifier.NoModifier,
         )
 
     def test_ORStoolsDialogConfig_endpoints(self):
@@ -301,7 +318,7 @@ class TestGui(unittest.TestCase):
 
         self.assertEqual(settings_directions_endpoint, "directions")
 
-        layer = proc.test_directions_points_layer()
+        layer = proc.get_directions_points_layer()
 
         # self.assertEqual(
         #     "POINT(8.67251100000000008 49.39887900000000087)",
@@ -340,7 +357,7 @@ class TestGui(unittest.TestCase):
         proc = TestProc()
         proc.setUpClass()
 
-        self.assertRaises(Exception, proc.test_directions_points_layer)
+        self.assertRaises(Exception, proc.get_directions_points_layer)
 
         # reset url
         url_reset_button = dlg_config.findChild(QPushButton, "openrouteservice_reset_url_button")
@@ -355,8 +372,504 @@ class TestGui(unittest.TestCase):
 
         self.assertEqual(settings_directions_endpoint, "directions")
 
-        layer = proc.test_directions_points_layer()
+        layer = proc.get_directions_points_layer()
+
+        self.assertEqual(
+            "POINT(8.67251100000000008 49.39887900000000087)",
+            next(layer.getFeatures()).geometry().asPolyline()[0].asWkt(),
+        )
+
+    def test_custom_endpoints(self):
+        from ORStools.gui.ORStoolsDialogConfig import ORStoolsDialogConfigMain
+
+        # Set and reset config to test whether the reset works
+        dlg_config = ORStoolsDialogConfigMain()
+        provider = dlg_config.providers.findChildren(QgsCollapsibleGroupBox)[0]
+
+        # set endpoint of directions to non-existent value
+        line_edit = provider.findChild(QLineEdit, "openrouteservice_directions_endpoint")
+        line_edit.setText("custom_directions_endpoint")
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "endpoints"
+        ]["directions"]
+
+        proc = TestProc()
+        proc.setUpClass()
+
+        self.assertEqual(settings_directions_endpoint, "custom_directions_endpoint")
+
+        layer = proc.get_directions_points_layer()
+        self.assertEqual(layer.featureCount(), 0)
+
+        # reset endpoints
+        dlg_config._reset_endpoints()
+        dlg_config.accept()
+
+        settings_directions_endpoint = QgsSettings().value("ORStools/config")["providers"][0][
+            "endpoints"
+        ]["directions"]
+
+        self.assertEqual(settings_directions_endpoint, "directions")
+
+        layer = proc.get_directions_points_layer()
+        self.assertAlmostEqual(layer.featureCount(), 93, delta=3)
 
         pt = next(layer.getFeatures()).geometry().asPolyline()[0]
         self.assertAlmostEqual(pt.x(), 8.67251100000000008, 3)
         self.assertAlmostEqual(pt.y(), 49.39887900000000087, 3)
+
+    def test_reload_geocode_completer_ors(self):
+        """Test geocoding completer functionality with mocked API response."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialog
+
+        CRS = QgsCoordinateReferenceSystem.fromEpsgId(3857)
+        CANVAS.setExtent(QgsRectangle(-13732628.1, 6181790.0, -13728426.7, 6179205.3))
+        CANVAS.setDestinationCrs(CRS)
+        CANVAS.setFrameStyle(0)
+        CANVAS.resize(600, 400)
+
+        dlg = ORStoolsDialog(IFACE)
+        dlg.open()
+        self.assertTrue(dlg.isVisible())
+
+        mock_response = {
+            "geocoding": {"version": "0.2", "query": {"text": "heidelberg"}},
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [8.6724, 49.3988]},
+                    "properties": {
+                        "id": "101906011",
+                        "gid": "whosonfirst:locality:101906011",
+                        "layer": "locality",
+                        "name": "Heidelberg",
+                        "label": "Heidelberg, BW, Germany",
+                        "country": "Germany",
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [145.0569, -37.7549]},
+                    "properties": {
+                        "id": "101933031",
+                        "gid": "whosonfirst:locality:101933031",
+                        "layer": "locality",
+                        "name": "Heidelberg",
+                        "label": "Heidelberg, VIC, Australia",
+                        "country": "Australia",
+                    },
+                },
+            ],
+        }
+
+        mock_request = Mock(spec=QgsBlockingNetworkRequest)
+        mock_reply = Mock()
+        mock_reply.content.return_value = Mock(
+            data=Mock(return_value=json.dumps(mock_response).encode("utf-8"))
+        )
+        mock_request.reply.return_value = mock_reply
+        mock_request.get.return_value = QgsBlockingNetworkRequest.ErrorCode.NoError
+        mock_request.abort = Mock()
+
+        text = "heidelberg"
+        dlg.geocode_edit.setText(text)
+
+        dlg.reload_geocode_completer_ors(mock_request, dlg.geocode_edit, text)
+
+        mock_request.get.assert_called_once()
+
+        completer = dlg.geocode_edit.completer()
+        self.assertIsNotNone(completer)
+
+        model = completer.completionModel()
+        self.assertEqual(model.rowCount(), 2)
+
+        completions = []
+        for i in range(model.rowCount()):
+            index = model.index(i, 0)
+            completions.append(model.data(index))
+
+        self.assertIn("Heidelberg, BW, Germany", completions)
+        self.assertIn("Heidelberg, VIC, Australia", completions)
+
+        completer.setCurrentRow(0)
+        first_completion = completer.currentCompletion()
+
+        self.assertIn("Germany", first_completion)
+
+        completer.activated.emit(first_completion)
+
+        self.assertEqual(dlg.routing_fromline_list.count(), 1)
+
+        item_text = dlg.routing_fromline_list.item(0).text()
+        self.assertIn("8.672", item_text)
+        self.assertIn("49.398", item_text)
+
+        self.assertEqual(len(dlg.annotations), 1)
+
+        self.assertEqual(dlg.geocode_edit.text(), "")
+
+        self.assertTrue(dlg.geocoded)
+
+    def test_reload_geocode_completer_ors_no_api_key(self):
+        """Test geocoding completer shows error when API key is missing."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialog
+        from ORStools.utils import configmanager
+
+        original_config = configmanager.read_config()
+
+        config = original_config.copy()
+        config["providers"][0]["key"] = ""
+
+        with patch("ORStools.utils.configmanager.read_config", return_value=config):
+            dlg = ORStoolsDialog(IFACE)
+            dlg.open()
+
+            mock_request = Mock(spec=QgsBlockingNetworkRequest)
+            mock_request.abort = Mock()
+            text = "heidelberg"
+            dlg.geocode_edit.setText(text)
+
+            with patch.object(QMessageBox, "critical") as mock_msgbox:
+                dlg.reload_geocode_completer_ors(mock_request, dlg.geocode_edit, text)
+                mock_msgbox.assert_called_once()
+
+            self.assertEqual(dlg.routing_fromline_list.count(), 0)
+
+    def test_add_geocoded_item(self):
+        pass
+
+    def test_load_valid_point_layer(self):
+        """Test loading vertices from valid point layer."""
+
+    def test_load_valid_point_layer_single_geometry(self):
+        """Test loading vertices from valid point layer with single point geometries."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create test layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+
+        # Add 3 features to point layer
+        for coords in [(1.0, 2.0), (3.0, 4.0), (5.0, 6.0)]:
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coords)))
+            point_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayer(point_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 3)
+        self.assertIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+
+        # Verify coordinates
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(0).text(), "Point 0: 1.000000, 2.000000"
+        )
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(1).text(), "Point 1: 3.000000, 4.000000"
+        )
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(2).text(), "Point 2: 5.000000, 6.000000"
+        )
+
+    def test_load_multipoint_geometry(self):
+        """Test loading vertices from layer with multipoint geometries."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create test layer with multipoint
+        multipoint_layer = QgsVectorLayer("MultiPoint?crs=EPSG:4326", "test_multipoints", "memory")
+
+        # Add multipoint feature
+        feat = QgsFeature()
+        points = [QgsPointXY(1.0, 2.0), QgsPointXY(3.0, 4.0), QgsPointXY(5.0, 6.0)]
+        feat.setGeometry(QgsGeometry.fromMultiPointXY(points))
+        multipoint_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayer(multipoint_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify - all points from multipoint should be loaded
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 3)
+        self.assertIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+
+    def test_load_layer_with_different_crs(self):
+        """Test loading vertices from layer with non-WGS84 CRS."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create test layer with Web Mercator CRS
+        point_layer = QgsVectorLayer("Point?crs=EPSG:3857", "test_points_3857", "memory")
+
+        # Add features (coordinates in EPSG:3857)
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(260102.8, 6251528.2)))
+        point_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayer(point_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 1)
+
+        # Verify transformation occurred (should be in WGS84)
+        item_text = dialog_main.dlg.routing_fromline_list.item(0).text()
+        self.assertTrue("Point 0:" in item_text)
+        # Coordinates should be approximately 1.0, 2.0 after transformation
+        coords = item_text.split(":")[1].strip()
+        x, y = (float(i) for i in coords.split(", "))
+        self.assertAlmostEqual(x, 2.3, places=1)
+        self.assertAlmostEqual(y, 48.9, places=1)
+
+    def test_load_empty_layer(self):
+        """Test loading vertices from empty layer."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create empty layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "empty_points", "memory")
+        QgsProject.instance().addMapLayer(point_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify - should handle empty layer gracefully
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)
+
+    def test_load_layer_with_null_geometries(self):
+        """Test loading vertices from layer with null geometries."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create layer with null geometries
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+
+        # Add feature with valid geometry
+        feat1 = QgsFeature()
+        feat1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.0, 2.0)))
+        point_layer.dataProvider().addFeature(feat1)
+
+        # Add feature with null geometry
+        feat2 = QgsFeature()
+        feat2.setGeometry(QgsGeometry())
+        point_layer.dataProvider().addFeature(feat2)
+
+        # Add another valid feature
+        feat3 = QgsFeature()
+        feat3.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(3.0, 4.0)))
+        point_layer.dataProvider().addFeature(feat3)
+
+        QgsProject.instance().addMapLayer(point_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify - should skip null geometry
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 2)
+
+    def test_load_invalid_layer_type(self):
+        """Test loading vertices from non-point layer."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create line layer
+        line_layer = QgsVectorLayer("LineString?crs=EPSG:4326", "test_lines", "memory")
+
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPolylineXY([QgsPointXY(0, 0), QgsPointXY(1, 1)]))
+        line_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayer(line_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify - should not load line geometries
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)
+
+    def test_user_cancels_import_operation(self):
+        """Test when user cancels the dialog."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create valid layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.0, 2.0)))
+        point_layer.dataProvider().addFeature(feat)
+        QgsProject.instance().addMapLayer(point_layer)
+
+        dialog_main.dlg.load_vertices_from_layer("not_ok")
+
+        self.assertTrue(dialog_main.dlg.line_tool is not None)
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)
+        self.assertNotIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+
+    def test_load_layer_with_many_points(self):
+        """Test loading many points from layer."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create layer with 100 points
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "many_points", "memory")
+        n = 52
+
+        for i in range(n):
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(float(i), float(i))))
+            point_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayer(point_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), n)
+        self.assertIsInstance(dialog_main.dlg.rubber_band, QgsRubberBand)
+
+    def test_load_layer_replaces_existing_vertices(self):
+        """Test that loading a layer clears existing vertices."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Add some vertices manually first
+        dialog_main.dlg.routing_fromline_list.addItem("Point 0: 0.000000, 0.000000")
+        dialog_main.dlg.routing_fromline_list.addItem("Point 1: 1.000000, 1.000000")
+
+        initial_count = dialog_main.dlg.routing_fromline_list.count()
+        self.assertEqual(initial_count, 2)
+
+        # Create and load layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+        feat = QgsFeature()
+        feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(5.0, 5.0)))
+        point_layer.dataProvider().addFeature(feat)
+        QgsProject.instance().addMapLayer(point_layer)
+
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify old vertices were cleared
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 3)
+        self.assertEqual(
+            dialog_main.dlg.routing_fromline_list.item(2).text(), "Point 2: 5.000000, 5.000000"
+        )
+
+    def test_load_layer_creates_annotations(self):
+        """Test that loading vertices creates map annotations."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create layer
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "test_points", "memory")
+
+        for coords in [(1.0, 2.0), (3.0, 4.0)]:
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coords)))
+            point_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayer(point_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify annotations were created
+        self.assertEqual(len(dialog_main.dlg.annotations), 2)
+
+        # Verify annotations are in project
+        project_annotations = QgsProject.instance().annotationManager().annotations()
+        for annotation in dialog_main.dlg.annotations:
+            self.assertIn(annotation, project_annotations)
+
+    def test_load_layer_mixed_multipoint_and_single(self):
+        """Test loading from layer with mixed single and multipoint geometries."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create layer that can hold both
+        point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "mixed_points", "memory")
+
+        # Add single point
+        feat1 = QgsFeature()
+        feat1.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(1.0, 2.0)))
+        point_layer.dataProvider().addFeature(feat1)
+
+        # Add single point
+        feat2 = QgsFeature()
+        feat2.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(3.0, 4.0)))
+        point_layer.dataProvider().addFeature(feat2)
+
+        QgsProject.instance().addMapLayer(point_layer)
+
+        # Run test
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Verify correct count
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 2)
+
+    def test_load_layer_exception_handling(self):
+        """Test exception handling when loading fails."""
+        from ORStools.gui.ORStoolsDialog import ORStoolsDialogMain
+
+        dialog_main = ORStoolsDialogMain(IFACE)
+        dialog_main._init_gui_control()
+
+        # Create a polygon layer (invalid for point loading)
+        polygon_layer = QgsVectorLayer("Polygon?crs=EPSG:4326", "test_polygons", "memory")
+
+        feat = QgsFeature()
+        points = [
+            QgsPointXY(0, 0),
+            QgsPointXY(1, 0),
+            QgsPointXY(1, 1),
+            QgsPointXY(0, 1),
+            QgsPointXY(0, 0),
+        ]
+        feat.setGeometry(QgsGeometry.fromPolygonXY([points]))
+        polygon_layer.dataProvider().addFeature(feat)
+
+        QgsProject.instance().addMapLayer(polygon_layer)
+
+        # Run test - should handle gracefully
+        dialog_main.dlg.load_vertices_from_layer("ok")
+
+        # Should not crash and list should be empty
+        self.assertEqual(dialog_main.dlg.routing_fromline_list.count(), 0)

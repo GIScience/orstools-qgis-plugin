@@ -30,6 +30,7 @@
 import json
 import math
 
+from ORStools.gui import directions_gui
 from qgis.gui import QgsMapToolEmitPoint, QgsRubberBand
 from qgis.core import (
     QgsProject,
@@ -44,9 +45,6 @@ from qgis.core import (
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QEvent
 from qgis.PyQt.QtGui import QColor, QMouseEvent
-from qgis.PyQt.QtWidgets import (
-    QApplication,
-)
 
 from ORStools import ROUTE_COLOR
 from ORStools.utils import transform, router
@@ -77,12 +75,7 @@ class LineTool(QgsMapToolEmitPoint):
         self.dlg.routing_preference_combo.currentIndexChanged.connect(self._toggle_preview)
         self.dlg.routing_travel_combo.currentIndexChanged.connect(self._toggle_preview)
 
-        self.pointPressed.connect(lambda point: self._on_movetool_map_press(point))
-        self.pointReleased.connect(lambda event, idx: self._on_movetool_map_release(event, idx))
-        self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-
-        self.last_click = "single-click"
-        self.moving = None
+        self.dragging_vertex = None
         self.moved_idxs = 0
         self.error_idxs = 0
         self.click_dist = 25
@@ -106,13 +99,17 @@ class LineTool(QgsMapToolEmitPoint):
 
     mouseMoved = pyqtSignal(["QPoint"])
 
+    # Mouse movement changes the cursor if it is hovering over an annotation.
+    # In that state, clicking means dragging an annotation.
+    # Thus, we only change restore the Cursor once we are not dragging the annotation anymore.
     def canvasMoveEvent(self, e: QEvent) -> None:
         hovering = self.check_annotation_hover(e.pos())
         if hovering:
-            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.OpenHandCursor)
-        else:
-            if not self.moving:
-                QApplication.restoreOverrideCursor()
+            self.setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
+        elif not self.dragging_vertex and self.dlg.isVisible():
+            self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        elif not self.dragging_vertex:
+            self.setCursor(QtCore.Qt.CursorShape.CrossCursor)
 
     def check_annotation_hover(self, pos: QMouseEvent) -> int:
         click = [pos.x(), pos.y()]
@@ -132,6 +129,8 @@ class LineTool(QgsMapToolEmitPoint):
         if dists and min(dists) < self.click_dist:
             idx = dists[min(dists)]
             return idx
+        else:
+            return 0
 
     def keyPressEvent(self, event: QEvent) -> None:
         if event.key() == Qt.Key.Key_Escape:
@@ -155,118 +154,121 @@ class LineTool(QgsMapToolEmitPoint):
                 self.dlg._clear_listwidget()
 
     def canvasPressEvent(self, event: QEvent) -> None:
+        if event.button() == Qt.MouseButton.RightButton:
+            return
+
         hovering = self.check_annotation_hover(event.pos())
         if hovering:
-            self.mouseMoved.disconnect()
-            QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
+            # clicking should only change the cursor if it is hovering over an annotation.
+            # The corresponding reset happens in the release event.
+            self.setCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
             if self.dlg.rubber_band:
                 self.dlg.rubber_band.reset()
             self.move_i = self.dlg.annotations.index(hovering)
             self.dlg.project.annotationManager().removeAnnotation(
                 self.dlg.annotations.pop(self.move_i)
             )
-            self.moving = True
+            self.dragging_vertex = True
 
     def canvasReleaseEvent(self, event: QEvent) -> None:
         if event.button() == Qt.MouseButton.RightButton:
+            self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
             self.dlg.show()
             return
 
         point = self.toMapCoordinates(event.pos())
         self.points.append(point)
 
-        if self.last_click == "single-click":
-            if self.moving:
-                try:
-                    self.moving = False
-                    QApplication.restoreOverrideCursor()
-                    crs = self.dlg.canvas.mapSettings().destinationCrs()
+        if self.dragging_vertex:
+            self.dragging_vertex = False
 
-                    annotation = self.dlg._linetool_annotate_point(point, self.move_i, crs=crs)
-                    self.dlg.annotations.insert(self.move_i, annotation)
-                    self.dlg.project.annotationManager().addAnnotation(annotation)
+            try:
+                crs = self.dlg.canvas.mapSettings().destinationCrs()
 
-                    transformer = transform.transformToWGS(crs)
-                    point_wgs = transformer.transform(point)
+                annotation = self.dlg._linetool_annotate_point(point, self.move_i, crs=crs)
+                self.dlg.annotations.insert(self.move_i, annotation)
+                self.dlg.project.annotationManager().addAnnotation(annotation)
 
-                    items = [
-                        self.dlg.routing_fromline_list.item(x).text()
-                        for x in range(self.dlg.routing_fromline_list.count())
-                    ]
-                    backup = items.copy()
-                    items[self.move_i] = (
-                        f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
-                    )
+                transformer = transform.transformToWGS(crs)
+                point_wgs = transformer.transform(point)
 
+                items = [
+                    self.dlg.routing_fromline_list.item(x).text()
+                    for x in range(self.dlg.routing_fromline_list.count())
+                ]
+                backup = items.copy()
+                items[self.move_i] = (
+                    f"Point {self.move_i}: {point_wgs.x():.6f}, {point_wgs.y():.6f}"
+                )
+
+                self.dlg.routing_fromline_list.clear()
+                for i, x in enumerate(items):
+                    coords = x.split(":")[1]
+                    item = f"Point {i}:{coords}"
+                    self.dlg.routing_fromline_list.addItem(item)
+                self.create_rubber_band()
+                self.save_last_point(point, annotation)
+            except ApiError as e:
+                if self.get_error_code(e) == 2010:
                     self.dlg.routing_fromline_list.clear()
-                    for i, x in enumerate(items):
+                    for i, x in enumerate(backup):
                         coords = x.split(":")[1]
                         item = f"Point {i}:{coords}"
                         self.dlg.routing_fromline_list.addItem(item)
+                    self.dlg._reindex_list_items()
+                    self.radius_message_box(e)
+                else:
+                    raise e
+            except Exception as e:
+                if "Connection refused" in str(e):
+                    self.api_key_message_bar()
+                else:
+                    raise e
+        # Non-dragging release
+        else:
+            # Dragging is possible while the main GUI is visible.
+            # Thus, we only check its visibility while not dragging
+            if self.dlg.isVisible():
+                return
+
+            try:
+                self.idx -= self.error_idxs
+                self.dlg.create_vertex(point, self.idx)
+                self.idx += 1
+                self.error_idxs = 0
+
+                if self.dlg.routing_fromline_list.count() > 1:
                     self.create_rubber_band()
-                    self.save_last_point(point, annotation)
-                    self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
+                    self.dragging_vertex = False
+            except ApiError as e:
+                if self.get_error_code(e) == 2010:
+                    self.error_idxs += 1
+                    num = len(self.dlg.routing_fromline_list) - 1
 
-                except ApiError as e:
-                    if self.get_error_code(e) == 2010:
-                        self.moving = False
+                    if num < 2:
                         self.dlg.routing_fromline_list.clear()
-                        for i, x in enumerate(backup):
-                            coords = x.split(":")[1]
-                            item = f"Point {i}:{coords}"
-                            self.dlg.routing_fromline_list.addItem(item)
+                        self.dlg._clear_annotations()
+                    else:
+                        self.dlg.routing_fromline_list.takeItem(num)
                         self.dlg._reindex_list_items()
-                        self.radius_message_box(e)
-                        self.mouseMoved.connect(lambda pos: self.change_cursor_on_hover(pos))
-                    else:
-                        raise e
-                except Exception as e:
-                    if "Connection refused" in str(e):
-                        self.api_key_message_bar()
-                    else:
-                        raise e
-            # Not moving release
-            else:
-                try:
-                    if not self.dlg.isVisible():
-                        self.idx -= self.error_idxs
-                        self.dlg.create_vertex(point, self.idx)
-                        self.idx += 1
-                        self.error_idxs = 0
+                        self.create_rubber_band()
 
-                        if self.dlg.routing_fromline_list.count() > 1:
-                            self.create_rubber_band()
-                            self.moving = False
-                except ApiError as e:
-                    if self.get_error_code(e) == 2010:
-                        self.error_idxs += 1
-                        num = len(self.dlg.routing_fromline_list) - 1
-
-                        if num < 2:
-                            self.dlg.routing_fromline_list.clear()
-                            self.dlg._clear_annotations()
-                        else:
-                            self.dlg.routing_fromline_list.takeItem(num)
-                            self.dlg._reindex_list_items()
-                            self.create_rubber_band()
-
-                        self.radius_message_box(e)
-                    else:
-                        raise e
-                except Exception as e:
-                    if "Connection refused" in str(e):
-                        self.api_key_message_bar()
-                    else:
-                        raise e
-
-        self.last_click = "single-click"
+                    self.radius_message_box(e)
+                else:
+                    raise e
+            except Exception as e:
+                if "Connection refused" in str(e):
+                    self.api_key_message_bar()
+                else:
+                    raise e
 
     def canvasDoubleClickEvent(self, e: QEvent) -> None:
         """
         Populate line list widget with coordinates, end point moving and show dialog again.
         """
         self.dlg.show()
-        self.last_click = "double-click"
+        # not resetting the cursor (and thus the cursor icon still being "+") suggest that you can still set points, which you can't.
+        # Thus, we should set another, different cursor icon here?
 
     def create_rubber_band(self) -> None:
         if self.dlg.optimization_group.isChecked() and self.dlg.routing_fromline_list.count() == 2:
@@ -282,7 +284,11 @@ class LineTool(QgsMapToolEmitPoint):
         self.dlg.rubber_band.setStrokeColor(color)
         self.dlg.rubber_band.setWidth(5)
         if self.dlg.toggle_preview.isChecked() and self.dlg.routing_fromline_list.count() > 1:
-            route_layer = router.route_as_layer(self.dlg)
+            provider, profile, optimize = router.get_routing_parameters(self.dlg)
+            directions = directions_gui.Directions(self.dlg)
+            route_layer = router.route_as_layer(
+                None, provider, profile, optimize, directions.get_directions()
+            )
             if route_layer:
                 feature = next(route_layer.getFeatures())
                 self.dlg.rubber_band.addGeometry(feature.geometry(), route_layer)
@@ -313,7 +319,8 @@ class LineTool(QgsMapToolEmitPoint):
         json_end_index = e.message.rfind("}") + 1
         json_str = e.message[json_start_index:json_end_index]
         error_dict = json.loads(json_str)
-        return error_dict["error"]["code"]
+
+        return error_dict["error"]["code"] if error_dict["error"]["code"] else e.status
 
     def radius_message_box(self, e) -> None:
         parsed = json.loads(e.message)
@@ -340,8 +347,15 @@ class LineTool(QgsMapToolEmitPoint):
                 self.create_rubber_band()
             except ApiError as e:
                 self.dlg.toggle_preview.setChecked(state)
-                if self.get_error_code(e) == 2010:
+                error_code = self.get_error_code(e)
+                if error_code == 2010:
                     self.radius_message_box(e)
+                elif error_code == "404":
+                    self.dlg._iface.messageBar().pushMessage(
+                        "Error 404: Not Found",
+                        "Are your endpoints set correctly in the Provider Settings?",
+                        level=Qgis.MessageLevel.Warning,
+                    )
                 else:
                     raise e
             except Exception as e:

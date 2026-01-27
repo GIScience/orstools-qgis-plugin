@@ -143,13 +143,51 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 optional=True,
             ),
         ]
+        self.setToolTip(
+            self.PARAMETERS[0], self.tr("Only Point layers are allowed, not MultiPoint.")
+        )
+        self.setToolTip(
+            self.PARAMETERS[1],
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[2],
+            self.tr(
+                "Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)"
+            ),
+        )
+        self.setToolTip(self.PARAMETERS[3], "Only Point layers are allowed, not MultiPoint.")
+        self.setToolTip(
+            self.PARAMETERS[4],
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[5],
+            self.tr(
+                "Before running the algorithm points are sorted by the values of this field (Be aware of the field type! Text fields will be sorted like 1,13,2,D,a,x)"
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[6],
+            self.tr("Dictates the cost. For longer routes don't use Shortest Path."),
+        )
+        self.setToolTip(
+            self.PARAMETERS[7],
+            self.tr(
+                "Either 'row-by-row' until one layers has no more features or 'all-by-all' for every feature combination"
+            ),
+        )
 
     # TODO: preprocess parameters to options the range cleanup below:
     # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
 
@@ -242,7 +280,7 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
                 endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                     "directions"
                 ]
-                response = ors_client.request(
+                response = ors_client.fetch_with_retry(
                     f"/v2/{endpoint}/{profile}/geojson", {}, post_json=params
                 )
             except (exceptions.ApiError, exceptions.InvalidKey, exceptions.GenericServerError) as e:

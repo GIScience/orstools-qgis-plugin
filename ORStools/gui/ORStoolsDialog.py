@@ -31,10 +31,14 @@ import json
 import os
 from datetime import datetime
 from typing import Optional
+from urllib.parse import quote
 
+from qgis.PyQt.QtCore import QTimer, Qt, QUrl
+from qgis.PyQt.QtNetwork import QNetworkRequest
 from qgis.PyQt.QtWidgets import QCheckBox
 
-from ..utils.router import route_as_layer
+from ..utils.router import route_as_layer, get_routing_parameters
+from ORStools.gui import directions_gui
 
 try:
     import processing
@@ -54,14 +58,33 @@ from qgis.core import (
     QgsGeometry,
     QgsCoordinateReferenceSystem,
     QgsSettings,
-    Qgis,  # noqa: F811
     QgsAnnotation,
+    QgsTask,
+    QgsApplication,
     QgsCoordinateTransform,
+    Qgis,
+    QgsBlockingNetworkRequest,
 )
-from qgis.gui import QgsMapCanvasAnnotationItem, QgsCollapsibleGroupBox, QgisInterface
+from qgis.gui import (
+    QgsMapCanvasAnnotationItem,
+    QgsCollapsibleGroupBox,
+    QgisInterface,
+)
+from qgis.core import QgsWkbTypes
 from qgis.PyQt.QtCore import QSizeF, QPointF, QCoreApplication
-from qgis.PyQt.QtGui import QTextDocument
-from qgis.PyQt.QtWidgets import QAction, QDialog, QApplication, QMenu, QMessageBox, QDialogButtonBox
+from qgis.PyQt.QtGui import QTextDocument, QKeySequence
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QDialog,
+    QApplication,
+    QMenu,
+    QMessageBox,
+    QDialogButtonBox,
+    QShortcut,
+)
+from qgis.PyQt.QtWidgets import (
+    QCompleter,
+)
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import (
     QWidget,
@@ -80,6 +103,7 @@ from ORStools.common import (
     PREFERENCES,
 )
 from ORStools.utils import maptools, configmanager, transform, gui, exceptions
+from ORStools.utils.gui import LayerMessageBox
 from .ORStoolsDialogConfig import ORStoolsDialogConfigMain
 
 MAIN_WIDGET, _ = uic.loadUiType(gui.GuiUtils.get_ui_file_path("ORStoolsDialogUI.ui"))
@@ -206,6 +230,11 @@ class ORStoolsDialogMain:
         # Remove action for keyboard shortcut
         self.iface.unregisterMainWindowAction(self.actions[0])
 
+        # Clear rubber band and annotations
+        if self.dlg:
+            self.dlg._clear_listwidget()
+            self.dlg._clear_annotations()
+
         del self.dlg
 
     # @staticmethod
@@ -246,52 +275,107 @@ class ORStoolsDialogMain:
 
         self.dlg.show()
 
+    def handle_task_exception(self, exception: Exception) -> None:
+        """Handles exceptions thrown by routing task."""
+        if isinstance(exception, exceptions.InvalidInput):
+            QMessageBox.critical(
+                self.dlg,
+                self.tr("Wrong number of waypoints"),
+                self.tr("""At least 3 or 4 waypoints are needed to perform routing optimization. 
+                                Remember, the first and last location are not part of the optimization.
+                                """),
+            )
+
+        elif isinstance(exception, exceptions.EmptyLayerError):
+            QMessageBox.warning(
+                self.dlg,
+                self.tr("Empty layer"),
+                self.tr("""
+                        The specified avoid polygon(s) layer does not contain any features.
+                        Please add polygons to the layer or uncheck avoid polygons.
+                                            """),
+            )
+
+        elif isinstance(exception, exceptions.InvalidKey):
+            QMessageBox.critical(
+                self.dlg,
+                self.tr("Missing API key"),
+                self.tr("""
+                Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+                If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                settings symbol in the main ORS Tools GUI, next to the provider dropdown."""),
+            )
+
+        elif isinstance(exception, exceptions.ApiError):
+            # Error thrown by ORStools/common/client.py, line 243, in _check_status
+            try:
+                parsed = json.loads(exception.message)
+                error_code = int(parsed["error"]["code"])
+            except KeyError:
+                error_code = exception.status
+
+            if error_code == 2010:
+                maptools.LineTool(self.dlg).radius_message_box(exception)
+                return
+            elif error_code == "404":
+                self.iface.messageBar().pushMessage(
+                    "Error 404: Not Found",
+                    "Are your endpoints set correctly in the Provider Settings?",
+                    level=Qgis.MessageLevel.Warning,
+                )
+            else:
+                raise exception
+
+    def on_finished(self, exception, layer_out=None) -> None:
+        """
+        Callback when task finishes.
+
+        :param exception: Exception if task failed, None otherwise
+        :param result: The layer_out returned from the task function
+        """
+        if exception is not None:
+            self.handle_task_exception(exception)
+            return
+
+        basepath = os.path.dirname(__file__)
+        qml_path = os.path.join(basepath, "linestyle.qml")
+        layer_out.loadNamedStyle(qml_path, True)
+        layer_out.triggerRepaint()
+
+        self.project.addMapLayer(layer_out)
+
+        my_new_path = os.path.join(basepath, "img/svg")
+        svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
+        if my_new_path not in svg_paths:
+            svg_paths.append(my_new_path)
+            QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
+
     def run_gui_control(self) -> None:
         """Slot function for OK button of main dialog."""
         if self.dlg.routing_fromline_list.count() == 0:
             return
 
-        try:
-            basepath = os.path.dirname(__file__)
+        provider, profile, optimize = get_routing_parameters(self.dlg)
+        directions = directions_gui.Directions(self.dlg)
 
-            layer_out = route_as_layer(self.dlg)
+        self.task = QgsTask.fromFunction(
+            "ORStools Routing Task",
+            route_as_layer,
+            provider=provider,
+            profile=profile,
+            optimize=optimize,
+            directions=directions.get_directions(),
+            on_finished=self.on_finished,
+        )
 
-            # style output layer
-            qml_path = os.path.join(basepath, "linestyle.qml")
-            layer_out.loadNamedStyle(qml_path, True)
-            layer_out.triggerRepaint()
+        self.dlg.setDisabled(True)
 
-            self.project.addMapLayer(layer_out)
+        QgsApplication.taskManager().addTask(self.task)
 
-            # add ors svg path
-            my_new_path = os.path.join(basepath, "img/svg")
-            svg_paths = QgsSettings().value("svg/searchPathsForSVG") or []
-            if my_new_path not in svg_paths:
-                svg_paths.append(my_new_path)
-                QgsSettings().setValue("svg/searchPathsForSVG", svg_paths)
-
-            # Associate annotations with map layer, so they get deleted when layer is deleted
-            for annotation in self.dlg.annotations:
-                # Has the potential to be pretty cool: instead of deleting, associate with mapLayer
-                # , you can change order after optimization
-                # Then in theory, when the layer is remove, the annotation is removed as well
-                # Doesn't work though, the annotations are still there when project is re-opened
-                # annotation.setMapLayer(layer_out)
-                self.project.annotationManager().removeAnnotation(annotation)
-
-            self.dlg.annotations = []
-            self.dlg.rubber_band.reset()
-
-            self.dlg._clear_listwidget()
-            self.dlg.line_tool = maptools.LineTool(self.dlg)
-
-        except exceptions.ApiError as e:
-            # Error thrown by ORStools/common/client.py, line 243, in _check_status
-            parsed = json.loads(e.message)
-            error_code = int(parsed["error"]["code"])
-            if error_code == 2010:
-                maptools.LineTool(self.dlg).radius_message_box(e)
-                return
+        self.task.taskCompleted.connect(lambda: self.dlg.setDisabled(False))
+        self.task.taskTerminated.connect(lambda: self.dlg.setDisabled(False))
 
     def tr(self, string: str) -> str:
         return QCoreApplication.translate(str(self.__class__.__name__), string)
@@ -342,9 +426,10 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.provider_refresh.clicked.connect(self._on_prov_refresh_click)
 
         # Routing tab
-        self.routing_fromline_map.clicked.connect(self._on_linetool_init)
+        self.routing_fromline_map.clicked.connect(lambda: self._on_linetool_init(hide=True))
         self.routing_fromline_clear.clicked.connect(self._clear_listwidget)
         self.save_vertices.clicked.connect(self._save_vertices_to_layer)
+        self.load_vertices.clicked.connect(self.load_vertices_from_layer)
 
         # Batch
         self.pushButton_routing_points.clicked.connect(
@@ -374,6 +459,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.pushButton_export.clicked.connect(
             lambda: processing.execAlgorithmDialog(f"{PLUGIN_NAME}:export_network_from_map")
         )
+        shortcut = QShortcut(QKeySequence("Ctrl+Return"), self)
+        shortcut.activated.connect(lambda: self.global_buttons.accepted.emit())
 
         # Reset index of list items every time something is moved or deleted
         self.routing_fromline_list.model().rowsMoved.connect(self._reindex_list_items)
@@ -387,6 +474,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.provider_config.setIcon(gui.GuiUtils.get_icon("icon_settings.png"))
         self.about_button.setIcon(gui.GuiUtils.get_icon("icon_about.png"))
         self.help_button.setIcon(gui.GuiUtils.get_icon("icon_help.png"))
+        self.load_vertices.setIcon(gui.GuiUtils.get_icon("icon_load.png"))
 
         # Connect signals to the color_duplicate_items function
         self.routing_fromline_list.model().rowsRemoved.connect(
@@ -409,6 +497,102 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                     child.toggled.connect(self.reload_rubber_band)
 
         self.rubber_band = None
+        # add connection to linedit text change
+        self.geocode_edit.textChanged.connect(lambda: self.wait_connect_geocode(self.geocode_edit))
+
+        self.start_geocode_coords = None
+        self.dest_geocode_coords = None
+        self.geocoded = None
+
+    def wait_connect_geocode(self, lineEdit):
+        text = lineEdit.text()
+        request = QgsBlockingNetworkRequest()
+        QTimer.singleShot(300, lambda: self.reload_geocode_completer_ors(request, lineEdit, text))
+
+    def option_chosen(self, label, lineEdit, data, completer):
+        coords = [
+            feature["geometry"]["coordinates"]
+            for feature in data["features"]
+            if feature["properties"]["label"] == label
+        ][0]
+        self.add_geocoded_item(coords, lineEdit)
+        completer.activated.disconnect()
+        lineEdit.setText("")
+
+    def reload_geocode_completer_ors(self, request, lineEdit, text):
+        request.abort()
+
+        if lineEdit.text() == text and lineEdit.text() != "":
+            provider_id = self.provider_combo.currentIndex()
+            provider = configmanager.read_config()["providers"][provider_id]
+            api_key = provider["key"]
+            if api_key != "":
+                e = self._iface.mapCanvas().extent()
+                lat = e.yMinimum() + (e.yMaximum() - e.yMinimum()) / 2
+                lon = e.xMinimum() + (e.xMaximum() - e.xMinimum()) / 2
+                sourceCrs = self._iface.mapCanvas().mapSettings().destinationCrs()
+                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                middle = tr.transform(QgsPointXY(lon, lat))
+
+                encoded = quote(lineEdit.text())
+
+                url = f"https://api.openrouteservice.org/geocode/search?api_key={api_key}&text={encoded}&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
+                error_code = request.get(QNetworkRequest(QUrl(url)))
+                if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
+                    reply = request.reply()
+                    data = json.loads(reply.content().data().decode("utf-8"))
+                    suggest = [i["properties"]["label"] for i in data["features"]]
+                    completer = QCompleter(suggest)
+                    completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+                    completer.setFilterMode(Qt.MatchFlag.MatchContains)
+                    completer.highlighted.connect(completer.highlighted.disconnect)
+                    completer.activated.connect(
+                        lambda t: self.option_chosen(t, lineEdit, data, completer)
+                    )
+                    lineEdit.setCompleter(completer)
+                    completer.complete()
+
+                else:
+                    raise ConnectionError(
+                        f"Error while trying to request geocoding search, error code: {error_code}"
+                    )
+            else:
+                QMessageBox.critical(
+                    self,
+                    "Missing API key",
+                    """
+                    Did you forget to set an <b>API key</b> for openrouteservice?<br><br>
+
+                    If you don't have an API key, please visit https://openrouteservice.org/sign-up to get one. <br><br> 
+                    Then enter the API key for openrouteservice provider in Web ► ORS Tools ► Provider Settings or the 
+                    settings symbol in the main ORS Tools GUI, next to the provider dropdown.""",
+                )
+
+    def add_geocoded_item(self, coordinates, lineEdit) -> None:
+        self._on_linetool_init(hide=False)
+        self.line_tool.idx += 1
+        p = f"Point {self.line_tool.idx}: {coordinates[0]}, {coordinates[1]}"
+        items = [
+            self.routing_fromline_list.item(x).text()
+            for x in range(self.routing_fromline_list.count())
+        ]
+        coords = [i.split(":")[1] for i in items]
+        if p.split(":")[1] not in coords:
+            if lineEdit.objectName() == "geocode_start":
+                items.insert(0, p)
+            else:
+                items.insert(self.routing_fromline_list.count(), p)
+
+        self.routing_fromline_list.clear()
+        self.routing_fromline_list.addItems(items)
+
+        point = QgsPointXY(coordinates[0], coordinates[1])
+        annotation = self._linetool_annotate_point(point, self.line_tool.idx)
+        self.annotations.append(annotation)
+        self.project.annotationManager().addAnnotation(annotation)
+        self._reindex_list_items()
+        self.geocoded = True
 
     def refresh_profiles(self) -> None:
         """Refreshes the profiles in the routing travel combo box when a provider is selected."""
@@ -455,6 +639,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
     def _clear_listwidget(self) -> None:
         """Clears the contents of the QgsListWidget and the annotations."""
+        self.setDisabled(True)
         items = self.routing_fromline_list.selectedItems()
         if items:
             rows = [self.routing_fromline_list.row(item) for item in items]
@@ -475,6 +660,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
                 self.rubber_band.reset()
             del self.line_tool
             self.line_tool = maptools.LineTool(self)
+            self.geocoded = False
+        self.setDisabled(False)
 
     def _linetool_annotate_point(
         self, point: QgsPointXY, idx: int, crs: Optional[QgsCoordinateReferenceSystem] = None
@@ -507,23 +694,28 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         if self.rubber_band:
             self.rubber_band.reset()
 
-    def _on_linetool_init(self) -> None:
+    def _on_linetool_init(self, hide: bool) -> None:
         """Hides GUI dialog, inits line maptool and add items to line list box."""
-        self.hide()
+        if hide:
+            self.hide()
         if self.line_tool:
             self.canvas.setMapTool(self.line_tool)
         else:
             self.line_tool = maptools.LineTool(self)
             self.canvas.setMapTool(self.line_tool)
 
-    def create_vertex(self, point, idx):
+    def create_vertex(self, point: QgsPointXY, idx: int, epsg: int = None) -> None:
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
-        map_crs = self.canvas.mapSettings().destinationCrs()
+        if not epsg:
+            map_crs = self.canvas.mapSettings().destinationCrs()
 
-        transformer = transform.transformToWGS(map_crs)
-        point_wgs = transformer.transform(point)
+            transformer = transform.transformToWGS(map_crs)
+            point_wgs = transformer.transform(point)
+        else:
+            transformer = transform.transformToWGS(QgsCoordinateReferenceSystem(f"EPSG:{epsg}"))
+            point_wgs = transformer.transform(point)
+
         self.routing_fromline_list.addItem(f"Point {idx}: {point_wgs.x():.6f}, {point_wgs.y():.6f}")
-
         crs = self.canvas.mapSettings().destinationCrs()
         annotation = self._linetool_annotate_point(point, idx, crs)
         self.annotations.append(annotation)
@@ -594,3 +786,49 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         """Load the saved state when the window is shown"""
         super().show()
         self.load_provider_combo_state()
+
+    def load_vertices_from_layer(self, testing: str = "") -> None:
+        self._on_linetool_init(hide=False)
+
+        box = LayerMessageBox(iface=self._iface)
+
+        if testing == "ok":
+            result = QMessageBox.StandardButton.Ok
+        elif testing == "not_ok":
+            result = QMessageBox.StandardButton.Cancel
+        else:
+            result = box.exec()
+
+        if result == QMessageBox.StandardButton.Ok:
+            layer = box.selectedLayer()
+            try:
+                for id, feat in enumerate(layer.getFeatures()):
+                    geom = feat.geometry()
+                    if not geom:
+                        continue
+
+                    if (
+                        geom.type() == QgsWkbTypes.GeometryType.PointGeometry
+                        and QgsWkbTypes.isSingleType(geom.wkbType())
+                    ):
+                        pt = geom.asPoint()
+                        self.create_vertex(pt, id, layer.crs().postgisSrid())
+
+                    elif (
+                        geom.type() == QgsWkbTypes.GeometryType.PointGeometry
+                        and QgsWkbTypes.isMultiType(geom.wkbType())
+                    ):
+                        pts = geom.asMultiPoint()
+                        for pt in pts:
+                            self.create_vertex(pt, id, layer.crs().postgisSrid())
+                self.line_tool.create_rubber_band()
+                self._reindex_list_items()
+
+            except Exception:
+                self._clear_annotations()
+                self._iface.messageBar().pushMessage(
+                    self.tr("Could not load points from Layer"),
+                    self.tr("Please select a valid point layer"),
+                    level=Qgis.MessageLevel.Warning,
+                    duration=3,
+                )

@@ -125,10 +125,28 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
             QgsProcessingParameterBoolean(self.EXPORT_ORDER, self.tr("Export order of jobs")),
         ]
 
+        self.setToolTip(self.PARAMETERS[0], "LineString or MultiLineString layer.")
+        self.setToolTip(
+            self.PARAMETERS[1],
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[2],
+            self.tr("Dictates the cost. For longer routes don't use Shortest Path."),
+        )
+        self.setToolTip(
+            self.PARAMETERS[3],
+            self.tr(
+                "You can optionally perform a Traveling Salesman on the waypoints of each MultiPoint feature. Enabling Traveling Salesman will erase all other advanced configuration and assume the preference to be fastest Advanced Parameters: see the documentation for descriptions."
+            ),
+        )
+
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
 
@@ -190,7 +208,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                     endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                         "optimization"
                     ]
-                    response = ors_client.request(f"{endpoint}/", {}, post_json=params)
+                    response = ors_client.fetch_with_retry(f"/{endpoint}/", {}, post_json=params)
 
                     sink.addFeature(
                         directions_core.get_output_features_optimization(
@@ -228,7 +246,7 @@ class ORSDirectionsLinesAlgo(ORSBaseProcessingAlgorithm):
                     endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                         "directions"
                     ]
-                    response = ors_client.request(
+                    response = ors_client.fetch_with_retry(
                         f"/v2/{endpoint}/{profile}/geojson", {}, post_json=params
                     )
 

@@ -97,6 +97,24 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
+        self.setToolTip(self.PARAMETERS[0], self.tr("Choose a Point from the map."))
+        self.setToolTip(
+            self.PARAMETERS[2],
+            self.tr(
+                "Parameter needs to be a comma-separated list of integer values, no decimal points."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[3],
+            self.tr(
+                "Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[4],
+            self.tr("Start treats the location(s) as starting point, destination as goal."),
+        )
+
     # Save some important references
     # TODO bad style, refactor
     isochrones = isochrones_core.Isochrones()
@@ -109,7 +127,7 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(self.profiles))[parameters[self.IN_PROFILE]]
         dimension = dict(enumerate(DIMENSIONS))[parameters[self.IN_METRIC]]
@@ -157,7 +175,9 @@ class ORSIsochronesPointAlgo(ORSBaseProcessingAlgorithm):
             endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                 "isochrones"
             ]
-            response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
+            response = ors_client.fetch_with_retry(
+                f"/v2/{endpoint}/{profile}", {}, post_json=params
+            )
 
             # Populate features from response
             for isochrone in self.isochrones.get_features(response, params["id"]):
