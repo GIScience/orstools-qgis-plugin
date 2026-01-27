@@ -29,13 +29,12 @@
 
 import json
 
-from PyQt5.QtCore import QUrl
-from PyQt5.QtNetwork import QNetworkRequest
-from qgis._core import QgsBlockingNetworkRequest
+from qgis.PyQt.QtNetwork import QNetworkRequest
+from qgis.core import QgsBlockingNetworkRequest
 from qgis.gui import QgsCollapsibleGroupBox, QgsNewNameDialog
 
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QMetaObject
+from qgis.PyQt.QtCore import QMetaObject, QUrl
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QInputDialog,
