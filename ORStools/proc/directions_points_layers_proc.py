@@ -305,6 +305,12 @@ class ORSDirectionsPointsLayersAlgo(ORSBaseProcessingAlgorithm):
             counter += 1
             feedback.setProgress(int(100.0 / route_count * counter))
 
+        sink.flushBuffer()
+        if hasattr(sink, "finalize"):
+            sink.finalize()
+        else:
+            del sink
+
         return {self.OUT: dest_id}
 
     @staticmethod
