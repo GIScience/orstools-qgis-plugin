@@ -111,6 +111,32 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
             ),
         ]
 
+        self.setToolTip(
+            self.PARAMETERS[0], self.tr("Only Point layers are allowed, not MultiPoint.")
+        )
+        self.setToolTip(
+            self.PARAMETERS[1],
+            self.tr(
+                "Values will transfer to the output layer and can be used to join layers or group features afterwards."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[3],
+            self.tr(
+                "Parameter needs to be a comma-separated list of integer values, no decimal points."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[4],
+            self.tr(
+                "Applies a level of generalisation to the isochrone polygons generated as a smoothing_factor between 0 and 100."
+            ),
+        )
+        self.setToolTip(
+            self.PARAMETERS[5],
+            self.tr("Start treats the location(s) as starting point, destination as goal."),
+        )
+
     # Save some important references
     # TODO bad style, refactor
     isochrones = isochrones_core.Isochrones()
@@ -123,7 +149,7 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, str]:
-        ors_client = self._get_ors_client_from_provider(parameters[self.IN_PROVIDER], feedback)
+        ors_client = self.get_client(parameters, context, feedback)
 
         profile = dict(enumerate(PROFILES))[int(parameters[self.IN_PROFILE])]
         dimension = dict(enumerate(DIMENSIONS))[int(parameters[self.IN_METRIC])]
@@ -199,7 +225,9 @@ class ORSIsochronesLayerAlgo(ORSBaseProcessingAlgorithm):
                 endpoint = self.get_endpoint_names_from_provider(parameters[self.IN_PROVIDER])[
                     "isochrones"
                 ]
-                response = ors_client.request(f"/v2/{endpoint}/{profile}", {}, post_json=params)
+                response = ors_client.fetch_with_retry(
+                    f"/v2/{endpoint}/{profile}", {}, post_json=params
+                )
 
                 for isochrone in self.isochrones.get_features(response, params["id"]):
                     sink.addFeature(isochrone)

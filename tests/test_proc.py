@@ -83,6 +83,32 @@ class TestProc(unittest.TestCase):
         feat_length = next(processed_layer.getFeatures()).geometry().length()
         self.assertTrue(feat_length > 0)
 
+    def test_directions_lines_layer_optimize(self):
+        parameters = {
+            "INPUT_AVOID_BORDERS": None,
+            "INPUT_AVOID_COUNTRIES": "",
+            "INPUT_AVOID_FEATURES": [],
+            "INPUT_AVOID_POLYGONS": None,
+            "INPUT_LAYER_FIELD": None,
+            "INPUT_LINE_LAYER": self.line_layer,
+            "INPUT_OPTIMIZE": 1,
+            "INPUT_PREFERENCE": 0,
+            "INPUT_PROFILE": 0,
+            "INPUT_PROVIDER": 0,
+            "INPUT_METRIC": 0,
+            "LOCATION_TYPE": 0,
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        }
+
+        directions = ORSDirectionsLinesAlgo().create()
+        dest_id = directions.processAlgorithm(parameters, self.context, self.feedback)
+        processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
+
+        self.assertEqual(type(processed_layer), QgsVectorLayer)
+
+        feat_length = next(processed_layer.getFeatures()).geometry().length()
+        self.assertTrue(feat_length > 0)
+
     def test_directions_points_layer(self):
         parameters = {
             "INPUT_AVOID_BORDERS": None,
@@ -108,7 +134,51 @@ class TestProc(unittest.TestCase):
         feat_length = next(processed_layer.getFeatures()).geometry().length()
         self.assertTrue(feat_length > 0)
 
-        return processed_layer
+    def get_directions_points_layer(self):
+        """Helper method to get a directions points layer for testing"""
+        parameters = {
+            "INPUT_AVOID_BORDERS": None,
+            "INPUT_AVOID_COUNTRIES": "",
+            "INPUT_AVOID_FEATURES": [],
+            "INPUT_AVOID_POLYGONS": None,
+            "INPUT_LAYER_FIELD": None,
+            "INPUT_OPTIMIZE": None,
+            "INPUT_POINT_LAYER": self.point_layer_1,
+            "INPUT_PREFERENCE": 0,
+            "INPUT_PROFILE": 0,
+            "INPUT_PROVIDER": 0,
+            "INPUT_SORTBY": None,
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        }
+
+        directions = ORSDirectionsPointsLayerAlgo().create()
+        dest_id = directions.processAlgorithm(parameters, self.context, self.feedback)
+        return QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
+
+    def test_directions_points_layer_optimization(self):
+        parameters = {
+            "INPUT_AVOID_BORDERS": None,
+            "INPUT_AVOID_COUNTRIES": "",
+            "INPUT_AVOID_FEATURES": [],
+            "INPUT_AVOID_POLYGONS": None,
+            "INPUT_LAYER_FIELD": None,
+            "INPUT_OPTIMIZE": 1,
+            "INPUT_POINT_LAYER": self.point_layer_1,
+            "INPUT_PREFERENCE": 0,
+            "INPUT_PROFILE": 0,
+            "INPUT_PROVIDER": 0,
+            "INPUT_SORTBY": None,
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        }
+
+        directions = ORSDirectionsPointsLayerAlgo().create()
+        dest_id = directions.processAlgorithm(parameters, self.context, self.feedback)
+        processed_layer = QgsProcessingUtils.mapLayerFromString(dest_id["OUTPUT"], self.context)
+
+        self.assertEqual(type(processed_layer), QgsVectorLayer)
+
+        feat_length = next(processed_layer.getFeatures()).geometry().length()
+        self.assertTrue(feat_length > 0)
 
     def test_directions_points_layers(self):
         parameters = {

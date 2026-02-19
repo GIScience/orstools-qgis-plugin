@@ -93,6 +93,26 @@ class Directions:
 
         self.options = dict()
 
+        request_line_feature = self.get_request_line_feature()
+        parameters = self.get_parameters()
+        optimize_parameters = self._get_optimize_parameters()
+
+        self.directions = {
+            "request_line_feature": request_line_feature,
+            "parameters": parameters,
+            "optimize_parameters": optimize_parameters,
+            "options": self.options,
+        }
+
+    def get_directions(self):
+        """
+        Returns the directions dict for use in router.
+
+        :returns: directions dict
+        :rtype: dict
+        """
+        return self.directions
+
     def get_request_line_feature(self):
         """
         Extracts all coordinates for the list in GUI.

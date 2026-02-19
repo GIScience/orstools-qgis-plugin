@@ -12,8 +12,10 @@ jobs:
       - uses: chartboost/ruff-action@v1
         with:
           src: ORStools
+          version: "0.14.7"
           args: format --check
       - uses: chartboost/ruff-action@v1
         with:
           src: ORStools
+          version: "0.14.7"
           args: check

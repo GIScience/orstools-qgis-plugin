@@ -35,6 +35,7 @@ from qgis.core import (
     QgsFeature,
     QgsFields,
     QgsGeometry,
+    QgsStyle,
     QgsSymbol,
     QgsSimpleFillSymbolLayer,
     QgsRendererCategory,
@@ -186,18 +187,14 @@ class Isochrones:
         field = layer.fields().indexOf(self.field_dimension_name)
         unique_values = sorted(layer.uniqueValues(field))
 
-        colors = {
-            0: QColor("#2b83ba"),
-            1: QColor("#64abb0"),
-            2: QColor("#9dd3a7"),
-            3: QColor("#c7e9ad"),
-            4: QColor("#edf8b9"),
-            5: QColor("#ffedaa"),
-            6: QColor("#fec980"),
-            7: QColor("#f99e59"),
-            8: QColor("#e85b3a"),
-            9: QColor("#d7191c"),
-        }
+        style = QgsStyle.defaultStyle()
+        color_ramp = style.colorRamp("Spectral")
+        color_ramp.invert()
+
+        n = len(unique_values)
+        max_position = min(0.1 * n, 1.0)
+
+        colors = [color_ramp.color(((i + 1) / n) * max_position) for i in range(n)]
 
         categories = []
 

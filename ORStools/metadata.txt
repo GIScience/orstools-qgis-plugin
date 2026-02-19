@@ -4,31 +4,33 @@ qgisMinimumVersion=3.4.8
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 supportsQt6=True
 
-version=2.0.1
+version=2.1.0
 author=HeiGIT gGmbH
 email=support@smartmobility.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2025/06/01 v2.0.1
+changelog=2025/12/09 v2.1.0
     Added
-    - readded old icons and add new icons for processing algorithms
+    - pre-commit configuration with Ruff linter for code quality enforcement
+    - tooltip hints in processing algorithms
+    - Improve isochrone color ramp with many ranges
+    - Enabled usage of custom endpoints in main application
 
-    2025/05/23 v2.0.0
-    Added
-    - Prepare plugin for Qt6
-    - Keep the selected provider when closing/reopening
-    - Allow endpoint configuration for processing algorithms
-    - Support for Snap endpoint
-    - Make vertex marker on map drag and droppable, add live preview
-    - Test correctness of processing algorithm output
+    Changed
+    - Improve cursor behaviour during digitization
 
     Fixed
-    - Improve error handling with radius error
-    - Rename output names of procs and append date and time
-    - Move comments and link about signup to new link
-    - Improve naming of batch jobs tab
-    - Less than two vertices not accepted with optimization and live preview
+    - Delete annotations when plugin is uninstalled
+    - Reset hand cursor after deactivating line tool
+    - Check API key being set before running tests
+    - Set url slashes correctly with optimization requests in procs
+    - Qt6 incompatibility with QVariant
+    - Switch to QgsBlockingNetworkRequest
+
+    2025/06/01 v2.0.1
+    Added
+    - readded old icons and add new icons for processing algorithms
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki

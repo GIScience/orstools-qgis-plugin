@@ -39,6 +39,29 @@ RELEASING:
 13. Upload the package to https://plugins.qgis.org/plugins/ORStools/ (Manage > Add Version)
 14. Create new release in GitHub with tag version and release title of `vX.X.X`
  -->
+## Unreleased
+### Added
+- Add shortcut to apply route calculation with ctrl+return
+- Add geocoding selection option for gui main application ([#223](https://github.com/GIScience/orstools-qgis-plugin/pull/223))
+
+## [2.1.0] - 2025-12-09
+
+### Added
+- pre-commit configuration with Ruff linter for code quality enforcement
+- tooltip hints in processing algorithms ([#196](https://github.com/GIScience/orstools-qgis-plugin/issues/196))
+- Improve isochrone color ramp with many ranges ([#264](https://github.com/GIScience/orstools-qgis-plugin/issues/264))
+- Enabled usage of custom endpoints in main application
+
+### Changed
+- Improve cursor behaviour during digitization ([#357](https://github.com/GIScience/orstools-qgis-plugin/pull/357))
+
+### Fixed
+- Delete annotations when plugin is uninstalled ([#346](https://github.com/GIScience/orstools-qgis-plugin/issues/346))
+- Reset hand cursor after deactivating line tool ([#342](https://github.com/GIScience/orstools-qgis-plugin/issues/342))
+- Check API key being set before running tests ([#358](https://github.com/GIScience/orstools-qgis-plugin/issues/358))
+- Set url slashes correctly with optimization requests in procs ([#347](https://github.com/GIScience/orstools-qgis-plugin/issues/347))
+- Qt6 incompatibility with QVariant ([#355](https://github.com/GIScience/orstools-qgis-plugin/issues/355))
+- Switch to QgsBlockingNetworkRequest ([#117](https://github.com/GIScience/orstools-qgis-plugin/issues/117))
 
 ## [2.0.1] - 2025-06-01
 ### Added
@@ -308,7 +331,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.1...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.10.0...v2.0.0
 [1.10.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v1.9.0...v1.10.0
