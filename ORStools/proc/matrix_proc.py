@@ -113,7 +113,7 @@ class ORSMatrixAlgo(ORSBaseProcessingAlgorithm):
         ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(PROFILES))[int(parameters[self.IN_PROFILE])]
 
         # TODO: enable once core matrix is available
         # options = self.parseOptions(parameters, context)

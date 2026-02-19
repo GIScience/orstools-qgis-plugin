@@ -161,7 +161,7 @@ class ORSDirectionsPointsLayerAlgo(ORSBaseProcessingAlgorithm):
     ) -> Dict[str, str]:
         ors_client = self.get_client(parameters, context, feedback)
 
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(PROFILES))[int(parameters[self.IN_PROFILE])]
 
         preference = dict(enumerate(PREFERENCES))[parameters[self.IN_PREFERENCE]]
 
