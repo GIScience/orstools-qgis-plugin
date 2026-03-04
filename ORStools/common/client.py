@@ -81,10 +81,12 @@ class Client(QObject):
             "Authorization": provider["key"],
         }
 
+        # Set user agent
         self.settings = QgsSettings()
-        # Read the current value
         self.user_agent = self.settings.value("qgis/networkAndProxy/userAgent")
-        # Set a new value
+        # In case the value was still set by the ORS Tools Plugin, reset to empty string
+        if "ORStools" in self.user_agent:
+            self.user_agent = ""
         self.settings.setValue("qgis/networkAndProxy/userAgent", agent)
 
         # Save some references to retrieve in client instances
@@ -109,6 +111,9 @@ class Client(QObject):
         :rtype: QgsNetworkReplyContent
         :raises: Various ApiError exceptions based on HTTP status codes
         """
+        
+
+
         if post_json is not None:
             result = blocking_request.post(request, json.dumps(post_json).encode())
         else:
@@ -193,14 +198,17 @@ class Client(QObject):
                     )
                 raise
 
+            finally:
+                # Reset to old value
+                self.settings.setValue("qgis/networkAndProxy/userAgent", self.user_agent)
+
+
         # Write env variables if successful
         if self.ENV_VARS:
             for env_var in self.ENV_VARS:
                 header_value = reply.rawHeader(self.ENV_VARS[env_var].encode()).data().decode()
                 configmanager.write_env_var(env_var, header_value)
 
-        # Reset to old value
-        self.settings.setValue("qgis/networkAndProxy/userAgent", self.user_agent)
 
         return json.loads(content)
 
