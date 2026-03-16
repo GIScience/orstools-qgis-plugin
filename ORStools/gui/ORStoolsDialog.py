@@ -100,7 +100,6 @@ from ORStools import (
     __help__,
 )
 from ORStools.common import (
-    PROFILES,
     PREFERENCES,
 )
 from ORStools.utils import maptools, configmanager, transform, gui, exceptions
@@ -118,6 +117,8 @@ def on_config_click(parent):
     """
     config_dlg = ORStoolsDialogConfigMain(parent=parent)
     config_dlg.exec()
+    if type(parent) is ORStoolsDialog:
+        parent.refresh_profiles()
 
 
 def on_help_click() -> None:
@@ -408,7 +409,8 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         os.environ["ORS_REMAINING"] = "None"
 
         # Populate combo boxes
-        self.routing_travel_combo.addItems(PROFILES)
+        self.provider_combo.currentIndexChanged.connect(self.refresh_profiles)
+        self.refresh_profiles()
         self.routing_preference_combo.addItems(PREFERENCES)
 
         # Change OK and Cancel button names
@@ -591,6 +593,13 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
         self.project.annotationManager().addAnnotation(annotation)
         self._reindex_list_items()
         self.geocoded = True
+
+    def refresh_profiles(self) -> None:
+        """Refreshes the profiles in the routing travel combo box when a provider is selected."""
+        self.routing_travel_combo.clear()
+        index = self.provider_combo.currentIndex()
+        provider = configmanager.read_config()["providers"][index]
+        self.routing_travel_combo.addItems(provider["profiles"])
 
     def _save_vertices_to_layer(self) -> None:
         """Saves the vertices list to a temp layer"""
