@@ -6,6 +6,11 @@ on:
   push:
 
 jobs:
+  pyqt6-check:
+    uses: opengisch/qgis-plugin-ci/.github/workflows/pyqt6_test.yml@master
+    with:
+      plugin_path: ORSTools
+
   test_3_16:
     runs-on: ubuntu-latest
     steps:
