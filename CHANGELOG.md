@@ -44,6 +44,12 @@ RELEASING:
 - Add shortcut to apply route calculation with ctrl+return
 - Add geocoding selection option for gui main application ([#223](https://github.com/GIScience/orstools-qgis-plugin/pull/223))
 
+### Changed
+
+### Fixed
+- reset user agent correctly
+
+
 ## [2.1.0] - 2025-12-09
 
 ### Added
