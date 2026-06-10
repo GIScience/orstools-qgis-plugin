@@ -26,7 +26,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Run test LTR
       run: |
-        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:ltr-trixie sh -c 'apt-get -y update && apt-get -y install xvfb && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && export DISPLAY=:0.0 && pip install -U pytest && xvfb-run -a pytest'
+        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:ltr-trixie sh -c 'apt-get -y update && apt-get -y install xvfb && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && export DISPLAY=:0.0 && apt install python3-pytest && xvfb-run -a pytest'
       env:
         DOCKER_IMAGE: ${{ steps.docker-build.outputs.FULL_IMAGE_NAME }}
   test_4_0:
