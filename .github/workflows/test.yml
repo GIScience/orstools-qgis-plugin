@@ -20,13 +20,22 @@ jobs:
         docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:release-3_16 sh -c 'apt-get -y update && apt-get -y install xvfb && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && pip install -U pytest && xvfb-run -a pytest'
       env:
         DOCKER_IMAGE: ${{ steps.docker-build.outputs.FULL_IMAGE_NAME }}
-  test_3_22:
+  test_ltr:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Run test 3.22
+    - name: Run test LTR
       run: |
-        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:release-3_22 sh -c 'apt-get -y update && apt-get -y install xvfb && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && export DISPLAY=:0.0 && pip install -U pytest && xvfb-run -a pytest'
+        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:ltr-trixie sh -c 'apt-get -y update && apt-get -y install xvfb && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && export DISPLAY=:0.0 && pip install -U pytest && xvfb-run -a pytest'
+      env:
+        DOCKER_IMAGE: ${{ steps.docker-build.outputs.FULL_IMAGE_NAME }}
+  test_4.0:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run test 4.0
+      run: |
+        docker run -v ${GITHUB_WORKSPACE}:/src -w /src qgis/qgis:4.0 sh -c 'apt-get -y update && apt-get -y install xvfb && export ORS_API_KEY=${{ secrets.ORS_API_KEY }} && export PYTHONPATH=/usr/share/qgis/python && apt install python3-pytest && xvfb-run -a pytest'
       env:
         DOCKER_IMAGE: ${{ steps.docker-build.outputs.FULL_IMAGE_NAME }}
   test_latest:
