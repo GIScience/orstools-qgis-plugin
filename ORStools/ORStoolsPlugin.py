@@ -34,7 +34,7 @@ import os.path
 
 from .gui import ORStoolsDialog
 from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS
-
+from .utils import read_config
 
 class ORStools:
     """QGIS Plugin Implementation."""
@@ -88,7 +88,7 @@ class ORStools:
 
     def add_default_provider_to_settings(self):
         s = QgsSettings()
-        settings = s.value("ORStools/config")
+        settings = read_config()
 
         settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
 
