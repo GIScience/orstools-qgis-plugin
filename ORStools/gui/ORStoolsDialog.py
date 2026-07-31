@@ -153,6 +153,35 @@ def on_about_click(parent: QWidget) -> None:
     )
 
 
+class DeprecatedUrlDialog(QMessageBox):
+    """Dialog informing the user that the configured URL is deprecated."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setIcon(QMessageBox.Warning)
+        self.setWindowTitle(self.tr("Deprecated URL"))
+
+        self.setText(
+            self.tr(
+                "The configured ORS provider URL is deprecated.\n"
+                "Would you like to reset it to the new default URL?"
+            )
+        )
+
+        self.reset_button = self.addButton(self.tr("Reset URL"), QMessageBox.AcceptRole)
+
+        self.addButton(self.tr("Close"), QMessageBox.RejectRole)
+
+
+def url_dialog_reset_button(parent=None) -> bool:
+    """Shows the deprecated URL dialog and returns bool."""
+
+    url_dlg = DeprecatedUrlDialog(parent)
+    url_dlg.exec()
+    return url_dlg.clickedButton() == url_dlg.reset_button
+
+
 class ORStoolsDialogMain:
     """Defines all mandatory QGIS things about dialog."""
 
@@ -535,7 +564,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
                 encoded = quote(lineEdit.text())
 
-                url = f"https://api.openrouteservice.org/geocode/search?api_key={api_key}&text={encoded}&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
+                url = f"https://api.heigit.org/geocode/search?api_key={api_key}&text={encoded}&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
                 error_code = request.get(QNetworkRequest(QUrl(url)))
                 if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
                     reply = request.reply()
