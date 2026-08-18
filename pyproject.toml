@@ -1,4 +1,11 @@
+[project]
+name = "ORSTools"
+version = "2.1.0"
+
 [tool.ruff]
 exclude = ["*UI.py"]
 
 line-length = 100
+
+[tool.qgis-plugin-ci]
+plugin_path = "ORStools"
