@@ -159,8 +159,8 @@ class DeprecatedUrlDialog(QMessageBox):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setIcon(QMessageBox.Warning)
-        self.setWindowTitle(self.tr("Deprecated URL"))
+        self.setIcon(QMessageBox.Icon.Warning)
+        self.setWindowTitle(self.tr("ORS Tools: Deprecated URL"))
 
         self.setText(
             self.tr(
@@ -169,9 +169,9 @@ class DeprecatedUrlDialog(QMessageBox):
             )
         )
 
-        self.reset_button = self.addButton(self.tr("Reset URL"), QMessageBox.AcceptRole)
+        self.reset_button = self.addButton(self.tr("Reset URL"), QMessageBox.ButtonRole.AcceptRole)
 
-        self.addButton(self.tr("Close"), QMessageBox.RejectRole)
+        self.addButton(self.tr("Close"), QMessageBox.ButtonRole.RejectRole)
 
 
 def url_dialog_reset_button(parent=None) -> bool:
