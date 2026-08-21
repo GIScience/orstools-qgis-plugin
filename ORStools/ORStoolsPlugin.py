@@ -31,7 +31,6 @@ from qgis.gui import QgisInterface
 from qgis.utils import iface
 from qgis.core import QgsApplication, QgsSettings
 from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale, QTimer
-from qgis.PyQt.QtWidgets import QMainWindow
 import os.path
 
 from .gui import ORStoolsDialog
