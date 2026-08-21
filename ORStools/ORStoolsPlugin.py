@@ -83,7 +83,7 @@ class ORStools:
 
         QgsApplication.processingRegistry().addProvider(self.provider)
         self.dialog.initGui()
-        # starts deprecated url dialog after QGIS Main-Window opened
+        # secures that the start of deprecated url dialog happens after QGIS Main-Window opened
         iface.initializationCompleted.connect(self.check_provider_url)
 
     def unload(self) -> None:
@@ -120,7 +120,7 @@ class ORStools:
         return settings["providers"][0]["base_url"] != DEFAULT_SETTINGS["providers"][0]["base_url"]
 
     def reset_provider_url(self):
-        """Reset the first provider URL to the default."""
+        """Reset the first provider URL to the default URL."""
 
         settings = configmanager.read_config()
 
