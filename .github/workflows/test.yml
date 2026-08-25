@@ -7,7 +7,7 @@ on:
 
 jobs:
   pyqt6-check:
-    uses: opengisch/qgis-plugin-ci/.github/workflows/pyqt6_test.yml@master
+    uses: qgis/qgis-plugin-ci/.github/workflows/pyqt6_test.yml@master
     with:
       plugin_path: ORSTools
 
