@@ -41,8 +41,14 @@ RELEASING:
  -->
 ## Unreleased
 ### Added
-- Add shortcut to apply route calculation with ctrl+return
-- Add geocoding selection option for gui main application ([#223](https://github.com/GIScience/orstools-qgis-plugin/pull/223))
+- shortcut to apply route calculation with ctrl+return ([#370](https://github.com/GIScience/orstools-qgis-plugin/pull/370))
+- geocoding selection option for gui main application ([#223](https://github.com/GIScience/orstools-qgis-plugin/pull/223))
+- option to load vertices ([#324](https://github.com/GIScience/orstools-qgis-plugin/pull/324))
+
+### Fixed
+- added compatibility with Qt6
+- point list does not get cleared after request anymore
+
 
 ## [2.1.0] - 2025-12-09
 
