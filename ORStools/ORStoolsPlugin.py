@@ -28,12 +28,14 @@
 """
 
 from qgis.gui import QgisInterface
+from qgis.utils import iface
 from qgis.core import QgsApplication, QgsSettings
-from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
+from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale, QTimer
 import os.path
 
 from .gui import ORStoolsDialog
 from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS
+from .utils import configmanager
 
 
 class ORStools:
@@ -49,6 +51,7 @@ class ORStools:
             application at run time.
         :type iface: QgsInterface
         """
+        self.iface = iface
         self.dialog = ORStoolsDialog.ORStoolsDialogMain(iface)
         self.provider = provider.ORStoolsProvider()
 
@@ -80,6 +83,18 @@ class ORStools:
 
         QgsApplication.processingRegistry().addProvider(self.provider)
         self.dialog.initGui()
+        # secures that the start of deprecated url dialog happens after QGIS Main-Window opened
+        self._wait_for_main_window()
+
+    def _wait_for_main_window(self) -> None:
+        """Wait until the QGIS main window is visible."""
+
+        main_window = iface.mainWindow()
+
+        if main_window is not None and main_window.isVisible():
+            self.check_provider_url()
+        else:
+            QTimer.singleShot(100, self._wait_for_main_window)
 
     def unload(self) -> None:
         """remove menu entry and toolbar icons"""
@@ -88,7 +103,7 @@ class ORStools:
 
     def add_default_provider_to_settings(self):
         s = QgsSettings()
-        settings = s.value("ORStools/config")
+        settings = configmanager.read_config()
 
         settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
 
@@ -105,3 +120,28 @@ class ORStools:
                 s.setValue("ORStools/config", settings)
         else:
             s.setValue("ORStools/config", DEFAULT_SETTINGS)
+
+    def url_is_deprecated(self) -> bool:
+        settings = configmanager.read_config()
+
+        if not settings:
+            return False
+
+        return settings["providers"][0]["base_url"] != DEFAULT_SETTINGS["providers"][0]["base_url"]
+
+    def reset_provider_url(self):
+        """Reset the first provider URL to the default URL."""
+
+        settings = configmanager.read_config()
+
+        if not settings:
+            return
+
+        settings["providers"][0]["base_url"] = DEFAULT_SETTINGS["providers"][0]["base_url"]
+
+        configmanager.write_config(settings)
+
+    def check_provider_url(self):
+        if self.url_is_deprecated():
+            if ORStoolsDialog.url_dialog_reset_button(self.iface.mainWindow()):
+                self.reset_provider_url()
