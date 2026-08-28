@@ -127,7 +127,10 @@ class ORStools:
         if not settings:
             return False
 
-        return settings["providers"][0]["base_url"] != DEFAULT_SETTINGS["providers"][0]["base_url"]
+        return any(
+            provider["base_url"] != DEFAULT_SETTINGS["providers"][0]["base_url"]
+            for provider in settings["providers"]
+        )
 
     def reset_provider_url(self):
         """Reset the first provider URL to the default URL."""
@@ -137,7 +140,11 @@ class ORStools:
         if not settings:
             return
 
-        settings["providers"][0]["base_url"] = DEFAULT_SETTINGS["providers"][0]["base_url"]
+        default_url = DEFAULT_SETTINGS["providers"][0]["base_url"]
+
+        for provider in settings.get("providers", []):
+            if provider.get("base_url") != default_url:
+                provider["base_url"] = default_url
 
         configmanager.write_config(settings)
 
