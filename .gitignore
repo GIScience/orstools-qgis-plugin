@@ -12,3 +12,7 @@ dist/
 tests/qgis
 # tag files
 .tags
+
+docs/.vitepress/dist
+docs/.vitepress/cache
+/node_modules
