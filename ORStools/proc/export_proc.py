@@ -159,6 +159,17 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
             feedback.reportError(msg)
             logger.log(msg)
 
+        sink_line.flushBuffer()
+        if hasattr(sink_line, "finalize"):
+            sink_line.finalize()
+        else:
+            del sink_line
+
+        sink_point.flushBuffer()
+        if hasattr(sink_point, "finalize"):
+            sink_point.finalize()
+        else:
+            del sink_point
         return {self.OUT: dest_id_line, self.OUT_POINT: dest_id_point}
 
     @staticmethod
