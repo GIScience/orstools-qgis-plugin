@@ -50,7 +50,6 @@ class ORStools:
         :type iface: QgsInterface
         """
         self.dialog = ORStoolsDialog.ORStoolsDialogMain(iface)
-        self.provider = provider.ORStoolsProvider()
 
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -75,10 +74,15 @@ class ORStools:
 
         self.add_default_provider_to_settings()
 
+    def initProcessing(self):
+        self.provider = provider.ORStoolsProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
+
     def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        self.initProcessing()
+
         self.dialog.initGui()
 
     def unload(self) -> None:
