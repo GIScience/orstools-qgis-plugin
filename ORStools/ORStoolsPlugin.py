@@ -33,7 +33,8 @@ from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
 
 from .gui import ORStoolsDialog
-from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS
+from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS, PROFILES
+from .utils import configmanager
 
 
 class ORStools:
@@ -51,6 +52,7 @@ class ORStools:
         """
         self.dialog = ORStoolsDialog.ORStoolsDialogMain(iface)
         self.provider = provider.ORStoolsProvider()
+        self.settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints", "profiles"]
 
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -73,7 +75,7 @@ class ORStools:
         except TypeError:
             pass
 
-        self.add_default_provider_to_settings()
+        self.update_settings()
 
     def initGui(self) -> None:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -86,22 +88,21 @@ class ORStools:
         QgsApplication.processingRegistry().removeProvider(self.provider)
         self.dialog.unload()
 
-    def add_default_provider_to_settings(self):
-        s = QgsSettings()
-        settings = s.value("ORStools/config")
+    def update_settings(self):
+        settings = configmanager.read_config()
 
-        settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
+        if settings is not None and settings != {}:
+            endpoints = settings.get("endpoints", ENDPOINTS)
+            profiles = settings.get("profiles", PROFILES)
 
-        # Add any new settings here for backwards compatibility
-        if settings:
             changed = False
             for i, prov in enumerate(settings["providers"]):
-                if any([i not in prov for i in settings_keys]):
+                if any([key not in prov for key in self.settings_keys]):
                     changed = True
-                    # Add here, like the endpoints
-                    prov["endpoints"] = ENDPOINTS
+                    prov["endpoints"] = endpoints
+                    prov["profiles"] = profiles
                     settings["providers"][i] = prov
             if changed:
-                s.setValue("ORStools/config", settings)
+                configmanager.write_config(settings)
         else:
-            s.setValue("ORStools/config", DEFAULT_SETTINGS)
+            configmanager.write_config(DEFAULT_SETTINGS)

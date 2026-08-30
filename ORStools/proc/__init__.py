@@ -27,6 +27,8 @@
  ***************************************************************************/
 """
 
+from ORStools.common import PROFILES
+
 ENDPOINTS = {
     "directions": "directions",
     "isochrones": "isochrones",
@@ -48,6 +50,7 @@ DEFAULT_SETTINGS = {
             "name": "openrouteservice",
             "timeout": 60,
             "endpoints": ENDPOINTS,
+            "profiles": PROFILES,
         }
     ]
 }
