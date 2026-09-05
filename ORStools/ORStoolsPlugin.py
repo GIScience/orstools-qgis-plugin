@@ -142,9 +142,9 @@ class ORStools:
 
         default_url = DEFAULT_SETTINGS["providers"][0]["base_url"]
 
-        for provider in settings.get("providers", []):
-            if provider.get("base_url") != default_url:
-                provider["base_url"] = default_url
+        for provider_config in settings.get("providers", []):
+            if provider_config.get("base_url") != default_url:
+                provider_config["base_url"] = default_url
 
         configmanager.write_config(settings)
 
