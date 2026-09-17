@@ -28,7 +28,6 @@
 """
 
 from qgis.gui import QgisInterface
-from qgis.utils import iface
 from qgis.core import QgsApplication, QgsSettings
 from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
@@ -84,7 +83,7 @@ class ORStools:
         QgsApplication.processingRegistry().addProvider(self.provider)
         self.dialog.initGui()
 
-        #InitializationCompleted only seems to trigger when the qgis version is >= 4.0.3
+        # InitializationCompleted only seems to trigger when the qgis version is >= 4.0.3
         self.iface.initializationCompleted.connect(self.check_provider_url)
 
     def unload(self) -> None:
