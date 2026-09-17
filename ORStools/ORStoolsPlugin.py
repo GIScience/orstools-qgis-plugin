@@ -30,7 +30,7 @@
 from qgis.gui import QgisInterface
 from qgis.utils import iface
 from qgis.core import QgsApplication, QgsSettings
-from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale, QTimer
+from qgis.PyQt.QtCore import QTranslator, qVersion, QCoreApplication, QLocale
 import os.path
 
 from .gui import ORStoolsDialog
@@ -83,18 +83,9 @@ class ORStools:
 
         QgsApplication.processingRegistry().addProvider(self.provider)
         self.dialog.initGui()
-        # secures that the start of deprecated url dialog happens after QGIS Main-Window opened
-        self._wait_for_main_window()
 
-    def _wait_for_main_window(self) -> None:
-        """Wait until the QGIS main window is visible."""
-
-        main_window = iface.mainWindow()
-
-        if main_window is not None and main_window.isVisible():
-            self.check_provider_url()
-        else:
-            QTimer.singleShot(100, self._wait_for_main_window)
+        #InitializationCompleted only seems to trigger when the qgis version is >= 4.0.3
+        self.iface.initializationCompleted.connect(self.check_provider_url)
 
     def unload(self) -> None:
         """remove menu entry and toolbar icons"""
