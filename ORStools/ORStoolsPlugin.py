@@ -50,6 +50,7 @@ class ORStools:
             application at run time.
         :type iface: QgsInterface
         """
+        self.iface = iface
         self.dialog = ORStoolsDialog.ORStoolsDialogMain(iface)
         self.provider = provider.ORStoolsProvider()
 
@@ -82,6 +83,10 @@ class ORStools:
         QgsApplication.processingRegistry().addProvider(self.provider)
         self.dialog.initGui()
 
+        # starts deprecated url dialog after QGIS Main-Window opened
+        # (InitializationCompleted only seems to trigger when the qgis version is >= 4.0.3)
+        self.iface.initializationCompleted.connect(self.check_provider_url)
+
     def unload(self) -> None:
         """remove menu entry and toolbar icons"""
         QgsApplication.processingRegistry().removeProvider(self.provider)
@@ -107,3 +112,35 @@ class ORStools:
                 configmanager.write_config(settings)
         else:
             configmanager.write_config(DEFAULT_SETTINGS)
+
+    def url_is_deprecated(self) -> bool:
+        settings = configmanager.read_config()
+
+        if not settings:
+            return False
+
+        return any(
+            provider["base_url"] != DEFAULT_SETTINGS["providers"][0]["base_url"]
+            for provider in settings["providers"]
+        )
+
+    def reset_provider_url(self):
+        """Reset the first provider URL to the default URL."""
+
+        settings = configmanager.read_config()
+
+        if not settings:
+            return
+
+        default_url = DEFAULT_SETTINGS["providers"][0]["base_url"]
+
+        for provider_config in settings.get("providers", []):
+            if provider_config.get("base_url") != default_url:
+                provider_config["base_url"] = default_url
+
+        configmanager.write_config(settings)
+
+    def check_provider_url(self):
+        if self.url_is_deprecated():
+            if ORStoolsDialog.url_dialog_reset_button(self.iface.mainWindow()):
+                self.reset_provider_url()
