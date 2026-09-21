@@ -34,6 +34,7 @@ import os.path
 
 from .gui import ORStoolsDialog
 from .proc import provider, ENDPOINTS, DEFAULT_SETTINGS
+from .utils import configmanager
 
 
 class ORStools:
@@ -89,6 +90,7 @@ class ORStools:
     def add_default_provider_to_settings(self):
         s = QgsSettings()
         settings = s.value("ORStools/config")
+        settings = configmanager.read_config()
 
         settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
 
@@ -102,6 +104,6 @@ class ORStools:
                     prov["endpoints"] = ENDPOINTS
                     settings["providers"][i] = prov
             if changed:
-                s.setValue("ORStools/config", settings)
+                configmanager.write_config(settings)
         else:
-            s.setValue("ORStools/config", DEFAULT_SETTINGS)
+            configmanager.write_config(DEFAULT_SETTINGS)
