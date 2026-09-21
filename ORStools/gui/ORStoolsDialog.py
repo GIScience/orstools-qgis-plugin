@@ -535,7 +535,7 @@ class ORStoolsDialog(QDialog, MAIN_WIDGET):
 
                 encoded = quote(lineEdit.text())
 
-                url = f"https://api.openrouteservice.org/geocode/search?api_key={api_key}&text={encoded}&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
+                url = f"https://api.heigit.org/pelias/v1/search?api_key={api_key}&text={encoded}&focus.point.lat={middle.y()}&focus.point.lon={middle.x()}"
                 error_code = request.get(QNetworkRequest(QUrl(url)))
                 if error_code == QgsBlockingNetworkRequest.ErrorCode.NoError:
                     reply = request.reply()
