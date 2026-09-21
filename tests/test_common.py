@@ -14,7 +14,7 @@ class TestCommon(unittest.TestCase):
         """Test that client retries on OverQueryLimit and eventually succeeds"""
         provider = {
             "ENV_VARS": None,
-            "base_url": "https://api.openrouteservice.org",
+            "base_url": "https://api.heigit.org",
             "key": self.api_key,
             "name": "openrouteservice",
             "timeout": 60,
