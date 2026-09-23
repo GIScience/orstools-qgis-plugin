@@ -117,7 +117,7 @@ class Client(QObject):
         else:
             result = blocking_request.get(request)
 
-        if result != QgsBlockingNetworkRequest.NoError:
+        if result != QgsBlockingNetworkRequest.ErrorCode.NoError:
             self._check_status(blocking_request.reply())
             return None
 
