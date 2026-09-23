@@ -64,7 +64,7 @@ class LayerMessageBox(QMessageBox):
         self.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
 
         self.layer_combo = QgsMapLayerComboBox(self)
-        self.layer_combo.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.layer_combo.setFilters(QgsMapLayerProxyModel.Filter.PointLayer)
         self.layer_combo.setMinimumWidth(200)
         self.layer_combo.setLayer(iface.activeLayer())
 
