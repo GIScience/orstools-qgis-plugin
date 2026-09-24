@@ -34,7 +34,7 @@ from qgis.core import QgsSettings
 
 def read_config() -> dict:
     """
-    Reads config.yml from file and returns the parsed dict.
+    Reads config and returns the parsed dict.
 
     :returns: Parsed settings dictionary.
     :rtype: dict
