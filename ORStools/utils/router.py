@@ -35,7 +35,10 @@ def route_as_layer(task, provider, profile, optimize, directions):
     layer_out.updateFields()
 
     # if no API key is present, when ORS is selected, throw an error message
-    if not provider["key"] and provider["base_url"].startswith("https://api.openrouteservice.org"):
+    if not provider["key"] and (
+        provider["base_url"].startswith("https://api.openrouteservice.org")
+        or provider["base_url"].startswith("https://api.heigit.org")
+    ):
         raise exceptions.InvalidKey()
 
     agent = "QGIS_ORStoolsDialog"
