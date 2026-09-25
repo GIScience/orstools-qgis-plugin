@@ -88,8 +88,6 @@ class ORStools:
         self.dialog.unload()
 
     def add_default_provider_to_settings(self):
-        s = QgsSettings()
-        settings = s.value("ORStools/config")
         settings = configmanager.read_config()
 
         settings_keys = ["ENV_VARS", "base_url", "key", "name", "endpoints"]
