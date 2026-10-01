@@ -119,10 +119,9 @@ class ORStools:
         if not settings:
             return False
 
-        return any(
-            provider["base_url"] != DEFAULT_SETTINGS["providers"][0]["base_url"]
-            for provider in settings["providers"]
-        )
+        legacy_url = "https://api.openrouteservice.org"
+
+        return any(provider["base_url"] == legacy_url for provider in settings["providers"])
 
     def reset_provider_url(self):
         """Reset the first provider URL to the default URL."""
@@ -133,9 +132,10 @@ class ORStools:
             return
 
         default_url = DEFAULT_SETTINGS["providers"][0]["base_url"]
+        legacy_url = "https://api.openrouteservice.org"
 
         for provider_config in settings.get("providers", []):
-            if provider_config.get("base_url") != default_url:
+            if provider_config.get("base_url") == legacy_url:
                 provider_config["base_url"] = default_url
 
         configmanager.write_config(settings)

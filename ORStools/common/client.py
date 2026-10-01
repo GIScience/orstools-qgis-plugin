@@ -157,7 +157,7 @@ class Client(QObject):
         authed_url = self._generate_auth_url(url, params)
 
         if self.base_url == "https://api.heigit.org":
-                    authed_url = "/openrouteservice" + authed_url
+            authed_url = "/openrouteservice" + authed_url
 
         self.url = self.base_url + authed_url
 
