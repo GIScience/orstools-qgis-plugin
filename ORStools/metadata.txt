@@ -4,33 +4,32 @@ qgisMinimumVersion=3.4.8
 qgisMaximumVersion=4.99
 description=openrouteservice routing, isochrones and matrix calculations for QGIS
 
-version=2.1.0
+version=2.2.0
 author=HeiGIT gGmbH
 email=support@smartmobility.heigit.org
 
 about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2025/12/09 v2.1.0
+changelog=2026/10/02 v2.2.0
+
+    Added
+    - shortcut to apply route calculation with ctrl+return
+    - geocoding selection option for gui main application
+    - option to load vertices
+    - Qt6-compatibility
+    - QGIS 4 compatibility
+
+    Fixed
+    - point list does not get cleared after request anymore
+    - reset user agent correctly
+
+    2025/12/09 v2.1.0
     Added
     - pre-commit configuration with Ruff linter for code quality enforcement
     - tooltip hints in processing algorithms
     - Improve isochrone color ramp with many ranges
     - Enabled usage of custom endpoints in main application
 
-    Changed
-    - Improve cursor behaviour during digitization
-
-    Fixed
-    - Delete annotations when plugin is uninstalled
-    - Reset hand cursor after deactivating line tool
-    - Check API key being set before running tests
-    - Set url slashes correctly with optimization requests in procs
-    - Qt6 incompatibility with QVariant
-    - Switch to QgsBlockingNetworkRequest
-
-    2025/06/01 v2.0.1
-    Added
-    - readded old icons and add new icons for processing algorithms
 
     Complete changelog of all versions: https://github.com/GIScience/orstools-qgis-plugin/blob/main/CHANGELOG.md
     Wiki: https://github.com/GIScience/orstools-qgis-plugin/wiki
