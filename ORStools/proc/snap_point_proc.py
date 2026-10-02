@@ -90,7 +90,7 @@ class ORSSnapPointAlgo(ORSBaseProcessingAlgorithm):
         ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(PROFILES))[int(parameters[self.IN_PROFILE])]
 
         # Get parameter values
         point = self.parameterAsPoint(parameters, self.IN_POINT, context, self.crs_out)

@@ -38,6 +38,9 @@ from .export_proc import ORSExportAlgo
 from .isochrones_layer_proc import ORSIsochronesLayerAlgo
 from .isochrones_point_proc import ORSIsochronesPointAlgo
 from .matrix_proc import ORSMatrixAlgo
+from .provider_add_conf import ORSProviderAddAlgo
+from .provider_rm_conf import ORSProviderRmAlgo
+from .provider_get_confid_by_name import ORSProviderGetConfIdAlgo
 from ORStools.utils.gui import GuiUtils
 
 from .snap_layer_proc import ORSSnapLayerAlgo
@@ -70,6 +73,9 @@ class ORStoolsProvider(QgsProcessingProvider):
         self.addAlgorithm(ORSExportAlgo())
         self.addAlgorithm(ORSSnapLayerAlgo())
         self.addAlgorithm(ORSSnapPointAlgo())
+        self.addAlgorithm(ORSProviderAddAlgo())
+        self.addAlgorithm(ORSProviderRmAlgo())
+        self.addAlgorithm(ORSProviderGetConfIdAlgo())
 
     @staticmethod
     def icon():

@@ -83,7 +83,7 @@ class ORSExportAlgo(ORSBaseProcessingAlgorithm):
         ors_client = self.get_client(parameters, context, feedback)
 
         # Get profile value
-        profile = dict(enumerate(PROFILES))[parameters[self.IN_PROFILE]]
+        profile = dict(enumerate(PROFILES))[int(parameters[self.IN_PROFILE])]
 
         target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
         rect = self.parameterAsExtent(parameters, self.IN_EXPORT, context, crs=target_crs)
