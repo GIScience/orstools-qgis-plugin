@@ -155,6 +155,17 @@ class Client(QObject):
         first_request_time = datetime.now()
 
         authed_url = self._generate_auth_url(url, params)
+
+        if self.base_url == "https://api.heigit.org":
+<<<<<<< ours
+            if url.startswith("/optimization"):
+                authed_url = "/vroom/v0" + authed_url[len("/optimization") :]
+            else:
+                authed_url = "/openrouteservice" + authed_url
+=======
+            authed_url = "/openrouteservice" + authed_url
+>>>>>>> theirs
+
         self.url = self.base_url + authed_url
 
         request = QNetworkRequest(QUrl(self.url))

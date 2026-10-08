@@ -43,7 +43,7 @@ DEFAULT_SETTINGS = {
                 "ORS_QUOTA": "X-Ratelimit-Limit",
                 "ORS_REMAINING": "X-Ratelimit-Remaining",
             },
-            "base_url": "https://api.openrouteservice.org",
+            "base_url": "https://api.heigit.org",
             "key": "",
             "name": "openrouteservice",
             "timeout": 60,
