@@ -41,8 +41,9 @@ class DeprecatedUrlDialog(QMessageBox):
 
         self.setText(
             self.tr(
-                "The configured ORS provider URL is deprecated.\n"
-                "Would you like to reset it to the new default URL?"
+                "<b>ORSTools Plugin:</b> <br /><br />"
+                "The configured ORS provider URL <tt>https://api.openrouteservice.org</tt> is <a href='https://ask.openrouteservice.org/t/deprecating-api-openrouteservice-org-in-favour-of-api-heigit-org/7912'>deprecated</a>.<br />"
+                "Would you like to reset it to the new default URL <tt>https://api.heigit.org</tt>?"
             )
         )
 
