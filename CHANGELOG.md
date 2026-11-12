@@ -41,6 +41,8 @@ RELEASING:
  -->
 ## Unreleased
 
+## [2.3.0] - 2026-11-12
+
 ### Added
 - warning and fix if deprecated URL is detected ([#389](https://github.com/GIScience/orstools-qgis-plugin/pull/388))
 
@@ -348,7 +350,8 @@ RELEASING:
 - first working version of ORS Tools, after replacing OSM Tools plugin
 
 
-[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.2.0...HEAD
+[unreleased]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/GIScience/orstools-qgis-plugin/compare/v2.0.0...v2.0.1
