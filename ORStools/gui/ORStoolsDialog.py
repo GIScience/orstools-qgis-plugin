@@ -39,6 +39,7 @@ from qgis.PyQt.QtWidgets import QCheckBox
 
 from ..utils.router import route_as_layer, get_routing_parameters
 from ORStools.gui import directions_gui
+from ..utils.deprecation import check_provider_url
 
 try:
     import processing
@@ -151,36 +152,6 @@ def on_about_click(parent: QWidget) -> None:
     QMessageBox.information(
         parent, QCoreApplication.translate("@default", "About {}").format(PLUGIN_NAME), info
     )
-
-
-class DeprecatedUrlDialog(QMessageBox):
-    """Dialog informing the user that the configured URL is deprecated."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.setIcon(QMessageBox.Icon.Warning)
-        self.setWindowTitle(self.tr("ORS Tools: Deprecated URL"))
-
-        self.setText(
-            self.tr(
-                "The configured ORS provider URL is deprecated.\n"
-                "Would you like to reset it to the new default URL?"
-            )
-        )
-
-        self.reset_button = self.addButton(self.tr("Reset URL"), QMessageBox.ButtonRole.AcceptRole)
-
-        self.addButton(self.tr("Close"), QMessageBox.ButtonRole.RejectRole)
-
-
-def url_dialog_reset_button(parent=None) -> bool:
-    """Shows the deprecated URL dialog and returns bool."""
-
-    url_dlg = DeprecatedUrlDialog(parent)
-    url_dlg.exec()
-    return url_dlg.clickedButton() == url_dlg.reset_button
-
 
 class ORStoolsDialogMain:
     """Defines all mandatory QGIS things about dialog."""
@@ -301,6 +272,7 @@ class ORStoolsDialogMain:
         for provider in providers:
             self.dlg.provider_combo.addItem(provider["name"], provider)
 
+        check_provider_url()
         self.dlg.show()
 
     def handle_task_exception(self, exception: Exception) -> None:
