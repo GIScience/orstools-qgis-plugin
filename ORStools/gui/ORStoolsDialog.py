@@ -153,6 +153,7 @@ def on_about_click(parent: QWidget) -> None:
         parent, QCoreApplication.translate("@default", "About {}").format(PLUGIN_NAME), info
     )
 
+
 class ORStoolsDialogMain:
     """Defines all mandatory QGIS things about dialog."""
 
