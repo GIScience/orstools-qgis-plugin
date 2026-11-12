@@ -26,9 +26,11 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from . import configmanager
 from qgis.PyQt.QtWidgets import QMessageBox
 from ..proc import ENDPOINTS, DEFAULT_SETTINGS
+
 
 class DeprecatedUrlDialog(QMessageBox):
     """Dialog informing the user that the configured URL is deprecated."""
@@ -59,6 +61,7 @@ def url_dialog_reset_button(parent=None) -> bool:
     url_dlg.exec()
     return url_dlg.clickedButton() == url_dlg.reset_button
 
+
 def add_default_provider_to_settings():
     settings = configmanager.read_config()
 
@@ -78,6 +81,7 @@ def add_default_provider_to_settings():
     else:
         configmanager.write_config(DEFAULT_SETTINGS)
 
+
 def url_is_deprecated() -> bool:
     settings = configmanager.read_config()
 
@@ -87,6 +91,7 @@ def url_is_deprecated() -> bool:
     legacy_url = "https://api.openrouteservice.org"
 
     return any(legacy_url in provider["base_url"] for provider in settings["providers"])
+
 
 def reset_provider_url():
     """Reset the first provider URL to the default URL."""
@@ -104,6 +109,7 @@ def reset_provider_url():
             provider_config["base_url"] = default_url
 
     configmanager.write_config(settings)
+
 
 def check_provider_url(parent=None):
     if url_is_deprecated():
