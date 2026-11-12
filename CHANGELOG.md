@@ -41,6 +41,12 @@ RELEASING:
  -->
 ## Unreleased
 
+### Added
+- warning and fix if deprecated URL is detected ([#389](https://github.com/GIScience/orstools-qgis-plugin/pull/388))
+
+### Changed
+- default base URL to api.heigit.org ([#388](https://github.com/GIScience/orstools-qgis-plugin/pull/388))
+
 ## [2.2.0] - 2026-10-02
 
 ### Added
