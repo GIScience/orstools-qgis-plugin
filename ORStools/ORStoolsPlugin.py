@@ -50,7 +50,6 @@ class ORStools:
             application at run time.
         :type iface: QgsInterface
         """
-        self.iface = iface
         self.dialog = ORStoolsDialog.ORStoolsDialogMain(iface)
         self.provider = provider.ORStoolsProvider()
 
