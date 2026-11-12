@@ -51,6 +51,7 @@ from ORStools.utils import configmanager
 from ..common import client, PROFILES, AVOID_BORDERS, AVOID_FEATURES, ADVANCED_PARAMETERS
 from ..utils.processing import read_help_file
 from ..gui.directions_gui import _get_avoid_polygons
+from ..utils.deprecation import check_provider_url
 
 
 # noinspection PyPep8Naming
@@ -78,6 +79,7 @@ class ORSBaseProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Returns instance of any child class
         """
+        check_provider_url()
         return self.__class__()
 
     def group(self) -> str:
